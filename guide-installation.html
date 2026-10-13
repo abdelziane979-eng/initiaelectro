@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Guide d'installation - InitiaElectro & ElectroPremium</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0' stop-color='%230369a1'/><stop offset='1' stop-color='%23a855f7'/></linearGradient></defs><rect width='512' height='512' rx='112' fill='url(%23g)'/><circle cx='220' cy='256' r='60' fill='%23ff3333' stroke='%23fff' stroke-width='12'/><circle cx='200' cy='236' r='14' fill='rgba(255,255,255,0.85)'/><rect x='300' y='238' width='140' height='36' rx='18' fill='%23D4A76A' stroke='%23fff' stroke-width='8'/></svg>">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: #f5f5f5;
+         color: #1a1f2e; line-height: 1.6; padding: 0; }
+  
+  /* EN-TETE */
+  header { background: linear-gradient(135deg, #0369a1, #6b21a8); color: white;
+           padding: 40px 20px; text-align: center;
+           box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
+  header h1 { font-size: 2em; margin-bottom: 8px; }
+  header .sous-titre { font-size: 1.1em; opacity: 0.95; }
+  header .auteur { font-size: 0.9em; margin-top: 16px; opacity: 0.9; font-style: italic; }
+  
+  /* CONTENEUR */
+  .conteneur { max-width: 900px; margin: 0 auto; padding: 32px 20px; }
+  
+  /* SOMMAIRE */
+  .sommaire { background: white; padding: 24px; border-radius: 12px;
+              box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin-bottom: 32px;
+              border-left: 4px solid #0369a1; }
+  .sommaire h2 { color: #0369a1; margin-bottom: 16px; font-size: 1.3em; }
+  .sommaire ol { padding-left: 24px; }
+  .sommaire li { padding: 6px 0; }
+  .sommaire a { color: #0369a1; text-decoration: none; font-weight: 500; }
+  .sommaire a:hover { text-decoration: underline; }
+  
+  /* SECTIONS */
+  section { background: white; padding: 28px; border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin-bottom: 24px; }
+  section h2 { color: #0369a1; font-size: 1.6em; margin-bottom: 16px;
+               padding-bottom: 12px; border-bottom: 3px solid #e0e0e0; }
+  section h3 { color: #6b21a8; font-size: 1.2em; margin: 20px 0 10px 0; }
+  section p { margin-bottom: 12px; }
+  section ul, section ol { padding-left: 24px; margin-bottom: 16px; }
+  section li { padding: 4px 0; }
+  
+  /* ETAPES */
+  .etapes { background: #f8f9fa; padding: 20px; border-radius: 8px;
+            border-left: 4px solid #6b21a8; margin: 16px 0; }
+  .etapes h4 { color: #6b21a8; margin-bottom: 12px; font-size: 1em; }
+  .etapes ol { padding-left: 24px; }
+  .etapes li { padding: 6px 0; }
+  
+  /* CAPTURES */
+  .capture { background: #f0f0f0; border: 2px dashed #999;
+             padding: 30px; text-align: center; border-radius: 8px;
+             margin: 16px 0; color: #666; font-style: italic; }
+  .capture::before { content: '📸 [Capture d\'écran à insérer ici]';
+                     font-size: 1em; }
+  
+  /* ASTUCES */
+  .astuce { background: #fff8e1; border-left: 4px solid #fbbf24;
+            padding: 14px 16px; border-radius: 6px; margin: 16px 0; }
+  .astuce strong { color: #b45309; }
+  
+  .attention { background: #fee2e2; border-left: 4px solid #ef4444;
+               padding: 14px 16px; border-radius: 6px; margin: 16px 0; }
+  .attention strong { color: #991b1b; }
+  
+  .info { background: #dbeafe; border-left: 4px solid #3b82f6;
+          padding: 14px 16px; border-radius: 6px; margin: 16px 0; }
+  .info strong { color: #1e40af; }
+  
+  /* TABLEAUX */
+  table { width: 100%; border-collapse: collapse; margin: 16px 0;
+          background: white; border-radius: 8px; overflow: hidden;
+          box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+  th { background: #0369a1; color: white; padding: 12px; text-align: left;
+       font-size: 0.95em; }
+  td { padding: 10px 12px; border-bottom: 1px solid #e0e0e0; font-size: 0.9em; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: #f8f9fa; }
+  
+  /* BOUTONS */
+  .btn { display: inline-block; padding: 10px 20px; background: #0369a1;
+         color: white; text-decoration: none; border-radius: 8px;
+         font-weight: bold; margin: 8px 4px; transition: all 0.2s;
+         box-shadow: 0 2px 6px rgba(3,105,161,0.3); }
+  .btn:hover { background: #0284c7; transform: translateY(-2px);
+               box-shadow: 0 4px 10px rgba(3,105,161,0.4); }
+  .btn-violet { background: #6b21a8; box-shadow: 0 2px 6px rgba(107,33,168,0.3); }
+  .btn-violet:hover { background: #7c3aed; }
+  
+  /* PIED DE PAGE */
+  footer { background: #1a1f2e; color: #94a3b8; padding: 24px;
+           text-align: center; margin-top: 40px; font-size: 0.9em; }
+  footer .version { font-size: 0.85em; margin-top: 8px; opacity: 0.7; }
+  
+  /* LIEN VERS L'APPLI */
+  .lien-appli { display: block; background: linear-gradient(135deg, #0369a1, #6b21a8);
+                color: white; padding: 20px; border-radius: 12px;
+                text-align: center; text-decoration: none;
+                font-weight: bold; font-size: 1.1em; margin: 20px 0;
+                box-shadow: 0 4px 12px rgba(3,105,161,0.3); }
+  .lien-appli:hover { transform: translateY(-3px);
+                      box-shadow: 0 8px 20px rgba(3,105,161,0.4); }
+  .lien-appli small { display: block; font-size: 0.75em; margin-top: 4px;
+                      opacity: 0.9; font-weight: normal; }
+  
+  /* RESPONSIVE */
+  @media (max-width: 600px) {
+    header h1 { font-size: 1.4em; }
+    section { padding: 20px; }
+    .conteneur { padding: 16px; }
+  }
+  
+  /* IMPRESSION */
+  @media print {
+    body { background: white; }
+    header { box-shadow: none; }
+    section { box-shadow: none; border: 1px solid #ddd; page-break-inside: avoid; }
+    .capture { border: 1px solid #999; background: white; }
+    .lien-appli { box-shadow: none; }
+    .no-print { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>📖 Guide d'installation</h1>
+  <div class="sous-titre">InitiaElectro & ElectroPremium</div>
+  <div class="auteur">Développé par M. Ziane</div>
+</header>
+
+<div class="conteneur">
+
+  <!-- SOMMAIRE -->
+  <div class="sommaire">
+    <h2>📋 Sommaire</h2>
+    <ol>
+      <li><a href="#presentation">Présentation de l'application</a></li>
+      <li><a href="#prerequis">Prérequis</a></li>
+      <li><a href="#methode1">Méthode 1 : Utiliser en ligne (sans installation)</a></li>
+      <li><a href="#methode2">Méthode 2 : Installer sur PC Windows</a></li>
+      <li><a href="#methode3">Méthode 3 : Installer sur tablette Android</a></li>
+      <li><a href="#methode4">Méthode 4 : Installer sur iPad / iPhone</a></li>
+      <li><a href="#verification">Vérifier l'installation</a></li>
+      <li><a href="#desinstallation">Désinstallation</a></li>
+      <li><a href="#depannage">Dépannage</a></li>
+      <li><a href="#technique">Informations techniques</a></li>
+    </ol>
+  </div>
+
+  <!-- 1. PRESENTATION -->
+  <section id="presentation">
+    <h2>1. 📱 Présentation de l'application</h2>
+    <p><strong>InitiaElectro</strong> et <strong>ElectroPremium</strong> sont deux applications éducatives qui permettent d'apprendre l'électronique en s'amusant.</p>
+    
+    <h3>🎯 Deux applications complémentaires</h3>
+    <table>
+      <tr>
+        <th>Application</th>
+        <th>Public</th>
+        <th>Contenu</th>
+      </tr>
+      <tr>
+        <td><strong>🛠️ InitiaElectro</strong></td>
+        <td>Écoliers, collégiens</td>
+        <td>4 projets guidés + quiz interactifs</td>
+      </tr>
+      <tr>
+        <td><strong>🧪 ElectroPremium</strong></td>
+        <td>Curieux, bricoleurs</td>
+        <td>Bac à sable libre avec 11 composants</td>
+      </tr>
+    </table>
+
+    <div class="info">
+      <strong>💡 Bon à savoir :</strong> Les deux applications fonctionnent <strong>hors ligne</strong> après installation. Pas besoin d'internet pour les utiliser !
+    </div>
+
+    <h3>🚀 Accès direct</h3>
+    <a href="https://abdelziane979-eng.github.io/initiaelectro/" class="lien-appli no-print" target="_blank">
+      🌐 Ouvrir InitiaElectro
+      <small>https://abdelziane979-eng.github.io/initiaelectro/</small>
+    </a>
+    <a href="https://abdelziane979-eng.github.io/initiaelectro/bac_a_sable.html" class="lien-appli no-print" target="_blank">
+      🧪 Ouvrir ElectroPremium
+      <small>https://abdelziane979-eng.github.io/initiaelectro/bac_a_sable.html</small>
+    </a>
+  </section>
+
+  <!-- 2. PREREQUIS -->
+  <section id="prerequis">
+    <h2>2. ✅ Prérequis</h2>
+    <p>Avant d'installer l'application, vérifiez que vous disposez de :</p>
+
+    <table>
+      <tr>
+        <th>Élément</th>
+        <th>Minimum requis</th>
+      </tr>
+      <tr>
+        <td>Navigateur</td>
+        <td>Chrome, Edge, Firefox ou Safari (version récente)</td>
+      </tr>
+      <tr>
+        <td>Système</td>
+        <td>Windows 10/11, Android 7+, iOS 12+, macOS 10.13+</td>
+      </tr>
+      <tr>
+        <td>Connexion Internet</td>
+        <td>Uniquement pour l'installation (pas après)</td>
+      </tr>
+      <tr>
+        <td>Espace disque</td>
+        <td>~10 Mo</td>
+      </tr>
+    </table>
+
+    <div class="attention">
+      <strong>⚠️ Attention :</strong> Sur PC, utilisez <strong>Chrome</strong> ou <strong>Edge</strong> pour l'installation automatique. <strong>Firefox PC</strong> ne propose pas toujours l'installation, mais l'appli reste utilisable en ligne.
+    </div>
+  </section>
+
+  <!-- 3. METHODE 1 -->
+  <section id="methode1">
+    <h2>3. 🌐 Méthode 1 : Utiliser en ligne (sans installation)</h2>
+    <p>La méthode la plus simple : ouvrez simplement le lien dans votre navigateur.</p>
+
+    <div class="etapes">
+      <h4>📋 Étapes</h4>
+      <ol>
+        <li>Ouvrez votre navigateur (Chrome, Edge, Firefox, Safari...)</li>
+        <li>Dans la barre d'adresse, tapez :<br>
+          <code style="background:#e0e0e0;padding:4px 8px;border-radius:4px;">https://abdelziane979-eng.github.io/initiaelectro/</code>
+        </li>
+        <li>Appuyez sur <strong>Entrée</strong></li>
+        <li>L'application InitiaElectro s'affiche !</li>
+        <li>Pour le bac à sable, cliquez sur la carte <strong>"🧪 Bac à sable"</strong></li>
+      </ol>
+    </div>
+
+    <div class="capture"></div>
+
+    <div class="astuce">
+      <strong>💡 Astuce :</strong> Ajoutez cette page à vos <strong>favoris</strong> pour y accéder rapidement la prochaine fois.
+    </div>
+
+    <div class="info">
+      <strong>✅ Avantages :</strong> Aucune installation, fonctionne partout.<br>
+      <strong>❌ Inconvénients :</strong> Nécessite une connexion Internet.
+    </div>
+  </section>
+
+  <!-- 4. METHODE 2 -->
+  <section id="methode2">
+    <h2>4. 💻 Méthode 2 : Installer sur PC Windows (Chrome ou Edge)</h2>
+    <p>Installez l'application comme un vrai logiciel, accessible depuis votre bureau.</p>
+
+    <div class="attention">
+      <strong>⚠️ Important :</strong> Utilisez <strong>Chrome</strong> ou <strong>Edge</strong>. L'installation automatique ne fonctionne pas toujours sur Firefox PC.
+    </div>
+
+    <div class="etapes">
+      <h4>📋 Étapes</h4>
+      <ol>
+        <li>Ouvrez <strong>Chrome</strong> ou <strong>Edge</strong></li>
+        <li>Allez sur :<br>
+          <code style="background:#e0e0e0;padding:4px 8px;border-radius:4px;">https://abdelziane979-eng.github.io/initiaelectro/</code>
+        </li>
+        <li>Attendez <strong>5 à 10 secondes</strong></li>
+        <li>Dans la <strong>barre d'adresse</strong>, cherchez une <strong>icône ⊕</strong> (cercle avec un +) ou <strong>📲</strong> (écran) à droite</li>
+        <li>Cliquez sur cette icône</li>
+        <li>Une fenêtre s'ouvre : cliquez sur <strong>"Installer"</strong></li>
+        <li>L'application s'ajoute à votre menu Démarrer et à votre bureau</li>
+      </ol>
+    </div>
+
+    <div class="capture"></div>
+
+    <div class="astuce">
+      <strong>💡 Astuce :</strong> Si l'icône ⊕ n'apparaît pas, <strong>fermez</strong> puis <strong>rouvrez</strong> Chrome/Edge, puis rechargez la page.
+    </div>
+
+    <div class="info">
+      <strong>✅ Résultat :</strong> Une icône "InitiaElectro" apparaît dans votre <strong>menu Démarrer</strong> et sur votre <strong>bureau</strong>.
+    </div>
+
+    <h3>🧪 Installer aussi ElectroPremium</h3>
+    <p>Répétez les mêmes étapes avec l'URL :</p>
+    <code style="background:#e0e0e0;padding:4px 8px;border-radius:4px;display:inline-block;">https://abdelziane979-eng.github.io/initiaelectro/bac_a_sable.html</code>
+  </section>
+
+  <!-- 5. METHODE 3 -->
+  <section id="methode3">
+    <h2>5. 📱 Méthode 3 : Installer sur tablette Android</h2>
+    <p>Sur Android, l'application s'installe facilement depuis Chrome.</p>
+
+    <div class="etapes">
+      <h4>📋 Étapes</h4>
+      <ol>
+        <li>Ouvrez <strong>Chrome</strong> sur votre tablette Android</li>
+        <li>Allez sur :<br>
+          <code style="background:#e0e0e0;padding:4px 8px;border-radius:4px;">https://abdelziane979-eng.github.io/initiaelectro/</code>
+        </li>
+        <li>Appuyez sur le menu <strong>⋮</strong> (3 points en haut à droite)</li>
+        <li>Choisissez <strong>"Installer l'application"</strong> ou <strong>"Ajouter à l'écran d'accueil"</strong></li>
+        <li>Confirmez en appuyant sur <strong>"Installer"</strong></li>
+        <li>L'icône apparaît sur votre <strong>écran d'accueil</strong> !</li>
+      </ol>
+    </div>
+
+    <div class="capture"></div>
+
+    <div class="astuce">
+      <strong>💡 Astuce :</strong> Sur tablette, l'appli s'ouvre en <strong>plein écran</strong> comme une vraie application.
+    </div>
+  </section>
+
+  <!-- 6. METHODE 4 -->
+  <section id="methode4">
+    <h2>6. 🍎 Méthode 4 : Installer sur iPad / iPhone</h2>
+    <p>Sur iPhone/iPad, utilisez <strong>Safari</strong> pour installer l'application.</p>
+
+    <div class="attention">
+      <strong>⚠️ Important :</strong> Utilisez <strong>Safari</strong> (pas Chrome), sinon l'installation ne fonctionnera pas.
+    </div>
+
+    <div class="etapes">
+      <h4>📋 Étapes</h4>
+      <ol>
+        <li>Ouvrez <strong>Safari</strong> sur votre iPhone/iPad</li>
+        <li>Allez sur :<br>
+          <code style="background:#e0e0e0;padding:4px 8px;border-radius:4px;">https://abdelziane979-eng.github.io/initiaelectro/</code>
+        </li>
+        <li>Appuyez sur l'icône <strong>Partager</strong> (carré avec flèche vers le haut)</li>
+        <li>Faites défiler et choisissez <strong>"Sur l'écran d'accueil"</strong></li>
+        <li>Donnez un nom (ex: "InitiaElectro")</li>
+        <li>Appuyez sur <strong>"Ajouter"</strong></li>
+        <li>L'icône apparaît sur votre <strong>écran d'accueil</strong> !</li>
+      </ol>
+    </div>
+
+    <div class="capture"></div>
+  </section>
+
+  <!-- 7. VERIFICATION -->
+  <section id="verification">
+    <h2>7. ✅ Vérifier l'installation</h2>
+    <p>Comment savoir que l'application est bien installée :</p>
+
+    <table>
+      <tr>
+        <th>Élément</th>
+        <th>Signe que c'est bon</th>
+      </tr>
+      <tr>
+        <td>Icône</td>
+        <td>Vous voyez un cercle bleu/violet avec une LED rouge</td>
+      </tr>
+      <tr>
+        <td>Nom</td>
+        <td>"InitiaElectro" ou "ElectroPremium"</td>
+      </tr>
+      <tr>
+        <td>Ouverture</td>
+        <td>L'appli s'ouvre en <strong>plein écran</strong> (sans barre d'adresse)</td>
+      </tr>
+      <tr>
+        <td>Hors ligne</td>
+        <td>Déconnectez Internet : l'appli fonctionne toujours</td>
+      </tr>
+    </table>
+
+    <div class="info">
+      <strong>🎉 Test final :</strong> Coupez votre WiFi, ouvrez l'appli. Si tout fonctionne, c'est gagné !
+    </div>
+  </section>
+
+  <!-- 8. DESINSTALLATION -->
+  <section id="desinstallation">
+    <h2>8. 🗑️ Désinstallation</h2>
+    <p>Pour retirer l'application :</p>
+
+    <h3>🖥️ Sur PC Windows</h3>
+    <ol>
+      <li>Menu <strong>Démarrer</strong> → cherchez "InitiaElectro"</li>
+      <li><strong>Clic droit</strong> → <strong>"Désinstaller"</strong></li>
+      <li>Confirmez</li>
+    </ol>
+
+    <h3>📱 Sur Android</h3>
+    <ol>
+      <li>Appui long sur l'icône</li>
+      <li>Faites glisser vers <strong>"Désinstaller"</strong> ou choisissez <strong>"Supprimer"</strong></li>
+    </ol>
+
+    <h3>🍎 Sur iPhone / iPad</h3>
+    <ol>
+      <li>Appui long sur l'icône</li>
+      <li>Choisissez <strong>"Supprimer l'app"</strong></li>
+    </ol>
+  </section>
+
+  <!-- 9. DEPANNAGE -->
+  <section id="depannage">
+    <h2>9. 🔧 Dépannage</h2>
+
+    <h3>❌ L'icône ⊕ n'apparaît pas dans la barre d'adresse</h3>
+    <ul>
+      <li>Vérifiez que vous utilisez <strong>Chrome</strong> ou <strong>Edge</strong> (pas Firefox PC)</li>
+      <li>Rechargez la page avec <strong>Ctrl + F5</strong></li>
+      <li>Fermez et rouvrez le navigateur</li>
+      <li>Attendez 10 à 15 secondes après le chargement</li>
+    </ul>
+
+    <h3>❌ L'installation échoue</h3>
+    <ul>
+      <li>Vérifiez votre connexion Internet</li>
+      <li>Essayez avec un autre navigateur (Chrome ou Edge)</li>
+      <li>Redémarrez votre appareil</li>
+    </ul>
+
+    <h3>❌ L'appli ne fonctionne pas hors ligne</h3>
+    <ul>
+      <li>Ouvrez l'appli <strong>une fois en ligne</strong> pour que les fichiers soient mis en cache</li>
+      <li>Attendez 30 secondes</li>
+      <li>Fermez et rouvrez l'appli</li>
+    </ul>
+
+    <h3>❌ Les projets ne se lancent pas</h3>
+    <ul>
+      <li>Vérifiez que vous avez bien cliqué sur une carte de projet</li>
+      <li>Rechargez la page avec <strong>Ctrl + F5</strong></li>
+      <li>Testez avec un autre navigateur</li>
+    </ul>
+
+    <div class="astuce">
+      <strong>💡 Astuce :</strong> En cas de problème, <strong>désinstallez</strong> puis <strong>réinstallez</strong> l'application.
+    </div>
+  </section>
+
+  <!-- 10. TECHNIQUE -->
+  <section id="technique">
+    <h2>10. 🔧 Informations techniques</h2>
+
+    <table>
+      <tr>
+        <th>Élément</th>
+        <th>Valeur</th>
+      </tr>
+      <tr>
+        <td>URL principale (InitiaElectro)</td>
+        <td><code>https://abdelziane979-eng.github.io/initiaelectro/</code></td>
+      </tr>
+      <tr>
+        <td>URL bac à sable (ElectroPremium)</td>
+        <td><code>https://abdelziane979-eng.github.io/initiaelectro/bac_a_sable.html</code></td>
+      </tr>
+      <tr>
+        <td>Technologie</td>
+        <td>HTML5 / CSS3 / JavaScript (Canvas 2D)</td>
+      </tr>
+      <tr>
+        <td>Hébergement</td>
+        <td>GitHub Pages (gratuit, HTTPS)</td>
+      </tr>
+      <tr>
+        <td>Type</td>
+        <td>Progressive Web App (PWA) installable</td>
+      </tr>
+      <tr>
+        <td>Auteur</td>
+        <td>M. Ziane</td>
+      </tr>
+      <tr>
+        <td>Version</td>
+        <td>1.0 (Octobre 2026)</td>
+      </tr>
+      <tr>
+        <td>Licence</td>
+        <td>Usage pédagogique</td>
+      </tr>
+    </table>
+
+    <h3>📞 Contact</h3>
+    <p>Pour toute question ou suggestion, contactez <strong>M. Ziane</strong>.</p>
+
+    <h3>🔄 Mise à jour</h3>
+    <p>Pour bénéficier des dernières fonctionnalités :</p>
+    <ol>
+      <li>Désinstallez l'ancienne version</li>
+      <li>Réinstallez depuis l'URL</li>
+    </ol>
+    <p>Ou plus simple : ouvrez l'appli <strong>en ligne</strong> et rechargez la page (<strong>Ctrl + F5</strong>).</p>
+  </section>
+
+  <div style="text-align:center;padding:20px;" class="no-print">
+    <a href="https://abdelziane979-eng.github.io/initiaelectro/" class="btn">🛠️ Lancer InitiaElectro</a>
+    <a href="https://abdelziane979-eng.github.io/initiaelectro/bac_a_sable.html" class="btn btn-violet">🧪 Lancer ElectroPremium</a>
+  </div>
+
+</div>
+
+<footer>
+  <div>📖 Guide d'installation - InitiaElectro & ElectroPremium</div>
+  <div style="margin-top:8px;">Développé par <strong>M. Ziane</strong></div>
+  <div class="version">Version 1.0 - Octobre 2026 - Usage pédagogique</div>
+</footer>
+
+</body>
+</html>
