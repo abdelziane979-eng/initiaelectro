@@ -1,0 +1,3053 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ElectroPremium</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0' stop-color='%236b21a8'/><stop offset='1' stop-color='%23a855f7'/></linearGradient></defs><rect width='512' height='512' rx='112' fill='url(%23g)'/><circle cx='220' cy='256' r='60' fill='%23ff3333' stroke='%23fff' stroke-width='12'/><circle cx='200' cy='236' r='14' fill='rgba(255,255,255,0.85)'/><rect x='300' y='238' width='140' height='36' rx='18' fill='%23D4A76A' stroke='%23fff' stroke-width='8'/><rect x='320' y='238' width='14' height='36' fill='%23FFD700'/><rect x='356' y='238' width='14' height='36' fill='%238B00FF'/><rect x='392' y='238' width='14' height='36' fill='%238B4513'/><line x1='280' y1='256' x2='300' y2='256' stroke='%23fff' stroke-width='10' stroke-linecap='round'/></svg>">
+<link rel="manifest" href="manifest-bac.json">
+<meta name="theme-color" content="#6b21a8">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="ElectroPremium">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: sans-serif; background: #1a1f2e; color: #e0e0e0; padding: 16px;
+         background-image: radial-gradient(circle at 20% 30%, rgba(168,85,247,0.06) 0%, transparent 50%),
+                           radial-gradient(circle at 80% 70%, rgba(56,189,248,0.06) 0%, transparent 50%); }
+  header { background: linear-gradient(135deg, #6b21a8, #a855f7); color: white;
+           padding: 20px; border-radius: 12px; text-align: center;
+           max-width: 1400px; margin: 0 auto 16px auto;
+           display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;
+           box-shadow: 0 8px 20px rgba(168,85,247,0.35); }
+  header h1 { font-size: 1.4em; text-shadow: 0 2px 4px rgba(0,0,0,0.3); }
+  header .sub { font-size: 0.85em; opacity: 0.95; }
+  .btn-retour { background: rgba(255,255,255,0.2); color: white; border: 2px solid rgba(255,255,255,0.4);
+                padding: 8px 16px; border-radius: 8px; cursor: pointer; font-weight: bold;
+                text-decoration: none; display: inline-block; transition: all 0.2s;
+                box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
+  .btn-retour:hover { background: rgba(255,255,255,0.35); transform: translateY(-2px);
+                      box-shadow: 0 6px 12px rgba(0,0,0,0.3); }
+  .conteneur { max-width: 1400px; margin: 0 auto; display: grid; grid-template-columns: 260px 1fr; gap: 16px; }
+  .palette { background: linear-gradient(135deg, #1e293b, #253044); padding: 12px; border-radius: 12px;
+             height: fit-content; max-height: 90vh; overflow-y: auto;
+             box-shadow: 0 8px 20px rgba(0,0,0,0.4); }
+  .palette h2 { font-size: 1em; color: #a855f7; margin-bottom: 10px;
+                padding-bottom: 6px; border-bottom: 2px solid #334155; margin-top: 12px; }
+  .palette h2:first-child { margin-top: 0; }
+  .item-palette { display: flex; align-items: center; gap: 10px;
+                  padding: 8px 10px; background: #334155; border-radius: 8px;
+                  margin-bottom: 6px; cursor: pointer; font-size: 0.85em;
+                  transition: all 0.2s; border: 2px solid transparent;
+                  box-shadow: 0 2px 4px rgba(0,0,0,0.3); }
+  .item-palette:hover { background: #475569; border-color: #a855f7;
+                        transform: translateX(4px); box-shadow: 0 4px 10px rgba(168,85,247,0.4); }
+  .item-palette.actif { background: linear-gradient(135deg, #6b21a8, #9333ea);
+                        border-color: #a855f7; box-shadow: 0 4px 12px rgba(168,85,247,0.5); }
+  .item-palette .icone { width: 34px; height: 34px; border-radius: 8px; flex-shrink: 0;
+                         display: flex; align-items: center; justify-content: center;
+                         font-size: 1.2em;
+                         box-shadow: inset 0 -3px 6px rgba(0,0,0,0.4), 0 2px 4px rgba(0,0,0,0.3); }
+  .item-palette .texte { flex: 1; }
+  .item-palette .texte small { color: #94a3b8; font-size: 0.75em; display: block; }
+  .item-bloc { background: linear-gradient(135deg, #4c1d95, #6b21a8); border-color: #9333ea; }
+  .item-bloc:hover { background: linear-gradient(135deg, #6b21a8, #9333ea); }
+  .item-bloc .icone { background: linear-gradient(135deg, #fbbf24, #f59e0b); }
+  .item-tuto { background: linear-gradient(135deg, #065f46, #047857); border-color: #22c55e; }
+  .item-tuto:hover { background: linear-gradient(135deg, #047857, #059669); }
+  .item-tuto .icone { background: linear-gradient(135deg, #22c55e, #16a34a); }
+  .option-cablage { display: flex; align-items: center; gap: 8px;
+                    padding: 10px; margin-bottom: 8px;
+                    background: linear-gradient(135deg, #0369a1, #075985);
+                    border-radius: 8px; cursor: pointer; font-size: 0.85em;
+                    transition: all 0.2s; user-select: none; }
+  .option-cablage:hover { background: linear-gradient(135deg, #075985, #0c4a6e); }
+  .option-cablage input { cursor: pointer; width: 18px; height: 18px; accent-color: #fbbf24; }
+  .option-cablage label { cursor: pointer; flex: 1; font-weight: bold; }
+  .zone { background: #0f1420; padding: 16px; border-radius: 12px;
+          box-shadow: 0 8px 20px rgba(0,0,0,0.4); }
+  .barre-outils { display: flex; justify-content: space-between; align-items: center;
+                  margin-bottom: 12px; flex-wrap: wrap; gap: 8px; }
+  .statut { font-size: 0.85em; color: #94a3b8; background: #1e293b;
+            padding: 6px 12px; border-radius: 6px;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.4); }
+  .statut.live { background: linear-gradient(135deg, #065f46, #047857); color: #a7f3d0;
+                 box-shadow: 0 0 10px rgba(34,197,94,0.4); }
+  .statut.multi { background: linear-gradient(135deg, #0369a1, #0284c7); color: #bae6fd;
+                  box-shadow: 0 0 10px rgba(3,105,161,0.5); }
+  .statut.tuto { background: linear-gradient(135deg, #7c2d12, #9a3412); color: #fed7aa;
+                 box-shadow: 0 0 10px rgba(249,115,22,0.5); }
+  canvas { width: 100%; background: #ffffff; border-radius: 8px; display: block; cursor: crosshair;
+           box-shadow: inset 0 0 30px rgba(0,0,0,0.08);
+           border: 3px solid transparent; transition: border-color 0.2s; }
+  canvas.mode-cablage { cursor: cell; border-color: #a855f7;
+                        box-shadow: 0 0 20px rgba(168,85,247,0.4), inset 0 0 30px rgba(0,0,0,0.08); }
+  canvas.mode-bloc { cursor: copy; border-color: #fbbf24;
+                     box-shadow: 0 0 20px rgba(251,191,36,0.4), inset 0 0 30px rgba(0,0,0,0.08); }
+  canvas.mode-multi { cursor: crosshair; border-color: #0ea5e9;
+                      box-shadow: 0 0 20px rgba(14,165,233,0.5), inset 0 0 30px rgba(0,0,0,0.08); }
+  .barre-actions { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+  button.action { padding: 10px 16px; border: none; border-radius: 8px;
+                  font-weight: bold; cursor: pointer; font-size: 0.9em;
+                  display: flex; align-items: center; gap: 6px;
+                  transition: all 0.2s; box-shadow: 0 4px 8px rgba(0,0,0,0.3); }
+  button.action:hover { transform: translateY(-2px); box-shadow: 0 6px 12px rgba(0,0,0,0.4); }
+  button.action:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+  .btn-vert { background: linear-gradient(135deg, #16a34a, #22c55e); color: white; }
+  .btn-rouge { background: linear-gradient(135deg, #dc2626, #ef4444); color: white; }
+  .btn-bleu { background: linear-gradient(135deg, #0369a1, #0ea5e9); color: white; }
+  .btn-gris { background: linear-gradient(135deg, #334155, #475569); color: #e0e0e0; }
+  .btn-cyan { background: linear-gradient(135deg, #0891b2, #06b6d4); color: white; }
+  .btn-cyan.actif { background: linear-gradient(135deg, #0e7490, #155e75);
+                    box-shadow: 0 0 15px rgba(6,182,212,0.6); }
+  .btn-orange { background: linear-gradient(135deg, #ea580c, #f97316); color: white; }
+  .btn-orange.actif { background: linear-gradient(135deg, #9a3412, #7c2d12);
+                      box-shadow: 0 0 15px rgba(249,115,22,0.6); }
+  .message-info { background: #0f1420; padding: 12px; border-radius: 8px;
+                  margin-top: 12px; font-size: 0.9em; border-left: 3px solid #a855f7;
+                  min-height: 50px; white-space: pre-line;
+                  box-shadow: inset 0 2px 4px rgba(0,0,0,0.4); }
+  .message-info.succes { border-left-color: #22c55e; }
+  .message-info.erreur { border-left-color: #ef4444; }
+  .message-info.avertissement { border-left-color: #fbbf24; }
+  .multimetre-panneau { display: none;
+    background: linear-gradient(135deg, #1e293b, #253044);
+    border-radius: 12px; padding: 16px; margin-top: 12px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.4); border: 2px solid #0891b2; }
+  .multimetre-panneau.actif { display: block; }
+  .multimetre-header { display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px solid #334155; }
+  .multimetre-header h3 { color: #06b6d4; font-size: 1.05em; }
+  .multimetre-ecran { background: linear-gradient(180deg, #1a2e1a, #0d1a0d);
+    border: 3px solid #333; border-radius: 8px; padding: 16px; margin-bottom: 12px;
+    box-shadow: inset 0 0 20px rgba(0,0,0,0.8), 0 4px 10px rgba(0,0,0,0.5);
+    font-family: 'Courier New', monospace; position: relative; }
+  .multimetre-ecran::before { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+    background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,255,0,0.03) 3px);
+    pointer-events: none; border-radius: 6px; }
+  .multimetre-valeur { font-size: 2.2em; font-weight: bold; color: #4ade80;
+    text-shadow: 0 0 10px rgba(74,222,128,0.8), 0 0 20px rgba(74,222,128,0.4);
+    letter-spacing: 3px; text-align: right; min-height: 1.2em; }
+  .multimetre-unite { font-size: 0.9em; color: #4ade80;
+    text-shadow: 0 0 6px rgba(74,222,128,0.6); text-align: right;
+    margin-top: 4px; letter-spacing: 1px; }
+  .multimetre-info { color: #86efac; font-size: 0.75em; margin-top: 8px;
+    text-align: left; letter-spacing: 1px; opacity: 0.85; }
+  .multimetre-selecteur { display: flex; gap: 4px; flex-wrap: wrap;
+    background: #0f1420; padding: 6px; border-radius: 8px; margin-bottom: 12px;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.5); }
+  .multimetre-selecteur button { flex: 1; min-width: 70px; padding: 8px 10px;
+    background: linear-gradient(180deg, #334155, #1e293b); color: #94a3b8;
+    border: 1px solid #475569; border-radius: 6px; cursor: pointer; font-size: 0.75em;
+    font-weight: bold; transition: all 0.15s; }
+  .multimetre-selecteur button:hover { background: linear-gradient(180deg, #475569, #334155); color: #e0e0e0; }
+  .multimetre-selecteur button.actif {
+    background: linear-gradient(180deg, #0891b2, #0369a1);
+    color: white; border-color: #06b6d4;
+    box-shadow: 0 0 12px rgba(6,182,212,0.5), inset 0 1px 2px rgba(255,255,255,0.2); }
+  .multimetre-aide { font-size: 0.85em; color: #94a3b8; padding: 10px;
+    background: #0f1420; border-radius: 8px; border-left: 3px solid #06b6d4; line-height: 1.4; }
+  .multimetre-aide strong { color: #06b6d4; }
+  .pointes-info { display: flex; gap: 12px; margin-top: 8px; font-size: 0.8em; }
+  .pointe { flex: 1; padding: 6px 10px; background: #0f1420; border-radius: 6px;
+    display: flex; align-items: center; gap: 6px; }
+  .pointe .rond { width: 14px; height: 14px; border-radius: 50%;
+    box-shadow: inset 0 -2px 3px rgba(0,0,0,0.4); }
+  .pointe.rouge .rond { background: radial-gradient(circle at 30% 30%, #ff6b6b, #c92a2a); }
+  .pointe.noire .rond { background: radial-gradient(circle at 30% 30%, #666, #1a1a1a); }
+  .pointe .texte-pointe { color: #94a3b8; font-size: 0.85em; }
+  .pointe.connectee { background: #1e3a2a; border: 1px solid #22c55e; }
+  .pointe.connectee .texte-pointe { color: #86efac; }
+  .tuto-panneau { display: none;
+    background: linear-gradient(135deg, #1c1917, #292524);
+    border-radius: 12px; padding: 16px; margin-top: 12px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.4); border: 2px solid #f97316; }
+  .tuto-panneau.actif { display: block; }
+  .tuto-header { display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px solid #44403c; }
+  .tuto-header h3 { color: #fb923c; font-size: 1.05em; }
+  .tuto-titre { background: linear-gradient(135deg, #7c2d12, #ea580c);
+    color: white; padding: 12px; border-radius: 8px; margin-bottom: 12px;
+    box-shadow: 0 4px 10px rgba(249,115,22,0.3); }
+  .tuto-titre h4 { font-size: 1.1em; margin-bottom: 4px; }
+  .tuto-titre .soustitre { font-size: 0.85em; opacity: 0.95; }
+  .tuto-etapes { display: flex; flex-direction: column; gap: 6px;
+    margin-bottom: 12px; max-height: 200px; overflow-y: auto; }
+  .tuto-etape { background: #1c1917; padding: 10px; border-radius: 8px;
+    border-left: 3px solid #fb923c; cursor: pointer; transition: all 0.2s; font-size: 0.85em; }
+  .tuto-etape:hover { background: #292524; transform: translateX(4px); }
+  .tuto-etape.active { background: linear-gradient(135deg, #7c2d12, #9a3412);
+    border-left-color: #fbbf24; box-shadow: 0 4px 10px rgba(249,115,22,0.3); }
+  .tuto-etape.faite { background: #14532d; border-left-color: #22c55e; opacity: 0.85; }
+  .tuto-etape strong { color: #fb923c; }
+  .tuto-etape.faite strong { color: #86efac; }
+  .tuto-etape .desc { color: #94a3b8; font-size: 0.85em; margin-top: 4px; }
+  .tuto-etape.active .desc { color: #fed7aa; }
+  .tuto-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+  .tuto-actions button { flex: 1; padding: 10px; border: none; border-radius: 8px;
+    font-weight: bold; cursor: pointer; font-size: 0.85em; transition: all 0.2s; }
+  .btn-tuto-suivant { background: linear-gradient(135deg, #16a34a, #22c55e); color: white; }
+  .btn-tuto-suivant:hover { transform: translateY(-2px); box-shadow: 0 6px 12px rgba(34,197,94,0.4); }
+  .btn-tuto-suivant:disabled { background: #475569; cursor: not-allowed; opacity: 0.5; }
+  .btn-tuto-quitter { background: #44403c; color: #e0e0e0; }
+  .btn-tuto-quitter:hover { background: #57534e; }
+  .menu-contextuel { display: none; position: fixed; z-index: 200;
+    background: linear-gradient(135deg, #1e293b, #253044);
+    border: 2px solid #a855f7; border-radius: 10px; padding: 6px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.6), 0 0 20px rgba(168,85,247,0.3);
+    min-width: 200px; }
+  .menu-contextuel.actif { display: block; }
+  .menu-contextuel button { display: flex; align-items: center; gap: 10px;
+    width: 100%; padding: 10px 14px; background: transparent; color: #e0e0e0;
+    border: none; border-radius: 6px; cursor: pointer; font-size: 0.9em;
+    font-weight: bold; text-align: left; transition: all 0.15s; }
+  .menu-contextuel button:hover { background: #334155; }
+  .menu-contextuel button.danger:hover { background: #7f1d1d; color: #fecaca; }
+  .menu-contextuel .sep { height: 1px; background: #334155; margin: 4px 0; }
+  .modal-overlay { display: none; position: fixed; top: 0; left: 0;
+    width: 100%; height: 100%; background: rgba(0,0,0,0.7);
+    z-index: 100; justify-content: center; align-items: center; padding: 20px; }
+  .modal-overlay.actif { display: flex; }
+  .modal-boite { background: linear-gradient(135deg, #1e293b, #253044);
+    border-radius: 16px; padding: 24px; max-width: 420px; width: 100%;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.6); }
+  .modal-boite h2 { color: #a855f7; margin-bottom: 16px; font-size: 1.1em; }
+  .choix-valeurs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+  .choix-valeurs button { padding: 10px 16px; border: 2px solid #334155;
+    border-radius: 8px; background: #0f1420; color: #e0e0e0; cursor: pointer;
+    font-weight: bold; transition: all 0.2s; }
+  .choix-valeurs button:hover { border-color: #a855f7; background: #334155; transform: scale(1.05); }
+  .btn-annuler { background: #334155; color: #e0e0e0; border: none;
+    padding: 10px; border-radius: 8px; cursor: pointer;
+    width: 100%; font-weight: bold; transition: all 0.2s; }
+  .btn-annuler:hover { background: #475569; }
+  /* PANNEAU COMPOSANTS PLACES */
+  .panneau-composants {
+    background: linear-gradient(135deg, #1e293b, #253044);
+    border-radius: 12px;
+    padding: 12px;
+    margin-top: 12px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+    border: 2px solid #38bdf8;
+  }
+  .panneau-composants-header {
+    display: flex; justify-content: space-between; align-items: center;
+    cursor: pointer;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #334155;
+    margin-bottom: 8px;
+    user-select: none;
+  }
+  .panneau-composants-header h3 {
+    color: #38bdf8;
+    font-size: 1em;
+    margin: 0;
+  }
+  .panneau-composants-toggle {
+    background: transparent;
+    border: none;
+    color: #38bdf8;
+    font-size: 1.2em;
+    cursor: pointer;
+    transition: transform 0.3s;
+    padding: 4px 8px;
+  }
+  .panneau-composants-toggle.ouvert {
+    transform: rotate(180deg);
+  }
+  .panneau-composants-liste {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    max-height: 300px;
+    overflow-y: auto;
+  }
+  .panneau-composants-liste.replie {
+    display: none;
+  }
+  .composant-item {
+    background: #334155;
+    border-radius: 8px;
+    padding: 8px 10px;
+    font-size: 0.8em;
+    transition: all 0.2s;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+  }
+  .composant-item:hover {
+    background: #475569;
+    transform: translateX(3px);
+  }
+  .composant-item.actif {
+    background: linear-gradient(135deg, #0369a1, #0284c7);
+    box-shadow: 0 0 12px rgba(56,189,248,0.6);
+  }
+  .composant-item-nom {
+    color: #f1f5f9;
+    font-weight: bold;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .composant-item-actions {
+    display: flex;
+    gap: 6px;
+  }
+  .composant-item-actions button {
+    flex: 1;
+    padding: 4px 8px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.75em;
+    font-weight: bold;
+    transition: all 0.15s;
+  }
+  .btn-item-centrer {
+    background: linear-gradient(135deg, #0891b2, #06b6d4);
+    color: white;
+  }
+  .btn-item-centrer:hover {
+    background: linear-gradient(135deg, #0e7490, #155e75);
+    transform: scale(1.05);
+  }
+  .btn-item-supprimer {
+    background: linear-gradient(135deg, #dc2626, #ef4444);
+    color: white;
+  }
+  .btn-item-supprimer:hover {
+    background: linear-gradient(135deg, #7f1d1d, #991b1b);
+    transform: scale(1.05);
+  }
+  .panneau-composants-vide {
+    text-align: center;
+    color: #94a3b8;
+    font-size: 0.8em;
+    padding: 12px;
+    font-style: italic;
+  }
+  /* ANIMATION CLIGNOTEMENT COMPOSANT */
+  @keyframes compoClignote {
+    0%, 100% { opacity: 1; filter: drop-shadow(0 0 0 transparent); }
+    50% { opacity: 0.5; filter: drop-shadow(0 0 20px #38bdf8); }
+  }
+  .compo-clignote {
+    animation: compoClignote 0.4s ease-in-out 5;
+  }
+  @media (max-width: 800px) { .conteneur { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>🧪 ElectroPremium</h1>
+    <div class="sub">Crée ton propre circuit librement !</div>
+  </div>
+  <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+    <button id="btn-installer" onclick="installerPWA()" style="display:none;padding:8px 16px;background:#fbbf24;color:#1a1f2e;border:none;border-radius:8px;font-weight:bold;cursor:pointer;font-size:0.9em;">
+      📲 Installer
+    </button>
+    <a href="index.html" class="btn-retour">← Retour à l'accueil</a>
+  </div>
+</header>
+
+<div class="conteneur">
+  <div class="palette">
+    <h2>📦 Composants</h2>
+    <div id="liste-palette"></div>
+    <h2>📚 Blocs prêts</h2>
+    <div class="option-cablage">
+      <input type="checkbox" id="opt-cablage" checked>
+      <label for="opt-cablage">Avec câblage automatique</label>
+    </div>
+    <div id="liste-blocs"></div>
+    <h2>📖 Tutoriels</h2>
+    <div id="liste-tutoriels"></div>
+    <div class="panneau-composants" id="panneau-composants">
+      <div class="panneau-composants-header" onclick="basculerPanneauComposants()">
+        <h3>📋 Mes composants <span id="panneau-nb">(0)</span></h3>
+        <button class="panneau-composants-toggle ouvert" id="panneau-toggle">▼</button>
+      </div>
+      <div class="panneau-composants-liste" id="panneau-composants-liste">
+        <div class="panneau-composants-vide">Aucun composant placé</div>
+      </div>
+    </div>
+  </div>
+  <div class="zone">
+    <div class="barre-outils">
+      <div class="statut" id="statut-mode">🖱️ Mode : Placer</div>
+      <div class="statut" id="statut-info">Aucun composant placé</div>
+    </div>
+    <canvas id="sandbox" width="1000" height="650"></canvas>
+    <div class="message-info" id="message">
+      👋 Bienvenue ! Placez des composants, câblez-les, fermez l'interrupteur, puis cliquez sur "Tester". Molette = zoom, clic-glisser sur fond = déplacer.
+    </div>
+    <div class="barre-actions">
+      <button class="action btn-gris" onclick="basculerModeCablage()" id="btn-cablage">🔗 Câblage</button>
+      <button class="action btn-vert" onclick="tester()">▶ Tester</button>
+      <button class="action btn-cyan" onclick="basculerMultimetre()" id="btn-multimetre">🔬 Multimètre</button>
+      <button class="action btn-orange" onclick="basculerTutoriels()" id="btn-tutoriels">📖 Tutoriels</button>
+      <button class="action btn-rouge" onclick="toutEffacer()">🗑️ Tout effacer</button>
+      <button class="action btn-bleu" onclick="exporterJSON()">💾 JSON</button>
+      <button class="action btn-bleu" onclick="exporterPNG()">🖼️ PNG</button>
+      <button class="action btn-bleu" onclick="exporterPDF()">📄 PDF</button>
+      <button class="action btn-bleu" onclick="document.getElementById('file-input').click()">📂 Charger</button>
+      <input type="file" id="file-input" accept=".json" style="display:none" onchange="importerJSON(event)">
+      <button class="action btn-gris" onclick="zoomPlus()" title="Zoom +">🔍＋</button>
+      <button class="action btn-gris" onclick="zoomMoins()" title="Zoom −">🔍−</button>
+      <button class="action btn-gris" onclick="recentrerVue()" title="Recentrer">🏠</button>
+      <button class="action btn-vert" onclick="basculerGrille()" id="btn-grille" title="Grille magnétique">🧲 Grille : ON</button>
+      <button class="action btn-orange" onclick="annulerMode()" title="Annuler le mode en cours">❌ Annuler</button>
+    </div>
+
+    <div class="multimetre-panneau" id="multimetre-panneau">
+      <div class="multimetre-header">
+        <h3>🔬 Multimètre virtuel</h3>
+        <button class="action btn-gris" onclick="basculerMultimetre()" style="padding: 6px 12px; font-size: 0.8em;">✖ Fermer</button>
+      </div>
+      <div class="multimetre-ecran">
+        <div class="multimetre-valeur" id="multi-valeur">----</div>
+        <div class="multimetre-unite" id="multi-unite">Sélectionnez un mode</div>
+        <div class="multimetre-info" id="multi-info">🔬 Multimètre prêt</div>
+      </div>
+      <div class="multimetre-selecteur">
+        <button onclick="setModeMultimetre('resistance')" id="btn-multi-resistance" class="actif">🔵 Résistance</button>
+        <button onclick="setModeMultimetre('tension')" id="btn-multi-tension">⚡ Tension</button>
+        <button onclick="setModeMultimetre('continuite')" id="btn-multi-continuite">🔔 Continuité</button>
+      </div>
+      <div class="multimetre-aide" id="multi-aide">
+        <strong>Mode Résistance</strong> : cliquez sur un composant pour mesurer sa résistance, OU sur 2 pattes pour mesurer entre elles.
+      </div>
+      <div class="pointes-info">
+        <div class="pointe rouge" id="pointe-rouge">
+          <div class="rond"></div>
+          <div class="texte-pointe">🔴 Pointe + : <span id="pointe-rouge-texte">non connectée</span></div>
+        </div>
+        <div class="pointe noire" id="pointe-noire">
+          <div class="rond"></div>
+          <div class="texte-pointe">⚫ Pointe - : <span id="pointe-noire-texte">non connectée</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tuto-panneau" id="tuto-panneau">
+      <div class="tuto-header">
+        <h3>📖 Tutoriel guidé</h3>
+        <button class="action btn-gris" onclick="basculerTutoriels()" style="padding: 6px 12px; font-size: 0.8em;">✖ Fermer</button>
+      </div>
+      <div class="tuto-titre" id="tuto-titre">
+        <h4 id="tuto-nom">Aucun tutoriel sélectionné</h4>
+        <div class="soustitre" id="tuto-desc">Choisissez un tutoriel dans la palette à gauche.</div>
+      </div>
+      <div class="tuto-etapes" id="tuto-etapes"></div>
+      <div class="tuto-actions">
+        <button class="btn-tuto-suivant" onclick="etapeTutoSuivante()" id="btn-tuto-suivant" disabled>▶ Étape suivante</button>
+        <button class="btn-tuto-quitter" onclick="quitterTutoriel()">❌ Quitter</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="menu-contextuel" id="menu-contextuel">
+  <button onclick="menuSupprimerFil()" class="danger">🗑️ Supprimer ce fil</button>
+  <div class="sep"></div>
+  <button onclick="fermerMenuContextuel()">❌ Annuler</button>
+</div>
+
+<div class="modal-overlay" id="modal-valeurs">
+  <div class="modal-boite">
+    <h2 id="modal-valeurs-titre">Choisir une valeur</h2>
+    <div class="choix-valeurs" id="modal-valeurs-choix"></div>
+    <button class="btn-annuler" onclick="fermerModalValeurs()">Annuler</button>
+  </div>
+</div>
+
+<script>
+/* =========================================================
+   CATALOGUE DES COMPOSANTS
+   ========================================================= */
+var CATALOGUE = {
+  pile: { id:'pile', nom:'Pile 9V', icone:'🔋', couleur:'#333', largeur:100, hauteur:60,
+    pattes:[{x:10,y:55},{x:90,y:55}], valeurs:null },
+  resistance: { id:'resistance', nom:'Résistance', icone:'🎨', couleur:'#D4A76A', largeur:100, hauteur:30,
+    pattes:[{x:0,y:15},{x:100,y:15}],
+    valeurs:[{val:'220',label:'220 Ω'},{val:'470',label:'470 Ω'},{val:'1000',label:'1 kΩ'},{val:'10000',label:'10 kΩ'}] },
+  led: { id:'led', nom:'LED', icone:'💡', couleur:'#E63946', largeur:50, hauteur:50,
+    pattes:[{x:10,y:25},{x:40,y:25}],
+    valeurs:[{val:'rouge',label:'🔴 Rouge'},{val:'vert',label:'🟢 Vert'},{val:'bleu',label:'🔵 Bleu'}] },
+  interrupteur: { id:'interrupteur', nom:'Interrupteur', icone:'🔘', couleur:'#555', largeur:100, hauteur:50,
+    pattes:[{x:5,y:25},{x:95,y:25}], valeurs:null },
+  ne555: { id:'ne555', nom:'NE555', icone:'⚡', couleur:'#222', largeur:80, hauteur:100,
+    pattes:[{x:-10,y:20},{x:-10,y:40},{x:-10,y:60},{x:-10,y:80},{x:90,y:20},{x:90,y:40},{x:90,y:60},{x:90,y:80}],
+    valeurs:null },
+  cd4017: { id:'cd4017', nom:'CD4017', icone:'🔢', couleur:'#1e293b', largeur:80, hauteur:100,
+    pattes:[{x:-10,y:20},{x:-10,y:40},{x:-10,y:60},{x:-10,y:80},{x:90,y:20},{x:90,y:40},{x:90,y:60},{x:90,y:80}],
+    valeurs:null },
+  condensateur: { id:'condensateur', nom:'Condensateur', icone:'🔌', couleur:'#0369a1', largeur:40, hauteur:60,
+    pattes:[{x:10,y:60},{x:30,y:60}],
+    valeurs:[{val:'10uF',label:'10 µF'},{val:'100uF',label:'100 µF'}] },
+  transistor: { id:'transistor', nom:'Transistor 2N2222', icone:'🎛️', couleur:'#222', largeur:60, hauteur:60,
+    pattes:[{x:10,y:60},{x:30,y:60},{x:50,y:60}], valeurs:null },
+  ldr: { id:'ldr', nom:'LDR (photo)', icone:'📏', couleur:'#D4A76A', largeur:60, hauteur:40,
+    pattes:[{x:0,y:20},{x:60,y:20}], valeurs:null },
+  bouton: { id:'bouton', nom:'Bouton poussoir', icone:'🧲', couleur:'#555', largeur:70, hauteur:50,
+    pattes:[{x:5,y:25},{x:65,y:25}], valeurs:null },
+  buzzer: { id:'buzzer', nom:'Buzzer', icone:'🔊', couleur:'#222', largeur:60, hauteur:60,
+    pattes:[{x:10,y:60},{x:50,y:60}], valeurs:null }
+};
+
+/* =========================================================
+   BLOCS PRETS
+   ========================================================= */
+var BLOCS = {
+  alim5v: { id:'alim5v', nom:'Alimentation 5V', icone:'🔋', desc:'Pile + R + condo',
+    fn: function(cx, cy, avecCablage) {
+      var pile = creerComposantBloc('pile', cx - 150, cy, null);
+      var res = creerComposantBloc('resistance', cx - 20, cy - 60, '470');
+      var condo = creerComposantBloc('condensateur', cx + 100, cy - 40, '100uF');
+      if (avecCablage) {
+        ajouterFilBloc(pile.id, 0, res.id, 0);
+        ajouterFilBloc(res.id, 1, condo.id, 0);
+        ajouterFilBloc(condo.id, 1, pile.id, 1);
+      }
+    }
+  },
+  alim9v: { id:'alim9v', nom:'Alimentation 9V propre', icone:'🔋', desc:'Pile + 2 condos',
+    fn: function(cx, cy, avecCablage) {
+      var pile = creerComposantBloc('pile', cx - 150, cy, null);
+      var c1 = creerComposantBloc('condensateur', cx, cy - 60, '10uF');
+      var c2 = creerComposantBloc('condensateur', cx + 100, cy - 60, '100uF');
+      if (avecCablage) {
+        ajouterFilBloc(pile.id, 0, c1.id, 0);
+        ajouterFilBloc(c1.id, 1, c2.id, 0);
+        ajouterFilBloc(c2.id, 1, pile.id, 1);
+      }
+    }
+  },
+  clignotant555: { id:'clignotant555', nom:'Clignotant NE555', icone:'✨', desc:'LED qui clignote',
+    fn: function(cx, cy, avecCablage) {
+      var pile = creerComposantBloc('pile', cx - 250, cy + 100, null);
+      var ne = creerComposantBloc('ne555', cx - 50, cy - 20, null);
+      var r1 = creerComposantBloc('resistance', cx - 180, cy - 120, '10000');
+      var r2 = creerComposantBloc('resistance', cx - 180, cy - 50, '10000');
+      var c1 = creerComposantBloc('condensateur', cx + 50, cy - 30, '10uF');
+      var led = creerComposantBloc('led', cx + 180, cy - 30, 'rouge');
+      var r3 = creerComposantBloc('resistance', cx + 100, cy + 80, '470');
+      if (avecCablage) {
+        ajouterFilBloc(pile.id, 0, ne.id, 0);
+        ajouterFilBloc(r1.id, 0, ne.id, 0);
+        ajouterFilBloc(r1.id, 1, ne.id, 6);
+        ajouterFilBloc(r2.id, 0, ne.id, 6);
+        ajouterFilBloc(r2.id, 1, ne.id, 7);
+        ajouterFilBloc(c1.id, 0, ne.id, 7);
+        ajouterFilBloc(c1.id, 1, ne.id, 5);
+        ajouterFilBloc(ne.id, 2, r3.id, 0);
+        ajouterFilBloc(r3.id, 1, led.id, 0);
+        ajouterFilBloc(led.id, 1, ne.id, 5);
+        ajouterFilBloc(ne.id, 5, pile.id, 1);
+      }
+    }
+  },
+  deuxLedAlt: { id:'deuxLedAlt', nom:'Deux LED alternées', icone:'💡💡', desc:'Interrupteur bascule',
+    fn: function(cx, cy, avecCablage) {
+      var pile = creerComposantBloc('pile', cx - 200, cy + 80, null);
+      var sw = creerComposantBloc('interrupteur', cx, cy + 80, null);
+      var r1 = creerComposantBloc('resistance', cx - 100, cy - 60, '470');
+      var r2 = creerComposantBloc('resistance', cx + 100, cy - 60, '470');
+      var led1 = creerComposantBloc('led', cx - 50, cy - 150, 'rouge');
+      var led2 = creerComposantBloc('led', cx + 150, cy - 150, 'vert');
+      if (avecCablage) {
+        ajouterFilBloc(pile.id, 0, r1.id, 0);
+        ajouterFilBloc(pile.id, 0, r2.id, 0);
+        ajouterFilBloc(r1.id, 1, led1.id, 0);
+        ajouterFilBloc(r2.id, 1, led2.id, 0);
+        ajouterFilBloc(led1.id, 1, sw.id, 0);
+        ajouterFilBloc(led2.id, 1, sw.id, 1);
+        ajouterFilBloc(sw.id, 0, pile.id, 1);
+      }
+    }
+  },
+  avecBouton: { id:'avecBouton', nom:'Allumer avec bouton', icone:'🔘', desc:'LED + bouton',
+    fn: function(cx, cy, avecCablage) {
+      var pile = creerComposantBloc('pile', cx - 180, cy + 50, null);
+      var bp = creerComposantBloc('bouton', cx - 20, cy + 50, null);
+      var res = creerComposantBloc('resistance', cx + 100, cy - 30, '470');
+      var led = creerComposantBloc('led', cx + 220, cy - 30, 'rouge');
+      if (avecCablage) {
+        ajouterFilBloc(pile.id, 0, bp.id, 0);
+        ajouterFilBloc(bp.id, 1, res.id, 0);
+        ajouterFilBloc(res.id, 1, led.id, 0);
+        ajouterFilBloc(led.id, 1, pile.id, 1);
+      }
+    }
+  },
+  detecteurNuit: { id:'detecteurNuit', nom:'Détecteur de nuit', icone:'🌙', desc:'LDR + transistor + LED',
+    fn: function(cx, cy, avecCablage) {
+      var pile = creerComposantBloc('pile', cx - 200, cy + 80, null);
+      var ldr = creerComposantBloc('ldr', cx - 100, cy - 100, null);
+      var tr = creerComposantBloc('transistor', cx + 50, cy - 30, null);
+      var res = creerComposantBloc('resistance', cx - 100, cy - 20, '10000');
+      var led = creerComposantBloc('led', cx + 180, cy - 30, 'rouge');
+      if (avecCablage) {
+        ajouterFilBloc(pile.id, 0, ldr.id, 0);
+        ajouterFilBloc(ldr.id, 1, res.id, 0);
+        ajouterFilBloc(ldr.id, 1, tr.id, 1);
+        ajouterFilBloc(res.id, 1, pile.id, 1);
+        ajouterFilBloc(tr.id, 2, led.id, 0);
+        ajouterFilBloc(led.id, 1, pile.id, 0);
+        ajouterFilBloc(tr.id, 0, pile.id, 1);
+      }
+    }
+  },
+  bipContinu: { id:'bipContinu', nom:'Bip continu', icone:'🔊', desc:'Buzzer en continu',
+    fn: function(cx, cy, avecCablage) {
+      var pile = creerComposantBloc('pile', cx - 150, cy, null);
+      var res = creerComposantBloc('resistance', cx, cy - 60, '470');
+      var bz = creerComposantBloc('buzzer', cx + 130, cy - 30, null);
+      if (avecCablage) {
+        ajouterFilBloc(pile.id, 0, res.id, 0);
+        ajouterFilBloc(res.id, 1, bz.id, 0);
+        ajouterFilBloc(bz.id, 1, pile.id, 1);
+      }
+    }
+  },
+  chenillard4: { id:'chenillard4', nom:'Chenillard 4 LED', icone:'🎮', desc:'4 LED qui défilent',
+    fn: function(cx, cy, avecCablage) {
+      var pile = creerComposantBloc('pile', cx - 300, cy + 120, null);
+      var sw = creerComposantBloc('interrupteur', cx, cy + 120, null);
+      var r1 = creerComposantBloc('resistance', cx - 250, cy - 60, '470');
+      var r2 = creerComposantBloc('resistance', cx - 100, cy - 60, '470');
+      var r3 = creerComposantBloc('resistance', cx + 50, cy - 60, '470');
+      var r4 = creerComposantBloc('resistance', cx + 200, cy - 60, '470');
+      var led1 = creerComposantBloc('led', cx - 250, cy - 160, 'rouge');
+      var led2 = creerComposantBloc('led', cx - 100, cy - 160, 'vert');
+      var led3 = creerComposantBloc('led', cx + 50, cy - 160, 'bleu');
+      var led4 = creerComposantBloc('led', cx + 200, cy - 160, 'rouge');
+      if (avecCablage) {
+        ajouterFilBloc(pile.id, 0, r1.id, 0);
+        ajouterFilBloc(pile.id, 0, r2.id, 0);
+        ajouterFilBloc(pile.id, 0, r3.id, 0);
+        ajouterFilBloc(pile.id, 0, r4.id, 0);
+        ajouterFilBloc(r1.id, 1, led1.id, 0);
+        ajouterFilBloc(r2.id, 1, led2.id, 0);
+        ajouterFilBloc(r3.id, 1, led3.id, 0);
+        ajouterFilBloc(r4.id, 1, led4.id, 0);
+        ajouterFilBloc(led1.id, 1, sw.id, 0);
+        ajouterFilBloc(led2.id, 1, sw.id, 0);
+        ajouterFilBloc(led3.id, 1, sw.id, 0);
+        ajouterFilBloc(led4.id, 1, sw.id, 0);
+        ajouterFilBloc(sw.id, 1, pile.id, 1);
+      }
+    }
+  },
+  compteurCD4017: { id:'compteurCD4017', nom:'Compteur CD4017', icone:'🔢', desc:'Horloge NE555 + CD4017',
+    fn: function(cx, cy, avecCablage) {
+      var pile = creerComposantBloc('pile', cx - 350, cy + 150, null);
+      var ne = creerComposantBloc('ne555', cx - 200, cy - 20, null);
+      var r1 = creerComposantBloc('resistance', cx - 320, cy - 130, '10000');
+      var r2 = creerComposantBloc('resistance', cx - 320, cy - 60, '10000');
+      var c1 = creerComposantBloc('condensateur', cx - 120, cy - 80, '10uF');
+      var cd = creerComposantBloc('cd4017', cx + 50, cy - 20, null);
+      var r3 = creerComposantBloc('resistance', cx - 30, cy + 100, '470');
+      var r4 = creerComposantBloc('resistance', cx + 130, cy + 100, '470');
+      var r5 = creerComposantBloc('resistance', cx + 290, cy + 100, '470');
+      var r6 = creerComposantBloc('resistance', cx + 450, cy + 100, '470');
+      var led1 = creerComposantBloc('led', cx - 30, cy + 180, 'rouge');
+      var led2 = creerComposantBloc('led', cx + 130, cy + 180, 'vert');
+      var led3 = creerComposantBloc('led', cx + 290, cy + 180, 'bleu');
+      var led4 = creerComposantBloc('led', cx + 450, cy + 180, 'rouge');
+      if (avecCablage) {
+        ajouterFilBloc(pile.id, 0, ne.id, 0);
+        ajouterFilBloc(ne.id, 5, pile.id, 1);
+        ajouterFilBloc(r1.id, 0, ne.id, 0);
+        ajouterFilBloc(r1.id, 1, ne.id, 6);
+        ajouterFilBloc(r2.id, 0, ne.id, 6);
+        ajouterFilBloc(r2.id, 1, ne.id, 7);
+        ajouterFilBloc(c1.id, 0, ne.id, 7);
+        ajouterFilBloc(c1.id, 1, ne.id, 5);
+        ajouterFilBloc(ne.id, 2, cd.id, 0);
+        ajouterFilBloc(pile.id, 0, cd.id, 7);
+        ajouterFilBloc(cd.id, 3, pile.id, 1);
+        ajouterFilBloc(cd.id, 1, r3.id, 0);
+        ajouterFilBloc(cd.id, 2, r4.id, 0);
+        ajouterFilBloc(cd.id, 4, r5.id, 0);
+        ajouterFilBloc(cd.id, 5, r6.id, 0);
+        ajouterFilBloc(r3.id, 1, led1.id, 0);
+        ajouterFilBloc(r4.id, 1, led2.id, 0);
+        ajouterFilBloc(r5.id, 1, led3.id, 0);
+        ajouterFilBloc(r6.id, 1, led4.id, 0);
+        ajouterFilBloc(led1.id, 1, pile.id, 1);
+        ajouterFilBloc(led2.id, 1, pile.id, 1);
+        ajouterFilBloc(led3.id, 1, pile.id, 1);
+        ajouterFilBloc(led4.id, 1, pile.id, 1);
+      }
+    }
+  }
+};
+
+/* =========================================================
+   TUTORIELS
+   ========================================================= */
+var TUTORIELS = {
+  ledSimple: {
+    id: 'ledSimple', nom: 'La LED simple', icone: '💡',
+    desc: 'Apprends à allumer une LED avec une pile et une résistance.',
+    etapes: [
+      { titre: 'Découvrir le circuit', description: 'Nous allons créer un circuit très simple : une pile, une résistance et une LED.', action: null },
+      { titre: 'Placer la pile', description: 'Trouve la Pile 9V dans la palette à gauche et place-la sur le canvas.', action: { type: 'composant', id: 'pile' } },
+      { titre: 'Ajouter la résistance', description: 'Place une résistance (470 Ω) entre la pile et la future LED.', action: { type: 'composant', id: 'resistance' } },
+      { titre: 'Ajouter la LED', description: 'Place une LED rouge à droite.', action: { type: 'composant', id: 'led' } },
+      { titre: 'Câbler la pile à la résistance', description: 'Câble la borne + de la pile à la patte gauche de la résistance.', action: { type: 'fil', de: {type:'pile'}, vers: {type:'resistance'} } },
+      { titre: 'Câbler la résistance à la LED', description: 'Câble la patte droite de la résistance à la patte gauche (anode) de la LED.', action: { type: 'fil', de: {type:'resistance'}, vers: {type:'led'} } },
+      { titre: 'Fermer le circuit', description: 'Câble la patte droite de la LED à la borne - de la pile.', action: { type: 'fil', de: {type:'led'}, vers: {type:'pile'} } },
+      { titre: 'Bravo !', description: 'Clique sur "Tester" pour voir la LED s\'allumer ! 💡', action: null }
+    ]
+  },
+  detecteurNuit: {
+    id: 'detecteurNuit', nom: 'Détecteur de nuit', icone: '🌙',
+    desc: 'Une LED qui s\'allume automatiquement quand il fait sombre.',
+    etapes: [
+      { titre: 'Le principe', description: 'La LDR change de valeur selon la lumière. On va détecter la nuit et allumer une LED.', action: null },
+      { titre: 'Placer la pile', description: 'Place une pile 9V sur le canvas.', action: { type: 'composant', id: 'pile' } },
+      { titre: 'Ajouter la LDR', description: 'Place la LDR (photo-résistance).', action: { type: 'composant', id: 'ldr' } },
+      { titre: 'Ajouter la résistance', description: 'Place une résistance 10 kΩ.', action: { type: 'composant', id: 'resistance' } },
+      { titre: 'Ajouter le transistor', description: 'Place le transistor 2N2222 au centre.', action: { type: 'composant', id: 'transistor' } },
+      { titre: 'Ajouter la LED', description: 'Place la LED rouge à droite.', action: { type: 'composant', id: 'led' } },
+      { titre: 'Câbler', description: 'Câble tout : Pile+ → LDR → Transistor → LED → Pile-.', action: null },
+      { titre: 'Bravo !', description: 'Clique sur "Tester" ! 🌙', action: null }
+    ]
+  },
+  chenillard: {
+    id: 'chenillard', nom: 'Chenillard 4 LED', icone: '🎮',
+    desc: 'Quatre LED qui s\'allument à tour de rôle !',
+    etapes: [
+      { titre: 'Le principe', description: 'Un "chenillard" est une série de LED qui s\'allument l\'une après l\'autre.', action: null },
+      { titre: 'Placer la pile', description: 'Place une pile 9V.', action: { type: 'composant', id: 'pile' } },
+      { titre: 'Placer les composants', description: 'Place 4 LED, 4 résistances et un interrupteur.', action: { type: 'bloc', id: 'chenillard4' } },
+      { titre: 'Vérifie le circuit', description: 'Le chenillard doit avoir : pile + 4 LED + 4 résistances + 1 interrupteur.', action: null },
+      { titre: 'Fermer l\'interrupteur', description: 'Clique sur l\'interrupteur pour le mettre en ON.', action: null },
+      { titre: 'Bravo !', description: 'Clique sur "Tester" : les 4 LED s\'allument à tour de rôle ! 🎮', action: null }
+    ]
+  }
+};
+
+/* =========================================================
+   AIDE CABLAGE BLOCS
+   ========================================================= */
+var CABLAGES_BLOCS = {
+  alim5v: ['Pile.+ (patte gauche) → Résistance (patte gauche)', 'Résistance (patte droite) → Condensateur (patte gauche)', 'Condensateur (patte droite) → Pile.- (patte droite)'],
+  alim9v: ['Pile.+ → Condensateur 10µF (patte gauche)', 'Condensateur 10µF (patte droite) → Condensateur 100µF (patte gauche)', 'Condensateur 100µF (patte droite) → Pile.-'],
+  clignotant555: ['Pile.+ → NE555 patte 8 (VCC)', 'NE555 patte 7 → R1 → NE555 patte 8', 'NE555 patte 7 → R2 → NE555 patte 6', 'NE555 patte 6 → Condensateur → NE555 patte 1', 'NE555 patte 3 (OUT) → R3 → LED (anode)', 'LED (cathode) → NE555 patte 1', 'NE555 patte 1 → Pile.-'],
+  deuxLedAlt: ['Pile.+ → R1 → LED1 (anode)', 'Pile.+ → R2 → LED2 (anode)', 'LED1 (cathode) → Interrupteur (patte gauche)', 'LED2 (cathode) → Interrupteur (patte droite)', 'Interrupteur (patte gauche) → Pile.-'],
+  avecBouton: ['Pile.+ → Bouton (patte gauche)', 'Bouton (patte droite) → Résistance → LED (anode)', 'LED (cathode) → Pile.-'],
+  detecteurNuit: ['Pile.+ → LDR (patte gauche)', 'LDR (patte droite) → Résistance 10kΩ → Pile.-', 'LDR (patte droite) → Transistor base', 'Pile.+ → LED (anode)', 'LED (cathode) → Transistor collecteur', 'Transistor émetteur → Pile.-'],
+  bipContinu: ['Pile.+ → Résistance → Buzzer (patte gauche)', 'Buzzer (patte droite) → Pile.-'],
+  chenillard4: ['Pile.+ → R1 → LED1', 'Pile.+ → R2 → LED2', 'Pile.+ → R3 → LED3', 'Pile.+ → R4 → LED4', 'LED1-4 (cathodes) → Interrupteur', 'Interrupteur → Pile.-'],
+  compteurCD4017: ['Pile.+ → NE555 (patte 8)', 'NE555 (patte 5) → Pile.-', 'R1 entre NE555 patte 8 et patte 7', 'R2 entre NE555 patte 7 et patte 6', 'Condensateur entre NE555 patte 6 et patte 1', 'NE555 patte 3 → CD4017 entrée horloge', 'Pile.+ → CD4017 VCC', 'CD4017 GND → Pile.-', 'CD4017 sorties → Résistances → LED', 'LED cathodes → Pile.-']
+};
+
+/* =========================================================
+   ETAT
+   ========================================================= */
+var composants = [];
+var fils = [];
+var prochainId = 1;
+var prochainFilId = 1;
+var composantSelectionne = null;
+var blocSelectionne = null;
+var modeCablage = false;
+var patteEnAttente = null;
+var composantEnDrag = null;
+var dragOffsetX = 0, dragOffsetY = 0;
+var canvas, ctx;
+
+/* ZOOM & PAN */
+var zoomLevel = 1.0;
+var panX = 0;
+var panY = 0;
+var zoomMin = 0.5;
+var zoomMax = 2.0;
+var enDeplacementVue = false;
+var dragVueStartX = 0;
+var dragVueStartY = 0;
+var dragVuePanStartX = 0;
+var dragVuePanStartY = 0;
+
+/* GRILLE MAGNETIQUE */
+var grilleActive = true;
+var grillePas = 20;
+
+/* HISTORIQUE (UNDO/REDO) */
+var historique = [];
+var historiqueIndex = -1;
+var MAX_HISTORIQUE = 30;
+var sauvegarde_en_cours = false;
+
+var composantAValeur = null;
+var ledPulsePhase = 0;
+var testActif = false;
+var filSurvole = null;
+var filMenuActif = null;
+var animChenillardActif = false;
+var animChenillardPhase = 0;
+var animChenillardTimer = null;
+var buzzerActif = false;
+var buzzerOndePhase = 0;
+
+/* MULTIMETRE */
+var multimetreActif = false;
+var multimetreMode = 'resistance';
+var pointeRouge = null;
+var pointeNoire = null;
+var composantMesure = null;
+var composantSurvoleClavier = null;
+
+/* TUTORIELS */
+var tutoActif = null;
+var tutoEtape = -1;
+
+/* LOCALSTORAGE */
+var LS_KEY = 'alerte_electro_bac_a_sable_v1';
+var autoSaveTimer = null;
+
+/* DRAG VUE */
+var dragVueSeuil = 5;
+var dragVuePretPourDeplacement = false;
+
+/* =========================================================
+   LOCALSTORAGE - SAUVEGARDE AUTOMATIQUE
+   ========================================================= */
+function sauvegarderLocal(silencieux) {
+  try {
+    var data = {
+      version: 1,
+      date: new Date().toISOString(),
+      composants: composants,
+      fils: fils,
+      prochainId: prochainId,
+      prochainFilId: prochainFilId
+    };
+    localStorage.setItem(LS_KEY, JSON.stringify(data));
+    if (!silencieux) mettreMessage('💾 Sauvegarde locale effectuée.', 'succes');
+  } catch (e) { console.log('Erreur sauvegarde locale:', e); }
+}
+
+function chargerLocal() {
+  try {
+    var raw = localStorage.getItem(LS_KEY);
+    if (!raw) return false;
+    var data = JSON.parse(raw);
+    if (!data.composants || !data.fils) return false;
+    if (data.composants.length === 0) return false;
+    if (confirm('📂 Un circuit sauvegardé a été trouvé (' + data.composants.length + ' composants).\nVoulez-vous le reprendre ?')) {
+      composants = data.composants;
+      fils = data.fils;
+      prochainId = data.prochainId || 1;
+      prochainFilId = data.prochainFilId || 1;
+            mettreMessage('📂 Circuit restauré ! ' + composants.length + ' composant(s).', 'succes');
+      mettreAJourStatut();
+      afficherPanneauComposants();
+      dessiner();
+      return true;
+    } else {
+      localStorage.removeItem(LS_KEY);
+      return false;
+    }
+  } catch (e) { console.log('Erreur chargement local:', e); return false; }
+}
+
+function demarrerAutoSave() {
+  if (autoSaveTimer) return;
+  autoSaveTimer = setInterval(function() {
+    if (composants.length > 0) sauvegarderLocal(true);
+  }, 30000);
+}
+
+function effacerLocal() {
+  try { localStorage.removeItem(LS_KEY); } catch (e) {}
+}
+
+/* =========================================================
+   ZOOM & PAN
+   ========================================================= */
+function gererMolette(event) {
+  event.preventDefault();
+  var rect = canvas.getBoundingClientRect();
+  var scaleX = canvas.width / rect.width;
+  var scaleY = canvas.height / rect.height;
+  var sx = (event.clientX - rect.left) * scaleX;
+  var sy = (event.clientY - rect.top) * scaleY;
+  var ancienZoom = zoomLevel;
+  var delta = event.deltaY < 0 ? 1.1 : 1 / 1.1;
+  var nouveauZoom = ancienZoom * delta;
+  nouveauZoom = Math.max(zoomMin, Math.min(zoomMax, nouveauZoom));
+  var wx = (sx - panX) / ancienZoom;
+  var wy = (sy - panY) / ancienZoom;
+  zoomLevel = nouveauZoom;
+  panX = sx - wx * zoomLevel;
+  panY = sy - wy * zoomLevel;
+  limiterPan();
+  dessiner();
+}
+
+function limiterPan() {
+  var marge = 300;
+  var largeurMonde = canvas.width * zoomLevel;
+  var hauteurMonde = canvas.height * zoomLevel;
+  var minX = -(largeurMonde - canvas.width) - marge;
+  var maxX = marge;
+  var minY = -(hauteurMonde - canvas.height) - marge;
+  var maxY = marge;
+  if (panX < minX) panX = minX;
+  if (panX > maxX) panX = maxX;
+  if (panY < minY) panY = minY;
+  if (panY > maxY) panY = maxY;
+}
+
+function zoomPlus() {
+  var centreX = canvas.width / 2;
+  var centreY = canvas.height / 2;
+  var ancienZoom = zoomLevel;
+  var nouveauZoom = Math.min(zoomMax, zoomLevel * 1.2);
+  var wx = (centreX - panX) / ancienZoom;
+  var wy = (centreY - panY) / ancienZoom;
+  zoomLevel = nouveauZoom;
+  panX = centreX - wx * zoomLevel;
+  panY = centreY - wy * zoomLevel;
+  limiterPan();
+  dessiner();
+}
+
+function zoomMoins() {
+  var centreX = canvas.width / 2;
+  var centreY = canvas.height / 2;
+  var ancienZoom = zoomLevel;
+  var nouveauZoom = Math.max(zoomMin, zoomLevel / 1.2);
+  var wx = (centreX - panX) / ancienZoom;
+  var wy = (centreY - panY) / ancienZoom;
+  zoomLevel = nouveauZoom;
+  panX = centreX - wx * zoomLevel;
+  panY = centreY - wy * zoomLevel;
+  limiterPan();
+  dessiner();
+}
+
+function recentrerVue() {
+  zoomLevel = 1.0;
+  panX = 0;
+  panY = 0;
+  dessiner();
+  mettreMessage('🏠 Vue recentrée (zoom 100%)', 'info');
+}
+
+function gererDragVueMousedown(event) {
+  if (event.button !== 0) return;
+  if (composantSelectionne || modeCablage || blocSelectionne || multimetreActif || tutoActif) {
+    return;
+  }
+  var pos = coordonneesSouris(event);
+  var comp = trouverComposantSousSouris(pos.x, pos.y);
+  if (comp) return;
+  var patte = trouverPatteSousSouris(pos.x, pos.y);
+  if (patte) return;
+  var rect = canvas.getBoundingClientRect();
+  var scaleX = canvas.width / rect.width;
+  var scaleY = canvas.height / rect.height;
+  dragVueStartX = (event.clientX - rect.left) * scaleX;
+  dragVueStartY = (event.clientY - rect.top) * scaleY;
+  dragVuePanStartX = panX;
+  dragVuePanStartY = panY;
+  dragVueSeuil = 5;
+  dragVuePretPourDeplacement = true;
+}
+
+function gererDragVueMousemove(event) {
+  if (!dragVuePretPourDeplacement) return;
+  var rect = canvas.getBoundingClientRect();
+  var scaleX = canvas.width / rect.width;
+  var scaleY = canvas.height / rect.height;
+  var sx = (event.clientX - rect.left) * scaleX;
+  var sy = (event.clientY - rect.top) * scaleY;
+  var dx = sx - dragVueStartX;
+  var dy = sy - dragVueStartY;
+  if (!enDeplacementVue) {
+    if (Math.abs(dx) < dragVueSeuil && Math.abs(dy) < dragVueSeuil) return;
+    enDeplacementVue = true;
+    canvas.style.cursor = 'grabbing';
+  }
+  panX = dragVuePanStartX + dx;
+  panY = dragVuePanStartY + dy;
+  limiterPan();
+  dessiner();
+}
+
+function gererDragVueMouseup(event) {
+  if (enDeplacementVue) {
+    enDeplacementVue = false;
+    canvas.style.cursor = 'crosshair';
+  }
+  dragVuePretPourDeplacement = false;
+}
+
+/* =========================================================
+   ANNULER LE MODE EN COURS (bouton)
+   ========================================================= */
+function annulerMode() {
+  var actionFaite = false;
+  if (composantSelectionne) {
+    composantSelectionne = null;
+    composantAValeur = null;
+    afficherPalette();
+    document.getElementById('statut-mode').textContent = '🖱️ Mode : Placer';
+    mettreMessage('❌ Placement annulé.', 'info');
+    actionFaite = true;
+  } else if (blocSelectionne) {
+    blocSelectionne = null;
+    canvas.classList.remove('mode-bloc');
+    afficherBlocs();
+    document.getElementById('statut-mode').textContent = '🖱️ Mode : Placer';
+    mettreMessage('❌ Bloc annulé.', 'info');
+    actionFaite = true;
+  } else if (modeCablage) {
+    basculerModeCablage();
+    actionFaite = true;
+  } else if (patteEnAttente) {
+    patteEnAttente = null;
+    mettreMessage('❌ Câblage annulé.', 'info');
+    actionFaite = true;
+  } else if (multimetreActif) {
+    basculerMultimetre();
+    actionFaite = true;
+  } else if (tutoActif) {
+    quitterTutoriel();
+    actionFaite = true;
+  }
+  if (!actionFaite) {
+    mettreMessage('💡 Rien à annuler.', 'info');
+  }
+  dessiner();
+}
+
+/* =========================================================
+   HISTORIQUE (UNDO / REDO)
+   ========================================================= */
+function faireSnapshot() {
+  if (sauvegarde_en_cours) return;
+  historique = historique.slice(0, historiqueIndex + 1);
+  var snapshot = {
+    composants: JSON.parse(JSON.stringify(composants)),
+    fils: JSON.parse(JSON.stringify(fils)),
+    prochainId: prochainId,
+    prochainFilId: prochainFilId
+  };
+  historique.push(snapshot);
+  if (historique.length > MAX_HISTORIQUE) historique.shift();
+  historiqueIndex = historique.length - 1;
+}
+
+function annulerAction() {
+  if (historiqueIndex <= 0) {
+    mettreMessage('↩️ Rien à annuler.', 'info');
+    return;
+  }
+  historiqueIndex--;
+  restaurerSnapshot(historique[historiqueIndex]);
+  mettreMessage('↩️ Action annulée.', 'info');
+}
+
+function retablirAction() {
+  if (historiqueIndex >= historique.length - 1) {
+    mettreMessage('↪️ Rien à rétablir.', 'info');
+    return;
+  }
+  historiqueIndex++;
+  restaurerSnapshot(historique[historiqueIndex]);
+  mettreMessage('↪️ Action rétablie.', 'info');
+}
+
+function restaurerSnapshot(snap) {
+  sauvegarde_en_cours = true;
+  composants = JSON.parse(JSON.stringify(snap.composants));
+  fils = JSON.parse(JSON.stringify(snap.fils));
+  prochainId = snap.prochainId;
+  prochainFilId = snap.prochainFilId;
+  patteEnAttente = null;
+  filSurvole = null;
+  pointeRouge = null;
+  pointeNoire = null;
+  sauvegarde_en_cours = false;
+  mettreAJourStatut();
+  dessiner();
+}
+
+/* =========================================================
+   RACCOURCIS CLAVIER
+   ========================================================= */
+function gererClavier(event) {
+  var tag = (event.target.tagName || '').toLowerCase();
+  if (tag === 'input' || tag === 'textarea') return;
+
+  // Suppr / Delete : supprime le composant sous la souris
+  if (event.key === 'Delete' || event.key === 'Backspace') {
+    if (composantSurvoleClavier) {
+      event.preventDefault();
+      supprimerComposant(composantSurvoleClavier.id);
+      return;
+    }
+  }
+
+  // Echap : annuler le mode en cours
+  if (event.key === 'Escape' || event.key === 'Esc' || event.keyCode === 27) {
+    event.preventDefault();
+    annulerMode();
+    return;
+  }
+
+  // Ctrl+Z : undo
+  if ((event.ctrlKey || event.metaKey) && (event.key === 'z' || event.key === 'Z')) {
+    event.preventDefault();
+    if (event.shiftKey) retablirAction();
+    else annulerAction();
+    return;
+  }
+
+  // Ctrl+Y : redo
+  if ((event.ctrlKey || event.metaKey) && (event.key === 'y' || event.key === 'Y')) {
+    event.preventDefault();
+    retablirAction();
+    return;
+  }
+
+  // Ctrl+S : sauvegarde JSON
+  if ((event.ctrlKey || event.metaKey) && (event.key === 's' || event.key === 'S')) {
+    event.preventDefault();
+    exporterJSON();
+    return;
+  }
+
+  // + : zoom avant
+  if (event.key === '+' || event.key === '=') {
+    event.preventDefault();
+    zoomPlus();
+    return;
+  }
+  // - : zoom arrière
+  if (event.key === '-' || event.key === '_') {
+    event.preventDefault();
+    zoomMoins();
+    return;
+  }
+    // 0 : recentrer
+  if (event.key === '0') {
+    event.preventDefault();
+    recentrerVue();
+    return;
+  }
+}
+
+/* =========================================================
+   PALETTE
+
+/* =========================================================
+   PALETTE
+   ========================================================= */
+/* =========================================================
+   PANNEAU COMPOSANTS PLACES (Session D - Patch 3)
+   ========================================================= */
+var panneauOuvert = true;
+var compoClignotantId = null;
+var compoClignotantTimer = null;
+
+function basculerPanneauComposants() {
+  panneauOuvert = !panneauOuvert;
+  var liste = document.getElementById('panneau-composants-liste');
+  var toggle = document.getElementById('panneau-toggle');
+  if (panneauOuvert) {
+    liste.classList.remove('replie');
+    toggle.classList.add('ouvert');
+  } else {
+    liste.classList.add('replie');
+    toggle.classList.remove('ouvert');
+  }
+}
+
+function afficherPanneauComposants() {
+  var div = document.getElementById('panneau-composants-liste');
+  var nbSpan = document.getElementById('panneau-nb');
+  if (!div) return;
+
+  nbSpan.textContent = '(' + composants.length + ')';
+
+  if (composants.length === 0) {
+    div.innerHTML = '<div class="panneau-composants-vide">Aucun composant placé</div>';
+    return;
+  }
+
+  var html = '';
+  for (var i = 0; i < composants.length; i++) {
+    var comp = composants[i];
+    var cat = CATALOGUE[comp.type];
+    if (!cat) continue;
+    var nom = cat.nom;
+    var valeur = comp.valeur ? ' ' + comp.valeur : '';
+    var estActif = (compoClignotantId === comp.id) ? ' actif' : '';
+    html += '<div class="composant-item' + estActif + '" id="compo-item-' + comp.id + '">';
+    html += '<div class="composant-item-nom">';
+    html += '<span>' + cat.icone + '</span>';
+    html += '<span>#' + comp.id + ' ' + nom + valeur + '</span>';
+    html += '</div>';
+    html += '<div class="composant-item-actions">';
+    html += '<button class="btn-item-centrer" onclick="centrerSurComposant(' + comp.id + ')">🎯 Centrer</button>';
+    html += '<button class="btn-item-supprimer" onclick="supprimerComposantDepuisPanneau(' + comp.id + ')">🗑️ Supprimer</button>';
+    html += '</div>';
+    html += '</div>';
+  }
+  div.innerHTML = html;
+
+  // Ouvrir automatiquement si >= 1 composant et pas encore manipule
+  if (!panneauOuvert) {
+    panneauOuvert = true;
+    div.classList.remove('replie');
+    document.getElementById('panneau-toggle').classList.add('ouvert');
+  }
+}
+
+function centrerSurComposant(id) {
+  var comp = trouverComposant(id);
+  if (!comp) return;
+
+  // Centrer la vue sur le composant
+  var centreCanvasX = canvas.width / 2;
+  var centreCanvasY = canvas.height / 2;
+  var compCentreX = comp.x + comp.largeur / 2;
+  var compCentreY = comp.y + comp.hauteur / 2;
+
+  // Calculer le pan necessaire pour centrer le composant
+  panX = centreCanvasX - compCentreX * zoomLevel;
+  panY = centreCanvasY - compCentreY * zoomLevel;
+  limiterPan();
+
+  // Marquer comme actif (clignote)
+  compoClignotantId = id;
+  if (compoClignotantTimer) clearTimeout(compoClignotantTimer);
+  compoClignotantTimer = setTimeout(function() {
+    compoClignotantId = null;
+    afficherPanneauComposants();
+    dessiner();
+  }, 2200);
+
+  afficherPanneauComposants();
+  dessiner();
+  mettreMessage('🎯 Vue centrée sur le composant #' + id, 'info');
+}
+
+function supprimerComposantDepuisPanneau(id) {
+  var comp = trouverComposant(id);
+  if (!comp) return;
+  var cat = CATALOGUE[comp.type];
+  var nom = cat ? cat.nom : 'Composant';
+  if (confirm('Supprimer ' + nom + ' #' + id + ' ?')) {
+    supprimerComposant(id);
+    // Si le composant supprime etait celui qui clignotait, on nettoie
+    if (compoClignotantId === id) compoClignotantId = null;
+  }
+}
+
+function afficherPalette() {
+  var div = document.getElementById('liste-palette');
+  var html = '';
+  var keys = Object.keys(CATALOGUE);
+  for (var i = 0; i < keys.length; i++) {
+    var c = CATALOGUE[keys[i]];
+    var actif = composantSelectionne === c.id ? ' actif' : '';
+    html += '<div class="item-palette' + actif + '" onclick="choisirComposant(\'' + c.id + '\')">';
+    html += '<div class="icone" style="background:' + c.couleur + ';color:white;">' + c.icone + '</div>';
+    html += '<div class="texte"><strong>' + c.nom + '</strong>';
+    if (c.valeurs) html += '<small>' + c.valeurs.length + ' valeur(s)</small>';
+    html += '</div></div>';
+  }
+  div.innerHTML = html;
+}
+
+function afficherBlocs() {
+  var div = document.getElementById('liste-blocs');
+  var html = '';
+  var keys = Object.keys(BLOCS);
+  for (var i = 0; i < keys.length; i++) {
+    var b = BLOCS[keys[i]];
+    var actif = blocSelectionne === b.id ? ' actif' : '';
+    html += '<div class="item-palette item-bloc' + actif + '" onclick="choisirBloc(\'' + b.id + '\')">';
+    html += '<div class="icone">' + b.icone + '</div>';
+    html += '<div class="texte"><strong>' + b.nom + '</strong><small>' + b.desc + '</small></div>';
+    html += '</div>';
+  }
+  div.innerHTML = html;
+}
+
+function afficherTutoriels() {
+  var div = document.getElementById('liste-tutoriels');
+  var html = '';
+  var keys = Object.keys(TUTORIELS);
+  for (var i = 0; i < keys.length; i++) {
+    var t = TUTORIELS[keys[i]];
+    var actif = (tutoActif && tutoActif.id === t.id) ? ' actif' : '';
+    html += '<div class="item-palette item-tuto' + actif + '" onclick="demarrerTutoriel(\'' + t.id + '\')">';
+    html += '<div class="icone">' + t.icone + '</div>';
+    html += '<div class="texte"><strong>' + t.nom + '</strong><small>' + t.etapes.length + ' étapes</small></div>';
+    html += '</div>';
+  }
+  div.innerHTML = html;
+}
+
+function choisirComposant(id) {
+  if (multimetreActif) basculerMultimetre();
+  var c = CATALOGUE[id];
+  if (c.valeurs && c.valeurs.length > 0) { afficherModalValeurs(id); return; }
+  composantSelectionne = id;
+  composantAValeur = null;
+  blocSelectionne = null;
+  if (modeCablage) {
+    modeCablage = false;
+    patteEnAttente = null;
+    var btn = document.getElementById('btn-cablage');
+    btn.textContent = '🔗 Câblage';
+    btn.classList.add('btn-gris');
+    btn.classList.remove('btn-vert');
+    canvas.classList.remove('mode-cablage');
+  }
+  canvas.classList.remove('mode-bloc');
+  afficherPalette(); afficherBlocs();
+  mettreMessage('🖱️ Cliquez sur la zone blanche pour placer : ' + c.nom, 'info');
+  document.getElementById('statut-mode').textContent = '🖱️ Mode : Placer ' + c.nom;
+}
+
+function choisirBloc(id) {
+  if (multimetreActif) basculerMultimetre();
+  blocSelectionne = id;
+  composantSelectionne = null;
+  composantAValeur = null;
+  canvas.classList.add('mode-bloc');
+  afficherPalette(); afficherBlocs();
+  var avecCab = document.getElementById('opt-cablage').checked;
+  var infoCab = avecCab ? '(câblé)' : '(NON câblé, à vous de câbler !)';
+  mettreMessage('📚 Cliquez sur la zone pour placer le bloc : ' + BLOCS[id].nom + ' ' + infoCab, 'info');
+  document.getElementById('statut-mode').textContent = '📚 Mode : Placer ' + BLOCS[id].nom;
+}
+
+function afficherModalValeurs(id) {
+  var c = CATALOGUE[id];
+  document.getElementById('modal-valeurs-titre').textContent = 'Choisir une valeur - ' + c.nom;
+  var div = document.getElementById('modal-valeurs-choix');
+  var html = '';
+  for (var i = 0; i < c.valeurs.length; i++) {
+    var v = c.valeurs[i];
+    html += '<button onclick="validerValeur(\'' + id + '\',\'' + v.val + '\')">' + v.label + '</button>';
+  }
+  div.innerHTML = html;
+  document.getElementById('modal-valeurs').classList.add('actif');
+}
+
+function validerValeur(id, valeur) {
+  document.getElementById('modal-valeurs').classList.remove('actif');
+  composantSelectionne = id;
+  composantAValeur = valeur;
+  blocSelectionne = null;
+  if (modeCablage) {
+    modeCablage = false;
+    patteEnAttente = null;
+    var btn = document.getElementById('btn-cablage');
+    btn.textContent = '🔗 Câblage';
+    btn.classList.add('btn-gris');
+    btn.classList.remove('btn-vert');
+    canvas.classList.remove('mode-cablage');
+  }
+  canvas.classList.remove('mode-bloc');
+  afficherPalette(); afficherBlocs();
+  mettreMessage('🖱️ Cliquez pour placer : ' + CATALOGUE[id].nom + ' (' + valeur + ')', 'info');
+  document.getElementById('statut-mode').textContent = '🖱️ Mode : Placer';
+}
+
+function fermerModalValeurs() { document.getElementById('modal-valeurs').classList.remove('actif'); }
+
+/* =========================================================
+   DESSIN
+   ========================================================= */
+function dessiner() {
+  if (!ctx) return;
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.save();
+  ctx.strokeStyle = grilleActive ? '#e8e8e8' : '#f5f5f5';
+  ctx.lineWidth = 1;
+  var gridSize = grillePas * zoomLevel;
+  var startX = panX % gridSize;
+  var startY = panY % gridSize;
+  if (startX < 0) startX += gridSize;
+  if (startY < 0) startY += gridSize;
+  for (var gx = startX; gx < canvas.width; gx += gridSize) {
+    ctx.beginPath(); ctx.moveTo(gx, 0); ctx.lineTo(gx, canvas.height); ctx.stroke();
+  }
+  for (var gy = startY; gy < canvas.height; gy += gridSize) {
+    ctx.beginPath(); ctx.moveTo(0, gy); ctx.lineTo(canvas.width, gy); ctx.stroke();
+  }
+  ctx.restore();
+  ctx.save();
+  ctx.translate(panX, panY);
+  ctx.scale(zoomLevel, zoomLevel);
+  for (var i = 0; i < fils.length; i++) {
+    var estSurvole = filSurvole && filSurvole === fils[i];
+    dessinerFil(fils[i], estSurvole);
+  }
+  for (var j = 0; j < composants.length; j++) {
+    var comp = composants[j];
+    var estMesure = multimetreActif && composantMesure === comp;
+    dessinerComposant(comp, estMesure);
+  }
+  if (patteEnAttente) {
+    var compA = trouverComposant(patteEnAttente.compId);
+    if (compA) {
+      var patte = obtenirPatteAbsolue(compA, patteEnAttente.patteIndex);
+      ctx.strokeStyle = '#fbbf24';
+      ctx.lineWidth = 4;
+      ctx.shadowColor = '#fbbf24';
+      ctx.shadowBlur = 15;
+      ctx.beginPath();
+      ctx.arc(patte.x, patte.y, 12, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.shadowBlur = 0;
+    }
+  }
+  if (multimetreActif) {
+    if (pointeRouge) dessinerPointeMultimetre(pointeRouge, '#E63946');
+    if (pointeNoire) dessinerPointeMultimetre(pointeNoire, '#1a1a1a');
+  }
+  if (buzzerActif) {
+    for (var b = 0; b < composants.length; b++) {
+      if (composants[b].type === 'buzzer' && composants[b].sonne) {
+        dessinerOndesSonores(composants[b]);
+      }
+    }
+  }
+  ctx.restore();
+  var zoomPourcent = Math.round(zoomLevel * 100) + '%';
+  ctx.fillStyle = 'rgba(15, 20, 32, 0.75)';
+  ctx.beginPath();
+  ctx.roundRect(canvas.width - 90, canvas.height - 35, 80, 26, 6);
+  ctx.fill();
+  ctx.fillStyle = '#38bdf8';
+  ctx.font = 'bold 13px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('🔍 ' + zoomPourcent, canvas.width - 50, canvas.height - 22);
+  // PANNEAU COMPOSANTS : clignotement du composant actif
+  if (compoClignotantId) {
+    var compCligno = trouverComposant(compoClignotantId);
+    if (compCligno) {
+      ctx.save();
+      // Revenir en coordonnees monde
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.translate(panX, panY);
+      ctx.scale(zoomLevel, zoomLevel);
+      // Calculer l'alpha pulsant
+      var t = Date.now() / 200;
+      var alphaC = 0.4 + 0.6 * Math.abs(Math.sin(t));
+      // Halo exterieur
+      ctx.strokeStyle = 'rgba(56, 189, 248, ' + alphaC + ')';
+      ctx.lineWidth = 4;
+      ctx.shadowColor = '#38bdf8';
+      ctx.shadowBlur = 20;
+      ctx.beginPath();
+      ctx.roundRect(
+        compCligno.x - 8,
+        compCligno.y - 8,
+        compCligno.largeur + 16,
+        compCligno.hauteur + 16,
+        10
+      );
+      ctx.stroke();
+      // Halo interieur (plus fin)
+      ctx.shadowBlur = 0;
+      ctx.strokeStyle = 'rgba(255, 255, 255, ' + (alphaC * 0.8) + ')';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.roundRect(
+        compCligno.x - 4,
+        compCligno.y - 4,
+        compCligno.largeur + 8,
+        compCligno.hauteur + 8,
+        8
+      );
+      ctx.stroke();
+      ctx.restore();
+    }
+  }
+
+  ctx.textBaseline = 'alphabetic';
+}
+
+function dessinerOndesSonores(comp) {
+  var cx = comp.x + comp.largeur/2;
+  var cy = comp.y + comp.hauteur/2;
+  var maxR = comp.largeur * 2.5;
+  for (var i = 0; i < 3; i++) {
+    var phase = (buzzerOndePhase + i / 3) % 1;
+    var r = comp.largeur/2 + phase * maxR;
+    var alpha = (1 - phase) * 0.6;
+    ctx.strokeStyle = 'rgba(251,191,36,' + alpha + ')';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, 0, Math.PI * 2);
+    ctx.stroke();
+  }
+  ctx.font = 'bold 20px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillStyle = 'rgba(251,191,36,' + (0.6 + 0.4*Math.abs(Math.sin(buzzerOndePhase*Math.PI))) + ')';
+  ctx.fillText('🔊', cx, cy - comp.hauteur/2 - 10);
+}
+
+function dessinerPointeMultimetre(pointe, couleur) {
+  var comp = trouverComposant(pointe.compId);
+  if (!comp) return;
+  var p = obtenirPatteAbsolue(comp, pointe.patteIndex);
+  var t = Date.now() / 300;
+  var alpha = 0.5 + 0.5 * Math.abs(Math.sin(t));
+  ctx.strokeStyle = couleur;
+  ctx.lineWidth = 3;
+  ctx.shadowColor = couleur;
+  ctx.shadowBlur = 15;
+  ctx.globalAlpha = alpha;
+  ctx.beginPath();
+  ctx.arc(p.x, p.y, 16, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.globalAlpha = 1;
+  ctx.shadowBlur = 0;
+}
+
+function calculerPointsFil(fil) {
+  var compA = trouverComposant(fil.compA);
+  var compB = trouverComposant(fil.compB);
+  if (!compA || !compB) return null;
+  var patteA = obtenirPatteAbsolue(compA, fil.patteA);
+  var patteB = obtenirPatteAbsolue(compB, fil.patteB);
+  var dx = patteB.x - patteA.x;
+  var dy = patteB.y - patteA.y;
+  var dist = Math.sqrt(dx*dx + dy*dy);
+  if (dist < 0.01) return null;
+  var midX = (patteA.x + patteB.x) / 2;
+  var midY = (patteA.y + patteB.y) / 2;
+  var nx = -dy / dist; var ny = dx / dist;
+  var offset = Math.min(dist * 0.3, 60);
+  var cx = midX + nx * offset;
+  var cy = midY + ny * offset;
+  return { patteA: patteA, patteB: patteB, cx: cx, cy: cy };
+}
+
+function dessinerFil(fil, survole) {
+  var pts = calculerPointsFil(fil);
+  if (!pts) return;
+  ctx.strokeStyle = 'rgba(0,0,0,0.15)';
+  ctx.lineWidth = 6; ctx.lineCap = 'round';
+  ctx.beginPath();
+  ctx.moveTo(pts.patteA.x + 2, pts.patteA.y + 2);
+  ctx.quadraticCurveTo(pts.cx + 2, pts.cy + 2, pts.patteB.x + 2, pts.patteB.y + 2);
+  ctx.stroke();
+  if (survole) {
+    ctx.strokeStyle = '#fbbf24'; ctx.lineWidth = 8;
+    ctx.shadowColor = '#fbbf24'; ctx.shadowBlur = 15;
+    ctx.beginPath();
+    ctx.moveTo(pts.patteA.x, pts.patteA.y);
+    ctx.quadraticCurveTo(pts.cx, pts.cy, pts.patteB.x, pts.patteB.y);
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+  }
+  ctx.strokeStyle = fil.couleur || '#E63946';
+  ctx.lineWidth = survole ? 6 : 4;
+  ctx.beginPath();
+  ctx.moveTo(pts.patteA.x, pts.patteA.y);
+  ctx.quadraticCurveTo(pts.cx, pts.cy, pts.patteB.x, pts.patteB.y);
+  ctx.stroke();
+  ctx.strokeStyle = 'rgba(255,255,255,0.3)';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(pts.patteA.x, pts.patteA.y - 1);
+  ctx.quadraticCurveTo(pts.cx, pts.cy - 1, pts.patteB.x, pts.patteB.y - 1);
+  ctx.stroke();
+}
+
+function distancePointAuFil(x, y, fil) {
+  var pts = calculerPointsFil(fil);
+  if (!pts) return Infinity;
+  var N = 30;
+  var minDist = Infinity;
+  for (var i = 0; i <= N; i++) {
+    var t = i / N;
+    var mt = 1 - t;
+    var px = mt*mt*pts.patteA.x + 2*mt*t*pts.cx + t*t*pts.patteB.x;
+    var py = mt*mt*pts.patteA.y + 2*mt*t*pts.cy + t*t*pts.patteB.y;
+    var dx = x - px, dy = y - py;
+    var d = Math.sqrt(dx*dx + dy*dy);
+    if (d < minDist) minDist = d;
+  }
+  return minDist;
+}
+
+function trouverFilSousSouris(x, y) {
+  var seuil = 15;
+  var meilleur = null;
+  var meilleureDist = Infinity;
+  for (var i = 0; i < fils.length; i++) {
+    var d = distancePointAuFil(x, y, fils[i]);
+    if (d < seuil && d < meilleureDist) { meilleureDist = d; meilleur = fils[i]; }
+  }
+  return meilleur;
+}
+
+function dessinerComposant(comp, estMesure) {
+  var c = CATALOGUE[comp.type];
+  if (!c) return;
+  if (estMesure) {
+    ctx.fillStyle = 'rgba(6,182,212,0.2)';
+    ctx.beginPath();
+    ctx.ellipse(comp.x + comp.largeur/2, comp.y + comp.hauteur/2,
+                comp.largeur, comp.hauteur * 0.9, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = '#06b6d4'; ctx.lineWidth = 3;
+    ctx.setLineDash([6, 4]);
+    ctx.beginPath();
+    ctx.ellipse(comp.x + comp.largeur/2, comp.y + comp.hauteur/2,
+                comp.largeur * 0.7, comp.hauteur * 0.8, 0, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.setLineDash([]);
+  }
+  ctx.fillStyle = 'rgba(0,0,0,0.18)';
+  ctx.beginPath();
+  ctx.ellipse(comp.x + comp.largeur/2, comp.y + comp.hauteur + 4,
+              comp.largeur/2 + 3, 6, 0, 0, Math.PI * 2);
+  ctx.fill();
+  if (comp.type === 'pile') dessinerPile(comp);
+  else if (comp.type === 'resistance') dessinerResistance(comp);
+  else if (comp.type === 'led') dessinerLED(comp, comp.allume);
+  else if (comp.type === 'interrupteur') dessinerInterrupteur(comp);
+  else if (comp.type === 'ne555') dessinerNE555(comp);
+  else if (comp.type === 'cd4017') dessinerCD4017(comp);
+  else if (comp.type === 'condensateur') dessinerCondensateur(comp);
+  else if (comp.type === 'transistor') dessinerTransistor(comp);
+  else if (comp.type === 'ldr') dessinerLDR(comp);
+  else if (comp.type === 'bouton') dessinerBouton(comp);
+  else if (comp.type === 'buzzer') dessinerBuzzer(comp);
+
+  for (var i = 0; i < c.pattes.length; i++) {
+    var p = obtenirPatteAbsolue(comp, i);
+    var estEnAttente = patteEnAttente && patteEnAttente.compId === comp.id && patteEnAttente.patteIndex === i;
+    var estPointeRouge = pointeRouge && pointeRouge.compId === comp.id && pointeRouge.patteIndex === i;
+    var estPointeNoire = pointeNoire && pointeNoire.compId === comp.id && pointeNoire.patteIndex === i;
+    var estPattePilePlus = comp.type === 'pile' && i === 0;
+    var estPattePileMoins = comp.type === 'pile' && i === 1;
+    ctx.fillStyle = 'rgba(0,0,0,0.3)';
+    ctx.beginPath(); ctx.arc(p.x + 1, p.y + 1, 6, 0, Math.PI * 2); ctx.fill();
+    var grdPatte = ctx.createRadialGradient(p.x - 2, p.y - 2, 1, p.x, p.y, 6);
+    if (estEnAttente || estPointeRouge || estPointeNoire) {
+      grdPatte.addColorStop(0, '#fff8b0'); grdPatte.addColorStop(0.5, '#fbbf24'); grdPatte.addColorStop(1, '#b45309');
+    } else if (estPattePilePlus) {
+      grdPatte.addColorStop(0, '#93c5fd'); grdPatte.addColorStop(0.5, '#3b82f6'); grdPatte.addColorStop(1, '#1e40af');
+    } else if (estPattePileMoins) {
+      grdPatte.addColorStop(0, '#fca5a5'); grdPatte.addColorStop(0.5, '#dc2626'); grdPatte.addColorStop(1, '#7f1d1d');
+    } else {
+      grdPatte.addColorStop(0, '#e0e0e0'); grdPatte.addColorStop(0.5, '#a0a0a0'); grdPatte.addColorStop(1, '#606060');
+    }
+    ctx.fillStyle = grdPatte;
+    ctx.beginPath(); ctx.arc(p.x, p.y, 7, 0, Math.PI * 2); ctx.fill();
+    ctx.strokeStyle = '#333'; ctx.lineWidth = 1; ctx.stroke();
+    if (estPattePilePlus) {
+      ctx.fillStyle = '#1e40af';
+      ctx.font = 'bold 14px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('+', p.x, p.y + 22);
+    }
+    if (estPattePileMoins) {
+      ctx.fillStyle = '#7f1d1d';
+      ctx.font = 'bold 16px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('−', p.x, p.y + 22);
+    }
+  }
+  ctx.fillStyle = '#333';
+  ctx.font = 'bold 11px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText(c.nom, comp.x + comp.largeur/2, comp.y - 5);
+  if (comp.valeur) {
+    ctx.fillStyle = '#0369a1';
+    ctx.font = '10px sans-serif';
+    ctx.fillText(comp.valeur, comp.x + comp.largeur/2, comp.y + comp.hauteur + 15);
+  }
+}
+
+function dessinerPile(comp) {
+  var grd = ctx.createLinearGradient(comp.x, comp.y, comp.x, comp.y + comp.hauteur);
+  grd.addColorStop(0, '#4a4a4a'); grd.addColorStop(0.5, '#2a2a2a'); grd.addColorStop(1, '#1a1a1a');
+  ctx.fillStyle = grd;
+  ctx.beginPath(); ctx.roundRect(comp.x, comp.y, comp.largeur, comp.hauteur, 6); ctx.fill();
+  ctx.fillStyle = 'rgba(255,255,255,0.15)';
+  ctx.beginPath(); ctx.roundRect(comp.x + 3, comp.y + 2, comp.largeur - 6, comp.hauteur/3, 4); ctx.fill();
+  var grdDore = ctx.createLinearGradient(comp.x, comp.y + 5, comp.x, comp.y + 13);
+  grdDore.addColorStop(0, '#f0c987'); grdDore.addColorStop(0.5, '#d4a76a'); grdDore.addColorStop(1, '#a67c3d');
+  ctx.fillStyle = grdDore;
+  ctx.fillRect(comp.x + 5, comp.y + 5, comp.largeur - 10, 8);
+  ctx.fillStyle = 'rgba(255,255,255,0.5)';
+  ctx.fillRect(comp.x + 5, comp.y + 5, comp.largeur - 10, 2);
+  ctx.fillStyle = '#3b82f6';
+  ctx.font = 'bold 18px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.shadowColor = 'rgba(59,130,246,0.8)'; ctx.shadowBlur = 8;
+  ctx.fillText('+', comp.x + 15, comp.y + 12);
+  ctx.fillStyle = '#dc2626';
+  ctx.font = 'bold 22px sans-serif';
+  ctx.shadowColor = 'rgba(220,38,38,0.8)'; ctx.shadowBlur = 8;
+  ctx.fillText('−', comp.x + comp.largeur - 15, comp.y + 13);
+  ctx.shadowBlur = 0;
+  ctx.fillStyle = '#fff';
+  ctx.font = 'bold 18px sans-serif';
+  ctx.shadowColor = 'rgba(0,0,0,0.6)'; ctx.shadowBlur = 4;
+  ctx.fillText('9V', comp.x + comp.largeur/2, comp.y + comp.hauteur/2 + 8);
+  ctx.shadowBlur = 0;
+  var grdRouge = ctx.createRadialGradient(comp.x + comp.largeur - 17, comp.y + 6, 1, comp.x + comp.largeur - 15, comp.y + 8, 6);
+  grdRouge.addColorStop(0, '#ff8a8a'); grdRouge.addColorStop(1, '#8b0000');
+  ctx.fillStyle = grdRouge;
+  ctx.beginPath(); ctx.arc(comp.x + comp.largeur - 15, comp.y + 8, 6, 0, Math.PI * 2); ctx.fill();
+  var grdBleu = ctx.createRadialGradient(comp.x + 13, comp.y + 6, 1, comp.x + 15, comp.y + 8, 6);
+  grdBleu.addColorStop(0, '#7ab8ff'); grdBleu.addColorStop(1, '#003366');
+  ctx.fillStyle = grdBleu;
+  ctx.beginPath(); ctx.arc(comp.x + 15, comp.y + 8, 6, 0, Math.PI * 2); ctx.fill();
+}
+
+function dessinerResistance(comp) {
+  var grd = ctx.createLinearGradient(comp.x, comp.y, comp.x, comp.y + comp.hauteur);
+  grd.addColorStop(0, '#f0d4a0'); grd.addColorStop(0.3, '#d4a76a'); grd.addColorStop(0.7, '#b8905a'); grd.addColorStop(1, '#8a6a40');
+  ctx.fillStyle = grd;
+  ctx.beginPath(); ctx.roundRect(comp.x, comp.y, comp.largeur, comp.hauteur, comp.hauteur/2); ctx.fill();
+  ctx.fillStyle = 'rgba(255,255,255,0.4)';
+  ctx.beginPath(); ctx.roundRect(comp.x + 8, comp.y + 3, comp.largeur - 16, 4, 2); ctx.fill();
+  var bandes = [{pos:15,col:'#FFD700'},{pos:35,col:'#8B00FF'},{pos:55,col:'#8B4513'},{pos:85,col:'#FFD700'}];
+  for (var i = 0; i < bandes.length; i++) {
+    var b = bandes[i];
+    ctx.fillStyle = b.col;
+    ctx.fillRect(comp.x + b.pos, comp.y + 2, 6, comp.hauteur - 4);
+    ctx.fillStyle = 'rgba(255,255,255,0.35)';
+    ctx.fillRect(comp.x + b.pos, comp.y + 2, 6, 2);
+  }
+}
+
+function dessinerLED(comp, allumee) {
+  var cx = comp.x + comp.largeur/2;
+  var cy = comp.y + comp.hauteur/2;
+  var r = comp.largeur/2;
+  var baseCouleur, glowCouleur, refletCouleur;
+  if (comp.valeur === 'vert') { baseCouleur = allumee ? '#4ade80' : '#166534'; glowCouleur = 'rgba(34,197,94,'; refletCouleur = '#86efac'; }
+  else if (comp.valeur === 'bleu') { baseCouleur = allumee ? '#60a5fa' : '#1e3a8a'; glowCouleur = 'rgba(59,130,246,'; refletCouleur = '#93c5fd'; }
+  else { baseCouleur = allumee ? '#ff3333' : '#b30000'; glowCouleur = 'rgba(255,50,50,'; refletCouleur = '#ff9999'; }
+  if (allumee) {
+    var pulse = 1 + 0.15 * Math.sin(ledPulsePhase);
+    var haloR = r * 4 * pulse;
+    var grdHalo = ctx.createRadialGradient(cx, cy, r, cx, cy, haloR);
+    grdHalo.addColorStop(0, glowCouleur + '0.7)');
+    grdHalo.addColorStop(0.5, glowCouleur + '0.2)');
+    grdHalo.addColorStop(1, glowCouleur + '0)');
+    ctx.fillStyle = grdHalo;
+    ctx.beginPath(); ctx.arc(cx, cy, haloR, 0, Math.PI * 2); ctx.fill();
+  }
+  var grd = ctx.createRadialGradient(cx - r/3, cy - r/3, 2, cx, cy, r);
+  grd.addColorStop(0, refletCouleur);
+  grd.addColorStop(0.4, baseCouleur);
+  grd.addColorStop(1, allumee ? '#880000' : '#550000');
+  ctx.fillStyle = grd;
+  ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.fill();
+  ctx.strokeStyle = 'rgba(0,0,0,0.5)'; ctx.lineWidth = 1.5; ctx.stroke();
+  ctx.fillStyle = allumee ? 'rgba(255,255,255,0.9)' : 'rgba(255,255,255,0.6)';
+  ctx.beginPath();
+  ctx.ellipse(cx - r/3, cy - r/3, r/3, r/4, -Math.PI/4, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = 'rgba(255,255,255,0.4)';
+  ctx.beginPath();
+  ctx.arc(cx - r/4, cy + r/3, r/8, 0, Math.PI * 2);
+  ctx.fill();
+}
+
+function dessinerInterrupteur(comp) {
+  var grd = ctx.createLinearGradient(comp.x, comp.y, comp.x, comp.y + comp.hauteur);
+  grd.addColorStop(0, '#666'); grd.addColorStop(0.5, '#3a3a3a'); grd.addColorStop(1, '#1a1a1a');
+  ctx.fillStyle = grd;
+  ctx.beginPath(); ctx.roundRect(comp.x, comp.y, comp.largeur, comp.hauteur, 6); ctx.fill();
+  ctx.fillStyle = 'rgba(255,255,255,0.15)';
+  ctx.beginPath(); ctx.roundRect(comp.x + 3, comp.y + 3, comp.largeur - 6, 6, 3); ctx.fill();
+  var grdBorne = ctx.createRadialGradient(comp.x + 13, comp.y + comp.hauteur/2 - 2, 1, comp.x + 15, comp.y + comp.hauteur/2, 7);
+  grdBorne.addColorStop(0, '#fff'); grdBorne.addColorStop(0.5, '#c0c0c0'); grdBorne.addColorStop(1, '#666');
+  ctx.fillStyle = grdBorne;
+  ctx.beginPath(); ctx.arc(comp.x + 15, comp.y + comp.hauteur/2, 6, 0, Math.PI * 2); ctx.fill();
+  ctx.beginPath(); ctx.arc(comp.x + comp.largeur - 15, comp.y + comp.hauteur/2, 6, 0, Math.PI * 2); ctx.fill();
+  ctx.strokeStyle = 'rgba(0,0,0,0.4)'; ctx.lineWidth = 7; ctx.lineCap = 'round';
+  ctx.beginPath();
+  if (comp.ferme) {
+    ctx.moveTo(comp.x + 15, comp.y + comp.hauteur/2);
+    ctx.lineTo(comp.x + comp.largeur - 15, comp.y + comp.hauteur/2);
+  } else {
+    ctx.moveTo(comp.x + 15, comp.y + comp.hauteur/2);
+    ctx.lineTo(comp.x + comp.largeur - 25, comp.y + 10);
+  }
+  ctx.stroke();
+  ctx.strokeStyle = comp.ferme ? '#22c55e' : '#ef4444';
+  ctx.lineWidth = 5;
+  ctx.beginPath();
+  if (comp.ferme) {
+    ctx.moveTo(comp.x + 15, comp.y + comp.hauteur/2);
+    ctx.lineTo(comp.x + comp.largeur - 15, comp.y + comp.hauteur/2);
+  } else {
+    ctx.moveTo(comp.x + 15, comp.y + comp.hauteur/2);
+    ctx.lineTo(comp.x + comp.largeur - 25, comp.y + 10);
+  }
+  ctx.stroke();
+  ctx.fillStyle = '#fff';
+  ctx.font = 'bold 10px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.shadowColor = 'rgba(0,0,0,0.8)'; ctx.shadowBlur = 3;
+  ctx.fillText(comp.ferme ? 'ON' : 'OFF', comp.x + comp.largeur/2, comp.y + comp.hauteur - 3);
+  ctx.shadowBlur = 0;
+}
+
+function dessinerNE555(comp) {
+  var grd = ctx.createLinearGradient(comp.x, comp.y, comp.x + comp.largeur, comp.y + comp.hauteur);
+  grd.addColorStop(0, '#3a3a3a'); grd.addColorStop(0.4, '#1a1a1a'); grd.addColorStop(1, '#000');
+  ctx.fillStyle = grd;
+  ctx.beginPath(); ctx.roundRect(comp.x, comp.y, comp.largeur, comp.hauteur, 5); ctx.fill();
+  ctx.fillStyle = 'rgba(255,255,255,0.12)';
+  ctx.beginPath(); ctx.roundRect(comp.x + 4, comp.y + 4, comp.largeur - 8, 15, 3); ctx.fill();
+  ctx.fillStyle = '#000';
+  ctx.beginPath(); ctx.arc(comp.x + comp.largeur/2, comp.y + 8, 8, 0, Math.PI, true); ctx.fill();
+  ctx.fillStyle = '#555';
+  ctx.beginPath(); ctx.arc(comp.x + comp.largeur/2, comp.y + 8, 8, 0, Math.PI); ctx.fill();
+  ctx.fillStyle = '#ccc';
+  ctx.font = 'bold 11px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.shadowColor = 'rgba(0,0,0,0.8)'; ctx.shadowBlur = 3;
+  ctx.fillText('NE555', comp.x + comp.largeur/2, comp.y + comp.hauteur/2 + 5);
+  ctx.shadowBlur = 0;
+}
+
+function dessinerCD4017(comp) {
+  var grd = ctx.createLinearGradient(comp.x, comp.y, comp.x + comp.largeur, comp.y + comp.hauteur);
+  grd.addColorStop(0, '#4a3a5a'); grd.addColorStop(0.4, '#2a1a3a'); grd.addColorStop(1, '#1a0a2a');
+  ctx.fillStyle = grd;
+  ctx.beginPath(); ctx.roundRect(comp.x, comp.y, comp.largeur, comp.hauteur, 5); ctx.fill();
+  ctx.fillStyle = 'rgba(255,255,255,0.12)';
+  ctx.beginPath(); ctx.roundRect(comp.x + 4, comp.y + 4, comp.largeur - 8, 15, 3); ctx.fill();
+  ctx.fillStyle = '#000';
+  ctx.beginPath(); ctx.arc(comp.x + comp.largeur/2, comp.y + 8, 8, 0, Math.PI, true); ctx.fill();
+  ctx.fillStyle = '#8b5cf6';
+  ctx.beginPath(); ctx.arc(comp.x + comp.largeur/2, comp.y + 8, 8, 0, Math.PI); ctx.fill();
+  ctx.fillStyle = '#e9d5ff';
+  ctx.font = 'bold 11px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.shadowColor = 'rgba(139,92,246,0.8)'; ctx.shadowBlur = 6;
+  ctx.fillText('CD4017', comp.x + comp.largeur/2, comp.y + comp.hauteur/2 + 5);
+  ctx.shadowBlur = 0;
+}
+
+function dessinerCondensateur(comp) {
+  var grd = ctx.createRadialGradient(comp.x + comp.largeur/2 - 5, comp.y + comp.hauteur/2 - 5, 2, comp.x + comp.largeur/2, comp.y + comp.hauteur/2, comp.largeur/2);
+  grd.addColorStop(0, '#60a5fa'); grd.addColorStop(0.5, '#0369a1'); grd.addColorStop(1, '#082f49');
+  ctx.fillStyle = grd;
+  ctx.beginPath(); ctx.arc(comp.x + comp.largeur/2, comp.y + comp.hauteur/2, comp.largeur/2, 0, Math.PI * 2); ctx.fill();
+  ctx.strokeStyle = 'rgba(0,0,0,0.5)'; ctx.lineWidth = 1.5; ctx.stroke();
+  ctx.fillStyle = 'rgba(255,255,255,0.5)';
+  ctx.beginPath(); ctx.ellipse(comp.x + comp.largeur/2 - 6, comp.y + comp.hauteur/2 - 6, 5, 3, -Math.PI/4, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = '#fff';
+  ctx.font = 'bold 12px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.shadowColor = 'rgba(0,0,0,0.8)'; ctx.shadowBlur = 3;
+  ctx.fillText('C', comp.x + comp.largeur/2, comp.y + comp.hauteur/2 + 4);
+  ctx.shadowBlur = 0;
+}
+
+function dessinerTransistor(comp) {
+  var grd = ctx.createRadialGradient(comp.x + comp.largeur/2 - 8, comp.y + comp.hauteur/2 - 8, 3, comp.x + comp.largeur/2, comp.y + comp.hauteur/2, comp.largeur/2);
+  grd.addColorStop(0, '#4a4a4a'); grd.addColorStop(0.5, '#222'); grd.addColorStop(1, '#000');
+  ctx.fillStyle = grd;
+  ctx.beginPath(); ctx.arc(comp.x + comp.largeur/2, comp.y + comp.hauteur/2, comp.largeur/2, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = 'rgba(255,255,255,0.15)';
+  ctx.beginPath(); ctx.ellipse(comp.x + comp.largeur/2 - 8, comp.y + comp.hauteur/2 - 8, 10, 6, -Math.PI/4, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = '#fff';
+  ctx.font = 'bold 11px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.shadowColor = 'rgba(0,0,0,0.8)'; ctx.shadowBlur = 3;
+  ctx.fillText('2N', comp.x + comp.largeur/2, comp.y + comp.hauteur/2 + 4);
+  ctx.shadowBlur = 0;
+}
+
+function dessinerLDR(comp) {
+  var grd = ctx.createLinearGradient(comp.x, comp.y, comp.x, comp.y + comp.hauteur);
+  grd.addColorStop(0, '#f0d4a0'); grd.addColorStop(0.5, '#d4a76a'); grd.addColorStop(1, '#a67c3d');
+  ctx.fillStyle = grd;
+  ctx.beginPath(); ctx.roundRect(comp.x, comp.y, comp.largeur, comp.hauteur, 4); ctx.fill();
+  ctx.strokeStyle = '#8B4513'; ctx.lineWidth = 2;
+  for (var i = 0; i < 4; i++) {
+    ctx.beginPath();
+    ctx.moveTo(comp.x + 8 + i * 13, comp.y + 4);
+    ctx.lineTo(comp.x + 8 + i * 13, comp.y + comp.hauteur - 4);
+    ctx.stroke();
+  }
+  ctx.fillStyle = 'rgba(255,255,255,0.4)';
+  ctx.fillRect(comp.x + 2, comp.y + 2, comp.largeur - 4, 3);
+}
+
+function dessinerBouton(comp) {
+  var grd = ctx.createLinearGradient(comp.x, comp.y, comp.x, comp.y + comp.hauteur);
+  grd.addColorStop(0, '#666'); grd.addColorStop(0.5, '#3a3a3a'); grd.addColorStop(1, '#1a1a1a');
+  ctx.fillStyle = grd;
+  ctx.beginPath(); ctx.roundRect(comp.x, comp.y, comp.largeur, comp.hauteur, 6); ctx.fill();
+  var grdBouton = ctx.createRadialGradient(comp.x + comp.largeur/2 - 4, comp.y + comp.hauteur/2 - 9, 2, comp.x + comp.largeur/2, comp.y + comp.hauteur/2 - 5, 15);
+  if (comp.appuye) {
+    grdBouton.addColorStop(0, '#4ade80'); grdBouton.addColorStop(1, '#166534');
+  } else {
+    grdBouton.addColorStop(0, '#c0c0c0'); grdBouton.addColorStop(1, '#666');
+  }
+  ctx.fillStyle = grdBouton;
+  ctx.beginPath(); ctx.arc(comp.x + comp.largeur/2, comp.y + comp.hauteur/2 - 5, comp.appuye ? 12 : 15, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = '#fff';
+  ctx.font = 'bold 10px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.shadowColor = 'rgba(0,0,0,0.8)'; ctx.shadowBlur = 3;
+  ctx.fillText('BP', comp.x + comp.largeur/2, comp.y + comp.hauteur - 5);
+  ctx.shadowBlur = 0;
+}
+
+function dessinerBuzzer(comp) {
+  var grd = ctx.createRadialGradient(comp.x + comp.largeur/2 - 5, comp.y + comp.hauteur/2 - 5, 2, comp.x + comp.largeur/2, comp.y + comp.hauteur/2, comp.largeur/2);
+  grd.addColorStop(0, '#4a4a4a'); grd.addColorStop(0.5, '#222'); grd.addColorStop(1, '#000');
+  ctx.fillStyle = grd;
+  ctx.beginPath(); ctx.arc(comp.x + comp.largeur/2, comp.y + comp.hauteur/2, comp.largeur/2, 0, Math.PI * 2); ctx.fill();
+  ctx.strokeStyle = '#fbbf24'; ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.arc(comp.x + comp.largeur/2, comp.y + comp.hauteur/2, comp.largeur/4, 0, Math.PI * 2); ctx.stroke();
+  ctx.fillStyle = '#fbbf24';
+  ctx.font = 'bold 10px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.shadowColor = 'rgba(251,191,36,0.8)'; ctx.shadowBlur = 6;
+  ctx.fillText('BZ', comp.x + comp.largeur/2, comp.y + comp.hauteur/2 + 4);
+  ctx.shadowBlur = 0;
+}
+
+function obtenirPatteAbsolue(comp, patteIndex) {
+  var c = CATALOGUE[comp.type];
+  var patteOffset = c.pattes[patteIndex];
+  return { x: comp.x + patteOffset.x, y: comp.y + patteOffset.y };
+}
+
+function trouverComposant(id) {
+  for (var i = 0; i < composants.length; i++) {
+    if (composants[i].id === id) return composants[i];
+  }
+  return null;
+}
+
+function trouverComposantSousSouris(x, y) {
+  for (var i = composants.length - 1; i >= 0; i--) {
+    var c = composants[i];
+    if (x >= c.x && x <= c.x + c.largeur && y >= c.y && y <= c.y + c.hauteur) return c;
+  }
+  return null;
+}
+
+function trouverPatteSousSouris(x, y) {
+  for (var i = composants.length - 1; i >= 0; i--) {
+    var comp = composants[i];
+    var c = CATALOGUE[comp.type];
+    for (var j = 0; j < c.pattes.length; j++) {
+      var p = obtenirPatteAbsolue(comp, j);
+      var dx = x - p.x, dy = y - p.y;
+      if (dx*dx + dy*dy <= 14*14) return { compId: comp.id, patteIndex: j };
+    }
+  }
+  return null;
+}
+
+function coordonneesSouris(event) {
+  var rect = canvas.getBoundingClientRect();
+  var scaleX = canvas.width / rect.width;
+  var scaleY = canvas.height / rect.height;
+  var sx = (event.clientX - rect.left) * scaleX;
+  var sy = (event.clientY - rect.top) * scaleY;
+  var wx = (sx - panX) / zoomLevel;
+  var wy = (sy - panY) / zoomLevel;
+  return { x: wx, y: wy };
+}
+
+/* =========================================================
+   FONCTIONS BLOCS
+   ========================================================= */
+function creerComposantBloc(type, cx, cy, valeur) {
+  var c = CATALOGUE[type];
+  var comp = {
+    id: prochainId++, type: type,
+    x: cx - c.largeur/2, y: cy - c.hauteur/2,
+    largeur: c.largeur, hauteur: c.hauteur,
+    valeur: valeur || null, ferme: false, appuye: false, allume: false, sonne: false
+  };
+  composants.push(comp);
+  return comp;
+}
+
+function ajouterFilBloc(compA, patteA, compB, patteB) {
+  var fil = {
+    id: prochainFilId++,
+    compA: compA, patteA: patteA,
+    compB: compB, patteB: patteB,
+    couleur: '#E63946'
+  };
+  fils.push(fil);
+  return fil;
+}
+
+function afficherAideCablage(blocId) {
+  var cables = CABLAGES_BLOCS[blocId];
+  if (!cables || cables.length === 0) return;
+  var msg = '📚 Bloc placé SANS câblage. Voici les câblages à faire :\n\n';
+  for (var i = 0; i < cables.length; i++) {
+    msg += (i+1) + '. ' + cables[i] + '\n';
+  }
+  var div = document.getElementById('message');
+  div.textContent = msg;
+  div.className = 'message-info avertissement';
+}
+
+/* =========================================================
+   CLIC CANVAS
+   ========================================================= */
+function clicCanvas(event) {
+  if (enDeplacementVue || dragVuePretPourDeplacement) return;
+  fermerMenuContextuel();
+  var pos = coordonneesSouris(event);
+
+  if (multimetreActif) { gererClicMultimetre(pos.x, pos.y); return; }
+
+  if (blocSelectionne) {
+    var b = BLOCS[blocSelectionne];
+    var avecCab = document.getElementById('opt-cablage').checked;
+    b.fn(pos.x, pos.y, avecCab);
+    blocSelectionne = null;
+    canvas.classList.remove('mode-bloc');
+    afficherPalette(); afficherBlocs();
+    document.getElementById('statut-mode').textContent = '🖱️ Mode : Placer';
+    var info = avecCab ? ' avec câblage' : '';
+    mettreMessage('📚 Bloc "' + b.nom + '" inséré' + info, 'succes');
+    if (!avecCab) afficherAideCablage(b.id);
+    mettreAJourStatut();
+    if (testActif) recalculerLED();
+    demarrerAnimationChenillard();
+    sauvegarderLocal(true);
+    faireSnapshot();
+    dessiner();
+    return;
+  }
+
+  if (composantSelectionne) {
+    placerComposant(composantSelectionne, pos.x, pos.y, composantAValeur);
+    composantSelectionne = null;
+    composantAValeur = null;
+    afficherPalette();
+    document.getElementById('statut-mode').textContent = '🖱️ Mode : Placer';
+    return;
+  }
+
+  if (modeCablage) {
+    var patte = trouverPatteSousSouris(pos.x, pos.y);
+    if (patte) {
+      if (!patteEnAttente) {
+        patteEnAttente = patte;
+        mettreMessage('🔗 Patte sélectionnée. Cliquez sur une autre patte pour relier.', 'avertissement');
+        dessiner();
+        return;
+      } else {
+        if (patteEnAttente.compId === patte.compId && patteEnAttente.patteIndex === patte.patteIndex) {
+          patteEnAttente = null;
+          mettreMessage('❌ Annulé.', 'info');
+          dessiner(); return;
+        }
+        creerFil(patteEnAttente, patte);
+        patteEnAttente = null;
+        modeCablage = false;
+        var btn = document.getElementById('btn-cablage');
+        btn.textContent = '🔗 Câblage';
+        btn.classList.add('btn-gris');
+        btn.classList.remove('btn-vert');
+        canvas.classList.remove('mode-cablage');
+        document.getElementById('statut-mode').textContent = '🖱️ Mode : Placer';
+        return;
+      }
+    }
+    if (patteEnAttente) {
+      patteEnAttente = null;
+      mettreMessage('❌ Câblage annulé.', 'info');
+      dessiner(); return;
+    }
+  }
+
+  var comp = trouverComposantSousSouris(pos.x, pos.y);
+  if (comp) {
+    if (comp.type === 'interrupteur') {
+      comp.ferme = !comp.ferme;
+      mettreMessage('🔘 Interrupteur ' + (comp.ferme ? 'fermé (ON) ✅' : 'ouvert (OFF) ❌'), 'info');
+      if (testActif) recalculerLED();
+      sauvegarderLocal(true);
+      dessiner(); return;
+    }
+    if (comp.type === 'bouton') {
+      comp.appuye = !comp.appuye;
+      mettreMessage('🧲 Bouton ' + (comp.appuye ? 'appuyé ✅' : 'relâché ❌'), 'info');
+      if (testActif) recalculerLED();
+      dessiner(); return;
+    }
+  }
+}
+
+/* =========================================================
+   MULTIMETRE
+   ========================================================= */
+function basculerMultimetre() {
+  multimetreActif = !multimetreActif;
+  pointeRouge = null; pointeNoire = null; composantMesure = null;
+  var btn = document.getElementById('btn-multimetre');
+  var panneau = document.getElementById('multimetre-panneau');
+  if (multimetreActif) {
+    btn.classList.add('actif');
+    panneau.classList.add('actif');
+    canvas.classList.add('mode-multi');
+    document.getElementById('statut-mode').textContent = '🔬 Mode : Multimètre';
+    document.getElementById('statut-mode').classList.add('multi');
+    if (modeCablage) basculerModeCablage();
+    composantSelectionne = null; blocSelectionne = null;
+    canvas.classList.remove('mode-bloc');
+    afficherPalette(); afficherBlocs();
+    mettreMessage('🔬 Multimètre activé. Cliquez sur un composant ou 2 pattes.', 'info');
+    mettreAJourAffichageMulti('----', 'Sélectionnez un mode', '🔬 Multimètre prêt');
+  } else {
+    btn.classList.remove('actif');
+    panneau.classList.remove('actif');
+    canvas.classList.remove('mode-multi');
+    document.getElementById('statut-mode').classList.remove('multi');
+    document.getElementById('statut-mode').textContent = '🖱️ Mode : Placer';
+    mettreMessage('🔬 Multimètre désactivé.', 'info');
+  }
+  dessiner();
+}
+
+function setModeMultimetre(mode) {
+  multimetreMode = mode;
+  document.getElementById('btn-multi-resistance').classList.toggle('actif', mode === 'resistance');
+  document.getElementById('btn-multi-tension').classList.toggle('actif', mode === 'tension');
+  document.getElementById('btn-multi-continuite').classList.toggle('actif', mode === 'continuite');
+  pointeRouge = null; pointeNoire = null; majPointes();
+  var aide = '';
+  if (mode === 'resistance') aide = '<strong>Mode Résistance</strong> : cliquez sur un composant pour mesurer sa résistance, OU sur 2 pattes pour mesurer entre elles.';
+  else if (mode === 'tension') aide = '<strong>Mode Tension</strong> : cliquez sur une pile pour mesurer sa tension, OU sur 2 pattes.';
+  else if (mode === 'continuite') aide = '<strong>Mode Continuité</strong> : cliquez sur 2 pattes. Le multimètre "bipe" si elles sont reliées.';
+  document.getElementById('multi-aide').innerHTML = aide;
+  mettreAJourAffichageMulti('----', 'Prêt', '🔬 Mode ' + mode);
+  dessiner();
+}
+
+function mettreAJourAffichageMulti(valeur, unite, info) {
+  document.getElementById('multi-valeur').textContent = valeur;
+  document.getElementById('multi-unite').textContent = unite;
+  document.getElementById('multi-info').textContent = info;
+}
+
+function gererClicMultimetre(x, y) {
+  var patte = trouverPatteSousSouris(x, y);
+  if (patte) {
+    if (!pointeRouge) {
+      pointeRouge = patte; majPointes();
+      mettreMessage('🔴 Pointe + connectée. Cliquez sur une autre patte pour la pointe -.', 'info');
+      dessiner(); return;
+    } else if (!pointeNoire) {
+      if (pointeRouge.compId === patte.compId && pointeRouge.patteIndex === patte.patteIndex) {
+        mettreMessage('❌ Impossible : les 2 pointes sur la même patte.', 'erreur'); return;
+      }
+      pointeNoire = patte; majPointes();
+      calculerMesureEntreDeuxPattes(); return;
+    } else {
+      pointeRouge = patte; pointeNoire = null; majPointes();
+      mettreMessage('🔴 Nouvelle pointe + connectée.', 'info');
+      dessiner(); return;
+    }
+  }
+  var comp = trouverComposantSousSouris(x, y);
+  if (comp) { mesurerComposant(comp); return; }
+  if (pointeRouge || pointeNoire) {
+    pointeRouge = null; pointeNoire = null; majPointes();
+    mettreAJourAffichageMulti('----', 'Prêt', '🔬 Pointes réinitialisées');
+    mettreMessage('🔬 Pointes réinitialisées.', 'info');
+    dessiner();
+  }
+}
+
+function majPointes() {
+  var pR = document.getElementById('pointe-rouge');
+  var pN = document.getElementById('pointe-noire');
+  var tR = document.getElementById('pointe-rouge-texte');
+  var tN = document.getElementById('pointe-noire-texte');
+  if (pointeRouge) { pR.classList.add('connectee'); tR.textContent = 'comp #' + pointeRouge.compId + ' patte ' + pointeRouge.patteIndex; }
+  else { pR.classList.remove('connectee'); tR.textContent = 'non connectée'; }
+  if (pointeNoire) { pN.classList.add('connectee'); tN.textContent = 'comp #' + pointeNoire.compId + ' patte ' + pointeNoire.patteIndex; }
+  else { pN.classList.remove('connectee'); tN.textContent = 'non connectée'; }
+}
+
+function mesurerComposant(comp) {
+  var resultat = null;
+  if (comp.type === 'resistance') {
+    var val = parseInt(comp.valeur) || 0;
+    if (multimetreMode === 'resistance') resultat = { valeur: formaterResistance(val), unite: 'Ω', info: '🔵 Résistance mesurée' };
+    else if (multimetreMode === 'tension') resultat = { valeur: '0.00', unite: 'V', info: '⚡ Une résistance n\'a pas de tension' };
+    else resultat = { valeur: 'OUI', unite: 'BIP !', info: '🔔 Une résistance conduit' };
+  } else if (comp.type === 'pile') {
+    if (multimetreMode === 'tension') resultat = { valeur: '9.00', unite: 'V', info: '⚡ Tension de la pile' };
+    else if (multimetreMode === 'resistance') resultat = { valeur: '----', unite: 'Ω', info: '⚠️ Ne pas mesurer une pile en ohmmètre' };
+    else resultat = { valeur: 'NON', unite: 'Pas de continuité', info: '🔔 Une pile n\'est pas un fil' };
+  } else if (comp.type === 'led') {
+    if (multimetreMode === 'resistance') resultat = { valeur: '1.8', unite: 'V (diode)', info: '🔵 Chute de tension LED' };
+    else if (multimetreMode === 'tension') resultat = { valeur: '1.80', unite: 'V', info: '⚡ Tension directe LED' };
+    else resultat = { valeur: 'OUI', unite: 'Continuité (1 sens)', info: '🔔 LED = diode' };
+  } else if (comp.type === 'interrupteur') {
+    if (multimetreMode === 'continuite') {
+      if (comp.ferme) resultat = { valeur: 'OUI', unite: 'BIP !', info: '🔔 Interrupteur fermé' };
+      else resultat = { valeur: 'NON', unite: 'Pas de continuité', info: '🔔 Interrupteur ouvert' };
+    } else if (multimetreMode === 'resistance') {
+      resultat = { valeur: comp.ferme ? '0.00' : 'OL', unite: 'Ω', info: comp.ferme ? '🔵 Fermé' : '🔵 Ouvert' };
+    } else resultat = { valeur: '0.00', unite: 'V', info: '⚡ Pas de tension' };
+  } else if (comp.type === 'bouton') {
+    if (multimetreMode === 'continuite') {
+      if (comp.appuye) resultat = { valeur: 'OUI', unite: 'BIP !', info: '🔔 Bouton appuyé' };
+      else resultat = { valeur: 'NON', unite: 'Pas de continuité', info: '🔔 Bouton relâché' };
+    } else if (multimetreMode === 'resistance') {
+      resultat = { valeur: comp.appuye ? '0.00' : 'OL', unite: 'Ω', info: comp.appuye ? '🔵 Appuyé' : '🔵 Relâché' };
+    } else resultat = { valeur: '0.00', unite: 'V', info: '⚡ Pas de tension' };
+  } else if (comp.type === 'condensateur') {
+    if (multimetreMode === 'resistance') resultat = { valeur: 'OL', unite: 'Ω', info: '🔵 Condo ne se mesure pas en continu' };
+    else if (multimetreMode === 'tension') resultat = { valeur: '0.00', unite: 'V', info: '⚡ Condo déchargé' };
+    else resultat = { valeur: 'NON', unite: 'Pas de continuité', info: '🔔 Condo ne conduit pas en continu' };
+  } else if (comp.type === 'ne555' || comp.type === 'cd4017') {
+    if (multimetreMode === 'tension') resultat = { valeur: '4.50', unite: 'V', info: '⚡ Tension interne (simulation)' };
+    else resultat = { valeur: '----', unite: 'Composant actif', info: '🔬 Mesure complexe' };
+  } else if (comp.type === 'ldr') {
+    if (multimetreMode === 'resistance') resultat = { valeur: '10.0', unite: 'kΩ', info: '🔵 LDR (dépend de la lumière)' };
+    else if (multimetreMode === 'tension') resultat = { valeur: '0.00', unite: 'V', info: '⚡ Composant passif' };
+    else resultat = { valeur: 'OUI', unite: 'Continuité', info: '🔔 LDR = résistance variable' };
+  } else if (comp.type === 'transistor') {
+    if (multimetreMode === 'continuite') resultat = { valeur: 'OUI', unite: 'Diode', info: '🔔 Transistor = 2 jonctions' };
+    else resultat = { valeur: '----', unite: 'Composant actif', info: '🔬 Mesure complexe' };
+  } else if (comp.type === 'buzzer') {
+    if (multimetreMode === 'resistance') resultat = { valeur: '8.00', unite: 'Ω', info: '🔵 Buzzer : résistance interne' };
+    else if (multimetreMode === 'tension') resultat = { valeur: '0.00', unite: 'V', info: '⚡ Composant passif' };
+    else resultat = { valeur: 'OUI', unite: 'Continuité', info: '🔔 Buzzer = bobine' };
+  }
+  if (resultat) {
+    mettreAJourAffichageMulti(resultat.valeur, resultat.unite, resultat.info);
+    mettreMessage('🔬 Mesure : ' + resultat.valeur + ' ' + resultat.unite, 'succes');
+  }
+  pointeRouge = null; pointeNoire = null; majPointes();
+  dessiner();
+}
+
+function calculerMesureEntreDeuxPattes() {
+  if (!pointeRouge || !pointeNoire) return;
+  var comp1 = trouverComposant(pointeRouge.compId);
+  if (!comp1) return;
+  if (pointeRouge.compId === pointeNoire.compId) {
+    if (comp1.type === 'resistance') {
+      var val = parseInt(comp1.valeur) || 0;
+      if (multimetreMode === 'resistance') mettreAJourAffichageMulti(formaterResistance(val), 'Ω', '🔵 Résistance entre les 2 pattes');
+      else if (multimetreMode === 'continuite') mettreAJourAffichageMulti('OUI', 'BIP !', '🔔 Résistance = conducteur');
+      else mettreAJourAffichageMulti('0.00', 'V', '⚡ Pas de tension');
+    } else if (comp1.type === 'pile') {
+      if (multimetreMode === 'tension') mettreAJourAffichageMulti('9.00', 'V', '⚡ Tension de la pile');
+      else mettreAJourAffichageMulti('----', '----', '⚠️ Ne pas mesurer une pile en ohmmètre !');
+    } else if (comp1.type === 'interrupteur') {
+      if (multimetreMode === 'continuite') {
+        if (comp1.ferme) mettreAJourAffichageMulti('OUI', 'BIP !', '🔔 Interrupteur fermé');
+        else mettreAJourAffichageMulti('NON', 'Pas de continuité', '🔔 Interrupteur ouvert');
+      } else if (multimetreMode === 'resistance') {
+        mettreAJourAffichageMulti(comp1.ferme ? '0.00' : 'OL', 'Ω', comp1.ferme ? '🔵 Fermé' : '🔵 Ouvert');
+      } else mettreAJourAffichageMulti('0.00', 'V', '⚡ Pas de tension');
+    } else {
+      mettreAJourAffichageMulti('----', '----', '🔬 Mesure non disponible');
+    }
+    pointeRouge = null; pointeNoire = null; majPointes();
+    dessiner(); return;
+  }
+  var adj = {};
+  function addEdge(a, b) {
+    if (!adj[a]) adj[a] = []; if (!adj[b]) adj[b] = [];
+    adj[a].push(b); adj[b].push(a);
+  }
+  for (var k = 0; k < fils.length; k++) {
+    var f = fils[k];
+    addEdge(f.compA + ':' + f.patteA, f.compB + ':' + f.patteB);
+  }
+  for (var m = 0; m < composants.length; m++) {
+    var comp = composants[m];
+    if (comp.type === 'pile' || comp.type === 'ne555' || comp.type === 'cd4017' || comp.type === 'condensateur' || comp.type === 'transistor') continue;
+    if (comp.type === 'interrupteur' && !comp.ferme) continue;
+    if (comp.type === 'bouton' && !comp.appuye) continue;
+    if (CATALOGUE[comp.type].pattes.length >= 2) addEdge(comp.id + ':0', comp.id + ':1');
+  }
+  var depart = pointeRouge.compId + ':' + pointeRouge.patteIndex;
+  var arrivee = pointeNoire.compId + ':' + pointeNoire.patteIndex;
+  var connecte = chercherChemin(depart, arrivee, adj);
+
+  if (multimetreMode === 'continuite') {
+    if (connecte) { mettreAJourAffichageMulti('OUI', '🔔 BIP BIP !', '🔔 Les 2 pattes sont reliées'); mettreMessage('🔔 Continuité détectée !', 'succes'); }
+    else { mettreAJourAffichageMulti('NON', 'Pas de continuité', '🔔 Circuit ouvert'); mettreMessage('🔔 Pas de continuité.', 'avertissement'); }
+  } else if (multimetreMode === 'resistance') {
+    if (connecte) {
+      var r = estimerResistanceEntre();
+      mettreAJourAffichageMulti(formaterResistance(r), 'Ω', '🔵 Résistance entre les 2 points');
+    } else mettreAJourAffichageMulti('OL', 'Ω', '🔵 Circuit ouvert');
+  } else if (multimetreMode === 'tension') {
+    mettreAJourAffichageMulti('0.00', 'V', connecte ? '⚡ Aucune source' : '⚡ Circuit ouvert');
+  }
+  pointeRouge = null; pointeNoire = null; majPointes();
+  dessiner();
+}
+
+function estimerResistanceEntre() {
+  var total = 0;
+  for (var i = 0; i < composants.length; i++) {
+    if (composants[i].type === 'resistance') total += parseInt(composants[i].valeur) || 0;
+  }
+  return total > 0 ? total : 0.1;
+}
+
+function formaterResistance(val) {
+  if (val >= 1000000) return (val / 1000000).toFixed(2) + ' M';
+  if (val >= 1000) return (val / 1000).toFixed(2) + ' k';
+  return val.toFixed(0) + ' ';
+}
+
+/* =========================================================
+   TUTORIELS
+   ========================================================= */
+function basculerTutoriels() {
+  var panneau = document.getElementById('tuto-panneau');
+  if (panneau.classList.contains('actif')) {
+    panneau.classList.remove('actif');
+    document.getElementById('btn-tutoriels').classList.remove('actif');
+  } else {
+    panneau.classList.add('actif');
+    document.getElementById('btn-tutoriels').classList.add('actif');
+  }
+}
+
+function demarrerTutoriel(id) {
+  var tuto = TUTORIELS[id];
+  if (!tuto) return;
+  tutoActif = tuto;
+  tutoEtape = 0;
+  document.getElementById('tuto-nom').textContent = tuto.icone + ' ' + tuto.nom;
+  document.getElementById('tuto-desc').textContent = tuto.desc;
+  afficherEtapesTuto();
+  document.getElementById('tuto-panneau').classList.add('actif');
+  document.getElementById('btn-tutoriels').classList.add('actif');
+  document.getElementById('btn-tuto-suivant').disabled = false;
+  document.getElementById('statut-mode').textContent = '📖 Tuto : ' + tuto.nom;
+  document.getElementById('statut-mode').classList.add('tuto');
+  afficherTutoriels();
+  mettreMessage('📖 Tutoriel "' + tuto.nom + '" démarré. Suivez les étapes !', 'info');
+  majEtapeTutoCourante();
+}
+
+function afficherEtapesTuto() {
+  if (!tutoActif) return;
+  var div = document.getElementById('tuto-etapes');
+  var html = '';
+  for (var i = 0; i < tutoActif.etapes.length; i++) {
+    var e = tutoActif.etapes[i];
+    var cls = 'tuto-etape';
+    if (i < tutoEtape) cls += ' faite';
+    if (i === tutoEtape) cls += ' active';
+    html += '<div class="' + cls + '"><strong>' + (i+1) + '. ' + e.titre + '</strong>';
+    if (i === tutoEtape) html += '<div class="desc">' + e.description + '</div>';
+    html += '</div>';
+  }
+  div.innerHTML = html;
+}
+
+function majEtapeTutoCourante() {
+  if (!tutoActif) return;
+  if (tutoEtape >= tutoActif.etapes.length) {
+    document.getElementById('btn-tuto-suivant').disabled = true;
+    document.getElementById('tuto-nom').textContent = '🎉 Tutoriel terminé !';
+    document.getElementById('tuto-desc').textContent = 'Bravo !';
+    return;
+  }
+  var e = tutoActif.etapes[tutoEtape];
+  mettreMessage('📖 Étape ' + (tutoEtape+1) + '/' + tutoActif.etapes.length + ' : ' + e.titre + ' — ' + e.description, 'info');
+}
+
+function verifierActionTuto(action) {
+  if (!action) return true;
+  if (action.type === 'composant') return composants.some(function(c) { return c.type === action.id; });
+  if (action.type === 'fil') {
+    return fils.some(function(f) {
+      var cA = trouverComposant(f.compA);
+      var cB = trouverComposant(f.compB);
+      if (!cA || !cB) return false;
+      return (cA.type === action.de.type && cB.type === action.vers.type) ||
+             (cA.type === action.vers.type && cB.type === action.de.type);
+    });
+  }
+  if (action.type === 'bloc') return composants.length >= 4;
+  return true;
+}
+
+function obtenirMessageManquant(action) {
+  if (action.type === 'composant') {
+    var c = CATALOGUE[action.id];
+    return 'Place d\'abord ' + (c ? c.nom : 'le composant') + ' sur le canvas !';
+  }
+  if (action.type === 'fil') return 'Câble d\'abord les composants entre eux !';
+  if (action.type === 'bloc') return 'Utilise le bloc correspondant dans la palette !';
+  return 'Termine d\'abord l\'étape en cours.';
+}
+
+function etapeTutoSuivante() {
+  if (!tutoActif) return;
+  if (tutoEtape >= tutoActif.etapes.length) return;
+  var etape = tutoActif.etapes[tutoEtape];
+  if (etape.action && !verifierActionTuto(etape.action)) {
+    mettreMessage('⏸️ ' + obtenirMessageManquant(etape.action), 'avertissement');
+    return;
+  }
+  tutoEtape++;
+  afficherEtapesTuto();
+  if (tutoEtape >= tutoActif.etapes.length) {
+    document.getElementById('btn-tuto-suivant').disabled = true;
+    document.getElementById('tuto-nom').textContent = '🎉 Tutoriel terminé !';
+    document.getElementById('tuto-desc').textContent = 'Bravo !';
+    mettreMessage('🎉 Tutoriel terminé ! Bravo !', 'succes');
+    return;
+  }
+  majEtapeTutoCourante();
+}
+
+function quitterTutoriel() {
+  if (tutoActif && tutoEtape < tutoActif.etapes.length && tutoEtape > 0) {
+    if (!confirm('⚠️ Voulez-vous vraiment quitter ce tutoriel ?\nToute la progression sera perdue.')) return;
+  }
+  tutoActif = null;
+  tutoEtape = -1;
+  document.getElementById('tuto-panneau').classList.remove('actif');
+  document.getElementById('btn-tutoriels').classList.remove('actif');
+  document.getElementById('statut-mode').classList.remove('tuto');
+  document.getElementById('statut-mode').textContent = '🖱️ Mode : Placer';
+  document.getElementById('tuto-nom').textContent = 'Aucun tutoriel sélectionné';
+  document.getElementById('tuto-desc').textContent = 'Choisissez un tutoriel dans la palette à gauche.';
+  afficherTutoriels();
+  mettreMessage('📖 Tutoriel quitté.', 'info');
+}
+
+/* =========================================================
+   AUTRES INTERACTIONS
+   ========================================================= */
+function clicDroitCanvas(event) {
+  event.preventDefault();
+  if (multimetreActif) return;
+  var pos = coordonneesSouris(event);
+  var fil = trouverFilSousSouris(pos.x, pos.y);
+  if (fil) { filMenuActif = fil; ouvrirMenuContextuel(event.clientX, event.clientY); }
+  else fermerMenuContextuel();
+}
+
+function ouvrirMenuContextuel(x, y) {
+  var menu = document.getElementById('menu-contextuel');
+  menu.style.left = x + 'px';
+  menu.style.top = y + 'px';
+  menu.classList.add('actif');
+}
+
+function fermerMenuContextuel() {
+  document.getElementById('menu-contextuel').classList.remove('actif');
+  filMenuActif = null;
+}
+
+function menuSupprimerFil() {
+  if (filMenuActif) {
+    var idFil = filMenuActif.id;
+    fils = fils.filter(function(f) { return f.id !== idFil; });
+    mettreMessage('🗑️ Fil supprimé.', 'succes');
+    if (testActif) recalculerLED();
+    sauvegarderLocal(true);
+    faireSnapshot();
+    dessiner();
+  }
+  fermerMenuContextuel();
+  afficherPanneauComposants();
+}
+
+function survolSouris(event) {
+  if (dragVuePretPourDeplacement || enDeplacementVue) return;
+  if (composantEnDrag) {
+    var pos = coordonneesSouris(event);
+    composantEnDrag.x = pos.x - dragOffsetX;
+    composantEnDrag.y = pos.y - dragOffsetY;
+    dessiner(); return;
+  }
+  if (enDeplacementVue) return;
+  var pos = coordonneesSouris(event);
+  if (multimetreActif) {
+    var compSurvol = trouverComposantSousSouris(pos.x, pos.y);
+    if (compSurvol !== composantMesure) {
+      composantMesure = compSurvol;
+      canvas.style.cursor = compSurvol ? 'pointer' : 'crosshair';
+      dessiner();
+    }
+    return;
+  }
+  var compSurvol = trouverComposantSousSouris(pos.x, pos.y);
+  composantSurvoleClavier = compSurvol;
+
+  var nouveauFilSurvole = null;
+  if (!modeCablage && !composantSelectionne && !blocSelectionne) {
+    nouveauFilSurvole = trouverFilSousSouris(pos.x, pos.y);
+  }
+  if (nouveauFilSurvole !== filSurvole) {
+    filSurvole = nouveauFilSurvole;
+    canvas.style.cursor = filSurvole ? 'pointer' : (compSurvol ? 'pointer' : 'grab');
+    dessiner();
+  }
+}
+
+function placerComposant(type, x, y, valeur) {
+  var c = CATALOGUE[type];
+  if (!c) return;
+  var comp = {
+    id: prochainId++, type: type,
+    x: x - c.largeur/2, y: y - c.hauteur/2,
+    largeur: c.largeur, hauteur: c.hauteur,
+    valeur: valeur || null, ferme: false, appuye: false, allume: false, sonne: false
+  };
+  composants.push(comp);
+  mettreMessage('✅ ' + c.nom + ' placé !', 'succes');
+  mettreAJourStatut();
+  sauvegarderLocal(true);
+  faireSnapshot();
+  dessiner();
+  afficherPanneauComposants();
+}
+
+function creerFil(patteA, patteB) {
+  var fil = {
+    id: prochainFilId++,
+    compA: patteA.compId, patteA: patteA.patteIndex,
+    compB: patteB.compId, patteB: patteB.patteIndex,
+    couleur: '#E63946'
+  };
+  fils.push(fil);
+  mettreMessage('🔗 Fil créé ! Mode câblage désactivé.', 'succes');
+  if (testActif) recalculerLED();
+  sauvegarderLocal(true);
+  faireSnapshot();
+  dessiner();
+}
+
+function sourisDown(event) {
+  if (composantSelectionne || modeCablage || blocSelectionne || multimetreActif) return;
+  if (event.button === 2) return;
+  var pos = coordonneesSouris(event);
+  var comp = trouverComposantSousSouris(pos.x, pos.y);
+  if (comp) {
+    composantEnDrag = comp;
+    dragOffsetX = pos.x - comp.x;
+    dragOffsetY = pos.y - comp.y;
+    canvas.style.cursor = 'grabbing';
+  }
+}
+
+function sourisUp(event) {
+  if (composantEnDrag) {
+    aimanterComposant(composantEnDrag);
+    composantEnDrag = null;
+    canvas.style.cursor = 'default';
+    sauvegarderLocal(true);
+    faireSnapshot();
+    dessiner();
+  }
+}
+
+function doubleClicCanvas(event) {
+  if (multimetreActif) return;
+  var pos = coordonneesSouris(event);
+  var comp = trouverComposantSousSouris(pos.x, pos.y);
+  if (comp) {
+    if (confirm('Supprimer ce composant ?')) supprimerComposant(comp.id);
+  }
+}
+
+function supprimerComposant(id) {
+  composants = composants.filter(function(c) { return c.id !== id; });
+  fils = fils.filter(function(f) { return f.compA !== id && f.compB !== id; });
+  if (patteEnAttente && patteEnAttente.compId === id) patteEnAttente = null;
+  if (pointeRouge && pointeRouge.compId === id) pointeRouge = null;
+  if (pointeNoire && pointeNoire.compId === id) pointeNoire = null;
+  majPointes();
+  mettreMessage('🗑️ Composant supprimé.', 'info');
+  mettreAJourStatut();
+  if (testActif) recalculerLED();
+  sauvegarderLocal(true);
+  faireSnapshot();
+  dessiner();
+  afficherPanneauComposants();
+}
+
+function basculerModeCablage() {
+  if (multimetreActif) basculerMultimetre();
+  modeCablage = !modeCablage;
+  patteEnAttente = null; composantSelectionne = null; blocSelectionne = null;
+  canvas.classList.remove('mode-bloc');
+  afficherPalette(); afficherBlocs();
+  var btn = document.getElementById('btn-cablage');
+  if (modeCablage) {
+    btn.textContent = '🖱️ Placer (quitter câblage)';
+    btn.classList.remove('btn-gris'); btn.classList.add('btn-vert');
+    canvas.classList.add('mode-cablage');
+    document.getElementById('statut-mode').textContent = '🔗 Mode : Câblage';
+    mettreMessage('🔗 Mode câblage activé.', 'avertissement');
+  } else {
+    btn.textContent = '🔗 Câblage';
+    btn.classList.add('btn-gris'); btn.classList.remove('btn-vert');
+    canvas.classList.remove('mode-cablage');
+    document.getElementById('statut-mode').textContent = '🖱️ Mode : Placer';
+    mettreMessage('🖱️ Mode placement.', 'info');
+  }
+  dessiner();
+}
+
+/* =========================================================
+   GRILLE MAGNETIQUE
+   ========================================================= */
+function aimanterValeur(valeur, pas) {
+  return Math.round(valeur / pas) * pas;
+}
+
+function aimanterComposant(comp) {
+  if (!grilleActive) return;
+  comp.x = aimanterValeur(comp.x, grillePas);
+  comp.y = aimanterValeur(comp.y, grillePas);
+}
+
+function basculerGrille() {
+  grilleActive = !grilleActive;
+  var btn = document.getElementById('btn-grille');
+  if (btn) {
+    if (grilleActive) {
+      btn.textContent = '🧲 Grille : ON';
+      btn.classList.add('btn-vert');
+      btn.classList.remove('btn-gris');
+    } else {
+      btn.textContent = '🧲 Grille : OFF';
+      btn.classList.remove('btn-vert');
+      btn.classList.add('btn-gris');
+    }
+  }
+  mettreMessage('🧲 Grille magnétique ' + (grilleActive ? 'activée' : 'désactivée'), 'info');
+}
+
+/* =========================================================
+   TEST / SIMULATION
+   ========================================================= */
+function calculerEtatLED() {
+  for (var i = 0; i < composants.length; i++) {
+    composants[i].allume = false;
+    if (composants[i].type === 'buzzer') composants[i].sonne = false;
+  }
+  var resultat = { etat: "ok", ledsAllumees: 0, buzzersActifs: 0, diagnostic: [] };
+  var piles = composants.filter(function(c) { return c.type === 'pile'; });
+  if (piles.length === 0) { resultat.etat = "pas-de-pile"; return resultat; }
+  var pile = piles[0];
+  var pattePlus = pile.id + ':0';
+  var patteMoins = pile.id + ':1';
+
+  var adj = {};
+  function addEdge(a, b) {
+    if (!adj[a]) adj[a] = []; if (!adj[b]) adj[b] = [];
+    adj[a].push(b); adj[b].push(a);
+  }
+  for (var k = 0; k < fils.length; k++) {
+    var f = fils[k];
+    addEdge(f.compA + ':' + f.patteA, f.compB + ':' + f.patteB);
+  }
+  for (var m = 0; m < composants.length; m++) {
+    var comp = composants[m];
+    if (comp.type === 'pile') continue;
+    if (comp.type === 'ne555' || comp.type === 'cd4017' || comp.type === 'condensateur' || comp.type === 'transistor') continue;
+    if (comp.type === 'led') addEdge(comp.id + ':0', comp.id + ':1');
+    else if (comp.type === 'resistance' || comp.type === 'ldr' || comp.type === 'buzzer') addEdge(comp.id + ':0', comp.id + ':1');
+    else if (comp.type === 'interrupteur' && comp.ferme) addEdge(comp.id + ':0', comp.id + ':1');
+    else if (comp.type === 'bouton' && comp.appuye) addEdge(comp.id + ':0', comp.id + ':1');
+  }
+
+  var adjDirect = {};
+  function addEdgeD(a, b) {
+    if (!adjDirect[a]) adjDirect[a] = []; if (!adjDirect[b]) adjDirect[b] = [];
+    adjDirect[a].push(b); adjDirect[b].push(a);
+  }
+  for (var k2 = 0; k2 < fils.length; k2++) {
+    var f2 = fils[k2];
+    addEdgeD(f2.compA + ':' + f2.patteA, f2.compB + ':' + f2.patteB);
+  }
+  for (var m2 = 0; m2 < composants.length; m2++) {
+    var comp2 = composants[m2];
+    if (comp2.type === 'interrupteur' && comp2.ferme) addEdgeD(comp2.id + ':0', comp2.id + ':1');
+    if (comp2.type === 'bouton' && comp2.appuye) addEdgeD(comp2.id + ':0', comp2.id + ':1');
+  }
+  if (chercherChemin(pattePlus, patteMoins, adjDirect)) {
+    resultat.etat = "court-circuit"; return resultat;
+  }
+
+  var leds = composants.filter(function(c) { return c.type === 'led'; });
+  for (var l = 0; l < leds.length; l++) {
+    var led = leds[l];
+    var cPlusP0 = chercherChemin(pattePlus, led.id + ':0', adj);
+    var cPlusP1 = chercherChemin(pattePlus, led.id + ':1', adj);
+    var cMoinsP0 = chercherChemin(patteMoins, led.id + ':0', adj);
+    var cMoinsP1 = chercherChemin(patteMoins, led.id + ':1', adj);
+    if ((cPlusP0 && cMoinsP1) || (cPlusP1 && cMoinsP0)) {
+      led.allume = true; resultat.ledsAllumees++;
+    }
+  }
+
+  var buzzers = composants.filter(function(c) { return c.type === 'buzzer'; });
+  for (var b = 0; b < buzzers.length; b++) {
+    var bz = buzzers[b];
+    var bPlusP0 = chercherChemin(pattePlus, bz.id + ':0', adj);
+    var bPlusP1 = chercherChemin(pattePlus, bz.id + ':1', adj);
+    var bMoinsP0 = chercherChemin(patteMoins, bz.id + ':0', adj);
+    var bMoinsP1 = chercherChemin(patteMoins, bz.id + ':1', adj);
+    if ((bPlusP0 && bMoinsP1) || (bPlusP1 && bMoinsP0)) {
+      bz.sonne = true; resultat.buzzersActifs++;
+    }
+  }
+  if (leds.length === 0 && buzzers.length === 0) resultat.etat = "pas-de-composant-visuel";
+  return resultat;
+}
+
+function recalculerLED() {
+  calculerEtatLED();
+  buzzerActif = composants.some(function(c) { return c.type === 'buzzer' && c.sonne; });
+  if (animChenillardActif) appliquerChenillard();
+  dessiner();
+}
+
+function tester() {
+  if (multimetreActif) basculerMultimetre();
+  var r = calculerEtatLED();
+  testActif = true;
+  buzzerActif = r.buzzersActifs > 0;
+  var statutInfo = document.getElementById('statut-info');
+  statutInfo.classList.add('live');
+
+  if (r.etat === "pas-de-pile") mettreMessage('❌ Aucune pile dans le circuit.', 'erreur');
+  else if (r.etat === "court-circuit") mettreMessage('⚠️ Court-circuit détecté !', 'erreur');
+  else if (r.etat === "pas-de-composant-visuel") mettreMessage('⚠️ Aucune LED ni buzzer dans le circuit.', 'avertissement');
+  else if (r.ledsAllumees > 0 && r.buzzersActifs > 0) mettreMessage('✅ Circuit fermé ! ' + r.ledsAllumees + ' LED + ' + r.buzzersActifs + ' buzzer(s) !', 'succes');
+  else if (r.ledsAllumees > 0) mettreMessage('✅ Circuit fermé ! ' + r.ledsAllumees + ' LED allumée(s).', 'succes');
+  else if (r.buzzersActifs > 0) mettreMessage('🔊 Circuit fermé ! ' + r.buzzersActifs + ' buzzer(s) !', 'succes');
+  else mettreMessage('🔌 Circuit ouvert ou incomplet.', 'avertissement');
+  demarrerAnimationChenillard();
+  dessiner();
+}
+
+function chercherChemin(depart, arrivee, adj) {
+  if (depart === arrivee) return true;
+  var visited = {};
+  var queue = [depart];
+  while (queue.length > 0) {
+    var c = queue.shift();
+    if (c === arrivee) return true;
+    if (visited[c]) continue;
+    visited[c] = true;
+    var voisins = adj[c] || [];
+    for (var i = 0; i < voisins.length; i++) {
+      if (!visited[voisins[i]]) queue.push(voisins[i]);
+    }
+  }
+  return false;
+}
+
+/* =========================================================
+   ANIMATION CHENILLARD
+   ========================================================= */
+function demarrerAnimationChenillard() {
+  var leds = composants.filter(function(c) { return c.type === 'led'; });
+  if (leds.length < 4) { arreterAnimationChenillard(); return; }
+  animChenillardActif = true;
+  if (!animChenillardTimer) {
+    animChenillardTimer = setInterval(function() {
+      animChenillardPhase = (animChenillardPhase + 1) % 4;
+      appliquerChenillard();
+      dessiner();
+    }, 400);
+  }
+}
+
+function arreterAnimationChenillard() {
+  animChenillardActif = false;
+  if (animChenillardTimer) { clearInterval(animChenillardTimer); animChenillardTimer = null; }
+}
+
+function appliquerChenillard() {
+  var leds = composants.filter(function(c) { return c.type === 'led'; });
+  if (leds.length < 4) return;
+  for (var i = 0; i < leds.length; i++) {
+    leds[i].allume = (i % 4) === animChenillardPhase && i < 4 ? true : false;
+    if (i >= 4) leds[i].allume = false;
+  }
+}
+
+/* =========================================================
+   EXPORT PNG / PDF / JSON
+   ========================================================= */
+function exporterJSON() {
+  var data = { version: 1, date: new Date().toISOString(), composants: composants, fils: fils };
+  var texte = JSON.stringify(data, null, 2);
+  var blob = new Blob([texte], { type: 'application/json' });
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url; a.download = 'bac_a_sable_' + Date.now() + '.json';
+  a.click(); URL.revokeObjectURL(url);
+  mettreMessage('💾 Sauvegarde JSON téléchargée !', 'succes');
+}
+
+function exporterPNG() {
+  var pointsAvant = pointeRouge; var pointsApres = pointeNoire;
+  pointeRouge = null; pointeNoire = null;
+  dessiner();
+  var canvasData = canvas.toDataURL('image/png');
+  pointeRouge = pointsAvant; pointeNoire = pointsApres;
+  dessiner();
+  var tmpCanvas = document.createElement('canvas');
+  tmpCanvas.width = canvas.width;
+  tmpCanvas.height = canvas.height;
+  var tmpCtx = tmpCanvas.getContext('2d');
+  var grd = tmpCtx.createLinearGradient(0, 0, 0, canvas.height);
+  grd.addColorStop(0, '#f0f9ff'); grd.addColorStop(1, '#e0f2fe');
+  tmpCtx.fillStyle = grd;
+  tmpCtx.fillRect(0, 0, tmpCanvas.width, tmpCanvas.height);
+  tmpCtx.strokeStyle = '#a855f7';
+  tmpCtx.lineWidth = 8;
+  tmpCtx.strokeRect(4, 4, tmpCanvas.width - 8, tmpCanvas.height - 8);
+  var img = new Image();
+  img.onload = function() {
+    tmpCtx.drawImage(img, 20, 20, tmpCanvas.width - 40, tmpCanvas.height - 40);
+    tmpCtx.fillStyle = '#6b21a8';
+    tmpCtx.font = 'bold 20px sans-serif';
+    tmpCtx.textAlign = 'center';
+    tmpCtx.fillText('🧪 Mon circuit - Alerte Electro - ' + new Date().toLocaleDateString('fr-FR'), tmpCanvas.width/2, 16);
+    var url = tmpCanvas.toDataURL('image/png');
+    var a = document.createElement('a');
+    a.href = url; a.download = 'circuit_' + Date.now() + '.png';
+    a.click();
+    mettreMessage('🖼️ Image PNG téléchargée !', 'succes');
+  };
+  img.src = canvasData;
+}
+
+function exporterPDF() {
+  var canvasData = canvas.toDataURL('image/png');
+  var html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Circuit - Alerte Electro</title>';
+  html += '<style>';
+  html += 'body { font-family: sans-serif; padding: 20px; text-align: center; }';
+  html += 'h1 { color: #6b21a8; margin-bottom: 10px; }';
+  html += 'p { color: #666; margin-bottom: 20px; }';
+  html += 'img { max-width: 100%; border: 3px solid #a855f7; border-radius: 8px; }';
+  html += '.footer { margin-top: 20px; color: #999; font-size: 12px; }';
+  html += '@media print { .no-print { display: none; } }';
+  html += '</style></head><body>';
+  html += '<h1>🧪 Mon circuit électronique</h1>';
+  html += '<p>Alerte Electro - Bac à sable - ' + new Date().toLocaleString('fr-FR') + '</p>';
+  html += '<img src="' + canvasData + '" alt="Circuit">';
+  html += '<div class="footer">Créé avec Alerte Electro - Bac à sable</div>';
+  html += '<div class="no-print" style="margin-top:20px;"><button onclick="window.print()" style="padding:12px 24px;font-size:16px;background:#6b21a8;color:white;border:none;border-radius:8px;cursor:pointer;">🖨️ Imprimer / Enregistrer en PDF</button></div>';
+  html += '<script>setTimeout(function(){ window.print(); }, 500);<\/script>';
+  html += '</body></html>';
+  var w = window.open('', '_blank');
+  w.document.write(html);
+  w.document.close();
+  mettreMessage('📄 Fenêtre PDF ouverte.', 'succes');
+}
+
+function importerJSON(event) {
+  var file = event.target.files[0];
+  if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      var data = JSON.parse(e.target.result);
+      if (data.composants && data.fils) {
+        composants = data.composants;
+        fils = data.fils;
+        var maxId = 0;
+        for (var i = 0; i < composants.length; i++) if (composants[i].id > maxId) maxId = composants[i].id;
+        prochainId = maxId + 1;
+        var maxFilId = 0;
+        for (var j = 0; j < fils.length; j++) if (fils[j].id > maxFilId) maxFilId = fils[j].id;
+        prochainFilId = maxFilId + 1;
+        mettreMessage('📂 Circuit chargé ! ' + composants.length + ' composant(s).', 'succes');
+        mettreAJourStatut();
+                sauvegarderLocal(true);
+        afficherPanneauComposants();
+        dessiner();
+      } else mettreMessage('❌ Fichier invalide.', 'erreur');
+    } catch (err) { mettreMessage('❌ Erreur : ' + err.message, 'erreur'); }
+  };
+  reader.readAsText(file);
+  event.target.value = '';
+}
+
+function toutEffacer() {
+  if (!confirm('Tout effacer ?')) return;
+  arreterAnimationChenillard();
+  if (multimetreActif) basculerMultimetre();
+  if (tutoActif) {
+    if (!confirm('⚠️ Un tutoriel est en cours. Continuer à tout effacer ?')) return;
+    tutoActif = null; tutoEtape = -1;
+    document.getElementById('tuto-panneau').classList.remove('actif');
+    document.getElementById('btn-tutoriels').classList.remove('actif');
+    document.getElementById('statut-mode').classList.remove('tuto');
+  }
+  composants = []; fils = [];
+  prochainId = 1; prochainFilId = 1;
+  patteEnAttente = null; composantSelectionne = null; blocSelectionne = null;
+  modeCablage = false; testActif = false;
+  filSurvole = null; filMenuActif = null;
+  pointeRouge = null; pointeNoire = null; composantMesure = null;
+  buzzerActif = false;
+  zoomLevel = 1.0; panX = 0; panY = 0;
+  var btn = document.getElementById('btn-cablage');
+  if (btn) {
+    btn.textContent = '🔗 Câblage';
+    btn.classList.add('btn-gris'); btn.classList.remove('btn-vert');
+    canvas.classList.remove('mode-cablage'); canvas.classList.remove('mode-bloc');
+    document.getElementById('statut-mode').textContent = '🖱️ Mode : Placer';
+  }
+  document.getElementById('statut-info').classList.remove('live');
+    afficherPalette(); afficherBlocs(); afficherTutoriels(); afficherPanneauComposants();
+  mettreMessage('🗑️ Tout a été effacé.', 'info');
+  effacerLocal();
+  mettreAJourStatut();
+  faireSnapshot();
+  dessiner();
+}
+
+function mettreMessage(texte, type) {
+  var div = document.getElementById('message');
+  div.textContent = texte;
+  div.className = 'message-info';
+  if (type === 'succes') div.classList.add('succes');
+  else if (type === 'erreur') div.classList.add('erreur');
+  else if (type === 'avertissement') div.classList.add('avertissement');
+}
+
+function mettreAJourStatut() {
+  var s = composants.length + ' composant(s)';
+  if (fils.length > 0) s += ' · ' + fils.length + ' fil(s)';
+  document.getElementById('statut-info').textContent = s;
+}
+
+/* =========================================================
+   INITIALISATION
+   ========================================================= */
+window.addEventListener('beforeunload', function(e) {
+  if (composants.length > 0) sauvegarderLocal(true);
+});
+/* =========================================================
+   INSTALLATION PWA (ElectroPremium)
+   ========================================================= */
+var promptInstallation = null;
+
+window.addEventListener('beforeinstallprompt', function(e) {
+  e.preventDefault();
+  promptInstallation = e;
+  var btn = document.getElementById('btn-installer');
+  if (btn) btn.style.display = 'inline-block';
+});
+
+function installerPWA() {
+  if (!promptInstallation) {
+    alert('Pour installer l\'appli :\n\n1. Cliquez sur le menu du navigateur\n2. Cherchez "Installer ElectroPremium"\n3. Cliquez dessus');
+    return;
+  }
+  promptInstallation.prompt();
+  promptInstallation.userChoice.then(function(choiceResult) {
+    if (choiceResult.outcome === 'accepted') {
+      console.log('✅ Installation acceptée');
+      var btn = document.getElementById('btn-installer');
+      if (btn) btn.style.display = 'none';
+    } else {
+      console.log('❌ Installation refusée');
+    }
+    promptInstallation = null;
+  });
+}
+
+window.onload = function() {
+  canvas = document.getElementById('sandbox');
+  ctx = canvas.getContext('2d');
+  afficherPalette();
+  afficherBlocs();
+  afficherTutoriels();
+  mettreAJourStatut();
+  canvas.addEventListener('click', clicCanvas);
+  canvas.addEventListener('dblclick', doubleClicCanvas);
+  canvas.addEventListener('mousedown', gererDragVueMousedown);
+  canvas.addEventListener('mousedown', sourisDown);
+  canvas.addEventListener('mousemove', gererDragVueMousemove);
+  canvas.addEventListener('mousemove', survolSouris);
+  canvas.addEventListener('mouseup', gererDragVueMouseup);
+  canvas.addEventListener('mouseup', sourisUp);
+  canvas.addEventListener('mouseleave', sourisUp);
+  canvas.addEventListener('contextmenu', clicDroitCanvas);
+  canvas.addEventListener('wheel', gererMolette, { passive: false });
+  document.addEventListener('click', function(e) {
+    var menu = document.getElementById('menu-contextuel');
+    if (!menu.contains(e.target)) fermerMenuContextuel();
+  });
+  document.addEventListener('keydown', gererClavier);
+  setInterval(function() {
+    ledPulsePhase += 0.08;
+    buzzerOndePhase = (buzzerOndePhase + 0.02) % 1;
+    var besoinRedraw = false;
+    if (!animChenillardActif) {
+      var aLEDAllumee = composants.some(function(c) { return c.type === 'led' && c.allume; });
+      if (aLEDAllumee) besoinRedraw = true;
+    }
+    if (multimetreActif && (pointeRouge || pointeNoire)) besoinRedraw = true;
+    if (buzzerActif) besoinRedraw = true;
+    if (besoinRedraw) dessiner();
+  }, 50);
+    chargerLocal();
+  demarrerAutoSave();
+  faireSnapshot();
+  dessiner();
+  
+  // Enregistrer le Service Worker (PWA)
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js').then(function(reg) {
+      console.log('✅ Service Worker enregistré');
+    }).catch(function(err) {
+      console.log('⚠️ Erreur Service Worker:', err);
+    });
+  }
+};
+</script>
+
+</body>
+</html>
