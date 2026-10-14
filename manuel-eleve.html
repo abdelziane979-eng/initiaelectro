@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Manuel de l'élève - InitiaElectro</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0' stop-color='%230369a1'/><stop offset='1' stop-color='%230284c7'/></linearGradient></defs><rect width='512' height='512' rx='112' fill='url(%23g)'/><circle cx='220' cy='256' r='60' fill='%23ff3333' stroke='%23fff' stroke-width='12'/><circle cx='200' cy='236' r='14' fill='rgba(255,255,255,0.85)'/><rect x='300' y='238' width='140' height='36' rx='18' fill='%23D4A76A' stroke='%23fff' stroke-width='8'/></svg>">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Comic Sans MS', 'Segoe UI', Arial, sans-serif;
+         background: #f0f9ff; color: #1a1f2e; line-height: 1.7; padding: 0; }
+  
+  /* EN-TETE */
+  header { background: linear-gradient(135deg, #0369a1, #0284c7);
+           color: white; padding: 40px 20px; text-align: center;
+           box-shadow: 0 4px 12px rgba(0,0,0,0.2); position: relative; }
+  header h1 { font-size: 2.2em; margin-bottom: 8px; }
+  header .sous-titre { font-size: 1.2em; opacity: 0.95; }
+  header .auteur { font-size: 0.9em; margin-top: 16px; opacity: 0.9; font-style: italic; }
+  
+  /* CONTENEUR */
+  .conteneur { max-width: 900px; margin: 0 auto; padding: 32px 20px; }
+  
+  /* SOMMAIRE */
+  .sommaire { background: white; padding: 24px; border-radius: 16px;
+              box-shadow: 0 4px 12px rgba(3,105,161,0.1); margin-bottom: 32px;
+              border: 3px solid #38bdf8; }
+  .sommaire h2 { color: #0369a1; margin-bottom: 16px; font-size: 1.4em;
+                 display: flex; align-items: center; gap: 8px; }
+  .sommaire ol { padding-left: 24px; }
+  .sommaire li { padding: 8px 0; font-size: 1.05em; }
+  .sommaire a { color: #0369a1; text-decoration: none; font-weight: bold; }
+  .sommaire a:hover { text-decoration: underline; color: #0284c7; }
+  
+  /* SECTIONS */
+  section { background: white; padding: 28px; border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(3,105,161,0.1); margin-bottom: 24px;
+            border-top: 4px solid #38bdf8; }
+  section.violet { border-top-color: #a855f7; }
+  section h2 { color: #0369a1; font-size: 1.6em; margin-bottom: 16px;
+               padding-bottom: 12px; border-bottom: 3px dashed #e0e0e0;
+               display: flex; align-items: center; gap: 10px; }
+  section.violet h2 { color: #6b21a8; }
+  section h3 { color: #0284c7; font-size: 1.2em; margin: 20px 0 10px 0; }
+  section.violet h3 { color: #7c3aed; }
+  section p { margin-bottom: 14px; font-size: 1.02em; }
+  section ul, section ol { padding-left: 28px; margin-bottom: 16px; }
+  section li { padding: 5px 0; }
+  
+  /* ETAPES */
+  .etapes { background: #f0f9ff; padding: 20px; border-radius: 12px;
+            border: 2px solid #bae6fd; margin: 16px 0; }
+  .etapes h4 { color: #0369a1; margin-bottom: 14px; font-size: 1.1em;
+               display: flex; align-items: center; gap: 8px; }
+  .etapes ol { padding-left: 28px; counter-reset: etape; }
+  .etapes li { padding: 8px 0; font-size: 1.02em; }
+  
+  /* CAPTURES */
+  .capture { background: #e0f2fe; border: 3px dashed #38bdf8;
+             padding: 40px 20px; text-align: center; border-radius: 12px;
+             margin: 16px 0; color: #0369a1; font-style: italic;
+             font-size: 1em; }
+  .capture::before { content: '📸 [Image à venir]'; font-weight: bold; }
+  
+  /* ASTUCES */
+  .astuce { background: #fef3c7; border-left: 5px solid #fbbf24;
+            padding: 16px 20px; border-radius: 10px; margin: 16px 0;
+            display: flex; gap: 12px; align-items: flex-start; }
+  .astuce .ico { font-size: 1.5em; flex-shrink: 0; }
+  .astuce strong { color: #b45309; display: block; margin-bottom: 4px; }
+  
+  .attention { background: #fee2e2; border-left: 5px solid #ef4444;
+               padding: 16px 20px; border-radius: 10px; margin: 16px 0;
+               display: flex; gap: 12px; align-items: flex-start; }
+  .attention .ico { font-size: 1.5em; flex-shrink: 0; }
+  .attention strong { color: #991b1b; display: block; margin-bottom: 4px; }
+  
+  .info { background: #dbeafe; border-left: 5px solid #3b82f6;
+          padding: 16px 20px; border-radius: 10px; margin: 16px 0;
+          display: flex; gap: 12px; align-items: flex-start; }
+  .info .ico { font-size: 1.5em; flex-shrink: 0; }
+  .info strong { color: #1e40af; display: block; margin-bottom: 4px; }
+  
+  .defi { background: linear-gradient(135deg, #fce7f3, #fbcfe8);
+          border: 2px solid #ec4899; border-radius: 12px; padding: 20px;
+          margin: 20px 0; }
+  .defi h4 { color: #9d174d; margin-bottom: 10px; font-size: 1.1em;
+             display: flex; align-items: center; gap: 8px; }
+  .defi p { margin-bottom: 8px; }
+  
+  /* TABLEAUX */
+  table { width: 100%; border-collapse: collapse; margin: 16px 0;
+          background: white; border-radius: 10px; overflow: hidden;
+          box-shadow: 0 2px 6px rgba(0,0,0,0.08); }
+  th { background: linear-gradient(135deg, #0369a1, #0284c7);
+       color: white; padding: 14px; text-align: left; font-size: 1em; }
+  td { padding: 12px 14px; border-bottom: 1px solid #e0e0e0; font-size: 0.98em; }
+  tr:last-child td { border-bottom: none; }
+  tr:nth-child(even) td { background: #f8fbff; }
+  
+  /* BOUTONS */
+  .btn { display: inline-block; padding: 12px 24px; background: #0369a1;
+         color: white; text-decoration: none; border-radius: 10px;
+         font-weight: bold; margin: 8px 4px; transition: all 0.2s;
+         box-shadow: 0 3px 8px rgba(3,105,161,0.3); font-size: 1.05em; }
+  .btn:hover { background: #0284c7; transform: translateY(-2px);
+               box-shadow: 0 5px 14px rgba(3,105,161,0.4); }
+  .btn-violet { background: #7c3aed; box-shadow: 0 3px 8px rgba(124,58,237,0.3); }
+  .btn-violet:hover { background: #8b5cf6; }
+  
+  /* PIED DE PAGE */
+  footer { background: #1a1f2e; color: #94a3b8; padding: 24px;
+           text-align: center; margin-top: 40px; font-size: 0.9em; }
+  footer .version { font-size: 0.85em; margin-top: 8px; opacity: 0.7; }
+  
+  /* LIEN VERS L'APPLI */
+  .lien-appli { display: block; background: linear-gradient(135deg, #0369a1, #0284c7);
+                color: white; padding: 24px; border-radius: 16px;
+                text-align: center; text-decoration: none;
+                font-weight: bold; font-size: 1.2em; margin: 20px 0;
+                box-shadow: 0 6px 16px rgba(3,105,161,0.3);
+                transition: all 0.2s; }
+  .lien-appli:hover { transform: translateY(-3px);
+                      box-shadow: 0 10px 24px rgba(3,105,161,0.4); }
+  .lien-appli small { display: block; font-size: 0.7em; margin-top: 6px;
+                      opacity: 0.9; font-weight: normal; }
+  
+  /* RESPONSIVE */
+  @media (max-width: 600px) {
+    header h1 { font-size: 1.6em; }
+    section { padding: 20px; }
+    .conteneur { padding: 16px; }
+    section h2 { font-size: 1.3em; }
+  }
+  
+  /* IMPRESSION */
+  @media print {
+    body { background: white; }
+    header { box-shadow: none; }
+    section { box-shadow: none; border: 2px solid #ddd; page-break-inside: avoid; }
+    .capture { border: 1px solid #999; background: white; }
+    .lien-appli { box-shadow: none; }
+    .no-print { display: none; }
+  }
+  
+  /* BADGE */
+  .badge { display: inline-block; padding: 3px 10px; border-radius: 10px;
+           font-size: 0.75em; margin-left: 6px; font-weight: bold; }
+  .badge-ecolier { background: #065f46; color: #a7f3d0; }
+  .badge-collegien { background: #92400e; color: #fde68a; }
+  .badge-libre { background: #6b21a8; color: #e9d5ff; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🎉 Bienvenue dans InitiaElectro !</h1>
+  <div class="sous-titre">Manuel de l'élève</div>
+  <div class="auteur">Développé par M. Ziane</div>
+</header>
+
+<div class="conteneur">
+
+  <!-- MESSAGE D'ACCUEIL -->
+  <section style="text-align:center;">
+    <h2 style="justify-content:center;">👋 Salut, futur électronicien !</h2>
+    <p>Tu vas apprendre à <strong>construire des circuits électroniques</strong> en t'amusant !</p>
+    <p>Avec cette appli, tu vas pouvoir :</p>
+    <ul style="list-style:none;padding-left:0;text-align:left;max-width:500px;margin:16px auto;">
+      <li>💡 <strong>Allumer une LED</strong></li>
+      <li>🔘 <strong>Utiliser un interrupteur</strong></li>
+      <li>✨ <strong>Créer un clignotant</strong></li>
+      <li>🧪 <strong>Inventer tes propres circuits</strong></li>
+    </ul>
+    <a href="https://abdelziane979-eng.github.io/initiaelectro/" class="lien-appli no-print" target="_blank">
+      🚀 Lancer l'application
+      <small>https://abdelziane979-eng.github.io/initiaelectro/</small>
+    </a>
+  </section>
+
+  <!-- SOMMAIRE -->
+  <div class="sommaire">
+    <h2>📖 Ce que tu vas apprendre</h2>
+    <ol>
+      <li><a href="#demarrer">Comment démarrer l'appli</a></li>
+      <li><a href="#premier-circuit">Ton premier circuit : la LED</a></li>
+      <li><a href="#modes">Les 4 modes de jeu</a></li>
+      <li><a href="#points">Comment gagner des points</a></li>
+      <li><a href="#interrupteur">Avec un interrupteur</a></li>
+      <li><a href="#deux-led">Deux LED en série</a></li>
+      <li><a href="#clignotant">Le clignotant NE555</a></li>
+      <li><a href="#bilan">Ton bilan de fin</a></li>
+      <li><a href="#bac-a-sable">Le bac à sable 🧪</a></li>
+      <li><a href="#composants">Les composants</a></li>
+      <li><a href="#multimetre">Le multimètre 🔬</a></li>
+      <li><a href="#astuces">Astuces et raccourcis</a></li>
+      <li><a href="#problemes">Que faire si ça bug ?</a></li>
+    </ol>
+  </div>
+
+  <!-- 1. DEMARRER -->
+  <section id="demarrer">
+    <h2>1. 🚀 Comment démarrer l'appli</h2>
+    <p>C'est super simple ! Suis ces étapes :</p>
+
+    <div class="etapes">
+      <h4>📋 Étapes à suivre</h4>
+      <ol>
+        <li>Demande à ton professeur l'adresse de l'appli (ou utilise le lien plus haut).</li>
+        <li>Ouvre un navigateur (Chrome, Edge, Firefox...).</li>
+        <li>Tape l'adresse :<br>
+          <code style="background:#fff;padding:4px 10px;border-radius:6px;">https://abdelziane979-eng.github.io/initiaelectro/</code>
+        </li>
+        <li>Appuie sur <strong>Entrée</strong>.</li>
+        <li>🎉 L'appli s'ouvre : tu vois la page d'accueil avec les projets !</li>
+      </ol>
+    </div>
+
+    <div class="capture"></div>
+
+    <div class="astuce">
+      <div class="ico">💡</div>
+      <div>
+        <strong>Astuce :</strong> Tu peux installer l'appli sur ton ordinateur ou ta tablette pour y accéder plus vite ! Demande à ton prof comment faire.
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. PREMIER CIRCUIT -->
+  <section id="premier-circuit">
+    <h2>2. 💡 Ton premier circuit : la LED</h2>
+    <p>Tu vas créer ton tout premier circuit : <strong>allumer une LED</strong> !</p>
+    <p>C'est le circuit le plus simple qui existe. Il a besoin de 3 choses :</p>
+
+    <table>
+      <tr>
+        <th>Composant</th>
+        <th>À quoi ça sert</th>
+      </tr>
+      <tr>
+        <td>🔋 <strong>Pile 9V</strong></td>
+        <td>Donne l'énergie au circuit</td>
+      </tr>
+      <tr>
+        <td>🎨 <strong>Résistance 470Ω</strong></td>
+        <td>Protège la LED (elle limite le courant)</td>
+      </tr>
+      <tr>
+        <td>💡 <strong>LED rouge</strong></td>
+        <td>S'allume quand le courant passe</td>
+      </tr>
+    </table>
+
+    <div class="etapes">
+      <h4>📋 Étapes pour construire ton circuit</h4>
+      <ol>
+        <li>Sur la page d'accueil, clique sur <strong>"Allumer une LED"</strong>.</li>
+        <li>Choisis le mode <strong>"🟢 Quiz Facile"</strong>.</li>
+        <li>Tape ton prénom (pour ton bilan).</li>
+        <li>Clique sur <strong>"▶ Démarrer"</strong>.</li>
+        <li>Un <strong>cercle jaune clignotant</strong> apparaît. <strong>Clique dedans</strong> pour placer la pile.</li>
+        <li>Un autre cercle apparaît : clique pour placer la résistance.</li>
+        <li>Pareil pour la LED.</li>
+        <li>🎉 Bravo ! La LED s'allume !</li>
+      </ol>
+    </div>
+
+    <div class="capture"></div>
+
+    <div class="info">
+      <div class="ico">ℹ️</div>
+      <div>
+        <strong>Le savais-tu ?</strong> La résistance est indispensable ! Sans elle, la LED grillerait instantanément. C'est comme un robinet qui règle le débit d'eau.
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. MODES -->
+  <section id="modes">
+    <h2>3. 🎮 Les 4 modes de jeu</h2>
+    <p>Pour chaque projet, tu peux choisir parmi 4 modes :</p>
+
+    <table>
+      <tr>
+        <th>Mode</th>
+        <th>Description</th>
+        <th>Difficulté</th>
+      </tr>
+      <tr>
+        <td>🎬 <strong>Démonstration</strong></td>
+        <td>L'appli construit le circuit toute seule</td>
+        <td>⭐</td>
+      </tr>
+      <tr>
+        <td>🟢 <strong>Quiz Facile</strong></td>
+        <td>Cercle jaune clignotant pour t'aider</td>
+        <td>⭐⭐</td>
+      </tr>
+      <tr>
+        <td>🟠 <strong>Quiz Moyen</strong></td>
+        <td>Petit point discret</td>
+        <td>⭐⭐⭐</td>
+      </tr>
+      <tr>
+        <td>🔴 <strong>Quiz Difficile</strong></td>
+        <td>Aucune indication, à toi de deviner !</td>
+        <td>⭐⭐⭐⭐</td>
+      </tr>
+    </table>
+
+    <div class="astuce">
+      <div class="ico">💡</div>
+      <div>
+        <strong>Conseil :</strong> Commence toujours par le mode <strong>Facile</strong> ou <strong>Moyen</strong>. Le mode Difficile est pour les experts !
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. POINTS -->
+  <section id="points">
+    <h2>4. 🎯 Comment gagner des points</h2>
+    <p>Tu gagnes des points selon <strong>combien d'essais tu utilises</strong> pour placer chaque composant :</p>
+
+    <table>
+      <tr>
+        <th>Essais</th>
+        <th>Points gagnés</th>
+        <th>Étoiles</th>
+      </tr>
+      <tr>
+        <td>1er essai (du premier coup !)</td>
+        <td><strong>3 points</strong></td>
+        <td>⭐⭐⭐</td>
+      </tr>
+      <tr>
+        <td>2ème essai</td>
+        <td><strong>2 points</strong></td>
+        <td>⭐⭐</td>
+      </tr>
+      <tr>
+        <td>3ème essai</td>
+        <td><strong>1 point</strong></td>
+        <td>⭐</td>
+      </tr>
+      <tr>
+        <td>Plus de 3 essais</td>
+        <td><strong>0 point</strong></td>
+        <td>—</td>
+      </tr>
+    </table>
+
+    <div class="info">
+      <div class="ico">🏆</div>
+      <div>
+        <strong>Score parfait :</strong> Si tu réussis tous les composants du premier coup, tu obtiens <strong>100%</strong> et un gros trophée 🏆 !
+      </div>
+    </div>
+
+    <div class="defi">
+      <h4>🎯 Défi personnel</h4>
+      <p>Essaie d'obtenir <strong>9 points sur 9</strong> au projet "Allumer une LED" !</p>
+      <p>Astuce : regarde bien où le cercle clignote avant de cliquer 😉</p>
+    </div>
+  </section>
+
+  <!-- 5. INTERRUPTEUR -->
+  <section id="interrupteur">
+    <h2>5. 🔘 Avec un interrupteur</h2>
+    <p>Ici, tu vas apprendre à <strong>allumer et éteindre</strong> une LED avec un interrupteur.</p>
+    <p>C'est comme un interrupteur de lampe chez toi !</p>
+
+    <h3>🎯 Comment ça marche ?</h3>
+    <ul>
+      <li>Place tous les composants (pile, interrupteur, résistance, LED).</li>
+      <li>Clique sur <strong>"▶ Tester"</strong>.</li>
+      <li>Puis <strong>clique sur l'interrupteur</strong> dans le circuit !</li>
+      <li>Quand il passe au <strong>vert (ON)</strong>, la LED s'allume 💡</li>
+      <li>Quand il passe au <strong>rouge (OFF)</strong>, la LED s'éteint ⚫</li>
+    </ul>
+
+    <div class="capture"></div>
+  </section>
+
+  <!-- 6. DEUX LED -->
+  <section id="deux-led">
+    <h2>6. 💡💡 Deux LED en série</h2>
+    <p>Maintenant, on va allumer <strong>2 LED en même temps</strong> : une rouge 🔴 et une verte 🟢.</p>
+
+    <h3>🎯 Ce qui change</h3>
+    <ul>
+      <li>Il y a <strong>une LED de plus</strong>.</li>
+      <li>La résistance est un peu plus petite (220Ω au lieu de 470Ω).</li>
+      <li>Les deux LED s'allument ensemble !</li>
+    </ul>
+
+    <div class="info">
+      <div class="ico">💡</div>
+      <div>
+        <strong>Le savais-tu ?</strong> En mettant les LED <strong>en série</strong>, le courant traverse l'une puis l'autre. C'est pour ça qu'elles s'allument en même temps.
+      </div>
+    </div>
+  </section>
+
+  <!-- 7. CLIGNOTANT -->
+  <section id="clignotant">
+    <h2>7. ✨ Le clignotant NE555</h2>
+    <p>Projet le plus <strong>impressionnant</strong> : une LED qui clignote toute seule ! 🎇</p>
+
+    <h3>🎯 Le composant magique : le NE555</h3>
+    <p>Le <strong>NE555</strong> est une petite puce électronique (8 pattes) qui peut faire clignoter une LED. On dit qu'il est en mode <strong>"astable"</strong>.</p>
+
+    <ul>
+      <li>Il envoie du courant, puis l'arrête, puis le renvoie...</li>
+      <li>La LED clignote donc en continu.</li>
+      <li>On peut régler la vitesse avec la résistance et le condensateur.</li>
+    </ul>
+
+    <div class="defi">
+      <h4>🚀 Projet expert</h4>
+      <p>Ce projet utilise <strong>4 composants différents</strong>. Prends ton temps et observe bien les zones clignotantes !</p>
+    </div>
+  </section>
+
+  <!-- 8. BILAN -->
+  <section id="bilan">
+    <h2>8. 📊 Ton bilan de fin</h2>
+    <p>À la fin de chaque projet, tu vois un <strong>bilan</strong> avec :</p>
+
+    <table>
+      <tr>
+        <th>Information</th>
+        <th>Signification</th>
+      </tr>
+      <tr>
+        <td>👤 <strong>Ton prénom</strong></td>
+        <td>Pour personnaliser le bilan</td>
+      </tr>
+      <tr>
+        <td>🎯 <strong>Ton score</strong></td>
+        <td>Ex: 7/9 points</td>
+      </tr>
+      <tr>
+        <td>⏱ <strong>Ton temps</strong></td>
+        <td>Combien de temps tu as mis</td>
+      </tr>
+      <tr>
+        <td>📋 <strong>Le détail</strong></td>
+        <td>Étape par étape (essais, temps)</td>
+      </tr>
+    </table>
+
+    <h3>🏆 Les messages selon ton score</h3>
+    <ul>
+      <li>🏆 <strong>PARFAIT !</strong> : 100% de réussite</li>
+      <li>🥈 <strong>TRÈS BIEN !</strong> : 75% ou plus</li>
+      <li>🥉 <strong>BIEN JOUÉ !</strong> : 50% ou plus</li>
+      <li>💪 <strong>CONTINUE !</strong> : moins de 50%</li>
+    </ul>
+
+    <div class="astuce">
+      <div class="ico">💡</div>
+      <div>
+        <strong>Astuce :</strong> Tu peux télécharger ton bilan en fichier <strong>.txt</strong> en cliquant sur <strong>"📄 Exporter .txt"</strong>. Pratique pour le montrer à ton prof !
+      </div>
+    </div>
+  </section>
+
+  <!-- 9. BAC A SABLE -->
+  <section id="bac-a-sable" class="violet">
+    <h2>9. 🧪 Le bac à sable</h2>
+    <p>Ici, <strong>pas de règles</strong> ! Tu peux <strong>créer ton propre circuit</strong>.</p>
+    <p>Il s'appelle <strong>ElectroPremium</strong>.</p>
+
+    <h3>🎯 Ce que tu peux faire</h3>
+    <ul>
+      <li>🧱 Placer <strong>11 composants</strong> différents</li>
+      <li>🔗 <strong>Câbler</strong> les composants entre eux</li>
+      <li>⚡ <strong>Tester</strong> ton circuit</li>
+      <li>📚 Utiliser des <strong>blocs prêts</strong> (9 disponibles)</li>
+      <li>🎓 Suivre des <strong>tutoriels guidés</strong> (3 disponibles)</li>
+      <li>🔬 Mesurer avec un <strong>multimètre virtuel</strong></li>
+    </ul>
+
+    <a href="https://abdelziane979-eng.github.io/initiaelectro/bac_a_sable.html" class="lien-appli btn-violet no-print" target="_blank">
+      🧪 Ouvrir le bac à sable
+      <small>https://abdelziane979-eng.github.io/initiaelectro/bac_a_sable.html</small>
+    </a>
+  </section>
+
+  <!-- 10. COMPOSANTS -->
+  <section id="composants" class="violet">
+    <h2>10. 🧱 Les 11 composants</h2>
+    <p>Voici tous les composants que tu peux utiliser dans le bac à sable :</p>
+
+    <table>
+      <tr>
+        <th>Emoji</th>
+        <th>Nom</th>
+        <th>Utilité</th>
+      </tr>
+      <tr><td>🔋</td><td><strong>Pile 9V</strong></td><td>Fournit l'énergie</td></tr>
+      <tr><td>🎨</td><td><strong>Résistance</strong></td><td>Limite le courant</td></tr>
+      <tr><td>💡</td><td><strong>LED</strong></td><td>S'allume (rouge/vert/bleu)</td></tr>
+      <tr><td>🔘</td><td><strong>Interrupteur</strong></td><td>Allume/éteint</td></tr>
+      <tr><td>⚡</td><td><strong>NE555</strong></td><td>Minuteur/clignotant</td></tr>
+      <tr><td>🔢</td><td><strong>CD4017</strong></td><td>Compteur (10 sorties)</td></tr>
+      <tr><td>🔌</td><td><strong>Condensateur</strong></td><td>Stocke l'énergie</td></tr>
+      <tr><td>🎛️</td><td><strong>Transistor 2N2222</strong></td><td>Amplifie/commute</td></tr>
+      <tr><td>📏</td><td><strong>LDR</strong></td><td>Résistance photo</td></tr>
+      <tr><td>🧲</td><td><strong>Bouton poussoir</strong></td><td>Bouton momentané</td></tr>
+      <tr><td>🔊</td><td><strong>Buzzer</strong></td><td>Fait du bruit</td></tr>
+    </table>
+
+    <div class="astuce">
+      <div class="ico">💡</div>
+      <div>
+        <strong>Astuce :</strong> Clique sur un composant dans la <strong>palette (à gauche)</strong>, puis clique dans la zone blanche pour le placer.
+      </div>
+    </div>
+  </section>
+
+  <!-- 11. MULTIMETRE -->
+  <section id="multimetre" class="violet">
+    <h2>11. 🔬 Le multimètre</h2>
+    <p>Le multimètre, c'est l'outil que les <strong>vrais électroniciens</strong> utilisent pour mesurer !</p>
+
+    <h3>🎯 3 modes disponibles</h3>
+    <ul>
+      <li>🔵 <strong>Résistance</strong> : mesure la résistance d'un composant</li>
+      <li>⚡ <strong>Tension</strong> : mesure la tension d'une pile</li>
+      <li>🔔 <strong>Continuité</strong> : vérifie si le courant peut passer</li>
+    </ul>
+
+    <div class="etapes">
+      <h4>📋 Comment l'utiliser</h4>
+      <ol>
+        <li>Clique sur <strong>"🔬 Multimètre"</strong> en bas.</li>
+        <li>Choisis un mode (Résistance, Tension, Continuité).</li>
+        <li><strong>Clique sur un composant</strong> dans le circuit : le multimètre affiche sa valeur !</li>
+        <li>Tu peux aussi cliquer sur 2 pattes pour mesurer entre elles.</li>
+      </ol>
+    </div>
+
+    <div class="info">
+      <div class="ico">🔬</div>
+      <div>
+        <strong>Exemple :</strong> Clique sur une résistance 470Ω → le multimètre affiche <strong>470 Ω</strong> !
+      </div>
+    </div>
+  </section>
+
+  <!-- 12. ASTUCES -->
+  <section id="astuces" class="violet">
+    <h2>12. ⚡ Astuces et raccourcis</h2>
+    <p>Pour aller plus vite dans le bac à sable :</p>
+
+    <table>
+      <tr>
+        <th>Raccourci</th>
+        <th>Action</th>
+      </tr>
+      <tr><td><strong>Suppr</strong></td><td>Supprime le composant sous la souris</td></tr>
+      <tr><td><strong>Ctrl + Z</strong></td><td>Annule la dernière action</td></tr>
+      <tr><td><strong>Ctrl + Y</strong></td><td>Rétablit</td></tr>
+      <tr><td><strong>Molette souris</strong></td><td>Zoom avant/arrière</td></tr>
+      <tr><td><strong>Cliquer-glisser (fond)</strong></td><td>Déplace la vue</td></tr>
+      <tr><td><strong>+ / -</strong></td><td>Zoom</td></tr>
+      <tr><td><strong>0</strong></td><td>Recentrer la vue</td></tr>
+      <tr><td><strong>Ctrl + S</strong></td><td>Sauvegarde le circuit (JSON)</td></tr>
+    </table>
+
+    <div class="astuce">
+      <div class="ico">💡</div>
+      <div>
+        <strong>Astuce :</strong> Utilise <strong>Ctrl + Z</strong> si tu te trompes, c'est comme un super bouton "annuler" !
+      </div>
+    </div>
+  </section>
+
+  <!-- 13. PROBLEMES -->
+  <section id="problemes">
+    <h2>13. ❓ Que faire si ça bug ?</h2>
+
+    <h3>❌ L'appli ne s'ouvre pas</h3>
+    <ul>
+      <li>Vérifie que tu as <strong>Internet</strong> (ou que l'appli est installée).</li>
+      <li>Réessaie en rechargeant la page : <strong>Ctrl + F5</strong>.</li>
+      <li>Essaie un autre navigateur (Chrome, Firefox...).</li>
+    </ul>
+
+    <h3>❌ Le cercle clignotant ne s'affiche pas</h3>
+    <ul>
+      <li>Vérifie que tu as bien cliqué sur <strong>"▶ Démarrer"</strong>.</li>
+      <li>Attends 2-3 secondes, il peut mettre du temps à apparaître.</li>
+    </ul>
+
+    <h3>❌ Je n'arrive pas à placer un composant</h3>
+    <ul>
+      <li>Clique bien <strong>au centre du cercle jaune</strong>.</li>
+      <li>Si tu rates 3 fois, la zone s'affichera en couleur.</li>
+    </ul>
+
+    <h3>❌ Je ne vois pas la LED s'allumer</h3>
+    <ul>
+      <li>Vérifie que tous les composants sont placés.</li>
+      <li>Clique sur <strong>"▶ Tester"</strong>.</li>
+      <li>S'il y a un interrupteur, clique dessus pour le mettre en <strong>ON (vert)</strong>.</li>
+    </ul>
+
+    <div class="info">
+      <div class="ico">🙋</div>
+      <div>
+        <strong>Si ça ne marche toujours pas :</strong> appelle ton professeur ! Il saura t'aider.
+      </div>
+    </div>
+  </section>
+
+  <!-- ENCOURAGEMENT FINAL -->
+  <section style="text-align:center;background:linear-gradient(135deg,#fef3c7,#fde68a);border-top-color:#fbbf24;">
+    <h2 style="color:#b45309;justify-content:center;border-bottom-color:#fbbf24;">🎉 Bravo, tu es un vrai électronicien !</h2>
+    <p style="font-size:1.1em;">Continue à explorer, expérimenter et inventer.</p>
+    <p>Chaque grand ingénieur a commencé par <strong>allumer une LED</strong> ! 🚀</p>
+    <div style="font-size:3em;margin:20px 0;">💡🔋🎨⚡✨</div>
+    <a href="https://abdelziane979-eng.github.io/initiaelectro/" class="btn no-print" target="_blank">🛠️ Retourner à l'appli</a>
+  </section>
+
+</div>
+
+<footer>
+  <div>📖 Manuel de l'élève - InitiaElectro & ElectroPremium</div>
+  <div style="margin-top:8px;">Développé par <strong>M. Ziane</strong></div>
+  <div class="version">Version 1.0 - Octobre 2026 - Usage pédagogique</div>
+</footer>
+
+</body>
+</html>
