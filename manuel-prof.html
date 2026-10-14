@@ -1,0 +1,1075 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Manuel du professeur - InitiaElectro</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0' stop-color='%230369a1'/><stop offset='1' stop-color='%236b21a8'/></linearGradient></defs><rect width='512' height='512' rx='112' fill='url(%23g)'/><circle cx='220' cy='256' r='60' fill='%23ff3333' stroke='%23fff' stroke-width='12'/><circle cx='200' cy='236' r='14' fill='rgba(255,255,255,0.85)'/><rect x='300' y='238' width='140' height='36' rx='18' fill='%23D4A76A' stroke='%23fff' stroke-width='8'/></svg>">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: #f5f5f5;
+         color: #1a1f2e; line-height: 1.7; padding: 0; }
+  
+  /* EN-TETE */
+  header { background: linear-gradient(135deg, #0369a1, #6b21a8); color: white;
+           padding: 40px 20px; text-align: center;
+           box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
+  header h1 { font-size: 2.2em; margin-bottom: 8px; }
+  header .sous-titre { font-size: 1.2em; opacity: 0.95; }
+  header .auteur { font-size: 0.9em; margin-top: 16px; opacity: 0.9; font-style: italic; }
+  
+  /* CONTENEUR */
+  .conteneur { max-width: 950px; margin: 0 auto; padding: 32px 20px; }
+  
+  /* SOMMAIRE */
+  .sommaire { background: white; padding: 24px; border-radius: 12px;
+              box-shadow: 0 2px 10px rgba(0,0,0,0.08); margin-bottom: 32px;
+              border-left: 4px solid #0369a1; }
+  .sommaire h2 { color: #0369a1; margin-bottom: 16px; font-size: 1.4em; }
+  .sommaire ol { padding-left: 24px; }
+  .sommaire li { padding: 6px 0; font-size: 1em; }
+  .sommaire a { color: #0369a1; text-decoration: none; font-weight: 500; }
+  .sommaire a:hover { text-decoration: underline; }
+  
+  /* SECTIONS */
+  section { background: white; padding: 28px; border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08); margin-bottom: 24px; }
+  section.violet { border-top: 4px solid #6b21a8; }
+  section h2 { color: #0369a1; font-size: 1.6em; margin-bottom: 16px;
+               padding-bottom: 12px; border-bottom: 3px solid #e0e0e0; }
+  section.violet h2 { color: #6b21a8; }
+  section h3 { color: #0284c7; font-size: 1.2em; margin: 20px 0 10px 0; }
+  section.violet h3 { color: #7c3aed; }
+  section h4 { color: #1e40af; font-size: 1.05em; margin: 16px 0 8px 0; }
+  section p { margin-bottom: 14px; }
+  section ul, section ol { padding-left: 26px; margin-bottom: 16px; }
+  section li { padding: 5px 0; }
+  
+  /* BLOCS */
+  .bloc { background: #f8fafc; padding: 18px; border-radius: 10px;
+          border-left: 4px solid #0369a1; margin: 16px 0; }
+  .bloc.violet { border-left-color: #7c3aed; }
+  .bloc h4 { color: #0369a1; margin-bottom: 10px; }
+  .bloc.violet h4 { color: #7c3aed; }
+  
+  .info { background: #dbeafe; border-left: 4px solid #3b82f6;
+          padding: 14px 16px; border-radius: 6px; margin: 16px 0; }
+  .info strong { color: #1e40af; }
+  
+  .astuce { background: #fef3c7; border-left: 4px solid #fbbf24;
+            padding: 14px 16px; border-radius: 6px; margin: 16px 0; }
+  .astuce strong { color: #b45309; }
+  
+  .attention { background: #fee2e2; border-left: 4px solid #ef4444;
+               padding: 14px 16px; border-radius: 6px; margin: 16px 0; }
+  .attention strong { color: #991b1b; }
+  
+  .succes { background: #dcfce7; border-left: 4px solid #22c55e;
+            padding: 14px 16px; border-radius: 6px; margin: 16px 0; }
+  .succes strong { color: #166534; }
+  
+  /* TABLEAUX */
+  table { width: 100%; border-collapse: collapse; margin: 16px 0;
+          background: white; border-radius: 8px; overflow: hidden;
+          box-shadow: 0 1px 3px rgba(0,0,0,0.1); font-size: 0.95em; }
+  th { background: #0369a1; color: white; padding: 12px; text-align: left; }
+  th.violet { background: #6b21a8; }
+  td { padding: 10px 12px; border-bottom: 1px solid #e0e0e0; }
+  tr:nth-child(even) td { background: #f8fbff; }
+  tr:last-child td { border-bottom: none; }
+  
+  /* LISTES SPECIALES */
+  .competences { list-style: none; padding-left: 0; }
+  .competences li { padding: 8px 12px; background: #f0f9ff;
+                    border-left: 3px solid #38bdf8; border-radius: 4px;
+                    margin-bottom: 6px; }
+  .competences li::before { content: '✓ '; color: #22c55e; font-weight: bold; }
+  
+  /* GRILLE EVALUATION */
+  .grille { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;
+            margin: 16px 0; }
+  .grille-item { background: #f8fafc; padding: 14px; border-radius: 8px;
+                 border-left: 3px solid #0369a1; }
+  .grille-item .label { font-weight: bold; color: #0369a1; margin-bottom: 4px; }
+  .grille-item .detail { font-size: 0.9em; color: #475569; }
+  
+  /* QUESTIONNAIRE */
+  .questionnaire { background: #f8fafc; padding: 20px; border-radius: 10px;
+                   border: 2px dashed #94a3b8; margin: 16px 0; }
+  .question { margin-bottom: 20px; }
+  .question .titre { font-weight: bold; color: #1e40af; margin-bottom: 8px; }
+  .question .reponses { padding-left: 16px; }
+  .question .reponses label { display: block; padding: 4px 0; }
+  .question .ligne { border-bottom: 1px solid #94a3b8; padding: 8px 0;
+                     margin-bottom: 8px; }
+  
+  /* PROJETS */
+  .projet { background: linear-gradient(135deg, #eff6ff, #dbeafe);
+            padding: 20px; border-radius: 10px;
+            border-left: 4px solid #0369a1; margin: 16px 0; }
+  .projet h4 { color: #0369a1; margin-bottom: 12px; font-size: 1.1em; }
+  .projet .details { display: grid; grid-template-columns: repeat(3, 1fr);
+                     gap: 12px; margin-top: 12px; }
+  .projet .detail-item { background: white; padding: 10px;
+                         border-radius: 6px; font-size: 0.9em; }
+  .projet .detail-item strong { color: #0369a1; display: block;
+                                font-size: 0.8em; margin-bottom: 2px; }
+  
+  /* BOUTONS */
+  .btn { display: inline-block; padding: 10px 20px; background: #0369a1;
+         color: white; text-decoration: none; border-radius: 8px;
+         font-weight: bold; margin: 8px 4px; transition: all 0.2s; }
+  .btn:hover { background: #0284c7; transform: translateY(-2px); }
+  .btn-violet { background: #6b21a8; }
+  .btn-violet:hover { background: #7c3aed; }
+  
+  /* PIED DE PAGE */
+  footer { background: #1a1f2e; color: #94a3b8; padding: 24px;
+           text-align: center; margin-top: 40px; font-size: 0.9em; }
+  footer .version { font-size: 0.85em; margin-top: 8px; opacity: 0.7; }
+  
+  /* LIEN APPS */
+  .lien-appli { display: block; background: linear-gradient(135deg, #0369a1, #6b21a8);
+                color: white; padding: 16px; border-radius: 10px;
+                text-align: center; text-decoration: none;
+                font-weight: bold; margin: 12px 0;
+                box-shadow: 0 3px 8px rgba(3,105,161,0.3); }
+  .lien-appli:hover { transform: translateY(-2px);
+                      box-shadow: 0 6px 14px rgba(3,105,161,0.4); }
+  .lien-appli small { display: block; font-size: 0.7em; margin-top: 4px;
+                      opacity: 0.9; font-weight: normal; }
+  
+  /* RESPONSIVE */
+  @media (max-width: 700px) {
+    header h1 { font-size: 1.5em; }
+    section { padding: 20px; }
+    .conteneur { padding: 16px; }
+    .grille { grid-template-columns: 1fr; }
+    .projet .details { grid-template-columns: 1fr; }
+  }
+  
+  /* IMPRESSION */
+  @media print {
+    body { background: white; font-size: 11pt; }
+    header { box-shadow: none; }
+    section { box-shadow: none; border: 1px solid #ddd; page-break-inside: avoid; }
+    .lien-appli { box-shadow: none; }
+    .no-print { display: none; }
+    .questionnaire { page-break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🎓 Manuel du professeur</h1>
+  <div class="sous-titre">InitiaElectro & ElectroPremium</div>
+  <div class="auteur">Développé par M. Ziane</div>
+</header>
+
+<div class="conteneur">
+
+  <!-- MESSAGE D'ACCUEIL -->
+  <section>
+    <h2>👋 Bienvenue, cher collègue</h2>
+    <p>Ce manuel vous accompagne dans l'utilisation pédagogique de <strong>InitiaElectro</strong> et <strong>ElectroPremium</strong>, deux applications éducatives d'initiation à l'électronique.</p>
+    <p>Vous y trouverez :</p>
+    <ul>
+      <li>🎯 Les <strong>objectifs pédagogiques</strong> et compétences visées</li>
+      <li>📋 Des <strong>séances clés en main</strong> adaptées à différents niveaux</li>
+      <li>📊 Des <strong>grilles d'évaluation</strong> multi-critères</li>
+      <li>📝 Un <strong>questionnaire élève</strong> à imprimer</li>
+      <li>🎨 Trois <strong>projets créatifs</strong> à réaliser en classe</li>
+      <li>❓ Une <strong>FAQ enseignants</strong> pour répondre aux questions fréquentes</li>
+    </ul>
+    
+    <div class="info">
+      <strong>💡 À qui s'adresse cette application ?</strong><br>
+      InitiaElectro est conçue pour des élèves de <strong>cycle 3 (CM1, CM2, 6e)</strong> et <strong>collège (5e, 4e, 3e)</strong>. Le niveau est progressif : les projets simples pour les débutants, les projets plus complexes pour les collégiens avancés.
+    </div>
+  </section>
+
+  <!-- SOMMAIRE -->
+  <div class="sommaire">
+    <h2>📋 Sommaire</h2>
+    <ol>
+      <li><a href="#presentation">Présentation de l'application</a></li>
+      <li><a href="#objectifs">Objectifs pédagogiques</a></li>
+      <li><a href="#public">Public cible et prérequis</a></li>
+      <li><a href="#installation">Installation rapide</a></li>
+      <li><a href="#initiaelectro">InitiaElectro : les projets guidés</a></li>
+      <li><a href="#gestion">Gestion de classe : chrono, score, bilan</a></li>
+      <li><a href="#export">Récupérer les résultats (.txt)</a></li>
+      <li><a href="#electropremium">ElectroPremium : le bac à sable</a></li>
+      <li><a href="#multimetre">Le multimètre virtuel</a></li>
+      <li><a href="#conseils">Conseils pédagogiques et séances types</a></li>
+      <li><a href="#evaluation">Grille d'évaluation multi-critères</a></li>
+      <li><a href="#questionnaire">Questionnaire élève (à imprimer)</a></li>
+      <li><a href="#projets">Trois projets créatifs pour la classe</a></li>
+      <li><a href="#faq">FAQ enseignants</a></li>
+      <li><a href="#annexes">Annexes et ressources</a></li>
+    </ol>
+  </div>
+
+  <!-- 1. PRESENTATION -->
+  <section id="presentation">
+    <h2>1. 📱 Présentation de l'application</h2>
+    <p><strong>InitiaElectro</strong> est une application web éducative permettant aux élèves de découvrir l'électronique par la pratique, sans matériel physique, sans installation lourde et sans risque.</p>
+
+    <h3>🎯 Deux modules complémentaires</h3>
+    <table>
+      <tr>
+        <th>Module</th>
+        <th>Description</th>
+        <th>Usage en classe</th>
+      </tr>
+      <tr>
+        <td><strong>🛠️ InitiaElectro</strong></td>
+        <td>4 projets guidés avec quiz interactif</td>
+        <td>Apprentissage progressif, évaluation</td>
+      </tr>
+      <tr>
+        <td><strong>🧪 ElectroPremium</strong></td>
+        <td>Bac à sable libre (11 composants)</td>
+        <td>Créativité, expérimentation, projets</td>
+      </tr>
+    </table>
+
+    <h3>✨ Points forts pédagogiques</h3>
+    <ul class="competences">
+      <li><strong>Immersif</strong> : circuit 2.5D avec fils et composants réalistes</li>
+      <li><strong>Progressif</strong> : 4 niveaux de difficulté (démonstration, facile, moyen, difficile)</li>
+      <li><strong>Autonome</strong> : tutoriels intégrés, aide contextuelle, indices</li>
+      <li><strong>Ludique</strong> : animations, sons visuels, système de points et de trophées</li>
+      <li><strong>Traçable</strong> : bilan exportable pour chaque élève (fichier .txt)</li>
+      <li><strong>Accessible</strong> : fonctionne sur PC, tablette, téléphone, hors ligne</li>
+    </ul>
+
+    <div class="info">
+      <strong>🎓 Une application pour tous</strong><br>
+      InitiaElectro couvre <strong>4 projets</strong> et <strong>4 modes</strong> pour s'adapter à chaque profil d'élève. Du simple "allumer une LED" jusqu'au clignotant NE555, la progression est naturelle.
+    </div>
+
+    <h3>🚀 Accès direct</h3>
+    <a href="https://abdelziane979-eng.github.io/initiaelectro/" class="lien-appli no-print" target="_blank">
+      🛠️ Ouvrir InitiaElectro
+      <small>https://abdelziane979-eng.github.io/initiaelectro/</small>
+    </a>
+    <a href="https://abdelziane979-eng.github.io/initiaelectro/bac_a_sable.html" class="lien-appli no-print" target="_blank">
+      🧪 Ouvrir ElectroPremium
+      <small>https://abdelziane979-eng.github.io/initiaelectro/bac_a_sable.html</small>
+    </a>
+  </section>
+
+  <!-- 2. OBJECTIFS -->
+  <section id="objectifs">
+    <h2>2. 🎯 Objectifs pédagogiques</h2>
+
+    <h3>📚 Compétences disciplinaires (Sciences et Technologie)</h3>
+    <ul class="competences">
+      <li>Identifier les composants de base d'un circuit électronique</li>
+      <li>Comprendre le rôle de chaque composant (pile, résistance, LED, interrupteur)</li>
+      <li>Construire un circuit en respectant un schéma</li>
+      <li>Distinguer circuit ouvert et circuit fermé</li>
+      <li>Utiliser un multimètre pour mesurer résistance et tension</li>
+      <li>Comprendre la notion de sens du courant</li>
+    </ul>
+
+    <h3>🧠 Compétences transversales</h3>
+    <ul class="competences">
+      <li>Développer la logique et le raisonnement</li>
+      <li>Faire preuve de patience et de précision</li>
+      <li>Apprendre par l'essai-erreur</li>
+      <li>Travailler en autonomie ou en binôme</li>
+      <li>Utiliser un outil numérique de manière responsable</li>
+    </ul>
+
+    <h3>🎓 Lien avec le programme scolaire</h3>
+    <table>
+      <tr>
+        <th>Niveau</th>
+        <th>Lien avec les programmes</th>
+      </tr>
+      <tr>
+        <td>CM1/CM2</td>
+        <td>Objets techniques, circuits électriques simples, sécurité</td>
+      </tr>
+      <tr>
+        <td>6e/5e</td>
+        <td>Énergie, circuits électriques, matériaux</td>
+      </tr>
+      <tr>
+        <td>4e/3e</td>
+        <td>Électronique, signaux, capteurs, automatismes</td>
+      </tr>
+    </table>
+  </section>
+
+  <!-- 3. PUBLIC -->
+  <section id="public">
+    <h2>3. 👨‍🎓 Public cible et prérequis</h2>
+
+    <h3>🎯 Niveaux concernés</h3>
+    <table>
+      <tr>
+        <th>Niveau</th>
+        <th>Projets adaptés</th>
+        <th>Mode conseillé</th>
+      </tr>
+      <tr>
+        <td><strong>CM1/CM2</strong> (8-10 ans)</td>
+        <td>💡 Allumer une LED</td>
+        <td>🟢 Facile ou 🎬 Démo</td>
+      </tr>
+      <tr>
+        <td><strong>6e/5e</strong> (10-13 ans)</td>
+        <td>💡 LED + 🔘 Interrupteur</td>
+        <td>🟢 Facile ou 🟠 Moyen</td>
+      </tr>
+      <tr>
+        <td><strong>4e/3e</strong> (13-15 ans)</td>
+        <td>💡💡 Deux LED + ✨ NE555</td>
+        <td>🟠 Moyen ou 🔴 Difficile</td>
+      </tr>
+    </table>
+
+    <h3>✅ Prérequis techniques</h3>
+    <ul>
+      <li><strong>Matériel</strong> : un PC, une tablette ou un smartphone par élève ou par binôme</li>
+      <li><strong>Navigateur</strong> : Chrome, Edge, Firefox, Safari (version récente)</li>
+      <li><strong>Connexion</strong> : Internet recommandé, mais l'appli fonctionne hors ligne après installation</li>
+      <li><strong>Compétences numériques</strong> : savoir cliquer, glisser, utiliser un navigateur (niveau CE2+)</li>
+    </ul>
+
+    <div class="astuce">
+      <strong>💡 Conseil d'organisation</strong><br>
+      Pour une classe de 25 élèves, prévoyez <strong>13 tablettes en binôme</strong> ou <strong>25 PC individuels</strong>. L'idéal est que chaque binôme ait son propre écran pour favoriser l'interaction.
+    </div>
+  </section>
+
+  <!-- 4. INSTALLATION -->
+  <section id="installation">
+    <h2>4. 🔧 Installation rapide</h2>
+    <p>Un guide complet est disponible à l'adresse suivante :</p>
+    <a href="https://abdelziane979-eng.github.io/initiaelectro/guide-installation.html" class="lien-appli no-print" target="_blank">
+      📖 Consulter le Guide d'installation
+      <small>https://abdelziane979-eng.github.io/initiaelectro/guide-installation.html</small>
+    </a>
+
+    <h3>🎯 En résumé</h3>
+    <table>
+      <tr>
+        <th>Méthode</th>
+        <th>Public</th>
+        <th>Complexité</th>
+      </tr>
+      <tr>
+        <td>🌐 <strong>Utiliser en ligne</strong></td>
+        <td>Tout le monde</td>
+        <td>Très simple</td>
+      </tr>
+      <tr>
+        <td>💻 <strong>Installer sur PC</strong> (Chrome/Edge)</td>
+        <td>Prof / classe</td>
+        <td>Simple</td>
+      </tr>
+      <tr>
+        <td>📱 <strong>Installer sur tablette Android</strong></td>
+        <td>Élèves</td>
+        <td>Simple</td>
+      </tr>
+      <tr>
+        <td>🍎 <strong>Installer sur iPad/iPhone</strong></td>
+        <td>Élèves</td>
+        <td>Simple</td>
+      </tr>
+    </table>
+
+    <div class="astuce">
+      <strong>💡 Astuce</strong><br>
+      Pour la classe, l'idéal est d'installer l'appli sur tous les appareils en début d'année. Une fois installée, elle fonctionne <strong>hors ligne</strong>, ce qui évite les problèmes de connexion.
+    </div>
+  </section>
+
+  <!-- 5. INITIAELECTRO -->
+  <section id="initiaelectro">
+    <h2>5. 🛠️ InitiaElectro : les 4 projets guidés</h2>
+    <p>Chaque projet est un <strong>quiz interactif</strong> qui guide l'élève dans la construction d'un circuit.</p>
+
+    <h3>📋 Les 4 projets</h3>
+    <table>
+      <tr>
+        <th>Projet</th>
+        <th>Composants</th>
+        <th>Niveau</th>
+        <th>Durée</th>
+      </tr>
+      <tr>
+        <td>💡 <strong>Allumer une LED</strong></td>
+        <td>Pile + R + LED</td>
+        <td>Écolier</td>
+        <td>10 min</td>
+      </tr>
+      <tr>
+        <td>🔘 <strong>Avec interrupteur</strong></td>
+        <td>Pile + Interrupteur + R + LED</td>
+        <td>Écolier</td>
+        <td>15 min</td>
+      </tr>
+      <tr>
+        <td>💡💡 <strong>Deux LED en série</strong></td>
+        <td>Pile + R + 2 LED</td>
+        <td>Collégien</td>
+        <td>20 min</td>
+      </tr>
+      <tr>
+        <td>✨ <strong>Clignotant NE555</strong></td>
+        <td>Pile + NE555 + R + LED</td>
+        <td>Collégien</td>
+        <td>30 min</td>
+      </tr>
+    </table>
+
+    <h3>🎮 Les 4 modes de jeu</h3>
+    <table>
+      <tr>
+        <th>Mode</th>
+        <th>Aide</th>
+        <th>Public</th>
+      </tr>
+      <tr>
+        <td>🎬 Démonstration</td>
+        <td>Construction automatique</td>
+        <td>Découverte</td>
+      </tr>
+      <tr>
+        <td>🟢 Quiz Facile</td>
+        <td>Cercle jaune clignotant</td>
+        <td>Débutants</td>
+      </tr>
+      <tr>
+        <td>🟠 Quiz Moyen</td>
+        <td>Petit point discret</td>
+        <td>Intermédiaires</td>
+      </tr>
+      <tr>
+        <td>🔴 Quiz Difficile</td>
+        <td>Indice textuel uniquement</td>
+        <td>Avancés</td>
+      </tr>
+    </table>
+
+    <div class="info">
+      <strong>📚 Utilisation pédagogique</strong><br>
+      <strong>Séance 1</strong> : Démonstration (découverte)<br>
+      <strong>Séance 2</strong> : Quiz Facile (premiers essais)<br>
+      <strong>Séance 3</strong> : Quiz Moyen (autonomie croissante)<br>
+      <strong>Séance 4</strong> : Quiz Difficile (évaluation)
+    </div>
+  </section>
+
+  <!-- 6. GESTION -->
+  <section id="gestion">
+    <h2>6. 📊 Gestion de classe : chrono, score, bilan</h2>
+
+    <h3>⏱ Le chrono</h3>
+    <ul>
+      <li>Démarre automatiquement quand l'élève clique sur <strong>"▶ Démarrer"</strong></li>
+      <li>S'arrête à la fin du quiz</li>
+      <li>Peut être mis en pause (bouton <strong>"⏸ Pause"</strong>) pour les interruptions</li>
+    </ul>
+
+    <h3>🎯 Le score</h3>
+    <ul>
+      <li>Points attribués selon le <strong>nombre d'essais</strong> :</li>
+    </ul>
+    <table>
+      <tr>
+        <th>Essais</th>
+        <th>Points</th>
+      </tr>
+      <tr><td>1er essai (premier coup)</td><td><strong>3 points</strong></td></tr>
+      <tr><td>2ème essai</td><td>2 points</td></tr>
+      <tr><td>3ème essai</td><td>1 point</td></tr>
+      <tr><td>Au-delà</td><td>0 point</td></tr>
+    </table>
+
+    <h3>📊 Le bilan final</h3>
+    <p>À la fin du quiz, l'élève voit un bilan détaillé :</p>
+    <ul>
+      <li>Son <strong>score</strong> (ex : 7/9 pts)</li>
+      <li>Son <strong>temps total</strong></li>
+      <li>Le <strong>détail par étape</strong> (essais, temps, points)</li>
+      <li>Un <strong>message d'encouragement</strong> (trophée 🏆, 🥈, 🥉, 💪)</li>
+      <li>Une <strong>animation de confettis</strong> pour récompenser</li>
+    </ul>
+
+    <div class="astuce">
+      <strong>💡 Astuce pour la classe</strong><br>
+      Projetez le bilan au tableau pour valoriser les réussites. Le système de trophée motive beaucoup les élèves.
+    </div>
+  </section>
+
+  <!-- 7. EXPORT -->
+  <section id="export">
+    <h2>7. 📄 Récupérer les résultats (.txt)</h2>
+    <p>Chaque élève peut <strong>exporter son bilan</strong> en fichier texte pour vous le transmettre.</p>
+
+    <h3>🎯 Comment faire</h3>
+    <ol>
+      <li>À la fin du quiz, l'élève voit son <strong>bilan</strong></li>
+      <li>Il clique sur <strong>"📄 Exporter .txt"</strong></li>
+      <li>Un fichier est téléchargé : <code>bilan_[Prénom]_[Timestamp].txt</code></li>
+      <li>L'élève vous l'envoie (email, ENT, clé USB...)</li>
+    </ol>
+
+    <h3>📋 Contenu du fichier</h3>
+    <div class="bloc">
+<pre style="font-family:monospace;font-size:0.85em;background:#0f1420;color:#4ade80;padding:16px;border-radius:8px;overflow-x:auto;">BILAN QUIZ - INITIAELECTRO
+============================
+
+Eleve : Lucas
+Projet : Allumer une LED
+Mode : Quiz Facile
+Date : 14/10/2026 16:45
+
+Temps total : 2 min 34 s
+Score : 7/9
+
+DETAIL PAR ETAPE :
+1. Placer la pile - 3 pts (1 essai, 12s)
+2. Ajouter la resistance - 2 pts (2 essais, 25s)
+3. Brancher la LED - 3 pts (1 essai, 8s)
+4. Verifier - 0 pts (0 essai, 0s)</pre>
+    </div>
+
+    <div class="info">
+      <strong>💡 Utilisation pédagogique</strong><br>
+      Vous pouvez demander aux élèves de vous envoyer leur bilan par email ou de le déposer sur l'ENT. Idéal pour tracer les progrès sur l'année.
+    </div>
+  </section>
+
+  <!-- 8. ELECTROPREMIUM -->
+  <section id="electropremium" class="violet">
+    <h2>8. 🧪 ElectroPremium : le bac à sable</h2>
+    <p>Une fois les bases acquises avec InitiaElectro, les élèves peuvent explorer <strong>librement</strong> dans ElectroPremium.</p>
+
+    <h3>🧱 11 composants disponibles</h3>
+    <table>
+      <tr>
+        <th class="violet">Composant</th>
+        <th class="violet">Usage pédagogique</th>
+      </tr>
+      <tr><td>🔋 Pile 9V</td><td>Source d'énergie</td></tr>
+      <tr><td>🎨 Résistance (220Ω à 10kΩ)</td><td>Loi d'Ohm, limitation de courant</td></tr>
+      <tr><td>💡 LED (rouge/vert/bleu)</td><td>Indicateur visuel, polarité</td></tr>
+      <tr><td>🔘 Interrupteur</td><td>Circuit ouvert / fermé</td></tr>
+      <tr><td>⚡ NE555</td><td>Oscillateur astable, minuterie</td></tr>
+      <tr><td>🔢 CD4017</td><td>Compteur décimal, séquenceur</td></tr>
+      <tr><td>🔌 Condensateur (10µF/100µF)</td><td>Stockage d'énergie, filtrage</td></tr>
+      <tr><td>🎛️ Transistor 2N2222</td><td>Amplification, commutation</td></tr>
+      <tr><td>📏 LDR</td><td>Capteur de lumière</td></tr>
+      <tr><td>🧲 Bouton poussoir</td><td>Contact momentané</td></tr>
+      <tr><td>🔊 Buzzer</td><td>Signal sonore</td></tr>
+    </table>
+
+    <h3>📚 9 blocs prêts à l'emploi</h3>
+    <p>Des sous-circuits pré-assemblés que les élèves peuvent insérer en un clic :</p>
+    <ul>
+      <li>🔋 Alimentation 5V / 9V propre</li>
+      <li>✨ Clignotant NE555</li>
+      <li>💡💡 Deux LED alternées</li>
+      <li>🔘 Allumer avec bouton</li>
+      <li>🌙 Détecteur de nuit</li>
+      <li>🔊 Bip continu</li>
+      <li>🎮 Chenillard 4 LED</li>
+      <li>🔢 Compteur CD4017</li>
+    </ul>
+
+    <h3>🎓 3 tutoriels guidés</h3>
+    <ul>
+      <li>💡 La LED simple (8 étapes)</li>
+      <li>🌙 Détecteur de nuit (8 étapes)</li>
+      <li>🎮 Chenillard 4 LED (6 étapes)</li>
+    </ul>
+
+    <div class="astuce">
+      <strong>💡 Astuce pédagogique</strong><br>
+      Utilisez ElectroPremium pour un <strong>projet de fin de séquence</strong> : chaque binôme imagine un circuit, le construit, le teste, puis le présente à la classe.
+    </div>
+  </section>
+
+  <!-- 9. MULTIMETRE -->
+  <section id="multimetre" class="violet">
+    <h2>9. 🔬 Le multimètre virtuel</h2>
+    <p>Un outil pédagogique puissant intégré dans ElectroPremium.</p>
+
+    <h3>🎯 3 modes de mesure</h3>
+    <table>
+      <tr>
+        <th class="violet">Mode</th>
+        <th class="violet">Ce qu'il mesure</th>
+        <th class="violet">Usage pédagogique</th>
+      </tr>
+      <tr>
+        <td>🔵 <strong>Résistance</strong></td>
+        <td>Valeur en ohms (Ω)</td>
+        <td>Comprendre les codes couleur</td>
+      </tr>
+      <tr>
+        <td>⚡ <strong>Tension</strong></td>
+        <td>Volts (V)</td>
+        <td>Notion de différence de potentiel</td>
+      </tr>
+      <tr>
+        <td>🔔 <strong>Continuité</strong></td>
+        <td>Passage ou non du courant</td>
+        <td>Circuit ouvert vs fermé</td>
+      </tr>
+    </table>
+
+    <h3>📋 Activité type</h3>
+    <ol>
+      <li>Placez une résistance dans le bac à sable</li>
+      <li>Activez le multimètre en mode <strong>"Résistance"</strong></li>
+      <li>Cliquez sur la résistance : le multimètre affiche <strong>470 Ω</strong></li>
+      <li>Demandez aux élèves de comparer avec les codes couleur</li>
+      <li>Refaites le test avec d'autres valeurs</li>
+    </ol>
+
+    <div class="info">
+      <strong>🎓 Compétence travaillée</strong><br>
+      Utiliser un instrument de mesure, lire une valeur, comparer avec la théorie.
+    </div>
+  </section>
+
+  <!-- 10. CONSEILS -->
+  <section id="conseils">
+    <h2>10. 🎓 Conseils pédagogiques et séances types</h2>
+
+    <h3>📅 Progression recommandée (6 séances)</h3>
+    <table>
+      <tr>
+        <th>Séance</th>
+        <th>Contenu</th>
+        <th>Mode</th>
+        <th>Durée</th>
+      </tr>
+      <tr>
+        <td>1</td>
+        <td>Découverte : présentation de l'appli</td>
+        <td>🎬 Démo</td>
+        <td>30 min</td>
+      </tr>
+      <tr>
+        <td>2</td>
+        <td>Projet 1 : Allumer une LED</td>
+        <td>🟢 Facile</td>
+        <td>45 min</td>
+      </tr>
+      <tr>
+        <td>3</td>
+        <td>Projet 2 : Avec interrupteur</td>
+        <td>🟢 Facile / 🟠 Moyen</td>
+        <td>45 min</td>
+      </tr>
+      <tr>
+        <td>4</td>
+        <td>Projet 3 : Deux LED en série</td>
+        <td>🟠 Moyen</td>
+        <td>45 min</td>
+      </tr>
+      <tr>
+        <td>5</td>
+        <td>Projet 4 : Clignotant NE555</td>
+        <td>🟠 Moyen / 🔴 Difficile</td>
+        <td>1 h</td>
+      </tr>
+      <tr>
+        <td>6</td>
+        <td>Bac à sable libre + présentation</td>
+        <td>Libre</td>
+        <td>1 h</td>
+      </tr>
+    </table>
+
+    <h3>🎯 Séance type détaillée (45 min)</h3>
+    <div class="bloc">
+      <h4>📋 Structure d'une séance</h4>
+      <ul>
+        <li><strong>5 min</strong> : Rappel de la séance précédente</li>
+        <li><strong>5 min</strong> : Présentation du projet du jour</li>
+        <li><strong>20 min</strong> : Travail individuel ou en binôme sur l'appli</li>
+        <li><strong>10 min</strong> : Mise en commun (partage des difficultés)</li>
+        <li><strong>5 min</strong> : Bilan de la séance + annonce de la suivante</li>
+      </ul>
+    </div>
+
+    <h3>🎨 Conseils pratiques</h3>
+    <ul>
+      <li>🎯 <strong>Binômes</strong> : alternez les rôles (un qui clique, un qui observe)</li>
+      <li>📊 <strong>Trace écrite</strong> : faites noter dans le cahier les composants vus et leur rôle</li>
+      <li>🏆 <strong>Défis</strong> : proposez des "challenges" (score parfait, temps limité)</li>
+      <li>💡 <strong>Différenciation</strong> : les rapides explorent le bac à sable, les autres finissent les projets</li>
+      <li>📸 <strong>Capture d'écran</strong> : faites imprimer les circuits réussis pour le portfolio</li>
+    </ul>
+
+    <div class="astuce">
+      <strong>💡 Astuce motivation</strong><br>
+      Organisez un <strong>concours de score</strong> en fin de séquence. Affichez les meilleurs scores (avec accord des élèves). Cela motive énormément.
+    </div>
+  </section>
+
+  <!-- 11. EVALUATION -->
+  <section id="evaluation">
+    <h2>11. 📊 Grille d'évaluation multi-critères</h2>
+    <p>Voici une grille d'évaluation complète pour chaque élève.</p>
+
+    <h3>🎯 Critères et barème (sur 20 points)</h3>
+    <div class="grille">
+      <div class="grille-item">
+        <div class="label">📊 Score appli (sur 8 pts)</div>
+        <div class="detail">Score total obtenu par l'élève dans les 4 projets</div>
+      </div>
+      <div class="grille-item">
+        <div class="label">⏱ Temps (sur 4 pts)</div>
+        <div class="detail">Rapidité d'exécution (&lt; 10 min = 4 pts, 10-20 min = 3 pts...)</div>
+      </div>
+      <div class="grille-item">
+        <div class="label">🧠 Autonomie (sur 4 pts)</div>
+        <div class="detail">Observations prof : aide demandée, essais, persévérance</div>
+      </div>
+      <div class="grille-item">
+        <div class="label">🎨 Créativité (sur 2 pts)</div>
+        <div class="detail">Capacité à proposer un circuit original dans le bac à sable</div>
+      </div>
+      <div class="grille-item">
+        <div class="label">👥 Collaboration (sur 2 pts)</div>
+        <div class="detail">Aide apportée aux autres, travail en binôme</div>
+      </div>
+    </div>
+
+    <h3>📋 Tableau de notation détaillé</h3>
+    <table>
+      <tr>
+        <th>Élément observé</th>
+        <th>Excellent</th>
+        <th>Satisfaisant</th>
+        <th>À améliorer</th>
+      </tr>
+      <tr>
+        <td><strong>Score appli</strong></td>
+        <td>≥ 90% (7-8 pts)</td>
+        <td>70-89% (5-6 pts)</td>
+        <td>&lt; 70% (0-4 pts)</td>
+      </tr>
+      <tr>
+        <td><strong>Temps</strong></td>
+        <td>&lt; 10 min (4 pts)</td>
+        <td>10-20 min (3 pts)</td>
+        <td>&gt; 20 min (0-2 pts)</td>
+      </tr>
+      <tr>
+        <td><strong>Autonomie</strong></td>
+        <td>Travaille seul (4 pts)</td>
+        <td>Quelques aides (2-3 pts)</td>
+        <td>Aide constante (0-1 pt)</td>
+      </tr>
+      <tr>
+        <td><strong>Créativité</strong></td>
+        <td>Circuit original (2 pts)</td>
+        <td>Circuit modifié (1 pt)</td>
+        <td>Recopie (0 pt)</td>
+      </tr>
+      <tr>
+        <td><strong>Collaboration</strong></td>
+        <td>Aide les autres (2 pts)</td>
+        <td>Bon binôme (1 pt)</td>
+        <td>Travaille seul (0 pt)</td>
+      </tr>
+    </table>
+
+    <div class="info">
+      <strong>💡 Adaptation</strong><br>
+      Cette grille peut être simplifiée (sur 10) pour le primaire, ou enrichie (sur 30) pour le collège.
+    </div>
+  </section>
+
+  <!-- 12. QUESTIONNAIRE -->
+  <section id="questionnaire">
+    <h2>12. 📝 Questionnaire élève (à imprimer)</h2>
+    <p>À distribuer en fin de séquence pour recueillir le ressenti des élèves.</p>
+
+    <div class="questionnaire">
+      <h3 style="color:#0369a1;margin-bottom:20px;">📋 Questionnaire de fin de séquence</h3>
+      
+      <div class="question">
+        <div class="titre">1. As-tu aimé utiliser InitiaElectro ?</div>
+        <div class="reponses">
+          <label>☐ Beaucoup</label>
+          <label>☐ Moyennement</label>
+          <label>☐ Pas du tout</label>
+        </div>
+      </div>
+
+      <div class="question">
+        <div class="titre">2. Quel a été ton projet préféré ?</div>
+        <div class="reponses">
+          <label>☐ 💡 Allumer une LED</label>
+          <label>☐ 🔘 Avec interrupteur</label>
+          <label>☐ 💡💡 Deux LED en série</label>
+          <label>☐ ✨ Clignotant NE555</label>
+        </div>
+      </div>
+
+      <div class="question">
+        <div class="titre">3. Quel mode as-tu préféré ?</div>
+        <div class="reponses">
+          <label>☐ 🎬 Démonstration</label>
+          <label>☐ 🟢 Facile</label>
+          <label>☐ 🟠 Moyen</label>
+          <label>☐ 🔴 Difficile</label>
+        </div>
+      </div>
+
+      <div class="question">
+        <div class="titre">4. As-tu trouvé les explications claires ?</div>
+        <div class="reponses">
+          <label>☐ Oui, très claires</label>
+          <label>☐ Moyennement</label>
+          <label>☐ Non, pas claires</label>
+        </div>
+      </div>
+
+      <div class="question">
+        <div class="titre">5. Qu'as-tu appris grâce à l'application ? (entoure les bonnes réponses)</div>
+        <div class="reponses">
+          <label>☐ Ce qu'est une LED</label>
+          <label>☐ Ce qu'est une résistance</label>
+          <label>☐ Le sens du courant</label>
+          <label>☐ Ce qu'est un circuit fermé</label>
+          <label>☐ Utiliser un multimètre</label>
+        </div>
+      </div>
+
+      <div class="question">
+        <div class="titre">6. Donne ton avis sur l'application (points forts, points à améliorer) :</div>
+        <div class="ligne"></div>
+        <div class="ligne"></div>
+        <div class="ligne"></div>
+      </div>
+
+      <div class="question">
+        <div class="titre">7. Voudrais-tu continuer à apprendre l'électronique ?</div>
+        <div class="reponses">
+          <label>☐ Oui, beaucoup</label>
+          <label>☐ Peut-être</label>
+          <label>☐ Non</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="astuce">
+      <strong>💡 Exploitation des résultats</strong><br>
+      Analysez les réponses pour améliorer vos séances et adapter le niveau de difficulté.
+    </div>
+  </section>
+
+  <!-- 13. PROJETS -->
+  <section id="projets">
+    <h2>13. 🎨 Trois projets créatifs pour la classe</h2>
+    <p>Des projets clés en main à réaliser dans ElectroPremium.</p>
+
+    <div class="projet">
+      <h4>🎯 Projet 1 : Le feu tricolore</h4>
+      <p>Construire un feu tricolore qui alterne rouge/jaune/vert.</p>
+      <div class="details">
+        <div class="detail-item">
+          <strong>Composants</strong>
+          1 pile + 1 NE555 + 1 CD4017 + 3 LED (rouge, jaune, verte) + 3 résistances
+        </div>
+        <div class="detail-item">
+          <strong>Objectif pédagogique</strong>
+          Comprendre un séquenceur et un compteur
+        </div>
+        <div class="detail-item">
+          <strong>Durée</strong>
+          1 heure
+        </div>
+      </div>
+      <p style="margin-top:12px;"><strong>Étapes :</strong></p>
+      <ol>
+        <li>Utiliser le bloc "Compteur CD4017"</li>
+        <li>Brancher les 3 LED sur les sorties 0, 1, 2 du CD4017</li>
+        <li>Vérifier l'alternance</li>
+      </ol>
+    </div>
+
+    <div class="projet">
+      <h4>🎯 Projet 2 : Le détecteur de lumière</h4>
+      <p>Une LED qui s'allume quand il fait sombre.</p>
+      <div class="details">
+        <div class="detail-item">
+          <strong>Composants</strong>
+          1 pile + 1 LDR + 1 transistor 2N2222 + 1 LED + 2 résistances
+        </div>
+        <div class="detail-item">
+          <strong>Objectif pédagogique</strong>
+          Comprendre un capteur et son amplification
+        </div>
+        <div class="detail-item">
+          <strong>Durée</strong>
+          45 minutes
+        </div>
+      </div>
+      <p style="margin-top:12px;"><strong>Étapes :</strong></p>
+      <ol>
+        <li>Utiliser le bloc "Détecteur de nuit"</li>
+        <li>Observer le comportement de la LED</li>
+        <li>Modifier les valeurs pour ajuster la sensibilité</li>
+      </ol>
+    </div>
+
+    <div class="projet">
+      <h4>🎯 Projet 3 : Le chenillard lumineux</h4>
+      <p>4 LED qui s'allument à tour de rôle.</p>
+      <div class="details">
+        <div class="detail-item">
+          <strong>Composants</strong>
+          1 pile + 1 NE555 + 1 CD4017 + 4 LED + 4 résistances
+        </div>
+        <div class="detail-item">
+          <strong>Objectif pédagogique</strong>
+          Comprendre un oscillateur + compteur
+        </div>
+        <div class="detail-item">
+          <strong>Durée</strong>
+          1 heure
+        </div>
+      </div>
+      <p style="margin-top:12px;"><strong>Étapes :</strong></p>
+      <ol>
+        <li>Utiliser le bloc "Chenillard 4 LED"</li>
+        <li>Observer le défilement</li>
+        <li>Modifier la vitesse en changeant la résistance</li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- 14. FAQ -->
+  <section id="faq">
+    <h2>14. ❓ FAQ enseignants</h2>
+
+    <h3>❓ Combien d'élèves par appareil ?</h3>
+    <p>L'idéal est <strong>1 élève par appareil</strong> pour favoriser l'autonomie. En binôme, alternez les rôles (manipulateur / observateur).</p>
+
+    <h3>❓ L'appli fonctionne-t-elle sans internet ?</h3>
+    <p><strong>Oui</strong>, si elle est installée (PWA). Une fois installée, elle fonctionne hors ligne. Idéal pour les salles sans WiFi.</p>
+
+    <h3>❓ Comment récupérer les résultats des élèves ?</h3>
+    <p>Chaque élève peut <strong>exporter son bilan</strong> en .txt à la fin du quiz. Vous pouvez aussi demander une capture d'écran du bilan.</p>
+
+    <h3>❓ Que faire si un élève est bloqué ?</h3>
+    <p>L'appli propose :</p>
+    <ul>
+      <li>Un <strong>indice textuel</strong> en mode difficile</li>
+      <li>Une <strong>zone visible</strong> après 3 essais ratés</li>
+      <li>Un mode <strong>Démonstration</strong> pour montrer la solution</li>
+    </ul>
+
+    <h3>❓ L'appli convient-elle aux élèves en difficulté ?</h3>
+    <p><strong>Oui</strong> : le mode Facile (cercle clignotant) et le mode Démonstration permettent à tous de réussir. La progression est très progressive.</p>
+
+    <h3>❓ Puis-je adapter l'appli à ma progression ?</h3>
+    <p>L'ordre des projets est libre. Vous pouvez commencer par n'importe quel projet. Le mode Difficile peut servir d'évaluation finale.</p>
+
+    <h3>❓ Comment signaler un bug ou suggérer une amélioration ?</h3>
+    <p>Contactez <strong>M. Ziane</strong> directement. Les retours sont précieux pour améliorer l'outil.</p>
+
+    <h3>❓ L'appli est-elle payante ?</h3>
+    <p><strong>Non</strong>, elle est gratuite et à usage pédagogique. Hébergée sur GitHub Pages.</p>
+
+    <h3>❓ Les données des élèves sont-elles collectées ?</h3>
+    <p><strong>Non</strong>. Aucune donnée n'est envoyée sur un serveur. Tout se passe <strong>localement</strong> dans le navigateur.</p>
+  </section>
+
+  <!-- 15. ANNEXES -->
+  <section id="annexes">
+    <h2>15. 📚 Annexes et ressources</h2>
+
+    <h3>📄 Documents complémentaires</h3>
+    <ul>
+      <li>📖 <strong>Guide d'installation</strong> : pour installer l'appli</li>
+      <li>📖 <strong>Manuel de l'élève</strong> : pour les élèves</li>
+    </ul>
+
+    <h3>⌨️ Raccourcis clavier (ElectroPremium)</h3>
+    <table>
+      <tr>
+        <th>Raccourci</th>
+        <th>Action</th>
+      </tr>
+      <tr><td><strong>Suppr</strong></td><td>Supprime le composant sous la souris</td></tr>
+      <tr><td><strong>Ctrl + Z</strong></td><td>Annuler</td></tr>
+      <tr><td><strong>Ctrl + Y</strong></td><td>Rétablir</td></tr>
+      <tr><td><strong>Molette</strong></td><td>Zoom</td></tr>
+      <tr><td><strong>+/−</strong></td><td>Zoom</td></tr>
+      <tr><td><strong>0</strong></td><td>Recentrer</td></tr>
+      <tr><td><strong>Ctrl + S</strong></td><td>Sauvegarder le circuit</td></tr>
+    </table>
+
+    <h3>🔤 Glossaire</h3>
+    <table>
+      <tr>
+        <th>Terme</th>
+        <th>Définition</th>
+      </tr>
+      <tr><td><strong>LED</strong></td><td>Diode Électroluminescente - s'allume quand le courant passe</td></tr>
+      <tr><td><strong>Résistance</strong></td><td>Composant qui limite le courant (en ohms Ω)</td></tr>
+      <tr><td><strong>Pile</strong></td><td>Source d'énergie (ici 9 volts)</td></tr>
+      <tr><td><strong>Circuit</strong></td><td>Ensemble de composants reliés par des fils</td></tr>
+      <tr><td><strong>Circuit fermé</strong></td><td>Circuit où le courant peut circuler</td></tr>
+      <tr><td><strong>Circuit ouvert</strong></td><td>Circuit où le courant ne peut pas circuler</td></tr>
+      <tr><td><strong>NE555</strong></td><td>Puce électronique polyvalente (minuteur/oscillateur)</td></tr>
+      <tr><td><strong>CD4017</strong></td><td>Compteur décimal (10 sorties)</td></tr>
+      <tr><td><strong>LDR</strong></td><td>Résistance photo-sensible (varie selon la lumière)</td></tr>
+      <tr><td><strong>Multimètre</strong></td><td>Instrument de mesure électrique</td></tr>
+    </table>
+
+    <h3>🔗 Liens utiles</h3>
+    <a href="https://abdelziane979-eng.github.io/initiaelectro/" class="lien-appli no-print" target="_blank">
+      🛠️ InitiaElectro
+      <small>https://abdelziane979-eng.github.io/initiaelectro/</small>
+    </a>
+    <a href="https://abdelziane979-eng.github.io/initiaelectro/bac_a_sable.html" class="lien-appli no-print" target="_blank">
+      🧪 ElectroPremium
+      <small>https://abdelziane979-eng.github.io/initiaelectro/bac_a_sable.html</small>
+    </a>
+    <a href="https://abdelziane979-eng.github.io/initiaelectro/guide-installation.html" class="lien-appli no-print" target="_blank">
+      📖 Guide d'installation
+      <small>https://abdelziane979-eng.github.io/initiaelectro/guide-installation.html</small>
+    </a>
+    <a href="https://abdelziane979-eng.github.io/initiaelectro/manuel-eleve.html" class="lien-appli no-print" target="_blank">
+      📖 Manuel de l'élève
+      <small>https://abdelziane979-eng.github.io/initiaelectro/manuel-eleve.html</small>
+    </a>
+  </section>
+
+  <!-- ENCOURAGEMENT FINAL -->
+  <section style="text-align:center;background:linear-gradient(135deg,#eff6ff,#dbeafe);border-top:4px solid #0369a1;">
+    <h2 style="color:#0369a1;justify-content:center;">🎓 Bonne utilisation !</h2>
+    <p style="font-size:1.1em;">N'hésitez pas à me contacter pour tout retour, suggestion ou problème.</p>
+    <p>Ensemble, faisons découvrir l'électronique à la nouvelle génération ! 🚀</p>
+    <div style="font-size:3em;margin:20px 0;">🛠️🧪⚡💡</div>
+  </section>
+
+</div>
+
+<footer>
+  <div>📖 Manuel du professeur - InitiaElectro & ElectroPremium</div>
+  <div style="margin-top:8px;">Développé par <strong>M. Ziane</strong></div>
+  <div class="version">Version 1.0 - Octobre 2026 - Usage pédagogique</div>
+</footer>
+
+</body>
+</html>
