@@ -2,7 +2,7 @@
    COMPOSANTS.JS - Bibliothèque de composants électroniques
    Projet : InitiaElectro / EspaceElectronic
    Auteur : M. Ziane
-   Version : 3.0 (Octobre 2026)
+   Version : 4.0 (Octobre 2026)
    
    Niveaux :
    - "decouverte"  : 8-10 ans (6 composants)
@@ -455,8 +455,73 @@ var COMPOSANTS = {
   
   /* =========================================================
      NIVEAU 4 : EXPERT (6 composants)
-     À ajouter en Session 3D
      ========================================================= */
+  
+  microcontroleur: {
+    id: "microcontroleur", nom: "Microcontrôleur (Arduino)", emoji: "🧠", categorie: "semi_conducteurs", niveau: "expert", difficulte: 4,
+    description: "Cerveau programmable. Permet de créer des circuits intelligents avec du code.",
+    caracteristiques: { type: "ATmega328P", tension: "5V", entrees_sorties: "14 E/S numériques + 6 analogiques" },
+    visuel: { couleur: "#0077B6", largeur: 100, hauteur: 80, forme: "rectangle" },
+    pattes: [{ x: -20, y: 10, nom: "D0" }, { x: -20, y: 30, nom: "D1" }, { x: -20, y: 50, nom: "D2" }, { x: -20, y: 70, nom: "D3" }, { x: 120, y: 10, nom: "5V" }, { x: 120, y: 30, nom: "GND" }, { x: 120, y: 50, nom: "A0" }, { x: 120, y: 70, nom: "A1" }],
+    exemple_usage: "Projets programmables, robots, capteurs",
+    precautions: ["Tension 5V", "Programmation nécessaire"],
+    suggestion: "Pour les projets avancés et l'IoT"
+  },
+  
+  afficheurLcd: {
+    id: "afficheurLcd", nom: "Afficheur LCD", emoji: "📊", categorie: "lumieres", niveau: "expert", difficulte: 4,
+    description: "Écran à cristaux liquides. Affiche du texte et des chiffres (16x2 caractères).",
+    caracteristiques: { type: "16x2", tension: "5V", interface: "Parallèle 4 bits ou 8 bits" },
+    visuel: { couleur: "#1e293b", largeur: 120, hauteur: 60, forme: "rectangle" },
+    pattes: [{ x: -10, y: 10, nom: "VSS" }, { x: -10, y: 20, nom: "VDD" }, { x: -10, y: 30, nom: "V0" }, { x: -10, y: 40, nom: "RS" }, { x: -10, y: 50, nom: "E" }, { x: 130, y: 10, nom: "D4" }, { x: 130, y: 20, nom: "D5" }, { x: 130, y: 30, nom: "D6" }, { x: 130, y: 40, nom: "D7" }],
+    exemple_usage: "Affichage texte, menu, mesures",
+    precautions: ["Réglage de contraste", "Alimentation 5V"],
+    suggestion: "Pour communiquer des informations"
+  },
+  
+  alimStabilisee: {
+    id: "alimStabilisee", nom: "Alimentation stabilisée", emoji: "🔋", categorie: "sources", niveau: "expert", difficulte: 4,
+    description: "Fournit une tension continue stable (5V ou 12V) à partir du secteur.",
+    caracteristiques: { entree: "220V AC", sortie: "5V / 12V DC", courant_max: "2A" },
+    visuel: { couleur: "#111111", largeur: 100, hauteur: 60, forme: "rectangle" },
+    pattes: [{ x: -10, y: 10, nom: "L" }, { x: -10, y: 20, nom: "N" }, { x: 110, y: 10, nom: "+V" }, { x: 110, y: 20, nom: "GND" }],
+    exemple_usage: "Alimenter des circuits puissants",
+    precautions: ["Attention : 220V !", "Ne pas toucher les parties nues"],
+    suggestion: "Pour les projets fixes"
+  },
+  
+  capteurHumidite: {
+    id: "capteurHumidite", nom: "Capteur d'humidité", emoji: "🌡️", categorie: "capteurs", niveau: "expert", difficulte: 4,
+    description: "Mesure le taux d'humidité dans l'air.",
+    caracteristiques: { type: "DHT11", tension: "3.3V à 5V", precision: "±5% HR" },
+    visuel: { couleur: "#0369a1", largeur: 40, hauteur: 60, forme: "rectangle" },
+    pattes: [{ x: -10, y: 10, nom: "VCC" }, { x: -10, y: 30, nom: "DATA" }, { x: -10, y: 50, nom: "GND" }],
+    exemple_usage: "Station météo, serre connectée",
+    precautions: ["Ne pas immerger"],
+    suggestion: "Pour les projets environnementaux"
+  },
+  
+  moduleBluetooth: {
+    id: "moduleBluetooth", nom: "Module Bluetooth", emoji: "📡", categorie: "capteurs", niveau: "expert", difficulte: 4,
+    description: "Permet une communication sans fil avec un smartphone ou un PC.",
+    caracteristiques: { type: "HC-05", tension: "3.3V à 5V", portee: "10m" },
+    visuel: { couleur: "#0ea5e9", largeur: 60, hauteur: 40, forme: "rectangle" },
+    pattes: [{ x: -10, y: 10, nom: "VCC" }, { x: -10, y: 20, nom: "GND" }, { x: -10, y: 30, nom: "TX" }, { x: -10, y: 40, nom: "RX" }],
+    exemple_usage: "Pilotage par smartphone, robot télécommandé",
+    precautions: ["Alimentation 3.3V pour la communication"],
+    suggestion: "Pour les projets connectés"
+  },
+  
+  ne555Cms: {
+    id: "ne555Cms", nom: "NE555 (CMS)", emoji: "⚡", categorie: "semi_conducteurs", niveau: "expert", difficulte: 4,
+    description: "Version miniature du NE555 pour montage en surface (CMS).",
+    caracteristiques: { type: "SOIC-8", tension: "4.5V à 16V", fonction: "Minuteur" },
+    visuel: { couleur: "#222222", largeur: 50, hauteur: 30, forme: "rectangle" },
+    pattes: [{ x: -5, y: 5, nom: "1" }, { x: -5, y: 15, nom: "2" }, { x: -5, y: 25, nom: "3" }, { x: 55, y: 5, nom: "8" }, { x: 55, y: 15, nom: "7" }, { x: 55, y: 25, nom: "6" }],
+    exemple_usage: "Circuits miniaturisés",
+    precautions: ["Nécessite une station de soudure CMS"],
+    suggestion: "Pour les circuits compacts"
+  }
   
 };
 
