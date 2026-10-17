@@ -332,7 +332,7 @@
   .compo-clignote {
     animation: compoClignote 0.4s ease-in-out 5;
   }
-  @media (max-width: 800px) { .conteneur { grid-template-columns: 1fr; } }
+  @media (max-width: 800px) { .conteneur f{ grid-template-columns: 1fr; } }
 </style>
 </head>
 <body>
@@ -1678,12 +1678,17 @@ function trouverFilSousSouris(x, y) {
 
 /* ⭐ MAPPING DES NOUVEAUX IDs VERS LES ANCIENS */
 function mapperTypeDessin(type) {
-  if (type === 'pile9v') return 'pile';
-  if (type === 'resistance470' || type === 'resistance220') return 'resistance';
-  if (type === 'ledRouge') return 'led';
+  if (type === 'pile9v' || type === 'pile15v' || type === 'pile12v' || type === 'alimStabilisee') return 'pile';
+  if (type === 'resistance470' || type === 'resistance220' || type === 'resistance1k' || type === 'resistance10k' || type === 'thermistance' || type === 'bobine') return 'resistance';
+  if (type === 'ledRouge' || type === 'ledVerte' || type === 'ledBleue' || type === 'ledJaune' || type === 'ledRgb' || type === 'afficheur7seg' || type === 'afficheurLcd') return 'led';
   if (type === 'boutonPoussoir') return 'bouton';
-  if (type === 'resistance1k' || type === 'resistance10k') return 'resistance';
-  if (type === 'ledVerte' || type === 'ledBleue' || type === 'ledJaune') return 'led';
+  if (type === 'potentiometre') return 'resistance';
+  if (type === 'condensateur10uF' || type === 'condensateur100uF') return 'condensateur';
+  if (type === 'diode1n4148' || type === 'diode1n4007' || type === 'diodeZener') return 'diode';
+  if (type === 'ne555' || type === 'ne555Cms' || type === 'cd4017' || type === 'cd4027' || type === 'ci74hc00' || type === 'microcontroleur' || type === 'porteAnd' || type === 'porteOr' || type === 'porteNot' || type === 'porteXor') return 'ci';
+  if (type === 'transistorPnp' || type === 'mosfet') return 'transistor';
+  if (type === 'capteurIr' || type === 'microphone' || type === 'capteurHumidite' || type === 'moduleBluetooth') return 'capteur';
+  if (type === 'hautParleur' || type === 'moteurDc' || type === 'servomoteur') return 'moteur';
   return type;
 }
 
@@ -1711,7 +1716,7 @@ function dessinerComposant(comp, estMesure) {
   ctx.fill();
   
   /* ⭐ MAPPING pour dessiner les nouveaux composants avec les fonctions existantes */
-  var typeDessin = mapperTypeDessin(comp.type);
+   var typeDessin = mapperTypeDessin(comp.type);
   
   if (typeDessin === 'pile') dessinerPile(comp);
   else if (typeDessin === 'resistance') dessinerResistance(comp);
@@ -1724,6 +1729,10 @@ function dessinerComposant(comp, estMesure) {
   else if (typeDessin === 'ldr') dessinerLDR(comp);
   else if (typeDessin === 'bouton') dessinerBouton(comp);
   else if (typeDessin === 'buzzer') dessinerBuzzer(comp);
+  else if (typeDessin === 'diode') dessinerDiodeGenerique(comp);
+  else if (typeDessin === 'ci') dessinerCIGenerique(comp);
+  else if (typeDessin === 'capteur') dessinerCapteurGenerique(comp);
+  else if (typeDessin === 'moteur') dessinerMoteurGenerique(comp);
   else {
     /* Composant inconnu : afficher un placeholder */
     ctx.fillStyle = '#94a3b8';
@@ -3155,6 +3164,56 @@ window.onload = function() {
     });
   }
 };
+/* =========================================================
+   DESSINS GENERIQUES POUR LES NOUVEAUX COMPOSANTS
+   ========================================================= */
+function dessinerDiodeGenerique(comp) {
+  var grd = ctx.createLinearGradient(comp.x, comp.y, comp.x, comp.y + comp.hauteur);
+  grd.addColorStop(0, '#333'); grd.addColorStop(1, '#111');
+  ctx.fillStyle = grd;
+  ctx.beginPath(); if (ctx.roundRect) ctx.roundRect(comp.x, comp.y, comp.largeur, comp.hauteur, 4); else ctx.rect(comp.x, comp.y, comp.largeur, comp.hauteur); ctx.fill();
+  ctx.fillStyle = '#fff';
+  ctx.beginPath();
+  ctx.moveTo(comp.x + 20, comp.y + 5); ctx.lineTo(comp.x + 20, comp.y + comp.hauteur - 5); ctx.lineTo(comp.x + 5, comp.y + comp.hauteur/2); ctx.fill();
+  ctx.fillRect(comp.x + 20, comp.y + 5, 3, comp.hauteur - 10);
+}
+
+function dessinerCIGenerique(comp) {
+  var grd = ctx.createLinearGradient(comp.x, comp.y, comp.x + comp.largeur, comp.y + comp.hauteur);
+  grd.addColorStop(0, '#3a3a3a'); grd.addColorStop(0.4, '#1a1a1a'); grd.addColorStop(1, '#000');
+  ctx.fillStyle = grd;
+  ctx.beginPath(); if (ctx.roundRect) ctx.roundRect(comp.x, comp.y, comp.largeur, comp.hauteur, 5); else ctx.rect(comp.x, comp.y, comp.largeur, comp.hauteur); ctx.fill();
+  ctx.fillStyle = '#000';
+  ctx.beginPath(); ctx.arc(comp.x + comp.largeur/2, comp.y + 8, 8, 0, Math.PI, true); ctx.fill();
+  ctx.fillStyle = '#555';
+  ctx.beginPath(); ctx.arc(comp.x + comp.largeur/2, comp.y + 8, 8, 0, Math.PI); ctx.fill();
+  ctx.fillStyle = '#ccc';
+  ctx.font = 'bold 10px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.shadowColor = 'rgba(0,0,0,0.8)'; ctx.shadowBlur = 3;
+  ctx.fillText('CI', comp.x + comp.largeur/2, comp.y + comp.hauteur/2 + 4);
+  ctx.shadowBlur = 0;
+}
+
+function dessinerCapteurGenerique(comp) {
+  ctx.fillStyle = '#0ea5e9';
+  ctx.beginPath(); if (ctx.roundRect) ctx.roundRect(comp.x, comp.y, comp.largeur, comp.hauteur, 4); else ctx.rect(comp.x, comp.y, comp.largeur, comp.hauteur); ctx.fill();
+  ctx.fillStyle = '#fff';
+  ctx.font = 'bold 20px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('📡', comp.x + comp.largeur/2, comp.y + comp.hauteur/2 + 7);
+}
+
+function dessinerMoteurGenerique(comp) {
+  var grd = ctx.createRadialGradient(comp.x + comp.largeur/2, comp.y + comp.hauteur/2, 5, comp.x + comp.largeur/2, comp.y + comp.hauteur/2, comp.largeur/2);
+  grd.addColorStop(0, '#4a4a4a'); grd.addColorStop(1, '#222');
+  ctx.fillStyle = grd;
+  ctx.beginPath(); ctx.arc(comp.x + comp.largeur/2, comp.y + comp.hauteur/2, comp.largeur/2, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = '#fff';
+  ctx.font = 'bold 20px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('⚙️', comp.x + comp.largeur/2, comp.y + comp.hauteur/2 + 7);
+}
 </script>
 
 </body>
