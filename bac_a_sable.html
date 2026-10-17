@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ElectroPremium</title>
+<title>EspaceElectronic</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0' stop-color='%236b21a8'/><stop offset='1' stop-color='%23a855f7'/></linearGradient></defs><rect width='512' height='512' rx='112' fill='url(%23g)'/><circle cx='220' cy='256' r='60' fill='%23ff3333' stroke='%23fff' stroke-width='12'/><circle cx='200' cy='236' r='14' fill='rgba(255,255,255,0.85)'/><rect x='300' y='238' width='140' height='36' rx='18' fill='%23D4A76A' stroke='%23fff' stroke-width='8'/><rect x='320' y='238' width='14' height='36' fill='%23FFD700'/><rect x='356' y='238' width='14' height='36' fill='%238B00FF'/><rect x='392' y='238' width='14' height='36' fill='%238B4513'/><line x1='280' y1='256' x2='300' y2='256' stroke='%23fff' stroke-width='10' stroke-linecap='round'/></svg>">
 <link rel="manifest" href="manifest-bac.json">
 <meta name="theme-color" content="#6b21a8">
@@ -221,7 +221,6 @@
     padding: 10px; border-radius: 8px; cursor: pointer;
     width: 100%; font-weight: bold; transition: all 0.2s; }
   .btn-annuler:hover { background: #475569; }
-  /* PANNEAU COMPOSANTS PLACES */
   .panneau-composants {
     background: linear-gradient(135deg, #1e293b, #253044);
     border-radius: 12px;
@@ -326,7 +325,6 @@
     padding: 12px;
     font-style: italic;
   }
-  /* ANIMATION CLIGNOTEMENT COMPOSANT */
   @keyframes compoClignote {
     0%, 100% { opacity: 1; filter: drop-shadow(0 0 0 transparent); }
     50% { opacity: 0.5; filter: drop-shadow(0 0 20px #38bdf8); }
@@ -341,8 +339,8 @@
 
 <header>
   <div>
-    <h1>🧪 ElectroPremium</h1>
-    <div class="sub">Crée ton propre circuit librement !</div>
+    <h1>⚡ EspaceElectronic</h1>
+   <div class="sub">Atelier de création électronique</div> 
   </div>
   <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
     <button id="btn-installer" onclick="installerPWA()" style="display:none;padding:8px 16px;background:#fbbf24;color:#1a1f2e;border:none;border-radius:8px;font-weight:bold;cursor:pointer;font-size:0.9em;">
@@ -355,6 +353,17 @@
 <div class="conteneur">
   <div class="palette">
     <h2>📦 Composants</h2>
+    <div style="margin-bottom:10px;">
+      <label style="font-size:0.8em;color:#94a3b8;display:block;margin-bottom:4px;">Niveau :</label>
+      <select id="select-niveau" onchange="filtrerParNiveau()" 
+              style="width:100%;padding:7px;background:#0f1420;color:#e0e0e0;border:2px solid #334155;border-radius:6px;font-size:0.85em;cursor:pointer;">
+        <option value="tous">🌍 Tous les niveaux</option>
+        <option value="decouverte">🟢 Découverte (8-10 ans)</option>
+        <option value="exploration">🟡 Exploration (10-13 ans)</option>
+        <option value="maitrise">🟠 Maîtrise (13-18 ans)</option>
+        <option value="expert">🔴 Expert (18+ ans)</option>
+      </select>
+    </div>
     <div id="liste-palette"></div>
     <h2>📚 Blocs prêts</h2>
     <div class="option-cablage">
@@ -463,6 +472,8 @@
   </div>
 </div>
 
+<script src="composants.js"></script>
+
 <script>
 /* =========================================================
    CATALOGUE DES COMPOSANTS
@@ -497,6 +508,58 @@ var CATALOGUE = {
     pattes:[{x:10,y:60},{x:50,y:60}], valeurs:null }
 };
 
+/* =========================================================
+   FUSION AVEC composants.js
+   Ajoute les composants de composants.js au CATALOGUE existant
+   sans écraser les 11 composants d'origine
+   ========================================================= */
+if (typeof COMPOSANTS !== 'undefined') {
+  var nbAjoutes = 0;
+  var nbEnrichis = 0;
+  for (var idComp in COMPOSANTS) {
+    var c = COMPOSANTS[idComp];
+    if (!CATALOGUE[idComp]) {
+      // Nouveau composant : on l'ajoute
+      CATALOGUE[idComp] = {
+        id: idComp,
+        nom: c.nom,
+        icone: c.emoji,
+        couleur: c.visuel.couleur,
+        largeur: c.visuel.largeur,
+        hauteur: c.visuel.hauteur,
+        pattes: c.pattes,
+        valeurs: null,
+        niveau: c.niveau,
+        categorie: c.categorie,
+        description: c.description,
+        caracteristiques: c.caracteristiques
+      };
+      nbAjoutes++;
+    } else {
+      // Composant existant : on l'enrichit (niveau, catégorie, description)
+      if (!CATALOGUE[idComp].niveau) {
+        CATALOGUE[idComp].niveau = c.niveau;
+        CATALOGUE[idComp].categorie = c.categorie;
+        CATALOGUE[idComp].description = c.description;
+        CATALOGUE[idComp].caracteristiques = c.caracteristiques;
+        nbEnrichis++;
+      }
+    }
+  }
+  console.log('✅ ' + nbAjoutes + ' composants ajoutés, ' + nbEnrichis + ' enrichis');
+}
+
+/* =========================================================
+   FILTRE PAR NIVEAU
+   ========================================================= */
+var filtreNiveauActif = 'tous';
+
+function filtrerParNiveau() {
+  var select = document.getElementById('select-niveau');
+  if (!select) return;
+  filtreNiveauActif = select.value;
+  afficherPalette();
+}
 /* =========================================================
    BLOCS PRETS
    ========================================================= */
@@ -762,7 +825,6 @@ var composantEnDrag = null;
 var dragOffsetX = 0, dragOffsetY = 0;
 var canvas, ctx;
 
-/* ZOOM & PAN */
 var zoomLevel = 1.0;
 var panX = 0;
 var panY = 0;
@@ -774,11 +836,9 @@ var dragVueStartY = 0;
 var dragVuePanStartX = 0;
 var dragVuePanStartY = 0;
 
-/* GRILLE MAGNETIQUE */
 var grilleActive = true;
 var grillePas = 20;
 
-/* HISTORIQUE (UNDO/REDO) */
 var historique = [];
 var historiqueIndex = -1;
 var MAX_HISTORIQUE = 30;
@@ -795,7 +855,6 @@ var animChenillardTimer = null;
 var buzzerActif = false;
 var buzzerOndePhase = 0;
 
-/* MULTIMETRE */
 var multimetreActif = false;
 var multimetreMode = 'resistance';
 var pointeRouge = null;
@@ -803,20 +862,17 @@ var pointeNoire = null;
 var composantMesure = null;
 var composantSurvoleClavier = null;
 
-/* TUTORIELS */
 var tutoActif = null;
 var tutoEtape = -1;
 
-/* LOCALSTORAGE */
 var LS_KEY = 'alerte_electro_bac_a_sable_v1';
 var autoSaveTimer = null;
 
-/* DRAG VUE */
 var dragVueSeuil = 5;
 var dragVuePretPourDeplacement = false;
 
 /* =========================================================
-   LOCALSTORAGE - SAUVEGARDE AUTOMATIQUE
+   LOCALSTORAGE
    ========================================================= */
 function sauvegarderLocal(silencieux) {
   try {
@@ -845,7 +901,7 @@ function chargerLocal() {
       fils = data.fils;
       prochainId = data.prochainId || 1;
       prochainFilId = data.prochainFilId || 1;
-            mettreMessage('📂 Circuit restauré ! ' + composants.length + ' composant(s).', 'succes');
+      mettreMessage('📂 Circuit restauré ! ' + composants.length + ' composant(s).', 'succes');
       mettreAJourStatut();
       afficherPanneauComposants();
       dessiner();
@@ -991,7 +1047,7 @@ function gererDragVueMouseup(event) {
 }
 
 /* =========================================================
-   ANNULER LE MODE EN COURS (bouton)
+   ANNULER MODE
    ========================================================= */
 function annulerMode() {
   var actionFaite = false;
@@ -1030,7 +1086,7 @@ function annulerMode() {
 }
 
 /* =========================================================
-   HISTORIQUE (UNDO / REDO)
+   HISTORIQUE
    ========================================================= */
 function faireSnapshot() {
   if (sauvegarde_en_cours) return;
@@ -1078,17 +1134,17 @@ function restaurerSnapshot(snap) {
   pointeNoire = null;
   sauvegarde_en_cours = false;
   mettreAJourStatut();
+  afficherPanneauComposants();
   dessiner();
 }
 
 /* =========================================================
-   RACCOURCIS CLAVIER
+   CLAVIER
    ========================================================= */
 function gererClavier(event) {
   var tag = (event.target.tagName || '').toLowerCase();
-  if (tag === 'input' || tag === 'textarea') return;
+  if (tag === 'input' || tag === 'textarea' || tag === 'select') return;
 
-  // Suppr / Delete : supprime le composant sous la souris
   if (event.key === 'Delete' || event.key === 'Backspace') {
     if (composantSurvoleClavier) {
       event.preventDefault();
@@ -1097,14 +1153,12 @@ function gererClavier(event) {
     }
   }
 
-  // Echap : annuler le mode en cours
   if (event.key === 'Escape' || event.key === 'Esc' || event.keyCode === 27) {
     event.preventDefault();
     annulerMode();
     return;
   }
 
-  // Ctrl+Z : undo
   if ((event.ctrlKey || event.metaKey) && (event.key === 'z' || event.key === 'Z')) {
     event.preventDefault();
     if (event.shiftKey) retablirAction();
@@ -1112,33 +1166,28 @@ function gererClavier(event) {
     return;
   }
 
-  // Ctrl+Y : redo
   if ((event.ctrlKey || event.metaKey) && (event.key === 'y' || event.key === 'Y')) {
     event.preventDefault();
     retablirAction();
     return;
   }
 
-  // Ctrl+S : sauvegarde JSON
   if ((event.ctrlKey || event.metaKey) && (event.key === 's' || event.key === 'S')) {
     event.preventDefault();
     exporterJSON();
     return;
   }
 
-  // + : zoom avant
   if (event.key === '+' || event.key === '=') {
     event.preventDefault();
     zoomPlus();
     return;
   }
-  // - : zoom arrière
   if (event.key === '-' || event.key === '_') {
     event.preventDefault();
     zoomMoins();
     return;
   }
-    // 0 : recentrer
   if (event.key === '0') {
     event.preventDefault();
     recentrerVue();
@@ -1147,13 +1196,7 @@ function gererClavier(event) {
 }
 
 /* =========================================================
-   PALETTE
-
-/* =========================================================
-   PALETTE
-   ========================================================= */
-/* =========================================================
-   PANNEAU COMPOSANTS PLACES (Session D - Patch 3)
+   PANNEAU COMPOSANTS PLACES
    ========================================================= */
 var panneauOuvert = true;
 var compoClignotantId = null;
@@ -1204,31 +1247,21 @@ function afficherPanneauComposants() {
     html += '</div>';
   }
   div.innerHTML = html;
-
-  // Ouvrir automatiquement si >= 1 composant et pas encore manipule
-  if (!panneauOuvert) {
-    panneauOuvert = true;
-    div.classList.remove('replie');
-    document.getElementById('panneau-toggle').classList.add('ouvert');
-  }
 }
 
 function centrerSurComposant(id) {
   var comp = trouverComposant(id);
   if (!comp) return;
 
-  // Centrer la vue sur le composant
   var centreCanvasX = canvas.width / 2;
   var centreCanvasY = canvas.height / 2;
   var compCentreX = comp.x + comp.largeur / 2;
   var compCentreY = comp.y + comp.hauteur / 2;
 
-  // Calculer le pan necessaire pour centrer le composant
   panX = centreCanvasX - compCentreX * zoomLevel;
   panY = centreCanvasY - compCentreY * zoomLevel;
   limiterPan();
 
-  // Marquer comme actif (clignote)
   compoClignotantId = id;
   if (compoClignotantTimer) clearTimeout(compoClignotantTimer);
   compoClignotantTimer = setTimeout(function() {
@@ -1249,24 +1282,81 @@ function supprimerComposantDepuisPanneau(id) {
   var nom = cat ? cat.nom : 'Composant';
   if (confirm('Supprimer ' + nom + ' #' + id + ' ?')) {
     supprimerComposant(id);
-    // Si le composant supprime etait celui qui clignotait, on nettoie
     if (compoClignotantId === id) compoClignotantId = null;
   }
 }
 
+/* =========================================================
+   AFFICHAGE PALETTE (avec filtre par niveau)
+   ========================================================= */
 function afficherPalette() {
   var div = document.getElementById('liste-palette');
+  if (!div) return;
   var html = '';
   var keys = Object.keys(CATALOGUE);
+  var nbAffiches = 0;
+  
+  var niveaux = {
+    decouverte: [],
+    exploration: [],
+    maitrise: [],
+    expert: [],
+    autres: []
+  };
   for (var i = 0; i < keys.length; i++) {
-    var c = CATALOGUE[keys[i]];
-    var actif = composantSelectionne === c.id ? ' actif' : '';
-    html += '<div class="item-palette' + actif + '" onclick="choisirComposant(\'' + c.id + '\')">';
-    html += '<div class="icone" style="background:' + c.couleur + ';color:white;">' + c.icone + '</div>';
-    html += '<div class="texte"><strong>' + c.nom + '</strong>';
-    if (c.valeurs) html += '<small>' + c.valeurs.length + ' valeur(s)</small>';
-    html += '</div></div>';
+  var c = CATALOGUE[keys[i]];
+  var niveauComp = c.niveau || 'autres';
+  if (niveauComp !== 'autres' && niveaux[niveauComp]) {
+    niveaux[niveauComp].push(c);
+  } else {
+    // Si le composant a un niveau, ne pas le mettre dans "autres"
+    if (!c.niveau) {
+      niveaux.autres.push(c);
+    }
   }
+}
+  
+  
+  function htmlPourListe(liste) {
+    var h = '';
+    for (var j = 0; j < liste.length; j++) {
+      var comp = liste[j];
+      var actif = composantSelectionne === comp.id ? ' actif' : '';
+      h += '<div class="item-palette' + actif + '" onclick="choisirComposant(\'' + comp.id + '\')">';
+      h += '<div class="icone" style="background:' + comp.couleur + ';color:white;">' + comp.icone + '</div>';
+      h += '<div class="texte"><strong>' + comp.nom + '</strong>';
+      if (comp.valeurs) h += '<small>' + comp.valeurs.length + ' valeur(s)</small>';
+      h += '</div></div>';
+    }
+    return h;
+  }
+  
+  if (filtreNiveauActif === 'tous') {
+    var labels = {
+      decouverte: '🟢 Découverte (8-10 ans)',
+      exploration: '🟡 Exploration (10-13 ans)',
+      maitrise: '🟠 Maîtrise (13-18 ans)',
+      expert: '🔴 Expert (18+ ans)',
+      autres: '📦 Classiques'
+    };
+    var ordre = ['decouverte', 'exploration', 'maitrise', 'expert', 'autres'];
+    for (var k = 0; k < ordre.length; k++) {
+      var niv = ordre[k];
+      if (niveaux[niv].length > 0) {
+        html += '<div style="font-size:0.75em;color:#94a3b8;margin:10px 0 6px 0;padding:4px 8px;background:#0f1420;border-radius:4px;border-left:2px solid #38bdf8;">' + labels[niv] + ' (' + niveaux[niv].length + ')</div>';
+        html += htmlPourListe(niveaux[niv]);
+        nbAffiches += niveaux[niv].length;
+      }
+    }
+  } else {
+    if (niveaux[filtreNiveauActif] && niveaux[filtreNiveauActif].length > 0) {
+      html += htmlPourListe(niveaux[filtreNiveauActif]);
+      nbAffiches = niveaux[filtreNiveauActif].length;
+    } else {
+      html += '<div style="padding:12px;color:#94a3b8;font-size:0.85em;text-align:center;font-style:italic;">Aucun composant dans ce niveau.</div>';
+    }
+  }
+  
   div.innerHTML = html;
 }
 
@@ -1434,52 +1524,33 @@ function dessiner() {
   var zoomPourcent = Math.round(zoomLevel * 100) + '%';
   ctx.fillStyle = 'rgba(15, 20, 32, 0.75)';
   ctx.beginPath();
-  ctx.roundRect(canvas.width - 90, canvas.height - 35, 80, 26, 6);
+  if (ctx.roundRect) ctx.roundRect(canvas.width - 90, canvas.height - 35, 80, 26, 6);
+  else ctx.rect(canvas.width - 90, canvas.height - 35, 80, 26);
   ctx.fill();
   ctx.fillStyle = '#38bdf8';
   ctx.font = 'bold 13px sans-serif';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
   ctx.fillText('🔍 ' + zoomPourcent, canvas.width - 50, canvas.height - 22);
-  // PANNEAU COMPOSANTS : clignotement du composant actif
+
   if (compoClignotantId) {
     var compCligno = trouverComposant(compoClignotantId);
     if (compCligno) {
       ctx.save();
-      // Revenir en coordonnees monde
       ctx.setTransform(1, 0, 0, 1, 0, 0);
       ctx.translate(panX, panY);
       ctx.scale(zoomLevel, zoomLevel);
-      // Calculer l'alpha pulsant
       var t = Date.now() / 200;
       var alphaC = 0.4 + 0.6 * Math.abs(Math.sin(t));
-      // Halo exterieur
       ctx.strokeStyle = 'rgba(56, 189, 248, ' + alphaC + ')';
       ctx.lineWidth = 4;
       ctx.shadowColor = '#38bdf8';
       ctx.shadowBlur = 20;
       ctx.beginPath();
-      ctx.roundRect(
-        compCligno.x - 8,
-        compCligno.y - 8,
-        compCligno.largeur + 16,
-        compCligno.hauteur + 16,
-        10
-      );
+      if (ctx.roundRect) ctx.roundRect(compCligno.x - 8, compCligno.y - 8, compCligno.largeur + 16, compCligno.hauteur + 16, 10);
+      else ctx.rect(compCligno.x - 8, compCligno.y - 8, compCligno.largeur + 16, compCligno.hauteur + 16);
       ctx.stroke();
-      // Halo interieur (plus fin)
       ctx.shadowBlur = 0;
-      ctx.strokeStyle = 'rgba(255, 255, 255, ' + (alphaC * 0.8) + ')';
-      ctx.lineWidth = 1.5;
-      ctx.beginPath();
-      ctx.roundRect(
-        compCligno.x - 4,
-        compCligno.y - 4,
-        compCligno.largeur + 8,
-        compCligno.hauteur + 8,
-        8
-      );
-      ctx.stroke();
       ctx.restore();
     }
   }
@@ -1604,6 +1675,17 @@ function trouverFilSousSouris(x, y) {
   return meilleur;
 }
 
+/* ⭐ MAPPING DES NOUVEAUX IDs VERS LES ANCIENS */
+function mapperTypeDessin(type) {
+  if (type === 'pile9v') return 'pile';
+  if (type === 'resistance470' || type === 'resistance220') return 'resistance';
+  if (type === 'ledRouge') return 'led';
+  if (type === 'boutonPoussoir') return 'bouton';
+  if (type === 'resistance1k' || type === 'resistance10k') return 'resistance';
+  if (type === 'ledVerte' || type === 'ledBleue' || type === 'ledJaune') return 'led';
+  return type;
+}
+
 function dessinerComposant(comp, estMesure) {
   var c = CATALOGUE[comp.type];
   if (!c) return;
@@ -1626,17 +1708,30 @@ function dessinerComposant(comp, estMesure) {
   ctx.ellipse(comp.x + comp.largeur/2, comp.y + comp.hauteur + 4,
               comp.largeur/2 + 3, 6, 0, 0, Math.PI * 2);
   ctx.fill();
-  if (comp.type === 'pile') dessinerPile(comp);
-  else if (comp.type === 'resistance') dessinerResistance(comp);
-  else if (comp.type === 'led') dessinerLED(comp, comp.allume);
-  else if (comp.type === 'interrupteur') dessinerInterrupteur(comp);
-  else if (comp.type === 'ne555') dessinerNE555(comp);
-  else if (comp.type === 'cd4017') dessinerCD4017(comp);
-  else if (comp.type === 'condensateur') dessinerCondensateur(comp);
-  else if (comp.type === 'transistor') dessinerTransistor(comp);
-  else if (comp.type === 'ldr') dessinerLDR(comp);
-  else if (comp.type === 'bouton') dessinerBouton(comp);
-  else if (comp.type === 'buzzer') dessinerBuzzer(comp);
+  
+  /* ⭐ MAPPING pour dessiner les nouveaux composants avec les fonctions existantes */
+  var typeDessin = mapperTypeDessin(comp.type);
+  
+  if (typeDessin === 'pile') dessinerPile(comp);
+  else if (typeDessin === 'resistance') dessinerResistance(comp);
+  else if (typeDessin === 'led') dessinerLED(comp, comp.allume);
+  else if (typeDessin === 'interrupteur') dessinerInterrupteur(comp);
+  else if (typeDessin === 'ne555') dessinerNE555(comp);
+  else if (typeDessin === 'cd4017') dessinerCD4017(comp);
+  else if (typeDessin === 'condensateur') dessinerCondensateur(comp);
+  else if (typeDessin === 'transistor') dessinerTransistor(comp);
+  else if (typeDessin === 'ldr') dessinerLDR(comp);
+  else if (typeDessin === 'bouton') dessinerBouton(comp);
+  else if (typeDessin === 'buzzer') dessinerBuzzer(comp);
+  else {
+    /* Composant inconnu : afficher un placeholder */
+    ctx.fillStyle = '#94a3b8';
+    ctx.fillRect(comp.x, comp.y, comp.largeur, comp.hauteur);
+    ctx.fillStyle = '#1a1f2e';
+    ctx.font = 'bold 12px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('?', comp.x + comp.largeur/2, comp.y + comp.hauteur/2 + 4);
+  }
 
   for (var i = 0; i < c.pattes.length; i++) {
     var p = obtenirPatteAbsolue(comp, i);
@@ -1684,13 +1779,16 @@ function dessinerComposant(comp, estMesure) {
   }
 }
 
+/* =========================================================
+   DESSINS COMPOSANTS (existants - conservés)
+   ========================================================= */
 function dessinerPile(comp) {
   var grd = ctx.createLinearGradient(comp.x, comp.y, comp.x, comp.y + comp.hauteur);
   grd.addColorStop(0, '#4a4a4a'); grd.addColorStop(0.5, '#2a2a2a'); grd.addColorStop(1, '#1a1a1a');
   ctx.fillStyle = grd;
-  ctx.beginPath(); ctx.roundRect(comp.x, comp.y, comp.largeur, comp.hauteur, 6); ctx.fill();
+  ctx.beginPath(); if (ctx.roundRect) ctx.roundRect(comp.x, comp.y, comp.largeur, comp.hauteur, 6); else ctx.rect(comp.x, comp.y, comp.largeur, comp.hauteur); ctx.fill();
   ctx.fillStyle = 'rgba(255,255,255,0.15)';
-  ctx.beginPath(); ctx.roundRect(comp.x + 3, comp.y + 2, comp.largeur - 6, comp.hauteur/3, 4); ctx.fill();
+  ctx.beginPath(); if (ctx.roundRect) ctx.roundRect(comp.x + 3, comp.y + 2, comp.largeur - 6, comp.hauteur/3, 4); else ctx.rect(comp.x + 3, comp.y + 2, comp.largeur - 6, comp.hauteur/3); ctx.fill();
   var grdDore = ctx.createLinearGradient(comp.x, comp.y + 5, comp.x, comp.y + 13);
   grdDore.addColorStop(0, '#f0c987'); grdDore.addColorStop(0.5, '#d4a76a'); grdDore.addColorStop(1, '#a67c3d');
   ctx.fillStyle = grdDore;
@@ -1726,9 +1824,9 @@ function dessinerResistance(comp) {
   var grd = ctx.createLinearGradient(comp.x, comp.y, comp.x, comp.y + comp.hauteur);
   grd.addColorStop(0, '#f0d4a0'); grd.addColorStop(0.3, '#d4a76a'); grd.addColorStop(0.7, '#b8905a'); grd.addColorStop(1, '#8a6a40');
   ctx.fillStyle = grd;
-  ctx.beginPath(); ctx.roundRect(comp.x, comp.y, comp.largeur, comp.hauteur, comp.hauteur/2); ctx.fill();
+  ctx.beginPath(); if (ctx.roundRect) ctx.roundRect(comp.x, comp.y, comp.largeur, comp.hauteur, comp.hauteur/2); else ctx.rect(comp.x, comp.y, comp.largeur, comp.hauteur); ctx.fill();
   ctx.fillStyle = 'rgba(255,255,255,0.4)';
-  ctx.beginPath(); ctx.roundRect(comp.x + 8, comp.y + 3, comp.largeur - 16, 4, 2); ctx.fill();
+  ctx.beginPath(); if (ctx.roundRect) ctx.roundRect(comp.x + 8, comp.y + 3, comp.largeur - 16, 4, 2); else ctx.rect(comp.x + 8, comp.y + 3, comp.largeur - 16, 4); ctx.fill();
   var bandes = [{pos:15,col:'#FFD700'},{pos:35,col:'#8B00FF'},{pos:55,col:'#8B4513'},{pos:85,col:'#FFD700'}];
   for (var i = 0; i < bandes.length; i++) {
     var b = bandes[i];
@@ -1778,9 +1876,9 @@ function dessinerInterrupteur(comp) {
   var grd = ctx.createLinearGradient(comp.x, comp.y, comp.x, comp.y + comp.hauteur);
   grd.addColorStop(0, '#666'); grd.addColorStop(0.5, '#3a3a3a'); grd.addColorStop(1, '#1a1a1a');
   ctx.fillStyle = grd;
-  ctx.beginPath(); ctx.roundRect(comp.x, comp.y, comp.largeur, comp.hauteur, 6); ctx.fill();
+  ctx.beginPath(); if (ctx.roundRect) ctx.roundRect(comp.x, comp.y, comp.largeur, comp.hauteur, 6); else ctx.rect(comp.x, comp.y, comp.largeur, comp.hauteur); ctx.fill();
   ctx.fillStyle = 'rgba(255,255,255,0.15)';
-  ctx.beginPath(); ctx.roundRect(comp.x + 3, comp.y + 3, comp.largeur - 6, 6, 3); ctx.fill();
+  ctx.beginPath(); if (ctx.roundRect) ctx.roundRect(comp.x + 3, comp.y + 3, comp.largeur - 6, 6, 3); else ctx.rect(comp.x + 3, comp.y + 3, comp.largeur - 6, 6); ctx.fill();
   var grdBorne = ctx.createRadialGradient(comp.x + 13, comp.y + comp.hauteur/2 - 2, 1, comp.x + 15, comp.y + comp.hauteur/2, 7);
   grdBorne.addColorStop(0, '#fff'); grdBorne.addColorStop(0.5, '#c0c0c0'); grdBorne.addColorStop(1, '#666');
   ctx.fillStyle = grdBorne;
@@ -1819,9 +1917,9 @@ function dessinerNE555(comp) {
   var grd = ctx.createLinearGradient(comp.x, comp.y, comp.x + comp.largeur, comp.y + comp.hauteur);
   grd.addColorStop(0, '#3a3a3a'); grd.addColorStop(0.4, '#1a1a1a'); grd.addColorStop(1, '#000');
   ctx.fillStyle = grd;
-  ctx.beginPath(); ctx.roundRect(comp.x, comp.y, comp.largeur, comp.hauteur, 5); ctx.fill();
+  ctx.beginPath(); if (ctx.roundRect) ctx.roundRect(comp.x, comp.y, comp.largeur, comp.hauteur, 5); else ctx.rect(comp.x, comp.y, comp.largeur, comp.hauteur); ctx.fill();
   ctx.fillStyle = 'rgba(255,255,255,0.12)';
-  ctx.beginPath(); ctx.roundRect(comp.x + 4, comp.y + 4, comp.largeur - 8, 15, 3); ctx.fill();
+  ctx.beginPath(); if (ctx.roundRect) ctx.roundRect(comp.x + 4, comp.y + 4, comp.largeur - 8, 15, 3); else ctx.rect(comp.x + 4, comp.y + 4, comp.largeur - 8, 15); ctx.fill();
   ctx.fillStyle = '#000';
   ctx.beginPath(); ctx.arc(comp.x + comp.largeur/2, comp.y + 8, 8, 0, Math.PI, true); ctx.fill();
   ctx.fillStyle = '#555';
@@ -1838,9 +1936,9 @@ function dessinerCD4017(comp) {
   var grd = ctx.createLinearGradient(comp.x, comp.y, comp.x + comp.largeur, comp.y + comp.hauteur);
   grd.addColorStop(0, '#4a3a5a'); grd.addColorStop(0.4, '#2a1a3a'); grd.addColorStop(1, '#1a0a2a');
   ctx.fillStyle = grd;
-  ctx.beginPath(); ctx.roundRect(comp.x, comp.y, comp.largeur, comp.hauteur, 5); ctx.fill();
+  ctx.beginPath(); if (ctx.roundRect) ctx.roundRect(comp.x, comp.y, comp.largeur, comp.hauteur, 5); else ctx.rect(comp.x, comp.y, comp.largeur, comp.hauteur); ctx.fill();
   ctx.fillStyle = 'rgba(255,255,255,0.12)';
-  ctx.beginPath(); ctx.roundRect(comp.x + 4, comp.y + 4, comp.largeur - 8, 15, 3); ctx.fill();
+  ctx.beginPath(); if (ctx.roundRect) ctx.roundRect(comp.x + 4, comp.y + 4, comp.largeur - 8, 15, 3); else ctx.rect(comp.x + 4, comp.y + 4, comp.largeur - 8, 15); ctx.fill();
   ctx.fillStyle = '#000';
   ctx.beginPath(); ctx.arc(comp.x + comp.largeur/2, comp.y + 8, 8, 0, Math.PI, true); ctx.fill();
   ctx.fillStyle = '#8b5cf6';
@@ -1888,7 +1986,7 @@ function dessinerLDR(comp) {
   var grd = ctx.createLinearGradient(comp.x, comp.y, comp.x, comp.y + comp.hauteur);
   grd.addColorStop(0, '#f0d4a0'); grd.addColorStop(0.5, '#d4a76a'); grd.addColorStop(1, '#a67c3d');
   ctx.fillStyle = grd;
-  ctx.beginPath(); ctx.roundRect(comp.x, comp.y, comp.largeur, comp.hauteur, 4); ctx.fill();
+  ctx.beginPath(); if (ctx.roundRect) ctx.roundRect(comp.x, comp.y, comp.largeur, comp.hauteur, 4); else ctx.rect(comp.x, comp.y, comp.largeur, comp.hauteur); ctx.fill();
   ctx.strokeStyle = '#8B4513'; ctx.lineWidth = 2;
   for (var i = 0; i < 4; i++) {
     ctx.beginPath();
@@ -1904,7 +2002,7 @@ function dessinerBouton(comp) {
   var grd = ctx.createLinearGradient(comp.x, comp.y, comp.x, comp.y + comp.hauteur);
   grd.addColorStop(0, '#666'); grd.addColorStop(0.5, '#3a3a3a'); grd.addColorStop(1, '#1a1a1a');
   ctx.fillStyle = grd;
-  ctx.beginPath(); ctx.roundRect(comp.x, comp.y, comp.largeur, comp.hauteur, 6); ctx.fill();
+  ctx.beginPath(); if (ctx.roundRect) ctx.roundRect(comp.x, comp.y, comp.largeur, comp.hauteur, 6); else ctx.rect(comp.x, comp.y, comp.largeur, comp.hauteur); ctx.fill();
   var grdBouton = ctx.createRadialGradient(comp.x + comp.largeur/2 - 4, comp.y + comp.hauteur/2 - 9, 2, comp.x + comp.largeur/2, comp.y + comp.hauteur/2 - 5, 15);
   if (comp.appuye) {
     grdBouton.addColorStop(0, '#4ade80'); grdBouton.addColorStop(1, '#166534');
@@ -1936,8 +2034,12 @@ function dessinerBuzzer(comp) {
   ctx.shadowBlur = 0;
 }
 
+/* =========================================================
+   UTILITAIRES
+   ========================================================= */
 function obtenirPatteAbsolue(comp, patteIndex) {
   var c = CATALOGUE[comp.type];
+  if (!c || !c.pattes[patteIndex]) return { x: comp.x, y: comp.y };
   var patteOffset = c.pattes[patteIndex];
   return { x: comp.x + patteOffset.x, y: comp.y + patteOffset.y };
 }
@@ -1961,6 +2063,7 @@ function trouverPatteSousSouris(x, y) {
   for (var i = composants.length - 1; i >= 0; i--) {
     var comp = composants[i];
     var c = CATALOGUE[comp.type];
+    if (!c || !c.pattes) continue;
     for (var j = 0; j < c.pattes.length; j++) {
       var p = obtenirPatteAbsolue(comp, j);
       var dx = x - p.x, dy = y - p.y;
@@ -1981,9 +2084,6 @@ function coordonneesSouris(event) {
   return { x: wx, y: wy };
 }
 
-/* =========================================================
-   FONCTIONS BLOCS
-   ========================================================= */
 function creerComposantBloc(type, cx, cy, valeur) {
   var c = CATALOGUE[type];
   var comp = {
@@ -2045,6 +2145,7 @@ function clicCanvas(event) {
     demarrerAnimationChenillard();
     sauvegarderLocal(true);
     faireSnapshot();
+    afficherPanneauComposants();
     dessiner();
     return;
   }
@@ -2100,7 +2201,7 @@ function clicCanvas(event) {
       sauvegarderLocal(true);
       dessiner(); return;
     }
-    if (comp.type === 'bouton') {
+    if (comp.type === 'bouton' || comp.type === 'boutonPoussoir') {
       comp.appuye = !comp.appuye;
       mettreMessage('🧲 Bouton ' + (comp.appuye ? 'appuyé ✅' : 'relâché ❌'), 'info');
       if (testActif) recalculerLED();
@@ -2203,48 +2304,49 @@ function majPointes() {
 
 function mesurerComposant(comp) {
   var resultat = null;
-  if (comp.type === 'resistance') {
-    var val = parseInt(comp.valeur) || 0;
+  var typeMesure = mapperTypeDessin(comp.type);
+  if (typeMesure === 'resistance') {
+    var val = parseInt(comp.valeur) || 470;
     if (multimetreMode === 'resistance') resultat = { valeur: formaterResistance(val), unite: 'Ω', info: '🔵 Résistance mesurée' };
     else if (multimetreMode === 'tension') resultat = { valeur: '0.00', unite: 'V', info: '⚡ Une résistance n\'a pas de tension' };
     else resultat = { valeur: 'OUI', unite: 'BIP !', info: '🔔 Une résistance conduit' };
-  } else if (comp.type === 'pile') {
+  } else if (typeMesure === 'pile') {
     if (multimetreMode === 'tension') resultat = { valeur: '9.00', unite: 'V', info: '⚡ Tension de la pile' };
     else if (multimetreMode === 'resistance') resultat = { valeur: '----', unite: 'Ω', info: '⚠️ Ne pas mesurer une pile en ohmmètre' };
     else resultat = { valeur: 'NON', unite: 'Pas de continuité', info: '🔔 Une pile n\'est pas un fil' };
-  } else if (comp.type === 'led') {
+  } else if (typeMesure === 'led') {
     if (multimetreMode === 'resistance') resultat = { valeur: '1.8', unite: 'V (diode)', info: '🔵 Chute de tension LED' };
     else if (multimetreMode === 'tension') resultat = { valeur: '1.80', unite: 'V', info: '⚡ Tension directe LED' };
     else resultat = { valeur: 'OUI', unite: 'Continuité (1 sens)', info: '🔔 LED = diode' };
-  } else if (comp.type === 'interrupteur') {
+  } else if (typeMesure === 'interrupteur') {
     if (multimetreMode === 'continuite') {
       if (comp.ferme) resultat = { valeur: 'OUI', unite: 'BIP !', info: '🔔 Interrupteur fermé' };
       else resultat = { valeur: 'NON', unite: 'Pas de continuité', info: '🔔 Interrupteur ouvert' };
     } else if (multimetreMode === 'resistance') {
       resultat = { valeur: comp.ferme ? '0.00' : 'OL', unite: 'Ω', info: comp.ferme ? '🔵 Fermé' : '🔵 Ouvert' };
     } else resultat = { valeur: '0.00', unite: 'V', info: '⚡ Pas de tension' };
-  } else if (comp.type === 'bouton') {
+  } else if (typeMesure === 'bouton') {
     if (multimetreMode === 'continuite') {
       if (comp.appuye) resultat = { valeur: 'OUI', unite: 'BIP !', info: '🔔 Bouton appuyé' };
       else resultat = { valeur: 'NON', unite: 'Pas de continuité', info: '🔔 Bouton relâché' };
     } else if (multimetreMode === 'resistance') {
       resultat = { valeur: comp.appuye ? '0.00' : 'OL', unite: 'Ω', info: comp.appuye ? '🔵 Appuyé' : '🔵 Relâché' };
     } else resultat = { valeur: '0.00', unite: 'V', info: '⚡ Pas de tension' };
-  } else if (comp.type === 'condensateur') {
+  } else if (typeMesure === 'condensateur') {
     if (multimetreMode === 'resistance') resultat = { valeur: 'OL', unite: 'Ω', info: '🔵 Condo ne se mesure pas en continu' };
     else if (multimetreMode === 'tension') resultat = { valeur: '0.00', unite: 'V', info: '⚡ Condo déchargé' };
     else resultat = { valeur: 'NON', unite: 'Pas de continuité', info: '🔔 Condo ne conduit pas en continu' };
-  } else if (comp.type === 'ne555' || comp.type === 'cd4017') {
+  } else if (typeMesure === 'ne555' || typeMesure === 'cd4017') {
     if (multimetreMode === 'tension') resultat = { valeur: '4.50', unite: 'V', info: '⚡ Tension interne (simulation)' };
     else resultat = { valeur: '----', unite: 'Composant actif', info: '🔬 Mesure complexe' };
-  } else if (comp.type === 'ldr') {
+  } else if (typeMesure === 'ldr') {
     if (multimetreMode === 'resistance') resultat = { valeur: '10.0', unite: 'kΩ', info: '🔵 LDR (dépend de la lumière)' };
     else if (multimetreMode === 'tension') resultat = { valeur: '0.00', unite: 'V', info: '⚡ Composant passif' };
     else resultat = { valeur: 'OUI', unite: 'Continuité', info: '🔔 LDR = résistance variable' };
-  } else if (comp.type === 'transistor') {
+  } else if (typeMesure === 'transistor') {
     if (multimetreMode === 'continuite') resultat = { valeur: 'OUI', unite: 'Diode', info: '🔔 Transistor = 2 jonctions' };
     else resultat = { valeur: '----', unite: 'Composant actif', info: '🔬 Mesure complexe' };
-  } else if (comp.type === 'buzzer') {
+  } else if (typeMesure === 'buzzer') {
     if (multimetreMode === 'resistance') resultat = { valeur: '8.00', unite: 'Ω', info: '🔵 Buzzer : résistance interne' };
     else if (multimetreMode === 'tension') resultat = { valeur: '0.00', unite: 'V', info: '⚡ Composant passif' };
     else resultat = { valeur: 'OUI', unite: 'Continuité', info: '🔔 Buzzer = bobine' };
@@ -2262,15 +2364,16 @@ function calculerMesureEntreDeuxPattes() {
   var comp1 = trouverComposant(pointeRouge.compId);
   if (!comp1) return;
   if (pointeRouge.compId === pointeNoire.compId) {
-    if (comp1.type === 'resistance') {
-      var val = parseInt(comp1.valeur) || 0;
+    var typeMesure = mapperTypeDessin(comp1.type);
+    if (typeMesure === 'resistance') {
+      var val = parseInt(comp1.valeur) || 470;
       if (multimetreMode === 'resistance') mettreAJourAffichageMulti(formaterResistance(val), 'Ω', '🔵 Résistance entre les 2 pattes');
       else if (multimetreMode === 'continuite') mettreAJourAffichageMulti('OUI', 'BIP !', '🔔 Résistance = conducteur');
       else mettreAJourAffichageMulti('0.00', 'V', '⚡ Pas de tension');
-    } else if (comp1.type === 'pile') {
+    } else if (typeMesure === 'pile') {
       if (multimetreMode === 'tension') mettreAJourAffichageMulti('9.00', 'V', '⚡ Tension de la pile');
       else mettreAJourAffichageMulti('----', '----', '⚠️ Ne pas mesurer une pile en ohmmètre !');
-    } else if (comp1.type === 'interrupteur') {
+    } else if (typeMesure === 'interrupteur') {
       if (multimetreMode === 'continuite') {
         if (comp1.ferme) mettreAJourAffichageMulti('OUI', 'BIP !', '🔔 Interrupteur fermé');
         else mettreAJourAffichageMulti('NON', 'Pas de continuité', '🔔 Interrupteur ouvert');
@@ -2294,10 +2397,11 @@ function calculerMesureEntreDeuxPattes() {
   }
   for (var m = 0; m < composants.length; m++) {
     var comp = composants[m];
-    if (comp.type === 'pile' || comp.type === 'ne555' || comp.type === 'cd4017' || comp.type === 'condensateur' || comp.type === 'transistor') continue;
-    if (comp.type === 'interrupteur' && !comp.ferme) continue;
-    if (comp.type === 'bouton' && !comp.appuye) continue;
-    if (CATALOGUE[comp.type].pattes.length >= 2) addEdge(comp.id + ':0', comp.id + ':1');
+    var typeMesure2 = mapperTypeDessin(comp.type);
+    if (typeMesure2 === 'pile' || typeMesure2 === 'ne555' || typeMesure2 === 'cd4017' || typeMesure2 === 'condensateur' || typeMesure2 === 'transistor') continue;
+    if (typeMesure2 === 'interrupteur' && !comp.ferme) continue;
+    if (typeMesure2 === 'bouton' && !comp.appuye) continue;
+    if (CATALOGUE[comp.type] && CATALOGUE[comp.type].pattes.length >= 2) addEdge(comp.id + ':0', comp.id + ':1');
   }
   var depart = pointeRouge.compId + ':' + pointeRouge.patteIndex;
   var arrivee = pointeNoire.compId + ':' + pointeNoire.patteIndex;
@@ -2321,7 +2425,7 @@ function calculerMesureEntreDeuxPattes() {
 function estimerResistanceEntre() {
   var total = 0;
   for (var i = 0; i < composants.length; i++) {
-    if (composants[i].type === 'resistance') total += parseInt(composants[i].valeur) || 0;
+    if (mapperTypeDessin(composants[i].type) === 'resistance') total += parseInt(composants[i].valeur) || 470;
   }
   return total > 0 ? total : 0.1;
 }
@@ -2455,7 +2559,7 @@ function quitterTutoriel() {
 }
 
 /* =========================================================
-   AUTRES INTERACTIONS
+   INTERACTIONS SOURIS
    ========================================================= */
 function clicDroitCanvas(event) {
   event.preventDefault();
@@ -2669,7 +2773,7 @@ function calculerEtatLED() {
     if (composants[i].type === 'buzzer') composants[i].sonne = false;
   }
   var resultat = { etat: "ok", ledsAllumees: 0, buzzersActifs: 0, diagnostic: [] };
-  var piles = composants.filter(function(c) { return c.type === 'pile'; });
+  var piles = composants.filter(function(c) { return mapperTypeDessin(c.type) === 'pile'; });
   if (piles.length === 0) { resultat.etat = "pas-de-pile"; return resultat; }
   var pile = piles[0];
   var pattePlus = pile.id + ':0';
@@ -2686,12 +2790,13 @@ function calculerEtatLED() {
   }
   for (var m = 0; m < composants.length; m++) {
     var comp = composants[m];
-    if (comp.type === 'pile') continue;
-    if (comp.type === 'ne555' || comp.type === 'cd4017' || comp.type === 'condensateur' || comp.type === 'transistor') continue;
-    if (comp.type === 'led') addEdge(comp.id + ':0', comp.id + ':1');
-    else if (comp.type === 'resistance' || comp.type === 'ldr' || comp.type === 'buzzer') addEdge(comp.id + ':0', comp.id + ':1');
-    else if (comp.type === 'interrupteur' && comp.ferme) addEdge(comp.id + ':0', comp.id + ':1');
-    else if (comp.type === 'bouton' && comp.appuye) addEdge(comp.id + ':0', comp.id + ':1');
+    var typeMesure = mapperTypeDessin(comp.type);
+    if (typeMesure === 'pile') continue;
+    if (typeMesure === 'ne555' || typeMesure === 'cd4017' || typeMesure === 'condensateur' || typeMesure === 'transistor') continue;
+    if (typeMesure === 'led') addEdge(comp.id + ':0', comp.id + ':1');
+    else if (typeMesure === 'resistance' || typeMesure === 'ldr' || typeMesure === 'buzzer') addEdge(comp.id + ':0', comp.id + ':1');
+    else if (typeMesure === 'interrupteur' && comp.ferme) addEdge(comp.id + ':0', comp.id + ':1');
+    else if (typeMesure === 'bouton' && comp.appuye) addEdge(comp.id + ':0', comp.id + ':1');
   }
 
   var adjDirect = {};
@@ -2705,14 +2810,15 @@ function calculerEtatLED() {
   }
   for (var m2 = 0; m2 < composants.length; m2++) {
     var comp2 = composants[m2];
-    if (comp2.type === 'interrupteur' && comp2.ferme) addEdgeD(comp2.id + ':0', comp2.id + ':1');
-    if (comp2.type === 'bouton' && comp2.appuye) addEdgeD(comp2.id + ':0', comp2.id + ':1');
+    var typeMesure2 = mapperTypeDessin(comp2.type);
+    if (typeMesure2 === 'interrupteur' && comp2.ferme) addEdgeD(comp2.id + ':0', comp2.id + ':1');
+    if (typeMesure2 === 'bouton' && comp2.appuye) addEdgeD(comp2.id + ':0', comp2.id + ':1');
   }
   if (chercherChemin(pattePlus, patteMoins, adjDirect)) {
     resultat.etat = "court-circuit"; return resultat;
   }
 
-  var leds = composants.filter(function(c) { return c.type === 'led'; });
+  var leds = composants.filter(function(c) { return mapperTypeDessin(c.type) === 'led'; });
   for (var l = 0; l < leds.length; l++) {
     var led = leds[l];
     var cPlusP0 = chercherChemin(pattePlus, led.id + ':0', adj);
@@ -2786,7 +2892,7 @@ function chercherChemin(depart, arrivee, adj) {
    ANIMATION CHENILLARD
    ========================================================= */
 function demarrerAnimationChenillard() {
-  var leds = composants.filter(function(c) { return c.type === 'led'; });
+  var leds = composants.filter(function(c) { return mapperTypeDessin(c.type) === 'led'; });
   if (leds.length < 4) { arreterAnimationChenillard(); return; }
   animChenillardActif = true;
   if (!animChenillardTimer) {
@@ -2804,7 +2910,7 @@ function arreterAnimationChenillard() {
 }
 
 function appliquerChenillard() {
-  var leds = composants.filter(function(c) { return c.type === 'led'; });
+  var leds = composants.filter(function(c) { return mapperTypeDessin(c.type) === 'led'; });
   if (leds.length < 4) return;
   for (var i = 0; i < leds.length; i++) {
     leds[i].allume = (i % 4) === animChenillardPhase && i < 4 ? true : false;
@@ -2813,7 +2919,7 @@ function appliquerChenillard() {
 }
 
 /* =========================================================
-   EXPORT PNG / PDF / JSON
+   EXPORT / IMPORT
    ========================================================= */
 function exporterJSON() {
   var data = { version: 1, date: new Date().toISOString(), composants: composants, fils: fils };
@@ -2902,7 +3008,7 @@ function importerJSON(event) {
         prochainFilId = maxFilId + 1;
         mettreMessage('📂 Circuit chargé ! ' + composants.length + ' composant(s).', 'succes');
         mettreAJourStatut();
-                sauvegarderLocal(true);
+        sauvegarderLocal(true);
         afficherPanneauComposants();
         dessiner();
       } else mettreMessage('❌ Fichier invalide.', 'erreur');
@@ -2939,7 +3045,7 @@ function toutEffacer() {
     document.getElementById('statut-mode').textContent = '🖱️ Mode : Placer';
   }
   document.getElementById('statut-info').classList.remove('live');
-    afficherPalette(); afficherBlocs(); afficherTutoriels(); afficherPanneauComposants();
+  afficherPalette(); afficherBlocs(); afficherTutoriels(); afficherPanneauComposants();
   mettreMessage('🗑️ Tout a été effacé.', 'info');
   effacerLocal();
   mettreAJourStatut();
@@ -2963,13 +3069,7 @@ function mettreAJourStatut() {
 }
 
 /* =========================================================
-   INITIALISATION
-   ========================================================= */
-window.addEventListener('beforeunload', function(e) {
-  if (composants.length > 0) sauvegarderLocal(true);
-});
-/* =========================================================
-   INSTALLATION PWA (ElectroPremium)
+   INSTALLATION PWA
    ========================================================= */
 var promptInstallation = null;
 
@@ -2998,6 +3098,13 @@ function installerPWA() {
   });
 }
 
+/* =========================================================
+   INITIALISATION
+   ========================================================= */
+window.addEventListener('beforeunload', function(e) {
+  if (composants.length > 0) sauvegarderLocal(true);
+});
+
 window.onload = function() {
   canvas = document.getElementById('sandbox');
   ctx = canvas.getContext('2d');
@@ -3005,6 +3112,7 @@ window.onload = function() {
   afficherBlocs();
   afficherTutoriels();
   mettreAJourStatut();
+  afficherPanneauComposants();
   canvas.addEventListener('click', clicCanvas);
   canvas.addEventListener('dblclick', doubleClicCanvas);
   canvas.addEventListener('mousedown', gererDragVueMousedown);
@@ -3026,19 +3134,18 @@ window.onload = function() {
     buzzerOndePhase = (buzzerOndePhase + 0.02) % 1;
     var besoinRedraw = false;
     if (!animChenillardActif) {
-      var aLEDAllumee = composants.some(function(c) { return c.type === 'led' && c.allume; });
+      var aLEDAllumee = composants.some(function(c) { return mapperTypeDessin(c.type) === 'led' && c.allume; });
       if (aLEDAllumee) besoinRedraw = true;
     }
     if (multimetreActif && (pointeRouge || pointeNoire)) besoinRedraw = true;
     if (buzzerActif) besoinRedraw = true;
     if (besoinRedraw) dessiner();
   }, 50);
-    chargerLocal();
+  chargerLocal();
   demarrerAutoSave();
   faireSnapshot();
   dessiner();
   
-  // Enregistrer le Service Worker (PWA)
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('sw.js').then(function(reg) {
       console.log('✅ Service Worker enregistré');

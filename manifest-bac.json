@@ -1,7 +1,7 @@
 {
-  "name": "ElectroPremium - Bac a sable",
-  "short_name": "ElectroPremium",
-  "description": "Bac a sable electronique pour creer tes propres circuits.",
+  "name": "EspaceElectronic - Atelier électronique",
+  "short_name": "EspaceElec",
+  "description": "Atelier de création électronique pour concevoir et tester tes propres circuits.",
   "start_url": "bac_a_sable.html",
   "scope": ".",
   "display": "standalone",

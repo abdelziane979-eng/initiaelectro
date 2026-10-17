@@ -1,12 +1,13 @@
 /* =========================================================
-   SERVICE WORKER - InitiaElectro
+   SERVICE WORKER - InitiaElectro / EspaceElectronic
    Permet le fonctionnement hors ligne et l'installation PWA
    ========================================================= */
-var CACHE_NAME = 'initiaelectro-v1';
+var CACHE_NAME = 'initiaelectro-v2';
 var FILES_TO_CACHE = [
   './',
   './index.html',
   './bac_a_sable.html',
+  './composants.js',
   './manifest.json',
   './manifest-bac.json'
 ];
@@ -15,7 +16,7 @@ var FILES_TO_CACHE = [
 self.addEventListener('install', function(event) {
   event.waitUntil(
     caches.open(CACHE_NAME).then(function(cache) {
-      console.log('📦 Cache ouvert');
+      console.log('📦 Cache ouvert : ' + CACHE_NAME);
       return cache.addAll(FILES_TO_CACHE);
     }).catch(function(err) {
       console.log('⚠️ Erreur cache:', err);
@@ -41,7 +42,7 @@ self.addEventListener('activate', function(event) {
   self.clients.claim();
 });
 
-/* Fetch : servir depuis le cache, sinon reseau */
+/* Fetch : servir depuis le cache, sinon réseau */
 self.addEventListener('fetch', function(event) {
   event.respondWith(
     caches.match(event.request).then(function(response) {
