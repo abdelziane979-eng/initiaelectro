@@ -2,7 +2,7 @@
    COMPOSANTS.JS - Bibliothèque de composants électroniques
    Projet : InitiaElectro / EspaceElectronic
    Auteur : M. Ziane
-   Version : 2.0 (Octobre 2026)
+   Version : 3.0 (Octobre 2026)
    
    Niveaux :
    - "decouverte"  : 8-10 ans (6 composants)
@@ -203,14 +203,10 @@ var COMPOSANTS = {
     caracteristiques: { type: "DIP-8", tension: "4.5V à 16V", fonction: "Minuteur / Oscillateur" },
     visuel: { couleur: "#222222", largeur: 80, hauteur: 100, forme: "rectangle" },
     pattes: [
-      { x: -10, y: 20, nom: "1 (GND)" },
-      { x: -10, y: 40, nom: "2 (TRIG)" },
-      { x: -10, y: 60, nom: "3 (OUT)" },
-      { x: -10, y: 80, nom: "4 (RESET)" },
-      { x: 90, y: 20, nom: "8 (VCC)" },
-      { x: 90, y: 40, nom: "7 (DISCH)" },
-      { x: 90, y: 60, nom: "6 (THRESH)" },
-      { x: 90, y: 80, nom: "5 (CTRL)" }
+      { x: -10, y: 20, nom: "1 (GND)" }, { x: -10, y: 40, nom: "2 (TRIG)" },
+      { x: -10, y: 60, nom: "3 (OUT)" }, { x: -10, y: 80, nom: "4 (RESET)" },
+      { x: 90, y: 20, nom: "8 (VCC)" }, { x: 90, y: 40, nom: "7 (DISCH)" },
+      { x: 90, y: 60, nom: "6 (THRESH)" }, { x: 90, y: 80, nom: "5 (CTRL)" }
     ],
     exemple_usage: "Clignotant, minuterie, générateur",
     precautions: ["Respecter le brochage"],
@@ -223,24 +219,239 @@ var COMPOSANTS = {
     caracteristiques: { type: "DIP-16", tension: "3V à 15V", fonction: "Compteur décimal" },
     visuel: { couleur: "#1e293b", largeur: 80, hauteur: 100, forme: "rectangle" },
     pattes: [
-      { x: -10, y: 20, nom: "Horloge" },
-      { x: -10, y: 40, nom: "Reset" },
-      { x: -10, y: 60, nom: "VCC" },
-      { x: -10, y: 80, nom: "GND" },
-      { x: 90, y: 20, nom: "S0" },
-      { x: 90, y: 40, nom: "S1" },
-      { x: 90, y: 60, nom: "S2" },
-      { x: 90, y: 80, nom: "S3" }
+      { x: -10, y: 20, nom: "Horloge" }, { x: -10, y: 40, nom: "Reset" },
+      { x: -10, y: 60, nom: "VCC" }, { x: -10, y: 80, nom: "GND" },
+      { x: 90, y: 20, nom: "S0" }, { x: 90, y: 40, nom: "S1" },
+      { x: 90, y: 60, nom: "S2" }, { x: 90, y: 80, nom: "S3" }
     ],
     exemple_usage: "Chenillard, séquenceur, feu tricolore",
     precautions: ["Respecter le brochage"],
     suggestion: "Pour créer des séquences lumineuses"
-  }
+  },
   
   /* =========================================================
      NIVEAU 3 : MAÎTRISE (20 composants)
-     À ajouter en Session 3C
      ========================================================= */
+  
+  porteAnd: {
+    id: "porteAnd", nom: "Porte AND", emoji: "🚪", categorie: "logiques", niveau: "maitrise", difficulte: 3,
+    description: "Porte logique ET. La sortie est à 1 seulement si les 2 entrées sont à 1.",
+    caracteristiques: { type: "74HC08", entrees: "2", sortie: "1", table_verite: "0+0=0, 0+1=0, 1+0=0, 1+1=1" },
+    visuel: { couleur: "#8b5cf6", largeur: 60, hauteur: 50, forme: "rectangle" },
+    pattes: [{ x: -10, y: 15, nom: "E1" }, { x: -10, y: 35, nom: "E2" }, { x: 70, y: 25, nom: "S" }],
+    exemple_usage: "Conditions multiples (ET)",
+    precautions: [],
+    suggestion: "Base de la logique combinatoire"
+  },
+  
+  porteOr: {
+    id: "porteOr", nom: "Porte OR", emoji: "🚪", categorie: "logiques", niveau: "maitrise", difficulte: 3,
+    description: "Porte logique OU. La sortie est à 1 si au moins une entrée est à 1.",
+    caracteristiques: { type: "74HC32", entrees: "2", sortie: "1", table_verite: "0+0=0, 0+1=1, 1+0=1, 1+1=1" },
+    visuel: { couleur: "#8b5cf6", largeur: 60, hauteur: 50, forme: "rectangle" },
+    pattes: [{ x: -10, y: 15, nom: "E1" }, { x: -10, y: 35, nom: "E2" }, { x: 70, y: 25, nom: "S" }],
+    exemple_usage: "Conditions alternatives (OU)",
+    precautions: [],
+    suggestion: "Base de la logique combinatoire"
+  },
+  
+  porteNot: {
+    id: "porteNot", nom: "Porte NOT", emoji: "🚪", categorie: "logiques", niveau: "maitrise", difficulte: 3,
+    description: "Porte logique NON (inverseur). La sortie est l'inverse de l'entrée.",
+    caracteristiques: { type: "74HC04", entrees: "1", sortie: "1", table_verite: "0=1, 1=0" },
+    visuel: { couleur: "#8b5cf6", largeur: 60, hauteur: 40, forme: "rectangle" },
+    pattes: [{ x: -10, y: 20, nom: "E" }, { x: 70, y: 20, nom: "S" }],
+    exemple_usage: "Inversion de signal",
+    precautions: [],
+    suggestion: "Pour créer des états complémentaires"
+  },
+  
+  porteXor: {
+    id: "porteXor", nom: "Porte XOR", emoji: "🚪", categorie: "logiques", niveau: "maitrise", difficulte: 3,
+    description: "Porte logique OU exclusif. La sortie est à 1 si les entrées sont différentes.",
+    caracteristiques: { type: "74HC86", entrees: "2", sortie: "1", table_verite: "0+0=0, 0+1=1, 1+0=1, 1+1=0" },
+    visuel: { couleur: "#8b5cf6", largeur: 60, hauteur: 50, forme: "rectangle" },
+    pattes: [{ x: -10, y: 15, nom: "E1" }, { x: -10, y: 35, nom: "E2" }, { x: 70, y: 25, nom: "S" }],
+    exemple_usage: "Détection de différence",
+    precautions: [],
+    suggestion: "Pour des circuits de comparaison"
+  },
+  
+  cd4027: {
+    id: "cd4027", nom: "CD4027 (Bascule JK)", emoji: "🧠", categorie: "semi_conducteurs", niveau: "maitrise", difficulte: 3,
+    description: "Bascule JK : composant de mémoire. Change d'état à chaque impulsion d'horloge.",
+    caracteristiques: { type: "DIP-16", tension: "3V à 15V", fonction: "Mémoire / Bascule" },
+    visuel: { couleur: "#1e293b", largeur: 80, hauteur: 100, forme: "rectangle" },
+    pattes: [{ x: -10, y: 20, nom: "J" }, { x: -10, y: 40, nom: "CLK" }, { x: -10, y: 60, nom: "K" }, { x: -10, y: 80, nom: "GND" }, { x: 90, y: 20, nom: "VCC" }, { x: 90, y: 40, nom: "Q" }, { x: 90, y: 60, nom: "Q'" }, { x: 90, y: 80, nom: "SET" }],
+    exemple_usage: "Compteur, mémoire, diviseur de fréquence",
+    precautions: ["Respecter le brochage"],
+    suggestion: "Pour comprendre la mémoire en électronique"
+  },
+  
+  ci74hc00: {
+    id: "ci74hc00", nom: "74HC00 (4x NAND)", emoji: "🧠", categorie: "semi_conducteurs", niveau: "maitrise", difficulte: 3,
+    description: "Circuit intégré contenant 4 portes NAND. Très utilisé en logique numérique.",
+    caracteristiques: { type: "DIP-14", tension: "2V à 6V", fonction: "4x NAND" },
+    visuel: { couleur: "#1e293b", largeur: 80, hauteur: 100, forme: "rectangle" },
+    pattes: [{ x: -10, y: 20, nom: "1A" }, { x: -10, y: 40, nom: "1B" }, { x: -10, y: 60, nom: "1Y" }, { x: -10, y: 80, nom: "GND" }, { x: 90, y: 20, nom: "VCC" }, { x: 90, y: 40, nom: "4Y" }, { x: 90, y: 60, nom: "4B" }, { x: 90, y: 80, nom: "4A" }],
+    exemple_usage: "Portes logiques, bascules",
+    precautions: ["Alimentation 5V recommandée"],
+    suggestion: "Base de la logique TTL"
+  },
+  
+  mosfet: {
+    id: "mosfet", nom: "MOSFET IRF540", emoji: "🎛️", categorie: "semi_conducteurs", niveau: "maitrise", difficulte: 3,
+    description: "Transistor à effet de champ. Permet de commuter de fortes puissances.",
+    caracteristiques: { tension: "100V", courant: "33A", type: "N-canal" },
+    visuel: { couleur: "#111111", largeur: 60, hauteur: 60, forme: "rectangle" },
+    pattes: [{ x: 10, y: 70, nom: "G (Grille)" }, { x: 30, y: 70, nom: "D (Drain)" }, { x: 50, y: 70, nom: "S (Source)" }],
+    exemple_usage: "Commande de moteur, relais",
+    precautions: ["Attention à la chaleur", "Protection contre les surtensions"],
+    suggestion: "Pour les circuits de puissance"
+  },
+  
+  transistorPnp: {
+    id: "transistorPnp", nom: "Transistor 2N2907", emoji: "🎛️", categorie: "semi_conducteurs", niveau: "maitrise", difficulte: 3,
+    description: "Transistor PNP. Fonctionne en complément du NPN.",
+    caracteristiques: { type: "PNP", courant_max: "600mA", tension_max: "40V" },
+    visuel: { couleur: "#111111", largeur: 60, hauteur: 60, forme: "rectangle" },
+    pattes: [{ x: 10, y: 70, nom: "E" }, { x: 30, y: 70, nom: "B" }, { x: 50, y: 70, nom: "C" }],
+    exemple_usage: "Amplification, commutation",
+    precautions: ["Respecter le sens du courant"],
+    suggestion: "Complémentaire du 2N2222"
+  },
+  
+  diodeZener: {
+    id: "diodeZener", nom: "Diode Zener 5.1V", emoji: "➡️", categorie: "semi_conducteurs", niveau: "maitrise", difficulte: 3,
+    description: "Diode qui maintient une tension constante (5.1V) à ses bornes.",
+    caracteristiques: { tension_zener: "5.1V", puissance: "0.5W" },
+    visuel: { couleur: "#333333", largeur: 60, hauteur: 20, forme: "rectangle" },
+    pattes: [{ x: -10, y: 0, nom: "A" }, { x: 10, y: 0, nom: "K" }],
+    exemple_usage: "Régulation de tension",
+    precautions: ["Respecter la polarité"],
+    suggestion: "Pour stabiliser une alimentation"
+  },
+  
+  thermistance: {
+    id: "thermistance", nom: "Thermistance", emoji: "🌡️", categorie: "capteurs", niveau: "maitrise", difficulte: 3,
+    description: "Résistance qui varie avec la température.",
+    caracteristiques: { type: "CTN", resistance_25C: "10kΩ" },
+    visuel: { couleur: "#D4A76A", largeur: 60, hauteur: 40, forme: "ovale" },
+    pattes: [{ x: -10, y: 0, nom: "1" }, { x: 10, y: 0, nom: "2" }],
+    exemple_usage: "Thermomètre, détection de chaleur",
+    precautions: [],
+    suggestion: "Pour les projets de mesure"
+  },
+  
+  capteurIr: {
+    id: "capteurIr", nom: "Capteur IR", emoji: "📡", categorie: "capteurs", niveau: "maitrise", difficulte: 3,
+    description: "Capteur infrarouge. Détecte les obstacles ou le mouvement.",
+    caracteristiques: { type: "Récepteur IR", tension: "5V" },
+    visuel: { couleur: "#111111", largeur: 60, hauteur: 40, forme: "rectangle" },
+    pattes: [{ x: -10, y: 0, nom: "VCC" }, { x: 10, y: 0, nom: "OUT" }, { x: 30, y: 0, nom: "GND" }],
+    exemple_usage: "Détection d'obstacle, télécommande",
+    precautions: ["Alimentation 5V"],
+    suggestion: "Pour les projets robotiques"
+  },
+  
+  microphone: {
+    id: "microphone", nom: "Microphone", emoji: "🔊", categorie: "capteurs", niveau: "maitrise", difficulte: 3,
+    description: "Capteur de son. Transforme les ondes sonores en signal électrique.",
+    caracteristiques: { type: "Électret", sensibilité: "-40dB" },
+    visuel: { couleur: "#222222", largeur: 40, hauteur: 40, forme: "ronde" },
+    pattes: [{ x: -10, y: 0, nom: "+" }, { x: 10, y: 0, nom: "-" }],
+    exemple_usage: "Détection de bruit, enregistrement",
+    precautions: ["Nécessite une amplification"],
+    suggestion: "Pour les projets audio"
+  },
+  
+  hautParleur: {
+    id: "hautParleur", nom: "Haut-parleur", emoji: "🔊", categorie: "sorties", niveau: "maitrise", difficulte: 3,
+    description: "Transforme un signal électrique en son.",
+    caracteristiques: { impedance: "8Ω", puissance: "0.5W" },
+    visuel: { couleur: "#222222", largeur: 60, hauteur: 60, forme: "ronde" },
+    pattes: [{ x: -10, y: 0, nom: "+" }, { x: 10, y: 0, nom: "-" }],
+    exemple_usage: "Audio, musique",
+    precautions: ["Attention à la puissance"],
+    suggestion: "Pour écouter un signal"
+  },
+  
+  moteurDc: {
+    id: "moteurDc", nom: "Moteur DC", emoji: "🔄", categorie: "sorties", niveau: "maitrise", difficulte: 3,
+    description: "Moteur à courant continu. Tourne quand il est alimenté.",
+    caracteristiques: { tension: "3V à 6V", vitesse: "3000 tr/min" },
+    visuel: { couleur: "#333333", largeur: 60, hauteur: 60, forme: "ronde" },
+    pattes: [{ x: -10, y: 0, nom: "+" }, { x: 10, y: 0, nom: "-" }],
+    exemple_usage: "Robot, ventilateur",
+    precautions: ["Attention à la polarité"],
+    suggestion: "Pour les projets mécaniques"
+  },
+  
+  servomoteur: {
+    id: "servomoteur", nom: "Servomoteur", emoji: "🔄", categorie: "sorties", niveau: "maitrise", difficulte: 3,
+    description: "Moteur qui peut se positionner à un angle précis (0° à 180°).",
+    caracteristiques: { tension: "4.8V à 6V", angle: "0° à 180°" },
+    visuel: { couleur: "#333333", largeur: 60, hauteur: 80, forme: "rectangle" },
+    pattes: [{ x: -10, y: 0, nom: "Signal" }, { x: 10, y: 0, nom: "VCC" }, { x: 30, y: 0, nom: "GND" }],
+    exemple_usage: "Robotique, bras articulé",
+    precautions: ["Nécessite un signal PWM"],
+    suggestion: "Pour les projets de précision"
+  },
+  
+  ledRgb: {
+    id: "ledRgb", nom: "LED RGB", emoji: "💡", categorie: "lumieres", niveau: "maitrise", difficulte: 3,
+    description: "LED qui peut afficher n'importe quelle couleur (Rouge, Vert, Bleu).",
+    caracteristiques: { tension: "5V", courant: "20mA par couleur" },
+    visuel: { couleur: "#a855f7", largeur: 50, hauteur: 50, forme: "ronde" },
+    pattes: [{ x: -10, y: 0, nom: "R" }, { x: 0, y: 0, nom: "V" }, { x: 10, y: 0, nom: "B" }, { x: 20, y: 0, nom: "GND" }],
+    exemple_usage: "Éclairage multicolore",
+    precautions: ["3 résistances nécessaires"],
+    suggestion: "Pour des effets visuels"
+  },
+  
+  afficheur7seg: {
+    id: "afficheur7seg", nom: "Afficheur 7 segments", emoji: "🔢", categorie: "lumieres", niveau: "maitrise", difficulte: 3,
+    description: "Afficheur numérique. Permet d'afficher des chiffres (0-9).",
+    caracteristiques: { type: "Cathode commune", tension: "5V" },
+    visuel: { couleur: "#E63946", largeur: 60, hauteur: 80, forme: "rectangle" },
+    pattes: [{ x: -10, y: 0, nom: "a" }, { x: 0, y: 0, nom: "b" }, { x: 10, y: 0, nom: "c" }, { x: 20, y: 0, nom: "d" }, { x: 30, y: 0, nom: "e" }, { x: 40, y: 0, nom: "f" }, { x: 50, y: 0, nom: "g" }, { x: 60, y: 0, nom: "DP" }],
+    exemple_usage: "Compteur, horloge",
+    precautions: ["7 résistances nécessaires"],
+    suggestion: "Pour afficher des chiffres"
+  },
+  
+  bobine: {
+    id: "bobine", nom: "Bobine (Inductance)", emoji: "🧲", categorie: "passifs", niveau: "maitrise", difficulte: 3,
+    description: "Composant qui stocke l'énergie sous forme magnétique.",
+    caracteristiques: { inductance: "100µH", courant_max: "1A" },
+    visuel: { couleur: "#B8860B", largeur: 60, hauteur: 30, forme: "ovale" },
+    pattes: [{ x: -10, y: 0, nom: "1" }, { x: 10, y: 0, nom: "2" }],
+    exemple_usage: "Filtrage, transformation",
+    precautions: ["Attention aux surtensions"],
+    suggestion: "Pour les circuits haute fréquence"
+  },
+  
+  pile15v: {
+    id: "pile15v", nom: "Pile 1.5V", emoji: "🔋", categorie: "sources", niveau: "maitrise", difficulte: 3,
+    description: "Petite pile 1.5V (type AA). Tension faible.",
+    caracteristiques: { tension: "1.5V", capacite: "2000mAh" },
+    visuel: { couleur: "#333333", largeur: 80, hauteur: 50, forme: "rectangle" },
+    pattes: [{ x: -10, y: 10, nom: "+" }, { x: 10, y: 20, nom: "-" }],
+    exemple_usage: "Petits appareils",
+    precautions: ["Ne pas court-circuiter"],
+    suggestion: "Pour les circuits basse tension"
+  },
+  
+  pile12v: {
+    id: "pile12v", nom: "Pile 12V", emoji: "🔋", categorie: "sources", niveau: "maitrise", difficulte: 3,
+    description: "Pile 12V (type télécommande). Tension plus élevée.",
+    caracteristiques: { tension: "12V", capacite: "50mAh" },
+    visuel: { couleur: "#333333", largeur: 80, hauteur: 50, forme: "rectangle" },
+    pattes: [{ x: -10, y: 10, nom: "+" }, { x: 10, y: 20, nom: "-" }],
+    exemple_usage: "Télécommandes, détecteurs",
+    precautions: ["Ne pas court-circuiter"],
+    suggestion: "Pour les circuits plus gourmands"
+  },
   
   /* =========================================================
      NIVEAU 4 : EXPERT (6 composants)
