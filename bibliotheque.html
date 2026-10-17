@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bibliothèque de composants - InitiaElectro</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0' stop-color='%230369a1'/><stop offset='1' stop-color='%23a855f7'/></linearGradient></defs><rect width='512' height='512' rx='112' fill='url(%23g)'/><circle cx='220' cy='256' r='60' fill='%23ff3333' stroke='%23fff' stroke-width='12'/><circle cx='200' cy='236' r='14' fill='rgba(255,255,255,0.85)'/><rect x='300' y='238' width='140' height='36' rx='18' fill='%23D4A76A' stroke='%23fff' stroke-width='8'/><line x1='280' y1='256' x2='300' y2='256' stroke='%23fff' stroke-width='10' stroke-linecap='round'/></svg>">
+<meta name="theme-color" content="#0369a1">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f9ff; color: #1a1f2e; line-height: 1.6; }
+  
+  /* EN-TETE */
+  header { background: linear-gradient(135deg, #0369a1, #6b21a8); color: white;
+           padding: 30px 20px; text-align: center;
+           box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
+  header h1 { font-size: 2em; margin-bottom: 8px; }
+  header .sous-titre { font-size: 1.1em; opacity: 0.95; margin-bottom: 20px; }
+  .btn-retour { display: inline-block; padding: 10px 20px; background: rgba(255,255,255,0.2); 
+                color: white; text-decoration: none; border-radius: 8px; font-weight: bold;
+                border: 2px solid rgba(255,255,255,0.4); transition: all 0.2s; }
+  .btn-retour:hover { background: rgba(255,255,255,0.35); transform: translateY(-2px); }
+  
+  /* CONTENEUR */
+  .conteneur { max-width: 1200px; margin: 0 auto; padding: 32px 20px; }
+  
+  /* BARRE DE RECHERCHE & FILTRES */
+  .barre-recherche { background: white; padding: 20px; border-radius: 12px;
+                     box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin-bottom: 24px;
+                     display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+  .champ-recherche { flex: 1; min-width: 200px; position: relative; }
+  .champ-recherche input { width: 100%; padding: 12px 16px 12px 40px; border: 2px solid #e0e0e0;
+                           border-radius: 8px; font-size: 1em; outline: none; transition: border-color 0.2s; }
+  .champ-recherche input:focus { border-color: #0369a1; }
+  .champ-recherche::before { content: '🔍'; position: absolute; left: 14px; top: 50%; transform: translateY(-50%); font-size: 1.1em; }
+  .filtre-select { padding: 12px 16px; border: 2px solid #e0e0e0; border-radius: 8px;
+                   background: white; font-size: 1em; cursor: pointer; outline: none;
+                   transition: border-color 0.2s; min-width: 180px; }
+  .filtre-select:focus { border-color: #0369a1; }
+  
+  /* GRILLE DE CARTES */
+  .grille-composants { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; }
+  .carte-composant { background: white; border-radius: 12px; padding: 20px; cursor: pointer;
+                     box-shadow: 0 4px 10px rgba(0,0,0,0.06); transition: all 0.2s;
+                     border-top: 4px solid transparent; }
+  .carte-composant:hover { transform: translateY(-4px); box-shadow: 0 8px 20px rgba(3,105,161,0.15); }
+  .carte-composant .emoji { font-size: 3em; text-align: center; margin-bottom: 12px; }
+  .carte-composant h3 { font-size: 1.1em; color: #1a1f2e; margin-bottom: 8px; text-align: center; }
+  .carte-composant .niveau-badge { display: block; text-align: center; font-size: 0.75em; 
+                                    padding: 3px 10px; border-radius: 10px; margin: 0 auto 8px auto; width: fit-content; }
+  .carte-composant .categorie { font-size: 0.8em; color: #64748b; text-align: center; }
+  
+  /* BADGES PAR NIVEAU */
+  .badge-decouverte { background: #dcfce7; color: #166534; }
+  .badge-exploration { background: #fef9c3; color: #854d0e; }
+  .badge-maitrise { background: #ffedd5; color: #9a3412; }
+  .badge-expert { background: #fee2e2; color: #991b1b; }
+  
+  /* AUCUN RESULTAT */
+  .aucun-resultat { text-align: center; padding: 40px; color: #64748b; font-style: italic; }
+  
+  /* FICHE DETAILLEE (MODAL) */
+  .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+                   background: rgba(0,0,0,0.6); z-index: 100; justify-content: center; align-items: center;
+                   padding: 20px; overflow-y: auto; }
+  .modal-overlay.actif { display: flex; animation: fadeIn 0.2s; }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  .modal-boite { background: white; border-radius: 16px; padding: 32px; max-width: 600px;
+                 width: 100%; max-height: 90vh; overflow-y: auto;
+                 box-shadow: 0 20px 50px rgba(0,0,0,0.3); position: relative; }
+  .btn-fermer { position: absolute; top: 16px; right: 16px; background: #f1f5f9; border: none;
+                width: 36px; height: 36px; border-radius: 50%; font-size: 1.2em; cursor: pointer;
+                transition: background 0.2s; }
+  .btn-fermer:hover { background: #e2e8f0; }
+  .fiche-entete { text-align: center; margin-bottom: 24px; }
+  .fiche-entete .emoji { font-size: 4em; margin-bottom: 12px; }
+  .fiche-entete h2 { font-size: 1.6em; color: #1a1f2e; margin-bottom: 8px; }
+  .fiche-entete .niveau-badge { font-size: 0.85em; padding: 4px 12px; }
+  .fiche-section { margin-bottom: 20px; }
+  .fiche-section h4 { font-size: 1em; color: #0369a1; margin-bottom: 8px; 
+                      padding-bottom: 4px; border-bottom: 2px solid #e0e0e0; }
+  .fiche-section p { margin-bottom: 8px; color: #334155; }
+  .fiche-section ul { padding-left: 20px; color: #334155; }
+  .fiche-section li { margin-bottom: 4px; }
+  .table-caract { width: 100%; border-collapse: collapse; margin-top: 8px; }
+  .table-caract td { padding: 8px 12px; border-bottom: 1px solid #f1f5f9; }
+  .table-caract td:first-child { font-weight: bold; color: #64748b; width: 40%; }
+  
+  /* RESPONSIVE */
+  @media (max-width: 600px) {
+    header h1 { font-size: 1.5em; }
+    .conteneur { padding: 16px; }
+    .modal-boite { padding: 20px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>📚 Bibliothèque de composants</h1>
+  <div class="sous-titre">Découvre, comprends et explore chaque composant électronique</div>
+  <a href="index.html" class="btn-retour">← Retour à l'accueil</a>
+</header>
+
+<div class="conteneur">
+  
+  <!-- BARRE DE RECHERCHE ET FILTRES -->
+  <div class="barre-recherche">
+    <div class="champ-recherche">
+      <input type="text" id="recherche" placeholder="Rechercher un composant..." oninput="filtrerComposants()">
+    </div>
+    <select class="filtre-select" id="filtre-categorie" onchange="filtrerComposants()">
+      <option value="toutes">Toutes les catégories</option>
+    </select>
+    <select class="filtre-select" id="filtre-niveau" onchange="filtrerComposants()">
+      <option value="tous">Tous les niveaux</option>
+      <option value="decouverte">🟢 Découverte</option>
+      <option value="exploration">🟡 Exploration</option>
+      <option value="maitrise">🟠 Maîtrise</option>
+      <option value="expert">🔴 Expert</option>
+    </select>
+  </div>
+
+  <!-- GRILLE DES COMPOSANTS -->
+  <div class="grille-composants" id="grille-composants"></div>
+  
+</div>
+
+<!-- MODAL FICHE DETAILLEE -->
+<div class="modal-overlay" id="modal-fiche">
+  <div class="modal-boite">
+    <button class="btn-fermer" onclick="fermerFiche()">✖</button>
+    <div id="contenu-fiche"></div>
+  </div>
+</div>
+
+<script src="composants.js"></script>
+<script>
+/* =========================================================
+   INITIALISATION
+   ========================================================= */
+window.onload = function() {
+  if (typeof COMPOSANTS === 'undefined') {
+    document.getElementById('grille-composants').innerHTML = 
+      '<div class="aucun-resultat">⚠️ Erreur : composants.js non chargé.</div>';
+    return;
+  }
+  remplirFiltres();
+  afficherTousComposants();
+};
+
+/* Remplir le filtre de catégories */
+function remplirFiltres() {
+  var cats = getCategories();
+  var select = document.getElementById('filtre-categorie');
+  var labels = {
+    sources: '🔋 Sources',
+    passifs: '🎨 Passifs',
+    lumieres: '💡 Lumières',
+    semi_conducteurs: '⚡ Semi-conducteurs',
+    logiques: '🚪 Logiques',
+    capteurs: '📏 Capteurs',
+    sorties: '🎵 Sorties',
+    interrupteurs: '🔘 Interrupteurs'
+  };
+  for (var i = 0; i < cats.length; i++) {
+    var opt = document.createElement('option');
+    opt.value = cats[i];
+    opt.textContent = labels[cats[i]] || cats[i];
+    select.appendChild(opt);
+  }
+}
+
+/* Afficher tous les composants */
+function afficherTousComposants() {
+  var html = '';
+  for (var id in COMPOSANTS) {
+    html += genererCarte(COMPOSANTS[id]);
+  }
+  document.getElementById('grille-composants').innerHTML = html;
+}
+
+/* Générer le HTML d'une carte */
+function genererCarte(c) {
+  var badgeClass = 'badge-' + c.niveau;
+  var niveauText = NIVEAUX[c.niveau] ? NIVEAUX[c.niveau].nom : c.niveau;
+  return '<div class="carte-composant" onclick="ouvrirFiche(\'' + c.id + '\')">' +
+         '<div class="emoji">' + c.emoji + '</div>' +
+         '<h3>' + c.nom + '</h3>' +
+         '<span class="niveau-badge ' + badgeClass + '">' + niveauText + '</span>' +
+         '<div class="categorie">' + c.categorie.replace('_', ' ') + '</div>' +
+         '</div>';
+}
+
+/* Filtrer les composants */
+function filtrerComposants() {
+  var texte = document.getElementById('recherche').value.toLowerCase();
+  var cat = document.getElementById('filtre-categorie').value;
+  var niv = document.getElementById('filtre-niveau').value;
+  
+  var resultats = [];
+  for (var id in COMPOSANTS) {
+    var c = COMPOSANTS[id];
+    var okTexte = !texte || c.nom.toLowerCase().indexOf(texte) !== -1 || 
+                  c.description.toLowerCase().indexOf(texte) !== -1;
+    var okCat = (cat === 'toutes') || c.categorie === cat;
+    var okNiv = (niv === 'tous') || c.niveau === niv;
+    if (okTexte && okCat && okNiv) {
+      resultats.push(c);
+    }
+  }
+  
+  var html = '';
+  if (resultats.length === 0) {
+    html = '<div class="aucun-resultat">Aucun composant trouvé.</div>';
+  } else {
+    for (var i = 0; i < resultats.length; i++) {
+      html += genererCarte(resultats[i]);
+    }
+  }
+  document.getElementById('grille-composants').innerHTML = html;
+}
+
+/* Ouvrir la fiche détaillée */
+function ouvrirFiche(id) {
+  var c = COMPOSANTS[id];
+  if (!c) return;
+  
+  var badgeClass = 'badge-' + c.niveau;
+  var niveauText = NIVEAUX[c.niveau] ? NIVEAUX[c.niveau].nom : c.niveau;
+  var niveauAge = NIVEAUX[c.niveau] ? NIVEAUX[c.niveau].age : '';
+  
+  var html = '<div class="fiche-entete">';
+  html += '<div class="emoji">' + c.emoji + '</div>';
+  html += '<h2>' + c.nom + '</h2>';
+  html += '<span class="niveau-badge ' + badgeClass + '">' + niveauText + ' (' + niveauAge + ')</span>';
+  html += '</div>';
+  
+  html += '<div class="fiche-section">';
+  html += '<h4>📖 Description</h4>';
+  html += '<p>' + c.description + '</p>';
+  html += '</div>';
+  
+  html += '<div class="fiche-section">';
+  html += '<h4>🔢 Caractéristiques</h4>';
+  html += '<table class="table-caract">';
+  for (var key in c.caracteristiques) {
+    html += '<tr><td>' + key.replace('_', ' ') + '</td><td>' + c.caracteristiques[key] + '</td></tr>';
+  }
+  html += '</table>';
+  html += '</div>';
+  
+  html += '<div class="fiche-section">';
+  html += '<h4>💡 Exemples d\'utilisation</h4>';
+  html += '<p>' + c.exemple_usage + '</p>';
+  html += '</div>';
+  
+  if (c.precautions && c.precautions.length > 0) {
+    html += '<div class="fiche-section">';
+    html += '<h4>⚠️ Précautions</h4>';
+    html += '<ul>';
+    for (var i = 0; i < c.precautions.length; i++) {
+      html += '<li>' + c.precautions[i] + '</li>';
+    }
+    html += '</ul>';
+    html += '</div>';
+  }
+  
+  if (c.suggestion) {
+    html += '<div class="fiche-section">';
+    html += '<h4>🎓 Suggestion pédagogique</h4>';
+    html += '<p>' + c.suggestion + '</p>';
+    html += '</div>';
+  }
+  
+  document.getElementById('contenu-fiche').innerHTML = html;
+  document.getElementById('modal-fiche').classList.add('actif');
+}
+
+/* Fermer la fiche */
+function fermerFiche() {
+  document.getElementById('modal-fiche').classList.remove('actif');
+}
+
+/* Fermer en cliquant en dehors */
+document.getElementById('modal-fiche').addEventListener('click', function(e) {
+  if (e.target === this) fermerFiche();
+});
+</script>
+
+</body>
+</html>
