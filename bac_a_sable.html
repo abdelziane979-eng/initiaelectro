@@ -1686,7 +1686,8 @@ function mapperTypeDessin(type) {
   if (type === 'condensateur10uF' || type === 'condensateur100uF') return 'condensateur';
   if (type === 'diode1n4148' || type === 'diode1n4007' || type === 'diodeZener') return 'diode';
   if (type === 'ne555' || type === 'ne555Cms' || type === 'cd4017' || type === 'cd4027' || type === 'ci74hc00' || type === 'microcontroleur' || type === 'porteAnd' || type === 'porteOr' || type === 'porteNot' || type === 'porteXor') return 'ci';
-  if (type === 'transistorPnp' || type === 'mosfet') return 'transistor';
+  if (type === 'transistorPnp' || type === 'mosfet' || type === 'aop' || type === 'relais') return 'transistor';
+  if (type === 'servomoteurAmeliore') return 'moteur';
   if (type === 'capteurIr' || type === 'microphone' || type === 'capteurHumidite' || type === 'moduleBluetooth') return 'capteur';
   if (type === 'hautParleur' || type === 'moteurDc' || type === 'servomoteur') return 'moteur';
   return type;

@@ -512,7 +512,39 @@ var COMPOSANTS = {
     suggestion: "Pour les projets connectés"
   },
   
-  ne555Cms: {
+   relais: {
+    id: "relais", nom: "Relais 5V", emoji: "🔌", categorie: "sorties", niveau: "maitrise", difficulte: 3,
+    description: "Interrupteur électromagnétique. Permet de commander un circuit de puissance (ex: une pompe, une lampe 220V) avec un petit signal (5V).",
+    caracteristiques: { tension_bobine: "5V", tension_contact: "250V AC", courant_max: "10A", type: "1 circuit inverseur" },
+    visuel: { couleur: "#0369a1", largeur: 80, hauteur: 60, forme: "rectangle" },
+    pattes: [{ x: -10, y: 20, nom: "Bobine +" }, { x: -10, y: 40, nom: "Bobine -" }, { x: 90, y: 20, nom: "COM" }, { x: 90, y: 40, nom: "NO (Normalement Ouvert)" }],
+    exemple_usage: "Serre connectée (pompe), domotique (lampe)",
+    precautions: ["Attention au 220V sur les contacts", "Diode de roue libre conseillée"],
+    suggestion: "Indispensable pour l'IoT et la domotique"
+  },
+  
+  aop: {
+    id: "aop", nom: "AOP LM358", emoji: "🧠", categorie: "semi_conducteurs", niveau: "expert", difficulte: 4,
+    description: "Amplificateur Opérationnel. Amplifie une différence de tension. C'est le composant roi de l'analogique (filtres, comparateurs, amplis).",
+    caracteristiques: { type: "DIP-8", tension: "3V à 32V", canaux: "2 (double AOP)", gain: "100dB" },
+    visuel: { couleur: "#111111", largeur: 80, hauteur: 100, forme: "rectangle" },
+    pattes: [{ x: -10, y: 20, nom: "1 (OUT1)" }, { x: -10, y: 40, nom: "2 (IN1-)" }, { x: -10, y: 60, nom: "3 (IN1+)" }, { x: -10, y: 80, nom: "4 (GND)" }, { x: 90, y: 20, nom: "8 (VCC)" }, { x: 90, y: 40, nom: "7 (OUT2)" }, { x: 90, y: 60, nom: "6 (IN2-)" }, { x: 90, y: 80, nom: "5 (IN2+)" }],
+    exemple_usage: "Détecteur de bruit, amplificateur de capteur, comparateur",
+    precautions: ["Alimentation symétrique parfois nécessaire", "Attention aux oscillations"],
+    suggestion: "Pour entrer dans le monde du signal analogique"
+  },
+  
+  servomoteurAmeliore: {
+    id: "servomoteurAmeliore", nom: "Servomoteur (Précision)", emoji: "⚙️", categorie: "sorties", niveau: "maitrise", difficulte: 3,
+    description: "Moteur avec positionnement angulaire précis (0° à 180°). Idéal pour la robotique et les projets de guidage.",
+    caracteristiques: { tension: "4.8V à 6V", angle: "0° à 180°", couple: "1.8 kg.cm", commande: "PWM" },
+    visuel: { couleur: "#334155", largeur: 70, hauteur: 80, forme: "rectangle" },
+    pattes: [{ x: -10, y: 20, nom: "PWM" }, { x: -10, y: 40, nom: "VCC" }, { x: -10, y: 60, nom: "GND" }],
+    exemple_usage: "Robot suiveur de ligne, bras articulé, barrière automatique",
+    precautions: ["Ne pas forcer sur l'axe", "Alimentation séparée recommandée"],
+    suggestion: "Pour les projets robotiques et l'automatisation"
+  }, 
+ne555Cms: {
     id: "ne555Cms", nom: "NE555 (CMS)", emoji: "⚡", categorie: "semi_conducteurs", niveau: "expert", difficulte: 4,
     description: "Version miniature du NE555 pour montage en surface (CMS).",
     caracteristiques: { type: "SOIC-8", tension: "4.5V à 16V", fonction: "Minuteur" },
