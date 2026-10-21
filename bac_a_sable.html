@@ -8,7 +8,7 @@
 <link rel="manifest" href="manifest-bac.json">
 <meta name="theme-color" content="#6b21a8">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="ElectroPremium">
+<meta name="apple-mobile-web-app-title" content="EspaceElectronic">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -332,7 +332,7 @@
   .compo-clignote {
     animation: compoClignote 0.4s ease-in-out 5;
   }
-  @media (max-width: 800px) { .conteneur f{ grid-template-columns: 1fr; } }
+  @media (max-width: 800px) { .conteneur { grid-template-columns: 1fr; } }
 </style>
 </head>
 <body>
@@ -340,14 +340,14 @@
 <header>
   <div>
     <h1>⚡ EspaceElectronic</h1>
-   <div class="sub">Atelier de création électronique</div> 
+    <div class="sub">Atelier de création électronique</div>
   </div>
   <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
     <button id="btn-installer" onclick="installerPWA()" style="display:none;padding:8px 16px;background:#fbbf24;color:#1a1f2e;border:none;border-radius:8px;font-weight:bold;cursor:pointer;font-size:0.9em;">
       📲 Installer
     </button>
+    <a href="bibliotheque.html" class="btn-retour" style="margin-left:10px;">📚 Bibliothèque</a>
     <a href="index.html" class="btn-retour">← Retour à l'accueil</a>
-<a href="bibliotheque.html" class="btn-retour" style="margin-left:10px;">📚 Bibliothèque</a>
   </div>
 </header>
 
@@ -366,14 +366,20 @@
       </select>
     </div>
     <div id="liste-palette"></div>
+    
     <h2>📚 Blocs prêts</h2>
     <div class="option-cablage">
       <input type="checkbox" id="opt-cablage" checked>
       <label for="opt-cablage">Avec câblage automatique</label>
     </div>
     <div id="liste-blocs"></div>
+    
     <h2>📖 Tutoriels</h2>
     <div id="liste-tutoriels"></div>
+    
+    <h2>🏆 Défis d'ingénierie</h2>
+    <div id="liste-defis"></div>
+    
     <div class="panneau-composants" id="panneau-composants">
       <div class="panneau-composants-header" onclick="basculerPanneauComposants()">
         <h3>📋 Mes composants <span id="panneau-nb">(0)</span></h3>
@@ -384,6 +390,7 @@
       </div>
     </div>
   </div>
+  
   <div class="zone">
     <div class="barre-outils">
       <div class="statut" id="statut-mode">🖱️ Mode : Placer</div>
@@ -408,6 +415,7 @@
       <button class="action btn-gris" onclick="zoomMoins()" title="Zoom −">🔍−</button>
       <button class="action btn-gris" onclick="recentrerVue()" title="Recentrer">🏠</button>
       <button class="action btn-vert" onclick="basculerGrille()" id="btn-grille" title="Grille magnétique">🧲 Grille : ON</button>
+      <button class="action btn-cyan" onclick="verifierDefi()" id="btn-verifier-defi" style="display:none; background: linear-gradient(135deg, #22c55e, #16a34a);">✅ Vérifier le Défi</button>
       <button class="action btn-orange" onclick="annulerMode()" title="Annuler le mode en cours">❌ Annuler</button>
     </div>
 
@@ -477,7 +485,7 @@
 
 <script>
 /* =========================================================
-   CATALOGUE DES COMPOSANTS
+   CATALOGUE DES COMPOSANTS (Base locale)
    ========================================================= */
 var CATALOGUE = {
   pile: { id:'pile', nom:'Pile 9V', icone:'🔋', couleur:'#333', largeur:100, hauteur:60,
@@ -511,8 +519,6 @@ var CATALOGUE = {
 
 /* =========================================================
    FUSION AVEC composants.js
-   Ajoute les composants de composants.js au CATALOGUE existant
-   sans écraser les 11 composants d'origine
    ========================================================= */
 if (typeof COMPOSANTS !== 'undefined') {
   var nbAjoutes = 0;
@@ -520,31 +526,19 @@ if (typeof COMPOSANTS !== 'undefined') {
   for (var idComp in COMPOSANTS) {
     var c = COMPOSANTS[idComp];
     if (!CATALOGUE[idComp]) {
-      // Nouveau composant : on l'ajoute
       CATALOGUE[idComp] = {
-        id: idComp,
-        nom: c.nom,
-        icone: c.emoji,
-        couleur: c.visuel.couleur,
-        largeur: c.visuel.largeur,
-        hauteur: c.visuel.hauteur,
-        pattes: c.pattes,
-        valeurs: null,
-        niveau: c.niveau,
-        categorie: c.categorie,
-        description: c.description,
-        caracteristiques: c.caracteristiques
+        id: idComp, nom: c.nom, icone: c.emoji, couleur: c.visuel.couleur,
+        largeur: c.visuel.largeur, hauteur: c.visuel.hauteur, pattes: c.pattes,
+        valeurs: null, niveau: c.niveau, categorie: c.categorie,
+        description: c.description, caracteristiques: c.caracteristiques
       };
       nbAjoutes++;
     } else {
-      // Composant existant : on l'enrichit (niveau, catégorie, description)
-      if (!CATALOGUE[idComp].niveau) {
-        CATALOGUE[idComp].niveau = c.niveau;
-        CATALOGUE[idComp].categorie = c.categorie;
-        CATALOGUE[idComp].description = c.description;
-        CATALOGUE[idComp].caracteristiques = c.caracteristiques;
-        nbEnrichis++;
-      }
+      CATALOGUE[idComp].niveau = c.niveau;
+      CATALOGUE[idComp].categorie = c.categorie;
+      if (!CATALOGUE[idComp].description) CATALOGUE[idComp].description = c.description;
+      if (!CATALOGUE[idComp].caracteristiques) CATALOGUE[idComp].caracteristiques = c.caracteristiques;
+      nbEnrichis++;
     }
   }
   console.log('✅ ' + nbAjoutes + ' composants ajoutés, ' + nbEnrichis + ' enrichis');
@@ -554,13 +548,13 @@ if (typeof COMPOSANTS !== 'undefined') {
    FILTRE PAR NIVEAU
    ========================================================= */
 var filtreNiveauActif = 'tous';
-
 function filtrerParNiveau() {
   var select = document.getElementById('select-niveau');
   if (!select) return;
   filtreNiveauActif = select.value;
   afficherPalette();
 }
+
 /* =========================================================
    BLOCS PRETS
    ========================================================= */
@@ -571,9 +565,7 @@ var BLOCS = {
       var res = creerComposantBloc('resistance', cx - 20, cy - 60, '470');
       var condo = creerComposantBloc('condensateur', cx + 100, cy - 40, '100uF');
       if (avecCablage) {
-        ajouterFilBloc(pile.id, 0, res.id, 0);
-        ajouterFilBloc(res.id, 1, condo.id, 0);
-        ajouterFilBloc(condo.id, 1, pile.id, 1);
+        ajouterFilBloc(pile.id, 0, res.id, 0); ajouterFilBloc(res.id, 1, condo.id, 0); ajouterFilBloc(condo.id, 1, pile.id, 1);
       }
     }
   },
@@ -583,9 +575,7 @@ var BLOCS = {
       var c1 = creerComposantBloc('condensateur', cx, cy - 60, '10uF');
       var c2 = creerComposantBloc('condensateur', cx + 100, cy - 60, '100uF');
       if (avecCablage) {
-        ajouterFilBloc(pile.id, 0, c1.id, 0);
-        ajouterFilBloc(c1.id, 1, c2.id, 0);
-        ajouterFilBloc(c2.id, 1, pile.id, 1);
+        ajouterFilBloc(pile.id, 0, c1.id, 0); ajouterFilBloc(c1.id, 1, c2.id, 0); ajouterFilBloc(c2.id, 1, pile.id, 1);
       }
     }
   },
@@ -599,17 +589,10 @@ var BLOCS = {
       var led = creerComposantBloc('led', cx + 180, cy - 30, 'rouge');
       var r3 = creerComposantBloc('resistance', cx + 100, cy + 80, '470');
       if (avecCablage) {
-        ajouterFilBloc(pile.id, 0, ne.id, 0);
-        ajouterFilBloc(r1.id, 0, ne.id, 0);
-        ajouterFilBloc(r1.id, 1, ne.id, 6);
-        ajouterFilBloc(r2.id, 0, ne.id, 6);
-        ajouterFilBloc(r2.id, 1, ne.id, 7);
-        ajouterFilBloc(c1.id, 0, ne.id, 7);
-        ajouterFilBloc(c1.id, 1, ne.id, 5);
-        ajouterFilBloc(ne.id, 2, r3.id, 0);
-        ajouterFilBloc(r3.id, 1, led.id, 0);
-        ajouterFilBloc(led.id, 1, ne.id, 5);
-        ajouterFilBloc(ne.id, 5, pile.id, 1);
+        ajouterFilBloc(pile.id, 0, ne.id, 0); ajouterFilBloc(r1.id, 0, ne.id, 0); ajouterFilBloc(r1.id, 1, ne.id, 6);
+        ajouterFilBloc(r2.id, 0, ne.id, 6); ajouterFilBloc(r2.id, 1, ne.id, 7); ajouterFilBloc(c1.id, 0, ne.id, 7);
+        ajouterFilBloc(c1.id, 1, ne.id, 5); ajouterFilBloc(ne.id, 2, r3.id, 0); ajouterFilBloc(r3.id, 1, led.id, 0);
+        ajouterFilBloc(led.id, 1, ne.id, 5); ajouterFilBloc(ne.id, 5, pile.id, 1);
       }
     }
   },
@@ -622,13 +605,9 @@ var BLOCS = {
       var led1 = creerComposantBloc('led', cx - 50, cy - 150, 'rouge');
       var led2 = creerComposantBloc('led', cx + 150, cy - 150, 'vert');
       if (avecCablage) {
-        ajouterFilBloc(pile.id, 0, r1.id, 0);
-        ajouterFilBloc(pile.id, 0, r2.id, 0);
-        ajouterFilBloc(r1.id, 1, led1.id, 0);
-        ajouterFilBloc(r2.id, 1, led2.id, 0);
-        ajouterFilBloc(led1.id, 1, sw.id, 0);
-        ajouterFilBloc(led2.id, 1, sw.id, 1);
-        ajouterFilBloc(sw.id, 0, pile.id, 1);
+        ajouterFilBloc(pile.id, 0, r1.id, 0); ajouterFilBloc(pile.id, 0, r2.id, 0);
+        ajouterFilBloc(r1.id, 1, led1.id, 0); ajouterFilBloc(r2.id, 1, led2.id, 0);
+        ajouterFilBloc(led1.id, 1, sw.id, 0); ajouterFilBloc(led2.id, 1, sw.id, 1); ajouterFilBloc(sw.id, 0, pile.id, 1);
       }
     }
   },
@@ -639,10 +618,8 @@ var BLOCS = {
       var res = creerComposantBloc('resistance', cx + 100, cy - 30, '470');
       var led = creerComposantBloc('led', cx + 220, cy - 30, 'rouge');
       if (avecCablage) {
-        ajouterFilBloc(pile.id, 0, bp.id, 0);
-        ajouterFilBloc(bp.id, 1, res.id, 0);
-        ajouterFilBloc(res.id, 1, led.id, 0);
-        ajouterFilBloc(led.id, 1, pile.id, 1);
+        ajouterFilBloc(pile.id, 0, bp.id, 0); ajouterFilBloc(bp.id, 1, res.id, 0);
+        ajouterFilBloc(res.id, 1, led.id, 0); ajouterFilBloc(led.id, 1, pile.id, 1);
       }
     }
   },
@@ -654,13 +631,8 @@ var BLOCS = {
       var res = creerComposantBloc('resistance', cx - 100, cy - 20, '10000');
       var led = creerComposantBloc('led', cx + 180, cy - 30, 'rouge');
       if (avecCablage) {
-        ajouterFilBloc(pile.id, 0, ldr.id, 0);
-        ajouterFilBloc(ldr.id, 1, res.id, 0);
-        ajouterFilBloc(ldr.id, 1, tr.id, 1);
-        ajouterFilBloc(res.id, 1, pile.id, 1);
-        ajouterFilBloc(tr.id, 2, led.id, 0);
-        ajouterFilBloc(led.id, 1, pile.id, 0);
-        ajouterFilBloc(tr.id, 0, pile.id, 1);
+        ajouterFilBloc(pile.id, 0, ldr.id, 0); ajouterFilBloc(ldr.id, 1, res.id, 0); ajouterFilBloc(ldr.id, 1, tr.id, 1);
+        ajouterFilBloc(res.id, 1, pile.id, 1); ajouterFilBloc(tr.id, 2, led.id, 0); ajouterFilBloc(led.id, 1, pile.id, 0); ajouterFilBloc(tr.id, 0, pile.id, 1);
       }
     }
   },
@@ -670,9 +642,7 @@ var BLOCS = {
       var res = creerComposantBloc('resistance', cx, cy - 60, '470');
       var bz = creerComposantBloc('buzzer', cx + 130, cy - 30, null);
       if (avecCablage) {
-        ajouterFilBloc(pile.id, 0, res.id, 0);
-        ajouterFilBloc(res.id, 1, bz.id, 0);
-        ajouterFilBloc(bz.id, 1, pile.id, 1);
+        ajouterFilBloc(pile.id, 0, res.id, 0); ajouterFilBloc(res.id, 1, bz.id, 0); ajouterFilBloc(bz.id, 1, pile.id, 1);
       }
     }
   },
@@ -689,18 +659,12 @@ var BLOCS = {
       var led3 = creerComposantBloc('led', cx + 50, cy - 160, 'bleu');
       var led4 = creerComposantBloc('led', cx + 200, cy - 160, 'rouge');
       if (avecCablage) {
-        ajouterFilBloc(pile.id, 0, r1.id, 0);
-        ajouterFilBloc(pile.id, 0, r2.id, 0);
-        ajouterFilBloc(pile.id, 0, r3.id, 0);
-        ajouterFilBloc(pile.id, 0, r4.id, 0);
-        ajouterFilBloc(r1.id, 1, led1.id, 0);
-        ajouterFilBloc(r2.id, 1, led2.id, 0);
-        ajouterFilBloc(r3.id, 1, led3.id, 0);
-        ajouterFilBloc(r4.id, 1, led4.id, 0);
-        ajouterFilBloc(led1.id, 1, sw.id, 0);
-        ajouterFilBloc(led2.id, 1, sw.id, 0);
-        ajouterFilBloc(led3.id, 1, sw.id, 0);
-        ajouterFilBloc(led4.id, 1, sw.id, 0);
+        ajouterFilBloc(pile.id, 0, r1.id, 0); ajouterFilBloc(pile.id, 0, r2.id, 0);
+        ajouterFilBloc(pile.id, 0, r3.id, 0); ajouterFilBloc(pile.id, 0, r4.id, 0);
+        ajouterFilBloc(r1.id, 1, led1.id, 0); ajouterFilBloc(r2.id, 1, led2.id, 0);
+        ajouterFilBloc(r3.id, 1, led3.id, 0); ajouterFilBloc(r4.id, 1, led4.id, 0);
+        ajouterFilBloc(led1.id, 1, sw.id, 0); ajouterFilBloc(led2.id, 1, sw.id, 0);
+        ajouterFilBloc(led3.id, 1, sw.id, 0); ajouterFilBloc(led4.id, 1, sw.id, 0);
         ajouterFilBloc(sw.id, 1, pile.id, 1);
       }
     }
@@ -722,33 +686,52 @@ var BLOCS = {
       var led3 = creerComposantBloc('led', cx + 290, cy + 180, 'bleu');
       var led4 = creerComposantBloc('led', cx + 450, cy + 180, 'rouge');
       if (avecCablage) {
-        ajouterFilBloc(pile.id, 0, ne.id, 0);
-        ajouterFilBloc(ne.id, 5, pile.id, 1);
-        ajouterFilBloc(r1.id, 0, ne.id, 0);
-        ajouterFilBloc(r1.id, 1, ne.id, 6);
-        ajouterFilBloc(r2.id, 0, ne.id, 6);
-        ajouterFilBloc(r2.id, 1, ne.id, 7);
-        ajouterFilBloc(c1.id, 0, ne.id, 7);
-        ajouterFilBloc(c1.id, 1, ne.id, 5);
-        ajouterFilBloc(ne.id, 2, cd.id, 0);
-        ajouterFilBloc(pile.id, 0, cd.id, 7);
+        ajouterFilBloc(pile.id, 0, ne.id, 0); ajouterFilBloc(ne.id, 5, pile.id, 1);
+        ajouterFilBloc(r1.id, 0, ne.id, 0); ajouterFilBloc(r1.id, 1, ne.id, 6);
+        ajouterFilBloc(r2.id, 0, ne.id, 6); ajouterFilBloc(r2.id, 1, ne.id, 7);
+        ajouterFilBloc(c1.id, 0, ne.id, 7); ajouterFilBloc(c1.id, 1, ne.id, 5);
+        ajouterFilBloc(ne.id, 2, cd.id, 0); ajouterFilBloc(pile.id, 0, cd.id, 7);
         ajouterFilBloc(cd.id, 3, pile.id, 1);
-        ajouterFilBloc(cd.id, 1, r3.id, 0);
-        ajouterFilBloc(cd.id, 2, r4.id, 0);
-        ajouterFilBloc(cd.id, 4, r5.id, 0);
-        ajouterFilBloc(cd.id, 5, r6.id, 0);
-        ajouterFilBloc(r3.id, 1, led1.id, 0);
-        ajouterFilBloc(r4.id, 1, led2.id, 0);
-        ajouterFilBloc(r5.id, 1, led3.id, 0);
-        ajouterFilBloc(r6.id, 1, led4.id, 0);
-        ajouterFilBloc(led1.id, 1, pile.id, 1);
-        ajouterFilBloc(led2.id, 1, pile.id, 1);
-        ajouterFilBloc(led3.id, 1, pile.id, 1);
-        ajouterFilBloc(led4.id, 1, pile.id, 1);
+        ajouterFilBloc(cd.id, 1, r3.id, 0); ajouterFilBloc(cd.id, 2, r4.id, 0);
+        ajouterFilBloc(cd.id, 4, r5.id, 0); ajouterFilBloc(cd.id, 5, r6.id, 0);
+        ajouterFilBloc(r3.id, 1, led1.id, 0); ajouterFilBloc(r4.id, 1, led2.id, 0);
+        ajouterFilBloc(r5.id, 1, led3.id, 0); ajouterFilBloc(r6.id, 1, led4.id, 0);
+        ajouterFilBloc(led1.id, 1, pile.id, 1); ajouterFilBloc(led2.id, 1, pile.id, 1);
+        ajouterFilBloc(led3.id, 1, pile.id, 1); ajouterFilBloc(led4.id, 1, pile.id, 1);
       }
     }
   }
 };
+
+/* =========================================================
+   DEFIS D'INGENIERIE (MODE INNOVANT)
+   ========================================================= */
+var DEFIS = {
+  serre: {
+    id: 'serre', nom: '🌱 La Serre Connectée', icone: '🌱',
+    desc: 'Allume la pompe (Moteur DC) automatiquement quand la terre est sèche (LDR à l\'ombre).',
+    composants_requis: ['pile', 'ldr', 'transistor', 'moteurDc'],
+    cablages_requis: [
+      { typeA: 'pile', patteA: 0, typeB: 'ldr', patteB: 0 },
+      { typeA: 'ldr', patteA: 1, typeB: 'transistor', patteB: 1 },
+      { typeA: 'pile', patteA: 0, typeB: 'moteurDc', patteB: 0 },
+      { typeA: 'moteurDc', patteA: 1, typeB: 'transistor', patteB: 2 },
+      { typeA: 'transistor', patteA: 0, typeB: 'pile', patteB: 1 }
+    ]
+  },
+  alarme: {
+    id: 'alarme', nom: '🚨 Alarme de Porte', icone: '🚨',
+    desc: 'Déclenche un buzzer quand la porte s\'ouvre (interrupteur).',
+    composants_requis: ['pile', 'interrupteur', 'buzzer'],
+    cablages_requis: [
+      { typeA: 'pile', patteA: 0, typeB: 'interrupteur', patteB: 0 },
+      { typeA: 'interrupteur', patteA: 1, typeB: 'buzzer', patteB: 0 },
+      { typeA: 'buzzer', patteA: 1, typeB: 'pile', patteB: 1 }
+    ]
+  }
+};
+
+var defiActif = null;
 
 /* =========================================================
    TUTORIELS
@@ -812,7 +795,7 @@ var CABLAGES_BLOCS = {
 };
 
 /* =========================================================
-   ETAT
+   ETAT GLOBAL
    ========================================================= */
 var composants = [];
 var fils = [];
@@ -873,456 +856,210 @@ var dragVueSeuil = 5;
 var dragVuePretPourDeplacement = false;
 
 /* =========================================================
-   LOCALSTORAGE
+   FONCTIONS DE LOGIQUE DES DEFIS
    ========================================================= */
-function sauvegarderLocal(silencieux) {
-  try {
-    var data = {
-      version: 1,
-      date: new Date().toISOString(),
-      composants: composants,
-      fils: fils,
-      prochainId: prochainId,
-      prochainFilId: prochainFilId
-    };
-    localStorage.setItem(LS_KEY, JSON.stringify(data));
-    if (!silencieux) mettreMessage('💾 Sauvegarde locale effectuée.', 'succes');
-  } catch (e) { console.log('Erreur sauvegarde locale:', e); }
-}
-
-function chargerLocal() {
-  try {
-    var raw = localStorage.getItem(LS_KEY);
-    if (!raw) return false;
-    var data = JSON.parse(raw);
-    if (!data.composants || !data.fils) return false;
-    if (data.composants.length === 0) return false;
-    if (confirm('📂 Un circuit sauvegardé a été trouvé (' + data.composants.length + ' composants).\nVoulez-vous le reprendre ?')) {
-      composants = data.composants;
-      fils = data.fils;
-      prochainId = data.prochainId || 1;
-      prochainFilId = data.prochainFilId || 1;
-      mettreMessage('📂 Circuit restauré ! ' + composants.length + ' composant(s).', 'succes');
-      mettreAJourStatut();
-      afficherPanneauComposants();
-      dessiner();
-      return true;
-    } else {
-      localStorage.removeItem(LS_KEY);
-      return false;
-    }
-  } catch (e) { console.log('Erreur chargement local:', e); return false; }
-}
-
-function demarrerAutoSave() {
-  if (autoSaveTimer) return;
-  autoSaveTimer = setInterval(function() {
-    if (composants.length > 0) sauvegarderLocal(true);
-  }, 30000);
-}
-
-function effacerLocal() {
-  try { localStorage.removeItem(LS_KEY); } catch (e) {}
-}
-
-/* =========================================================
-   ZOOM & PAN
-   ========================================================= */
-function gererMolette(event) {
-  event.preventDefault();
-  var rect = canvas.getBoundingClientRect();
-  var scaleX = canvas.width / rect.width;
-  var scaleY = canvas.height / rect.height;
-  var sx = (event.clientX - rect.left) * scaleX;
-  var sy = (event.clientY - rect.top) * scaleY;
-  var ancienZoom = zoomLevel;
-  var delta = event.deltaY < 0 ? 1.1 : 1 / 1.1;
-  var nouveauZoom = ancienZoom * delta;
-  nouveauZoom = Math.max(zoomMin, Math.min(zoomMax, nouveauZoom));
-  var wx = (sx - panX) / ancienZoom;
-  var wy = (sy - panY) / ancienZoom;
-  zoomLevel = nouveauZoom;
-  panX = sx - wx * zoomLevel;
-  panY = sy - wy * zoomLevel;
-  limiterPan();
-  dessiner();
-}
-
-function limiterPan() {
-  var marge = 300;
-  var largeurMonde = canvas.width * zoomLevel;
-  var hauteurMonde = canvas.height * zoomLevel;
-  var minX = -(largeurMonde - canvas.width) - marge;
-  var maxX = marge;
-  var minY = -(hauteurMonde - canvas.height) - marge;
-  var maxY = marge;
-  if (panX < minX) panX = minX;
-  if (panX > maxX) panX = maxX;
-  if (panY < minY) panY = minY;
-  if (panY > maxY) panY = maxY;
-}
-
-function zoomPlus() {
-  var centreX = canvas.width / 2;
-  var centreY = canvas.height / 2;
-  var ancienZoom = zoomLevel;
-  var nouveauZoom = Math.min(zoomMax, zoomLevel * 1.2);
-  var wx = (centreX - panX) / ancienZoom;
-  var wy = (centreY - panY) / ancienZoom;
-  zoomLevel = nouveauZoom;
-  panX = centreX - wx * zoomLevel;
-  panY = centreY - wy * zoomLevel;
-  limiterPan();
-  dessiner();
-}
-
-function zoomMoins() {
-  var centreX = canvas.width / 2;
-  var centreY = canvas.height / 2;
-  var ancienZoom = zoomLevel;
-  var nouveauZoom = Math.max(zoomMin, zoomLevel / 1.2);
-  var wx = (centreX - panX) / ancienZoom;
-  var wy = (centreY - panY) / ancienZoom;
-  zoomLevel = nouveauZoom;
-  panX = centreX - wx * zoomLevel;
-  panY = centreY - wy * zoomLevel;
-  limiterPan();
-  dessiner();
-}
-
-function recentrerVue() {
-  zoomLevel = 1.0;
-  panX = 0;
-  panY = 0;
-  dessiner();
-  mettreMessage('🏠 Vue recentrée (zoom 100%)', 'info');
-}
-
-function gererDragVueMousedown(event) {
-  if (event.button !== 0) return;
-  if (composantSelectionne || modeCablage || blocSelectionne || multimetreActif || tutoActif) {
-    return;
-  }
-  var pos = coordonneesSouris(event);
-  var comp = trouverComposantSousSouris(pos.x, pos.y);
-  if (comp) return;
-  var patte = trouverPatteSousSouris(pos.x, pos.y);
-  if (patte) return;
-  var rect = canvas.getBoundingClientRect();
-  var scaleX = canvas.width / rect.width;
-  var scaleY = canvas.height / rect.height;
-  dragVueStartX = (event.clientX - rect.left) * scaleX;
-  dragVueStartY = (event.clientY - rect.top) * scaleY;
-  dragVuePanStartX = panX;
-  dragVuePanStartY = panY;
-  dragVueSeuil = 5;
-  dragVuePretPourDeplacement = true;
-}
-
-function gererDragVueMousemove(event) {
-  if (!dragVuePretPourDeplacement) return;
-  var rect = canvas.getBoundingClientRect();
-  var scaleX = canvas.width / rect.width;
-  var scaleY = canvas.height / rect.height;
-  var sx = (event.clientX - rect.left) * scaleX;
-  var sy = (event.clientY - rect.top) * scaleY;
-  var dx = sx - dragVueStartX;
-  var dy = sy - dragVueStartY;
-  if (!enDeplacementVue) {
-    if (Math.abs(dx) < dragVueSeuil && Math.abs(dy) < dragVueSeuil) return;
-    enDeplacementVue = true;
-    canvas.style.cursor = 'grabbing';
-  }
-  panX = dragVuePanStartX + dx;
-  panY = dragVuePanStartY + dy;
-  limiterPan();
-  dessiner();
-}
-
-function gererDragVueMouseup(event) {
-  if (enDeplacementVue) {
-    enDeplacementVue = false;
-    canvas.style.cursor = 'crosshair';
-  }
-  dragVuePretPourDeplacement = false;
-}
-
-/* =========================================================
-   ANNULER MODE
-   ========================================================= */
-function annulerMode() {
-  var actionFaite = false;
-  if (composantSelectionne) {
-    composantSelectionne = null;
-    composantAValeur = null;
-    afficherPalette();
-    document.getElementById('statut-mode').textContent = '🖱️ Mode : Placer';
-    mettreMessage('❌ Placement annulé.', 'info');
-    actionFaite = true;
-  } else if (blocSelectionne) {
-    blocSelectionne = null;
-    canvas.classList.remove('mode-bloc');
-    afficherBlocs();
-    document.getElementById('statut-mode').textContent = '🖱️ Mode : Placer';
-    mettreMessage('❌ Bloc annulé.', 'info');
-    actionFaite = true;
-  } else if (modeCablage) {
-    basculerModeCablage();
-    actionFaite = true;
-  } else if (patteEnAttente) {
-    patteEnAttente = null;
-    mettreMessage('❌ Câblage annulé.', 'info');
-    actionFaite = true;
-  } else if (multimetreActif) {
-    basculerMultimetre();
-    actionFaite = true;
-  } else if (tutoActif) {
-    quitterTutoriel();
-    actionFaite = true;
-  }
-  if (!actionFaite) {
-    mettreMessage('💡 Rien à annuler.', 'info');
-  }
-  dessiner();
-}
-
-/* =========================================================
-   HISTORIQUE
-   ========================================================= */
-function faireSnapshot() {
-  if (sauvegarde_en_cours) return;
-  historique = historique.slice(0, historiqueIndex + 1);
-  var snapshot = {
-    composants: JSON.parse(JSON.stringify(composants)),
-    fils: JSON.parse(JSON.stringify(fils)),
-    prochainId: prochainId,
-    prochainFilId: prochainFilId
-  };
-  historique.push(snapshot);
-  if (historique.length > MAX_HISTORIQUE) historique.shift();
-  historiqueIndex = historique.length - 1;
-}
-
-function annulerAction() {
-  if (historiqueIndex <= 0) {
-    mettreMessage('↩️ Rien à annuler.', 'info');
-    return;
-  }
-  historiqueIndex--;
-  restaurerSnapshot(historique[historiqueIndex]);
-  mettreMessage('↩️ Action annulée.', 'info');
-}
-
-function retablirAction() {
-  if (historiqueIndex >= historique.length - 1) {
-    mettreMessage('↪️ Rien à rétablir.', 'info');
-    return;
-  }
-  historiqueIndex++;
-  restaurerSnapshot(historique[historiqueIndex]);
-  mettreMessage('↪️ Action rétablie.', 'info');
-}
-
-function restaurerSnapshot(snap) {
-  sauvegarde_en_cours = true;
-  composants = JSON.parse(JSON.stringify(snap.composants));
-  fils = JSON.parse(JSON.stringify(snap.fils));
-  prochainId = snap.prochainId;
-  prochainFilId = snap.prochainFilId;
-  patteEnAttente = null;
-  filSurvole = null;
-  pointeRouge = null;
-  pointeNoire = null;
-  sauvegarde_en_cours = false;
-  mettreAJourStatut();
-  afficherPanneauComposants();
-  dessiner();
-}
-
-/* =========================================================
-   CLAVIER
-   ========================================================= */
-function gererClavier(event) {
-  var tag = (event.target.tagName || '').toLowerCase();
-  if (tag === 'input' || tag === 'textarea' || tag === 'select') return;
-
-  if (event.key === 'Delete' || event.key === 'Backspace') {
-    if (composantSurvoleClavier) {
-      event.preventDefault();
-      supprimerComposant(composantSurvoleClavier.id);
-      return;
-    }
-  }
-
-  if (event.key === 'Escape' || event.key === 'Esc' || event.keyCode === 27) {
-    event.preventDefault();
-    annulerMode();
-    return;
-  }
-
-  if ((event.ctrlKey || event.metaKey) && (event.key === 'z' || event.key === 'Z')) {
-    event.preventDefault();
-    if (event.shiftKey) retablirAction();
-    else annulerAction();
-    return;
-  }
-
-  if ((event.ctrlKey || event.metaKey) && (event.key === 'y' || event.key === 'Y')) {
-    event.preventDefault();
-    retablirAction();
-    return;
-  }
-
-  if ((event.ctrlKey || event.metaKey) && (event.key === 's' || event.key === 'S')) {
-    event.preventDefault();
-    exporterJSON();
-    return;
-  }
-
-  if (event.key === '+' || event.key === '=') {
-    event.preventDefault();
-    zoomPlus();
-    return;
-  }
-  if (event.key === '-' || event.key === '_') {
-    event.preventDefault();
-    zoomMoins();
-    return;
-  }
-  if (event.key === '0') {
-    event.preventDefault();
-    recentrerVue();
-    return;
-  }
-}
-
-/* =========================================================
-   PANNEAU COMPOSANTS PLACES
-   ========================================================= */
-var panneauOuvert = true;
-var compoClignotantId = null;
-var compoClignotantTimer = null;
-
-function basculerPanneauComposants() {
-  panneauOuvert = !panneauOuvert;
-  var liste = document.getElementById('panneau-composants-liste');
-  var toggle = document.getElementById('panneau-toggle');
-  if (panneauOuvert) {
-    liste.classList.remove('replie');
-    toggle.classList.add('ouvert');
-  } else {
-    liste.classList.add('replie');
-    toggle.classList.remove('ouvert');
-  }
-}
-
-function afficherPanneauComposants() {
-  var div = document.getElementById('panneau-composants-liste');
-  var nbSpan = document.getElementById('panneau-nb');
+function afficherDefis() {
+  var div = document.getElementById('liste-defis');
   if (!div) return;
-
-  nbSpan.textContent = '(' + composants.length + ')';
-
-  if (composants.length === 0) {
-    div.innerHTML = '<div class="panneau-composants-vide">Aucun composant placé</div>';
-    return;
-  }
-
   var html = '';
-  for (var i = 0; i < composants.length; i++) {
-    var comp = composants[i];
-    var cat = CATALOGUE[comp.type];
-    if (!cat) continue;
-    var nom = cat.nom;
-    var valeur = comp.valeur ? ' ' + comp.valeur : '';
-    var estActif = (compoClignotantId === comp.id) ? ' actif' : '';
-    html += '<div class="composant-item' + estActif + '" id="compo-item-' + comp.id + '">';
-    html += '<div class="composant-item-nom">';
-    html += '<span>' + cat.icone + '</span>';
-    html += '<span>#' + comp.id + ' ' + nom + valeur + '</span>';
-    html += '</div>';
-    html += '<div class="composant-item-actions">';
-    html += '<button class="btn-item-centrer" onclick="centrerSurComposant(' + comp.id + ')">🎯 Centrer</button>';
-    html += '<button class="btn-item-supprimer" onclick="supprimerComposantDepuisPanneau(' + comp.id + ')">🗑️ Supprimer</button>';
-    html += '</div>';
+  for (var id in DEFIS) {
+    var d = DEFIS[id];
+    var actif = (defiActif && defiActif.id === d.id) ? ' actif' : '';
+    html += '<div class="item-palette item-tuto' + actif + '" onclick="demarrerDefi(\'' + d.id + '\')" style="background: linear-gradient(135deg, #7c2d12, #ea580c); border-color: #f97316;">';
+    html += '<div class="icone" style="background: linear-gradient(135deg, #fbbf24, #f59e0b);">' + d.icone + '</div>';
+    html += '<div class="texte"><strong>' + d.nom + '</strong><small>Défi d\'ingénierie</small></div>';
     html += '</div>';
   }
   div.innerHTML = html;
 }
 
-function centrerSurComposant(id) {
-  var comp = trouverComposant(id);
-  if (!comp) return;
-
-  var centreCanvasX = canvas.width / 2;
-  var centreCanvasY = canvas.height / 2;
-  var compCentreX = comp.x + comp.largeur / 2;
-  var compCentreY = comp.y + comp.hauteur / 2;
-
-  panX = centreCanvasX - compCentreX * zoomLevel;
-  panY = centreCanvasY - compCentreY * zoomLevel;
-  limiterPan();
-
-  compoClignotantId = id;
-  if (compoClignotantTimer) clearTimeout(compoClignotantTimer);
-  compoClignotantTimer = setTimeout(function() {
-    compoClignotantId = null;
-    afficherPanneauComposants();
-    dessiner();
-  }, 2200);
-
-  afficherPanneauComposants();
-  dessiner();
-  mettreMessage('🎯 Vue centrée sur le composant #' + id, 'info');
+function demarrerDefi(id) {
+  defiActif = DEFIS[id];
+  if (!defiActif) return;
+  mettreMessage('🏆 DÉFI LANCÉ : ' + defiActif.nom + '\n\n' + defiActif.desc + '\n\nPlace les composants et câble-les, puis clique sur "Vérifier le Défi".', 'info');
+  document.getElementById('btn-verifier-defi').style.display = 'block';
+  afficherDefis();
 }
 
-function supprimerComposantDepuisPanneau(id) {
-  var comp = trouverComposant(id);
-  if (!comp) return;
-  var cat = CATALOGUE[comp.type];
-  var nom = cat ? cat.nom : 'Composant';
-  if (confirm('Supprimer ' + nom + ' #' + id + ' ?')) {
-    supprimerComposant(id);
-    if (compoClignotantId === id) compoClignotantId = null;
+function verifierDefi() {
+  if (!defiActif) return;
+  var composantsTrouves = {};
+  for (var i = 0; i < composants.length; i++) {
+    composantsTrouves[composants[i].type] = true;
+  }
+  for (var j = 0; j < defiActif.composants_requis.length; j++) {
+    if (!composantsTrouves[defiActif.composants_requis[j]]) {
+      var nomComposant = CATALOGUE[defiActif.composants_requis[j]] ? CATALOGUE[defiActif.composants_requis[j]].nom : defiActif.composants_requis[j];
+      mettreMessage('❌ Il manque un composant : ' + nomComposant + '\nVérifie ta liste !', 'erreur');
+      return;
+    }
+  }
+  var erreurs = [];
+  for (var k = 0; k < defiActif.cablages_requis.length; k++) {
+    var regle = defiActif.cablages_requis[k];
+    var cableTrouve = false;
+    for (var m = 0; m < fils.length; m++) {
+      var f = fils[m];
+      var compA = trouverComposant(f.compA);
+      var compB = trouverComposant(f.compB);
+      if (!compA || !compB) continue;
+      if ((compA.type === regle.typeA && f.patteA === regle.patteA && compB.type === regle.typeB && f.patteB === regle.patteB) ||
+          (compB.type === regle.typeA && f.patteB === regle.patteA && compA.type === regle.typeB && f.patteA === regle.patteB)) {
+        cableTrouve = true;
+        break;
+      }
+    }
+    if (!cableTrouve) {
+      var nomA = CATALOGUE[regle.typeA] ? CATALOGUE[regle.typeA].nom : regle.typeA;
+      var nomB = CATALOGUE[regle.typeB] ? CATALOGUE[regle.typeB].nom : regle.typeB;
+      erreurs.push('Câblage manquant entre ' + nomA + ' et ' + nomB);
+    }
+  }
+  if (erreurs.length > 0) {
+    mettreMessage('❌ Le circuit n\'est pas complet.\n\n' + erreurs.join('\n'), 'erreur');
+  } else {
+    mettreMessage('✅ FÉLICITATIONS ! Tu as réussi le défi "' + defiActif.nom + '" ! 🏆', 'succes');
+    if (typeof lancerConfettis === 'function') lancerConfettis();
+    defiActif = null;
+    document.getElementById('btn-verifier-defi').style.display = 'none';
+    afficherDefis();
   }
 }
 
 /* =========================================================
-   AFFICHAGE PALETTE (avec filtre par niveau)
+   FONCTIONS TUTORIELS
+   ========================================================= */
+function basculerTutoriels() {
+  var panneau = document.getElementById('tuto-panneau');
+  if (panneau.classList.contains('actif')) {
+    panneau.classList.remove('actif');
+    document.getElementById('btn-tutoriels').classList.remove('actif');
+  } else {
+    panneau.classList.add('actif');
+    document.getElementById('btn-tutoriels').classList.add('actif');
+  }
+}
+
+function demarrerTutoriel(id) {
+  var tuto = TUTORIELS[id];
+  if (!tuto) return;
+  tutoActif = tuto; tutoEtape = 0;
+  document.getElementById('tuto-nom').textContent = tuto.icone + ' ' + tuto.nom;
+  document.getElementById('tuto-desc').textContent = tuto.desc;
+  afficherEtapesTuto();
+  document.getElementById('tuto-panneau').classList.add('actif');
+  document.getElementById('btn-tutoriels').classList.add('actif');
+  document.getElementById('btn-tuto-suivant').disabled = false;
+  document.getElementById('statut-mode').textContent = '📖 Tuto : ' + tuto.nom;
+  document.getElementById('statut-mode').classList.add('tuto');
+  afficherTutoriels();
+  mettreMessage('📖 Tutoriel "' + tuto.nom + '" démarré. Suivez les étapes !', 'info');
+  majEtapeTutoCourante();
+}
+
+function afficherEtapesTuto() {
+  if (!tutoActif) return;
+  var div = document.getElementById('tuto-etapes');
+  var html = '';
+  for (var i = 0; i < tutoActif.etapes.length; i++) {
+    var e = tutoActif.etapes[i];
+    var cls = 'tuto-etape';
+    if (i < tutoEtape) cls += ' faite';
+    if (i === tutoEtape) cls += ' active';
+    html += '<div class="' + cls + '"><strong>' + (i+1) + '. ' + e.titre + '</strong>';
+    if (i === tutoEtape) html += '<div class="desc">' + e.description + '</div>';
+    html += '</div>';
+  }
+  div.innerHTML = html;
+}
+
+function majEtapeTutoCourante() {
+  if (!tutoActif) return;
+  if (tutoEtape >= tutoActif.etapes.length) {
+    document.getElementById('btn-tuto-suivant').disabled = true;
+    document.getElementById('tuto-nom').textContent = '🎉 Tutoriel terminé !';
+    document.getElementById('tuto-desc').textContent = 'Bravo !';
+    return;
+  }
+  var e = tutoActif.etapes[tutoEtape];
+  mettreMessage('📖 Étape ' + (tutoEtape+1) + '/' + tutoActif.etapes.length + ' : ' + e.titre + ' — ' + e.description, 'info');
+}
+
+function verifierActionTuto(action) {
+  if (!action) return true;
+  if (action.type === 'composant') return composants.some(function(c) { return c.type === action.id; });
+  if (action.type === 'fil') {
+    return fils.some(function(f) {
+      var cA = trouverComposant(f.compA); var cB = trouverComposant(f.compB);
+      if (!cA || !cB) return false;
+      return (cA.type === action.de.type && cB.type === action.vers.type) || (cA.type === action.vers.type && cB.type === action.de.type);
+    });
+  }
+  if (action.type === 'bloc') return composants.length >= 4;
+  return true;
+}
+
+function obtenirMessageManquant(action) {
+  if (action.type === 'composant') {
+    var c = CATALOGUE[action.id];
+    return 'Place d\'abord ' + (c ? c.nom : 'le composant') + ' sur le canvas !';
+  }
+  if (action.type === 'fil') return 'Câble d\'abord les composants entre eux !';
+  if (action.type === 'bloc') return 'Utilise le bloc correspondant dans la palette !';
+  return 'Termine d\'abord l\'étape en cours.';
+}
+
+function etapeTutoSuivante() {
+  if (!tutoActif) return;
+  if (tutoEtape >= tutoActif.etapes.length) return;
+  var etape = tutoActif.etapes[tutoEtape];
+  if (etape.action && !verifierActionTuto(etape.action)) {
+    mettreMessage('⏸️ ' + obtenirMessageManquant(etape.action), 'avertissement');
+    return;
+  }
+  tutoEtape++;
+  afficherEtapesTuto();
+  if (tutoEtape >= tutoActif.etapes.length) {
+    document.getElementById('btn-tuto-suivant').disabled = true;
+    document.getElementById('tuto-nom').textContent = '🎉 Tutoriel terminé !';
+    document.getElementById('tuto-desc').textContent = 'Bravo !';
+    mettreMessage('🎉 Tutoriel terminé ! Bravo !', 'succes');
+    return;
+  }
+  majEtapeTutoCourante();
+}
+
+function quitterTutoriel() {
+  if (tutoActif && tutoEtape < tutoActif.etapes.length && tutoEtape > 0) {
+    if (!confirm('⚠️ Voulez-vous vraiment quitter ce tutoriel ?\nToute la progression sera perdue.')) return;
+  }
+  tutoActif = null; tutoEtape = -1;
+  document.getElementById('tuto-panneau').classList.remove('actif');
+  document.getElementById('btn-tutoriels').classList.remove('actif');
+  document.getElementById('statut-mode').classList.remove('tuto');
+  document.getElementById('statut-mode').textContent = '🖱️ Mode : Placer';
+  document.getElementById('tuto-nom').textContent = 'Aucun tutoriel sélectionné';
+  document.getElementById('tuto-desc').textContent = 'Choisissez un tutoriel dans la palette à gauche.';
+  afficherTutoriels();
+  mettreMessage('📖 Tutoriel quitté.', 'info');
+}
+
+/* =========================================================
+   FONCTIONS PRINCIPALES (Palette, Dessin, Interactions)
    ========================================================= */
 function afficherPalette() {
   var div = document.getElementById('liste-palette');
   if (!div) return;
-  var html = '';
-  var keys = Object.keys(CATALOGUE);
-  var nbAffiches = 0;
-  
-  var niveaux = {
-    decouverte: [],
-    exploration: [],
-    maitrise: [],
-    expert: [],
-    autres: []
-  };
+  var html = ''; var keys = Object.keys(CATALOGUE); var nbAffiches = 0;
+  var niveaux = { decouverte: [], exploration: [], maitrise: [], expert: [], autres: [] };
   for (var i = 0; i < keys.length; i++) {
-  var c = CATALOGUE[keys[i]];
-  var niveauComp = c.niveau || 'autres';
-  if (niveauComp !== 'autres' && niveaux[niveauComp]) {
-    niveaux[niveauComp].push(c);
-  } else {
-    // Si le composant a un niveau, ne pas le mettre dans "autres"
-    if (!c.niveau) {
-      niveaux.autres.push(c);
-    }
+    var c = CATALOGUE[keys[i]]; var niveauComp = c.niveau || 'autres';
+    if (niveauComp !== 'autres' && niveaux[niveauComp]) niveaux[niveauComp].push(c); else if (!c.niveau) niveaux.autres.push(c);
   }
-}
-  
-  
   function htmlPourListe(liste) {
     var h = '';
     for (var j = 0; j < liste.length; j++) {
-      var comp = liste[j];
-      var actif = composantSelectionne === comp.id ? ' actif' : '';
+      var comp = liste[j]; var actif = composantSelectionne === comp.id ? ' actif' : '';
       h += '<div class="item-palette' + actif + '" onclick="choisirComposant(\'' + comp.id + '\')">';
       h += '<div class="icone" style="background:' + comp.couleur + ';color:white;">' + comp.icone + '</div>';
       h += '<div class="texte"><strong>' + comp.nom + '</strong>';
@@ -1331,62 +1068,42 @@ function afficherPalette() {
     }
     return h;
   }
-  
   if (filtreNiveauActif === 'tous') {
-    var labels = {
-      decouverte: '🟢 Découverte (8-10 ans)',
-      exploration: '🟡 Exploration (10-13 ans)',
-      maitrise: '🟠 Maîtrise (13-18 ans)',
-      expert: '🔴 Expert (18+ ans)',
-      autres: '📦 Classiques'
-    };
+    var labels = { decouverte: '🟢 Découverte', exploration: '🟡 Exploration', maitrise: '🟠 Maîtrise', expert: '🔴 Expert', autres: '📦 Classiques' };
     var ordre = ['decouverte', 'exploration', 'maitrise', 'expert', 'autres'];
     for (var k = 0; k < ordre.length; k++) {
       var niv = ordre[k];
       if (niveaux[niv].length > 0) {
         html += '<div style="font-size:0.75em;color:#94a3b8;margin:10px 0 6px 0;padding:4px 8px;background:#0f1420;border-radius:4px;border-left:2px solid #38bdf8;">' + labels[niv] + ' (' + niveaux[niv].length + ')</div>';
-        html += htmlPourListe(niveaux[niv]);
-        nbAffiches += niveaux[niv].length;
+        html += htmlPourListe(niveaux[niv]); nbAffiches += niveaux[niv].length;
       }
     }
   } else {
     if (niveaux[filtreNiveauActif] && niveaux[filtreNiveauActif].length > 0) {
-      html += htmlPourListe(niveaux[filtreNiveauActif]);
-      nbAffiches = niveaux[filtreNiveauActif].length;
+      html += htmlPourListe(niveaux[filtreNiveauActif]); nbAffiches = niveaux[filtreNiveauActif].length;
     } else {
       html += '<div style="padding:12px;color:#94a3b8;font-size:0.85em;text-align:center;font-style:italic;">Aucun composant dans ce niveau.</div>';
     }
   }
-  
   div.innerHTML = html;
 }
 
 function afficherBlocs() {
-  var div = document.getElementById('liste-blocs');
-  var html = '';
-  var keys = Object.keys(BLOCS);
+  var div = document.getElementById('liste-blocs'); var html = ''; var keys = Object.keys(BLOCS);
   for (var i = 0; i < keys.length; i++) {
-    var b = BLOCS[keys[i]];
-    var actif = blocSelectionne === b.id ? ' actif' : '';
+    var b = BLOCS[keys[i]]; var actif = blocSelectionne === b.id ? ' actif' : '';
     html += '<div class="item-palette item-bloc' + actif + '" onclick="choisirBloc(\'' + b.id + '\')">';
-    html += '<div class="icone">' + b.icone + '</div>';
-    html += '<div class="texte"><strong>' + b.nom + '</strong><small>' + b.desc + '</small></div>';
-    html += '</div>';
+    html += '<div class="icone">' + b.icone + '</div><div class="texte"><strong>' + b.nom + '</strong><small>' + b.desc + '</small></div></div>';
   }
   div.innerHTML = html;
 }
 
 function afficherTutoriels() {
-  var div = document.getElementById('liste-tutoriels');
-  var html = '';
-  var keys = Object.keys(TUTORIELS);
+  var div = document.getElementById('liste-tutoriels'); var html = ''; var keys = Object.keys(TUTORIELS);
   for (var i = 0; i < keys.length; i++) {
-    var t = TUTORIELS[keys[i]];
-    var actif = (tutoActif && tutoActif.id === t.id) ? ' actif' : '';
+    var t = TUTORIELS[keys[i]]; var actif = (tutoActif && tutoActif.id === t.id) ? ' actif' : '';
     html += '<div class="item-palette item-tuto' + actif + '" onclick="demarrerTutoriel(\'' + t.id + '\')">';
-    html += '<div class="icone">' + t.icone + '</div>';
-    html += '<div class="texte"><strong>' + t.nom + '</strong><small>' + t.etapes.length + ' étapes</small></div>';
-    html += '</div>';
+    html += '<div class="icone">' + t.icone + '</div><div class="texte"><strong>' + t.nom + '</strong><small>' + t.etapes.length + ' étapes</small></div></div>';
   }
   div.innerHTML = html;
 }
@@ -1395,31 +1112,20 @@ function choisirComposant(id) {
   if (multimetreActif) basculerMultimetre();
   var c = CATALOGUE[id];
   if (c.valeurs && c.valeurs.length > 0) { afficherModalValeurs(id); return; }
-  composantSelectionne = id;
-  composantAValeur = null;
-  blocSelectionne = null;
+  composantSelectionne = id; composantAValeur = null; blocSelectionne = null;
   if (modeCablage) {
-    modeCablage = false;
-    patteEnAttente = null;
-    var btn = document.getElementById('btn-cablage');
-    btn.textContent = '🔗 Câblage';
-    btn.classList.add('btn-gris');
-    btn.classList.remove('btn-vert');
-    canvas.classList.remove('mode-cablage');
+    modeCablage = false; patteEnAttente = null;
+    var btn = document.getElementById('btn-cablage'); btn.textContent = '🔗 Câblage'; btn.classList.add('btn-gris'); btn.classList.remove('btn-vert'); canvas.classList.remove('mode-cablage');
   }
-  canvas.classList.remove('mode-bloc');
-  afficherPalette(); afficherBlocs();
+  canvas.classList.remove('mode-bloc'); afficherPalette(); afficherBlocs();
   mettreMessage('🖱️ Cliquez sur la zone blanche pour placer : ' + c.nom, 'info');
   document.getElementById('statut-mode').textContent = '🖱️ Mode : Placer ' + c.nom;
 }
 
 function choisirBloc(id) {
   if (multimetreActif) basculerMultimetre();
-  blocSelectionne = id;
-  composantSelectionne = null;
-  composantAValeur = null;
-  canvas.classList.add('mode-bloc');
-  afficherPalette(); afficherBlocs();
+  blocSelectionne = id; composantSelectionne = null; composantAValeur = null;
+  canvas.classList.add('mode-bloc'); afficherPalette(); afficherBlocs();
   var avecCab = document.getElementById('opt-cablage').checked;
   var infoCab = avecCab ? '(câblé)' : '(NON câblé, à vous de câbler !)';
   mettreMessage('📚 Cliquez sur la zone pour placer le bloc : ' + BLOCS[id].nom + ' ' + infoCab, 'info');
@@ -1427,135 +1133,64 @@ function choisirBloc(id) {
 }
 
 function afficherModalValeurs(id) {
-  var c = CATALOGUE[id];
-  document.getElementById('modal-valeurs-titre').textContent = 'Choisir une valeur - ' + c.nom;
-  var div = document.getElementById('modal-valeurs-choix');
-  var html = '';
-  for (var i = 0; i < c.valeurs.length; i++) {
-    var v = c.valeurs[i];
-    html += '<button onclick="validerValeur(\'' + id + '\',\'' + v.val + '\')">' + v.label + '</button>';
-  }
-  div.innerHTML = html;
-  document.getElementById('modal-valeurs').classList.add('actif');
+  var c = CATALOGUE[id]; document.getElementById('modal-valeurs-titre').textContent = 'Choisir une valeur - ' + c.nom;
+  var div = document.getElementById('modal-valeurs-choix'); var html = '';
+  for (var i = 0; i < c.valeurs.length; i++) { var v = c.valeurs[i]; html += '<button onclick="validerValeur(\'' + id + '\',\'' + v.val + '\')">' + v.label + '</button>'; }
+  div.innerHTML = html; document.getElementById('modal-valeurs').classList.add('actif');
 }
 
 function validerValeur(id, valeur) {
   document.getElementById('modal-valeurs').classList.remove('actif');
-  composantSelectionne = id;
-  composantAValeur = valeur;
-  blocSelectionne = null;
+  composantSelectionne = id; composantAValeur = valeur; blocSelectionne = null;
   if (modeCablage) {
-    modeCablage = false;
-    patteEnAttente = null;
-    var btn = document.getElementById('btn-cablage');
-    btn.textContent = '🔗 Câblage';
-    btn.classList.add('btn-gris');
-    btn.classList.remove('btn-vert');
-    canvas.classList.remove('mode-cablage');
+    modeCablage = false; patteEnAttente = null;
+    var btn = document.getElementById('btn-cablage'); btn.textContent = '🔗 Câblage'; btn.classList.add('btn-gris'); btn.classList.remove('btn-vert'); canvas.classList.remove('mode-cablage');
   }
-  canvas.classList.remove('mode-bloc');
-  afficherPalette(); afficherBlocs();
+  canvas.classList.remove('mode-bloc'); afficherPalette(); afficherBlocs();
   mettreMessage('🖱️ Cliquez pour placer : ' + CATALOGUE[id].nom + ' (' + valeur + ')', 'info');
   document.getElementById('statut-mode').textContent = '🖱️ Mode : Placer';
 }
 
 function fermerModalValeurs() { document.getElementById('modal-valeurs').classList.remove('actif'); }
 
-/* =========================================================
-   DESSIN
-   ========================================================= */
 function dessiner() {
   if (!ctx) return;
-  ctx.setTransform(1, 0, 0, 1, 0, 0);
-  ctx.fillStyle = '#ffffff';
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-  ctx.save();
-  ctx.strokeStyle = grilleActive ? '#e8e8e8' : '#f5f5f5';
-  ctx.lineWidth = 1;
-  var gridSize = grillePas * zoomLevel;
-  var startX = panX % gridSize;
-  var startY = panY % gridSize;
-  if (startX < 0) startX += gridSize;
-  if (startY < 0) startY += gridSize;
-  for (var gx = startX; gx < canvas.width; gx += gridSize) {
-    ctx.beginPath(); ctx.moveTo(gx, 0); ctx.lineTo(gx, canvas.height); ctx.stroke();
-  }
-  for (var gy = startY; gy < canvas.height; gy += gridSize) {
-    ctx.beginPath(); ctx.moveTo(0, gy); ctx.lineTo(canvas.width, gy); ctx.stroke();
-  }
+  ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.save(); ctx.strokeStyle = grilleActive ? '#e8e8e8' : '#f5f5f5'; ctx.lineWidth = 1;
+  var gridSize = grillePas * zoomLevel; var startX = panX % gridSize; var startY = panY % gridSize;
+  if (startX < 0) startX += gridSize; if (startY < 0) startY += gridSize;
+  for (var gx = startX; gx < canvas.width; gx += gridSize) { ctx.beginPath(); ctx.moveTo(gx, 0); ctx.lineTo(gx, canvas.height); ctx.stroke(); }
+  for (var gy = startY; gy < canvas.height; gy += gridSize) { ctx.beginPath(); ctx.moveTo(0, gy); ctx.lineTo(canvas.width, gy); ctx.stroke(); }
   ctx.restore();
-  ctx.save();
-  ctx.translate(panX, panY);
-  ctx.scale(zoomLevel, zoomLevel);
-  for (var i = 0; i < fils.length; i++) {
-    var estSurvole = filSurvole && filSurvole === fils[i];
-    dessinerFil(fils[i], estSurvole);
-  }
-  for (var j = 0; j < composants.length; j++) {
-    var comp = composants[j];
-    var estMesure = multimetreActif && composantMesure === comp;
-    dessinerComposant(comp, estMesure);
-  }
+  ctx.save(); ctx.translate(panX, panY); ctx.scale(zoomLevel, zoomLevel);
+  for (var i = 0; i < fils.length; i++) { var estSurvole = filSurvole && filSurvole === fils[i]; dessinerFil(fils[i], estSurvole); }
+  for (var j = 0; j < composants.length; j++) { var comp = composants[j]; var estMesure = multimetreActif && composantMesure === comp; dessinerComposant(comp, estMesure); }
   if (patteEnAttente) {
     var compA = trouverComposant(patteEnAttente.compId);
     if (compA) {
       var patte = obtenirPatteAbsolue(compA, patteEnAttente.patteIndex);
-      ctx.strokeStyle = '#fbbf24';
-      ctx.lineWidth = 4;
-      ctx.shadowColor = '#fbbf24';
-      ctx.shadowBlur = 15;
-      ctx.beginPath();
-      ctx.arc(patte.x, patte.y, 12, 0, Math.PI * 2);
-      ctx.stroke();
-      ctx.shadowBlur = 0;
+      ctx.strokeStyle = '#fbbf24'; ctx.lineWidth = 4; ctx.shadowColor = '#fbbf24'; ctx.shadowBlur = 15;
+      ctx.beginPath(); ctx.arc(patte.x, patte.y, 12, 0, Math.PI * 2); ctx.stroke(); ctx.shadowBlur = 0;
     }
   }
-  if (multimetreActif) {
-    if (pointeRouge) dessinerPointeMultimetre(pointeRouge, '#E63946');
-    if (pointeNoire) dessinerPointeMultimetre(pointeNoire, '#1a1a1a');
-  }
-  if (buzzerActif) {
-    for (var b = 0; b < composants.length; b++) {
-      if (composants[b].type === 'buzzer' && composants[b].sonne) {
-        dessinerOndesSonores(composants[b]);
-      }
-    }
-  }
+  if (multimetreActif) { if (pointeRouge) dessinerPointeMultimetre(pointeRouge, '#E63946'); if (pointeNoire) dessinerPointeMultimetre(pointeNoire, '#1a1a1a'); }
+  if (buzzerActif) { for (var b = 0; b < composants.length; b++) { if (composants[b].type === 'buzzer' && composants[b].sonne) dessinerOndesSonores(composants[b]); } }
   ctx.restore();
   var zoomPourcent = Math.round(zoomLevel * 100) + '%';
-  ctx.fillStyle = 'rgba(15, 20, 32, 0.75)';
-  ctx.beginPath();
-  if (ctx.roundRect) ctx.roundRect(canvas.width - 90, canvas.height - 35, 80, 26, 6);
-  else ctx.rect(canvas.width - 90, canvas.height - 35, 80, 26);
-  ctx.fill();
-  ctx.fillStyle = '#38bdf8';
-  ctx.font = 'bold 13px sans-serif';
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
+  ctx.fillStyle = 'rgba(15, 20, 32, 0.75)'; ctx.beginPath();
+  if (ctx.roundRect) ctx.roundRect(canvas.width - 90, canvas.height - 35, 80, 26, 6); else ctx.rect(canvas.width - 90, canvas.height - 35, 80, 26);
+  ctx.fill(); ctx.fillStyle = '#38bdf8'; ctx.font = 'bold 13px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
   ctx.fillText('🔍 ' + zoomPourcent, canvas.width - 50, canvas.height - 22);
-
   if (compoClignotantId) {
     var compCligno = trouverComposant(compoClignotantId);
     if (compCligno) {
-      ctx.save();
-      ctx.setTransform(1, 0, 0, 1, 0, 0);
-      ctx.translate(panX, panY);
-      ctx.scale(zoomLevel, zoomLevel);
-      var t = Date.now() / 200;
-      var alphaC = 0.4 + 0.6 * Math.abs(Math.sin(t));
-      ctx.strokeStyle = 'rgba(56, 189, 248, ' + alphaC + ')';
-      ctx.lineWidth = 4;
-      ctx.shadowColor = '#38bdf8';
-      ctx.shadowBlur = 20;
-      ctx.beginPath();
-      if (ctx.roundRect) ctx.roundRect(compCligno.x - 8, compCligno.y - 8, compCligno.largeur + 16, compCligno.hauteur + 16, 10);
-      else ctx.rect(compCligno.x - 8, compCligno.y - 8, compCligno.largeur + 16, compCligno.hauteur + 16);
-      ctx.stroke();
-      ctx.shadowBlur = 0;
-      ctx.restore();
+      ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.translate(panX, panY); ctx.scale(zoomLevel, zoomLevel);
+      var t = Date.now() / 200; var alphaC = 0.4 + 0.6 * Math.abs(Math.sin(t));
+      ctx.strokeStyle = 'rgba(56, 189, 248, ' + alphaC + ')'; ctx.lineWidth = 4; ctx.shadowColor = '#38bdf8'; ctx.shadowBlur = 20;
+      ctx.beginPath(); if (ctx.roundRect) ctx.roundRect(compCligno.x - 8, compCligno.y - 8, compCligno.largeur + 16, compCligno.hauteur + 16, 10); else ctx.rect(compCligno.x - 8, compCligno.y - 8, compCligno.largeur + 16, compCligno.hauteur + 16);
+      ctx.stroke(); ctx.shadowBlur = 0; ctx.restore();
     }
   }
-
   ctx.textBaseline = 'alphabetic';
 }
 
@@ -1676,7 +1311,6 @@ function trouverFilSousSouris(x, y) {
   return meilleur;
 }
 
-/* ⭐ MAPPING DES NOUVEAUX IDs VERS LES ANCIENS */
 function mapperTypeDessin(type) {
   if (type === 'pile9v' || type === 'pile15v' || type === 'pile12v' || type === 'alimStabilisee') return 'pile';
   if (type === 'resistance470' || type === 'resistance220' || type === 'resistance1k' || type === 'resistance10k' || type === 'thermistance' || type === 'bobine') return 'resistance';
@@ -1687,9 +1321,8 @@ function mapperTypeDessin(type) {
   if (type === 'diode1n4148' || type === 'diode1n4007' || type === 'diodeZener') return 'diode';
   if (type === 'ne555' || type === 'ne555Cms' || type === 'cd4017' || type === 'cd4027' || type === 'ci74hc00' || type === 'microcontroleur' || type === 'porteAnd' || type === 'porteOr' || type === 'porteNot' || type === 'porteXor') return 'ci';
   if (type === 'transistorPnp' || type === 'mosfet' || type === 'aop' || type === 'relais') return 'transistor';
-  if (type === 'servomoteurAmeliore') return 'moteur';
   if (type === 'capteurIr' || type === 'microphone' || type === 'capteurHumidite' || type === 'moduleBluetooth') return 'capteur';
-  if (type === 'hautParleur' || type === 'moteurDc' || type === 'servomoteur') return 'moteur';
+  if (type === 'hautParleur' || type === 'moteurDc' || type === 'servomoteur' || type === 'servomoteurAmeliore') return 'moteur';
   return type;
 }
 
@@ -1699,25 +1332,21 @@ function dessinerComposant(comp, estMesure) {
   if (estMesure) {
     ctx.fillStyle = 'rgba(6,182,212,0.2)';
     ctx.beginPath();
-    ctx.ellipse(comp.x + comp.largeur/2, comp.y + comp.hauteur/2,
-                comp.largeur, comp.hauteur * 0.9, 0, 0, Math.PI * 2);
+    ctx.ellipse(comp.x + comp.largeur/2, comp.y + comp.hauteur/2, comp.largeur, comp.hauteur * 0.9, 0, 0, Math.PI * 2);
     ctx.fill();
     ctx.strokeStyle = '#06b6d4'; ctx.lineWidth = 3;
     ctx.setLineDash([6, 4]);
     ctx.beginPath();
-    ctx.ellipse(comp.x + comp.largeur/2, comp.y + comp.hauteur/2,
-                comp.largeur * 0.7, comp.hauteur * 0.8, 0, 0, Math.PI * 2);
+    ctx.ellipse(comp.x + comp.largeur/2, comp.y + comp.hauteur/2, comp.largeur * 0.7, comp.hauteur * 0.8, 0, 0, Math.PI * 2);
     ctx.stroke();
     ctx.setLineDash([]);
   }
   ctx.fillStyle = 'rgba(0,0,0,0.18)';
   ctx.beginPath();
-  ctx.ellipse(comp.x + comp.largeur/2, comp.y + comp.hauteur + 4,
-              comp.largeur/2 + 3, 6, 0, 0, Math.PI * 2);
+  ctx.ellipse(comp.x + comp.largeur/2, comp.y + comp.hauteur + 4, comp.largeur/2 + 3, 6, 0, 0, Math.PI * 2);
   ctx.fill();
   
-  /* ⭐ MAPPING pour dessiner les nouveaux composants avec les fonctions existantes */
-   var typeDessin = mapperTypeDessin(comp.type);
+  var typeDessin = mapperTypeDessin(comp.type);
   
   if (typeDessin === 'pile') dessinerPile(comp);
   else if (typeDessin === 'resistance') dessinerResistance(comp);
@@ -1735,7 +1364,6 @@ function dessinerComposant(comp, estMesure) {
   else if (typeDessin === 'capteur') dessinerCapteurGenerique(comp);
   else if (typeDessin === 'moteur') dessinerMoteurGenerique(comp);
   else {
-    /* Composant inconnu : afficher un placeholder */
     ctx.fillStyle = '#94a3b8';
     ctx.fillRect(comp.x, comp.y, comp.largeur, comp.hauteur);
     ctx.fillStyle = '#1a1f2e';
@@ -1790,9 +1418,6 @@ function dessinerComposant(comp, estMesure) {
   }
 }
 
-/* =========================================================
-   DESSINS COMPOSANTS (existants - conservés)
-   ========================================================= */
 function dessinerPile(comp) {
   var grd = ctx.createLinearGradient(comp.x, comp.y, comp.x, comp.y + comp.hauteur);
   grd.addColorStop(0, '#4a4a4a'); grd.addColorStop(0.5, '#2a2a2a'); grd.addColorStop(1, '#1a1a1a');
@@ -2045,9 +1670,54 @@ function dessinerBuzzer(comp) {
   ctx.shadowBlur = 0;
 }
 
-/* =========================================================
-   UTILITAIRES
-   ========================================================= */
+function dessinerDiodeGenerique(comp) {
+  var grd = ctx.createLinearGradient(comp.x, comp.y, comp.x, comp.y + comp.hauteur);
+  grd.addColorStop(0, '#333'); grd.addColorStop(1, '#111');
+  ctx.fillStyle = grd;
+  ctx.beginPath(); if (ctx.roundRect) ctx.roundRect(comp.x, comp.y, comp.largeur, comp.hauteur, 4); else ctx.rect(comp.x, comp.y, comp.largeur, comp.hauteur); ctx.fill();
+  ctx.fillStyle = '#fff';
+  ctx.beginPath();
+  ctx.moveTo(comp.x + 20, comp.y + 5); ctx.lineTo(comp.x + 20, comp.y + comp.hauteur - 5); ctx.lineTo(comp.x + 5, comp.y + comp.hauteur/2); ctx.fill();
+  ctx.fillRect(comp.x + 20, comp.y + 5, 3, comp.hauteur - 10);
+}
+
+function dessinerCIGenerique(comp) {
+  var grd = ctx.createLinearGradient(comp.x, comp.y, comp.x + comp.largeur, comp.y + comp.hauteur);
+  grd.addColorStop(0, '#3a3a3a'); grd.addColorStop(0.4, '#1a1a1a'); grd.addColorStop(1, '#000');
+  ctx.fillStyle = grd;
+  ctx.beginPath(); if (ctx.roundRect) ctx.roundRect(comp.x, comp.y, comp.largeur, comp.hauteur, 5); else ctx.rect(comp.x, comp.y, comp.largeur, comp.hauteur); ctx.fill();
+  ctx.fillStyle = '#000';
+  ctx.beginPath(); ctx.arc(comp.x + comp.largeur/2, comp.y + 8, 8, 0, Math.PI, true); ctx.fill();
+  ctx.fillStyle = '#555';
+  ctx.beginPath(); ctx.arc(comp.x + comp.largeur/2, comp.y + 8, 8, 0, Math.PI); ctx.fill();
+  ctx.fillStyle = '#ccc';
+  ctx.font = 'bold 10px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.shadowColor = 'rgba(0,0,0,0.8)'; ctx.shadowBlur = 3;
+  ctx.fillText('CI', comp.x + comp.largeur/2, comp.y + comp.hauteur/2 + 4);
+  ctx.shadowBlur = 0;
+}
+
+function dessinerCapteurGenerique(comp) {
+  ctx.fillStyle = '#0ea5e9';
+  ctx.beginPath(); if (ctx.roundRect) ctx.roundRect(comp.x, comp.y, comp.largeur, comp.hauteur, 4); else ctx.rect(comp.x, comp.y, comp.largeur, comp.hauteur); ctx.fill();
+  ctx.fillStyle = '#fff';
+  ctx.font = 'bold 20px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('📡', comp.x + comp.largeur/2, comp.y + comp.hauteur/2 + 7);
+}
+
+function dessinerMoteurGenerique(comp) {
+  var grd = ctx.createRadialGradient(comp.x + comp.largeur/2, comp.y + comp.hauteur/2, 5, comp.x + comp.largeur/2, comp.y + comp.hauteur/2, comp.largeur/2);
+  grd.addColorStop(0, '#4a4a4a'); grd.addColorStop(1, '#222');
+  ctx.fillStyle = grd;
+  ctx.beginPath(); ctx.arc(comp.x + comp.largeur/2, comp.y + comp.hauteur/2, comp.largeur/2, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = '#fff';
+  ctx.font = 'bold 20px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('⚙️', comp.x + comp.largeur/2, comp.y + comp.hauteur/2 + 7);
+}
+
 function obtenirPatteAbsolue(comp, patteIndex) {
   var c = CATALOGUE[comp.type];
   if (!c || !c.pattes[patteIndex]) return { x: comp.x, y: comp.y };
@@ -2130,16 +1800,11 @@ function afficherAideCablage(blocId) {
   div.className = 'message-info avertissement';
 }
 
-/* =========================================================
-   CLIC CANVAS
-   ========================================================= */
 function clicCanvas(event) {
   if (enDeplacementVue || dragVuePretPourDeplacement) return;
   fermerMenuContextuel();
   var pos = coordonneesSouris(event);
-
   if (multimetreActif) { gererClicMultimetre(pos.x, pos.y); return; }
-
   if (blocSelectionne) {
     var b = BLOCS[blocSelectionne];
     var avecCab = document.getElementById('opt-cablage').checked;
@@ -2160,7 +1825,6 @@ function clicCanvas(event) {
     dessiner();
     return;
   }
-
   if (composantSelectionne) {
     placerComposant(composantSelectionne, pos.x, pos.y, composantAValeur);
     composantSelectionne = null;
@@ -2169,7 +1833,6 @@ function clicCanvas(event) {
     document.getElementById('statut-mode').textContent = '🖱️ Mode : Placer';
     return;
   }
-
   if (modeCablage) {
     var patte = trouverPatteSousSouris(pos.x, pos.y);
     if (patte) {
@@ -2202,7 +1865,6 @@ function clicCanvas(event) {
       dessiner(); return;
     }
   }
-
   var comp = trouverComposantSousSouris(pos.x, pos.y);
   if (comp) {
     if (comp.type === 'interrupteur') {
@@ -2221,9 +1883,87 @@ function clicCanvas(event) {
   }
 }
 
-/* =========================================================
-   MULTIMETRE
-   ========================================================= */
+function doubleClicCanvas(event) {
+  if (multimetreActif) return;
+  var pos = coordonneesSouris(event);
+  var comp = trouverComposantSousSouris(pos.x, pos.y);
+  if (comp) {
+    if (confirm('Supprimer ce composant ?')) supprimerComposant(comp.id);
+  }
+}
+
+function supprimerComposant(id) {
+  composants = composants.filter(function(c) { return c.id !== id; });
+  fils = fils.filter(function(f) { return f.compA !== id && f.compB !== id; });
+  if (patteEnAttente && patteEnAttente.compId === id) patteEnAttente = null;
+  if (pointeRouge && pointeRouge.compId === id) pointeRouge = null;
+  if (pointeNoire && pointeNoire.compId === id) pointeNoire = null;
+  majPointes();
+  mettreMessage('🗑️ Composant supprimé.', 'info');
+  mettreAJourStatut();
+  if (testActif) recalculerLED();
+  sauvegarderLocal(true);
+  faireSnapshot();
+  dessiner();
+  afficherPanneauComposants();
+}
+
+function placerComposant(type, x, y, valeur) {
+  var c = CATALOGUE[type];
+  if (!c) return;
+  var comp = {
+    id: prochainId++, type: type,
+    x: x - c.largeur/2, y: y - c.hauteur/2,
+    largeur: c.largeur, hauteur: c.hauteur,
+    valeur: valeur || null, ferme: false, appuye: false, allume: false, sonne: false
+  };
+  composants.push(comp);
+  mettreMessage('✅ ' + c.nom + ' placé !', 'succes');
+  mettreAJourStatut();
+  sauvegarderLocal(true);
+  faireSnapshot();
+  dessiner();
+  afficherPanneauComposants();
+}
+
+function creerFil(patteA, patteB) {
+  var fil = {
+    id: prochainFilId++,
+    compA: patteA.compId, patteA: patteA.patteIndex,
+    compB: patteB.compId, patteB: patteB.patteIndex,
+    couleur: '#E63946'
+  };
+  fils.push(fil);
+  mettreMessage('🔗 Fil créé ! Mode câblage désactivé.', 'succes');
+  if (testActif) recalculerLED();
+  sauvegarderLocal(true);
+  faireSnapshot();
+  dessiner();
+}
+
+function basculerModeCablage() {
+  if (multimetreActif) basculerMultimetre();
+  modeCablage = !modeCablage;
+  patteEnAttente = null; composantSelectionne = null; blocSelectionne = null;
+  canvas.classList.remove('mode-bloc');
+  afficherPalette(); afficherBlocs();
+  var btn = document.getElementById('btn-cablage');
+  if (modeCablage) {
+    btn.textContent = '🖱️ Placer (quitter câblage)';
+    btn.classList.remove('btn-gris'); btn.classList.add('btn-vert');
+    canvas.classList.add('mode-cablage');
+    document.getElementById('statut-mode').textContent = '🔗 Mode : Câblage';
+    mettreMessage('🔗 Mode câblage activé.', 'avertissement');
+  } else {
+    btn.textContent = '🔗 Câblage';
+    btn.classList.add('btn-gris'); btn.classList.remove('btn-vert');
+    canvas.classList.remove('mode-cablage');
+    document.getElementById('statut-mode').textContent = '🖱️ Mode : Placer';
+    mettreMessage('🖱️ Mode placement.', 'info');
+  }
+  dessiner();
+}
+
 function basculerMultimetre() {
   multimetreActif = !multimetreActif;
   pointeRouge = null; pointeNoire = null; composantMesure = null;
@@ -2447,9 +2187,6 @@ function formaterResistance(val) {
   return val.toFixed(0) + ' ';
 }
 
-/* =========================================================
-   TUTORIELS
-   ========================================================= */
 function basculerTutoriels() {
   var panneau = document.getElementById('tuto-panneau');
   if (panneau.classList.contains('actif')) {
@@ -2464,8 +2201,7 @@ function basculerTutoriels() {
 function demarrerTutoriel(id) {
   var tuto = TUTORIELS[id];
   if (!tuto) return;
-  tutoActif = tuto;
-  tutoEtape = 0;
+  tutoActif = tuto; tutoEtape = 0;
   document.getElementById('tuto-nom').textContent = tuto.icone + ' ' + tuto.nom;
   document.getElementById('tuto-desc').textContent = tuto.desc;
   afficherEtapesTuto();
@@ -2512,11 +2248,9 @@ function verifierActionTuto(action) {
   if (action.type === 'composant') return composants.some(function(c) { return c.type === action.id; });
   if (action.type === 'fil') {
     return fils.some(function(f) {
-      var cA = trouverComposant(f.compA);
-      var cB = trouverComposant(f.compB);
+      var cA = trouverComposant(f.compA); var cB = trouverComposant(f.compB);
       if (!cA || !cB) return false;
-      return (cA.type === action.de.type && cB.type === action.vers.type) ||
-             (cA.type === action.vers.type && cB.type === action.de.type);
+      return (cA.type === action.de.type && cB.type === action.vers.type) || (cA.type === action.vers.type && cB.type === action.de.type);
     });
   }
   if (action.type === 'bloc') return composants.length >= 4;
@@ -2557,8 +2291,7 @@ function quitterTutoriel() {
   if (tutoActif && tutoEtape < tutoActif.etapes.length && tutoEtape > 0) {
     if (!confirm('⚠️ Voulez-vous vraiment quitter ce tutoriel ?\nToute la progression sera perdue.')) return;
   }
-  tutoActif = null;
-  tutoEtape = -1;
+  tutoActif = null; tutoEtape = -1;
   document.getElementById('tuto-panneau').classList.remove('actif');
   document.getElementById('btn-tutoriels').classList.remove('actif');
   document.getElementById('statut-mode').classList.remove('tuto');
@@ -2569,9 +2302,6 @@ function quitterTutoriel() {
   mettreMessage('📖 Tutoriel quitté.', 'info');
 }
 
-/* =========================================================
-   INTERACTIONS SOURIS
-   ========================================================= */
 function clicDroitCanvas(event) {
   event.preventDefault();
   if (multimetreActif) return;
@@ -2628,7 +2358,6 @@ function survolSouris(event) {
   }
   var compSurvol = trouverComposantSousSouris(pos.x, pos.y);
   composantSurvoleClavier = compSurvol;
-
   var nouveauFilSurvole = null;
   if (!modeCablage && !composantSelectionne && !blocSelectionne) {
     nouveauFilSurvole = trouverFilSousSouris(pos.x, pos.y);
@@ -2638,39 +2367,6 @@ function survolSouris(event) {
     canvas.style.cursor = filSurvole ? 'pointer' : (compSurvol ? 'pointer' : 'grab');
     dessiner();
   }
-}
-
-function placerComposant(type, x, y, valeur) {
-  var c = CATALOGUE[type];
-  if (!c) return;
-  var comp = {
-    id: prochainId++, type: type,
-    x: x - c.largeur/2, y: y - c.hauteur/2,
-    largeur: c.largeur, hauteur: c.hauteur,
-    valeur: valeur || null, ferme: false, appuye: false, allume: false, sonne: false
-  };
-  composants.push(comp);
-  mettreMessage('✅ ' + c.nom + ' placé !', 'succes');
-  mettreAJourStatut();
-  sauvegarderLocal(true);
-  faireSnapshot();
-  dessiner();
-  afficherPanneauComposants();
-}
-
-function creerFil(patteA, patteB) {
-  var fil = {
-    id: prochainFilId++,
-    compA: patteA.compId, patteA: patteA.patteIndex,
-    compB: patteB.compId, patteB: patteB.patteIndex,
-    couleur: '#E63946'
-  };
-  fils.push(fil);
-  mettreMessage('🔗 Fil créé ! Mode câblage désactivé.', 'succes');
-  if (testActif) recalculerLED();
-  sauvegarderLocal(true);
-  faireSnapshot();
-  dessiner();
 }
 
 function sourisDown(event) {
@@ -2697,57 +2393,6 @@ function sourisUp(event) {
   }
 }
 
-function doubleClicCanvas(event) {
-  if (multimetreActif) return;
-  var pos = coordonneesSouris(event);
-  var comp = trouverComposantSousSouris(pos.x, pos.y);
-  if (comp) {
-    if (confirm('Supprimer ce composant ?')) supprimerComposant(comp.id);
-  }
-}
-
-function supprimerComposant(id) {
-  composants = composants.filter(function(c) { return c.id !== id; });
-  fils = fils.filter(function(f) { return f.compA !== id && f.compB !== id; });
-  if (patteEnAttente && patteEnAttente.compId === id) patteEnAttente = null;
-  if (pointeRouge && pointeRouge.compId === id) pointeRouge = null;
-  if (pointeNoire && pointeNoire.compId === id) pointeNoire = null;
-  majPointes();
-  mettreMessage('🗑️ Composant supprimé.', 'info');
-  mettreAJourStatut();
-  if (testActif) recalculerLED();
-  sauvegarderLocal(true);
-  faireSnapshot();
-  dessiner();
-  afficherPanneauComposants();
-}
-
-function basculerModeCablage() {
-  if (multimetreActif) basculerMultimetre();
-  modeCablage = !modeCablage;
-  patteEnAttente = null; composantSelectionne = null; blocSelectionne = null;
-  canvas.classList.remove('mode-bloc');
-  afficherPalette(); afficherBlocs();
-  var btn = document.getElementById('btn-cablage');
-  if (modeCablage) {
-    btn.textContent = '🖱️ Placer (quitter câblage)';
-    btn.classList.remove('btn-gris'); btn.classList.add('btn-vert');
-    canvas.classList.add('mode-cablage');
-    document.getElementById('statut-mode').textContent = '🔗 Mode : Câblage';
-    mettreMessage('🔗 Mode câblage activé.', 'avertissement');
-  } else {
-    btn.textContent = '🔗 Câblage';
-    btn.classList.add('btn-gris'); btn.classList.remove('btn-vert');
-    canvas.classList.remove('mode-cablage');
-    document.getElementById('statut-mode').textContent = '🖱️ Mode : Placer';
-    mettreMessage('🖱️ Mode placement.', 'info');
-  }
-  dessiner();
-}
-
-/* =========================================================
-   GRILLE MAGNETIQUE
-   ========================================================= */
 function aimanterValeur(valeur, pas) {
   return Math.round(valeur / pas) * pas;
 }
@@ -2775,9 +2420,6 @@ function basculerGrille() {
   mettreMessage('🧲 Grille magnétique ' + (grilleActive ? 'activée' : 'désactivée'), 'info');
 }
 
-/* =========================================================
-   TEST / SIMULATION
-   ========================================================= */
 function calculerEtatLED() {
   for (var i = 0; i < composants.length; i++) {
     composants[i].allume = false;
@@ -2899,9 +2541,6 @@ function chercherChemin(depart, arrivee, adj) {
   return false;
 }
 
-/* =========================================================
-   ANIMATION CHENILLARD
-   ========================================================= */
 function demarrerAnimationChenillard() {
   var leds = composants.filter(function(c) { return mapperTypeDessin(c.type) === 'led'; });
   if (leds.length < 4) { arreterAnimationChenillard(); return; }
@@ -2929,9 +2568,6 @@ function appliquerChenillard() {
   }
 }
 
-/* =========================================================
-   EXPORT / IMPORT
-   ========================================================= */
 function exporterJSON() {
   var data = { version: 1, date: new Date().toISOString(), composants: composants, fils: fils };
   var texte = JSON.stringify(data, null, 2);
@@ -3079,11 +2715,7 @@ function mettreAJourStatut() {
   document.getElementById('statut-info').textContent = s;
 }
 
-/* =========================================================
-   INSTALLATION PWA
-   ========================================================= */
 var promptInstallation = null;
-
 window.addEventListener('beforeinstallprompt', function(e) {
   e.preventDefault();
   promptInstallation = e;
@@ -3093,25 +2725,19 @@ window.addEventListener('beforeinstallprompt', function(e) {
 
 function installerPWA() {
   if (!promptInstallation) {
-    alert('Pour installer l\'appli :\n\n1. Cliquez sur le menu du navigateur\n2. Cherchez "Installer ElectroPremium"\n3. Cliquez dessus');
+    alert('Pour installer l\'appli :\n\n1. Cliquez sur le menu du navigateur\n2. Cherchez "Installer EspaceElectronic"\n3. Cliquez dessus');
     return;
   }
   promptInstallation.prompt();
   promptInstallation.userChoice.then(function(choiceResult) {
     if (choiceResult.outcome === 'accepted') {
-      console.log('✅ Installation acceptée');
       var btn = document.getElementById('btn-installer');
       if (btn) btn.style.display = 'none';
-    } else {
-      console.log('❌ Installation refusée');
     }
     promptInstallation = null;
   });
 }
 
-/* =========================================================
-   INITIALISATION
-   ========================================================= */
 window.addEventListener('beforeunload', function(e) {
   if (composants.length > 0) sauvegarderLocal(true);
 });
@@ -3119,11 +2745,8 @@ window.addEventListener('beforeunload', function(e) {
 window.onload = function() {
   canvas = document.getElementById('sandbox');
   ctx = canvas.getContext('2d');
-  afficherPalette();
-  afficherBlocs();
-  afficherTutoriels();
-  mettreAJourStatut();
-  afficherPanneauComposants();
+  afficherPalette(); afficherBlocs(); afficherTutoriels(); afficherDefis();
+  mettreAJourStatut(); afficherPanneauComposants();
   canvas.addEventListener('click', clicCanvas);
   canvas.addEventListener('dblclick', doubleClicCanvas);
   canvas.addEventListener('mousedown', gererDragVueMousedown);
@@ -3135,86 +2758,21 @@ window.onload = function() {
   canvas.addEventListener('mouseleave', sourisUp);
   canvas.addEventListener('contextmenu', clicDroitCanvas);
   canvas.addEventListener('wheel', gererMolette, { passive: false });
-  document.addEventListener('click', function(e) {
-    var menu = document.getElementById('menu-contextuel');
-    if (!menu.contains(e.target)) fermerMenuContextuel();
-  });
+  document.addEventListener('click', function(e) { var menu = document.getElementById('menu-contextuel'); if (!menu.contains(e.target)) fermerMenuContextuel(); });
   document.addEventListener('keydown', gererClavier);
   setInterval(function() {
-    ledPulsePhase += 0.08;
-    buzzerOndePhase = (buzzerOndePhase + 0.02) % 1;
+    ledPulsePhase += 0.08; buzzerOndePhase = (buzzerOndePhase + 0.02) % 1;
     var besoinRedraw = false;
-    if (!animChenillardActif) {
-      var aLEDAllumee = composants.some(function(c) { return mapperTypeDessin(c.type) === 'led' && c.allume; });
-      if (aLEDAllumee) besoinRedraw = true;
-    }
+    if (!animChenillardActif) { var aLEDAllumee = composants.some(function(c) { return mapperTypeDessin(c.type) === 'led' && c.allume; }); if (aLEDAllumee) besoinRedraw = true; }
     if (multimetreActif && (pointeRouge || pointeNoire)) besoinRedraw = true;
     if (buzzerActif) besoinRedraw = true;
     if (besoinRedraw) dessiner();
   }, 50);
-  chargerLocal();
-  demarrerAutoSave();
-  faireSnapshot();
-  dessiner();
-  
+  chargerLocal(); demarrerAutoSave(); faireSnapshot(); dessiner();
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js').then(function(reg) {
-      console.log('✅ Service Worker enregistré');
-    }).catch(function(err) {
-      console.log('⚠️ Erreur Service Worker:', err);
-    });
+    navigator.serviceWorker.register('sw.js').then(function(reg) { console.log('✅ Service Worker enregistré'); }).catch(function(err) { console.log('⚠️ Erreur Service Worker:', err); });
   }
 };
-/* =========================================================
-   DESSINS GENERIQUES POUR LES NOUVEAUX COMPOSANTS
-   ========================================================= */
-function dessinerDiodeGenerique(comp) {
-  var grd = ctx.createLinearGradient(comp.x, comp.y, comp.x, comp.y + comp.hauteur);
-  grd.addColorStop(0, '#333'); grd.addColorStop(1, '#111');
-  ctx.fillStyle = grd;
-  ctx.beginPath(); if (ctx.roundRect) ctx.roundRect(comp.x, comp.y, comp.largeur, comp.hauteur, 4); else ctx.rect(comp.x, comp.y, comp.largeur, comp.hauteur); ctx.fill();
-  ctx.fillStyle = '#fff';
-  ctx.beginPath();
-  ctx.moveTo(comp.x + 20, comp.y + 5); ctx.lineTo(comp.x + 20, comp.y + comp.hauteur - 5); ctx.lineTo(comp.x + 5, comp.y + comp.hauteur/2); ctx.fill();
-  ctx.fillRect(comp.x + 20, comp.y + 5, 3, comp.hauteur - 10);
-}
-
-function dessinerCIGenerique(comp) {
-  var grd = ctx.createLinearGradient(comp.x, comp.y, comp.x + comp.largeur, comp.y + comp.hauteur);
-  grd.addColorStop(0, '#3a3a3a'); grd.addColorStop(0.4, '#1a1a1a'); grd.addColorStop(1, '#000');
-  ctx.fillStyle = grd;
-  ctx.beginPath(); if (ctx.roundRect) ctx.roundRect(comp.x, comp.y, comp.largeur, comp.hauteur, 5); else ctx.rect(comp.x, comp.y, comp.largeur, comp.hauteur); ctx.fill();
-  ctx.fillStyle = '#000';
-  ctx.beginPath(); ctx.arc(comp.x + comp.largeur/2, comp.y + 8, 8, 0, Math.PI, true); ctx.fill();
-  ctx.fillStyle = '#555';
-  ctx.beginPath(); ctx.arc(comp.x + comp.largeur/2, comp.y + 8, 8, 0, Math.PI); ctx.fill();
-  ctx.fillStyle = '#ccc';
-  ctx.font = 'bold 10px sans-serif';
-  ctx.textAlign = 'center';
-  ctx.shadowColor = 'rgba(0,0,0,0.8)'; ctx.shadowBlur = 3;
-  ctx.fillText('CI', comp.x + comp.largeur/2, comp.y + comp.hauteur/2 + 4);
-  ctx.shadowBlur = 0;
-}
-
-function dessinerCapteurGenerique(comp) {
-  ctx.fillStyle = '#0ea5e9';
-  ctx.beginPath(); if (ctx.roundRect) ctx.roundRect(comp.x, comp.y, comp.largeur, comp.hauteur, 4); else ctx.rect(comp.x, comp.y, comp.largeur, comp.hauteur); ctx.fill();
-  ctx.fillStyle = '#fff';
-  ctx.font = 'bold 20px sans-serif';
-  ctx.textAlign = 'center';
-  ctx.fillText('📡', comp.x + comp.largeur/2, comp.y + comp.hauteur/2 + 7);
-}
-
-function dessinerMoteurGenerique(comp) {
-  var grd = ctx.createRadialGradient(comp.x + comp.largeur/2, comp.y + comp.hauteur/2, 5, comp.x + comp.largeur/2, comp.y + comp.hauteur/2, comp.largeur/2);
-  grd.addColorStop(0, '#4a4a4a'); grd.addColorStop(1, '#222');
-  ctx.fillStyle = grd;
-  ctx.beginPath(); ctx.arc(comp.x + comp.largeur/2, comp.y + comp.hauteur/2, comp.largeur/2, 0, Math.PI * 2); ctx.fill();
-  ctx.fillStyle = '#fff';
-  ctx.font = 'bold 20px sans-serif';
-  ctx.textAlign = 'center';
-  ctx.fillText('⚙️', comp.x + comp.largeur/2, comp.y + comp.hauteur/2 + 7);
-}
 </script>
 
 </body>
