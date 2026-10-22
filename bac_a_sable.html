@@ -707,8 +707,61 @@ var BLOCS = {
    DEFIS D'INGENIERIE (MODE INNOVANT)
    ========================================================= */
 var DEFIS = {
+  sonnette: {
+    id: 'sonnette', nom: '🚪 Sonnette', icone: '🚪',
+    categorie: 'maison',
+    desc: 'Appuie sur le bouton pour faire sonner la sonnette (buzzer).',
+    composants_requis: ['pile', 'bouton', 'buzzer'],
+    cablages_requis: [
+      { typeA: 'pile', patteA: 0, typeB: 'bouton', patteB: 0 },
+      { typeA: 'bouton', patteA: 1, typeB: 'buzzer', patteB: 0 },
+      { typeA: 'buzzer', patteA: 1, typeB: 'pile', patteB: 1 }
+    ]
+  },
+  veilleuse: {
+    id: 'veilleuse', nom: '🌙 Veilleuse', icone: '🌙',
+    categorie: 'maison',
+    desc: 'La LED s\'allume automatiquement quand il fait sombre (LDR).',
+    composants_requis: ['pile', 'ldr', 'transistor', 'led', 'resistance'],
+    cablages_requis: [
+      { typeA: 'pile', patteA: 0, typeB: 'ldr', patteB: 0 },
+      { typeA: 'ldr', patteA: 1, typeB: 'transistor', patteB: 1 },
+      { typeA: 'pile', patteA: 0, typeB: 'led', patteB: 0 },
+      { typeA: 'led', patteA: 1, typeB: 'transistor', patteB: 2 },
+      { typeA: 'transistor', patteA: 0, typeB: 'pile', patteB: 1 },
+      { typeA: 'resistance', patteA: 0, typeB: 'transistor', patteB: 1 },
+      { typeA: 'resistance', patteA: 1, typeB: 'pile', patteB: 1 }
+    ]
+  },
+  lumièreWC: {
+    id: 'lumièreWC', nom: '🚿 Lumière automatique', icone: '🚿',
+    categorie: 'maison',
+    desc: 'Appuie sur le bouton pour allumer la LED. Elle s\'éteint automatiquement après 3 secondes.',
+    composants_requis: ['pile', 'bouton', 'condensateur', 'transistor', 'led', 'resistance'],
+    cablages_requis: [
+      { typeA: 'pile', patteA: 0, typeB: 'bouton', patteB: 0 },
+      { typeA: 'bouton', patteA: 1, typeB: 'condensateur', patteB: 0 },
+      { typeA: 'condensateur', patteA: 0, typeB: 'transistor', patteB: 1 },
+      { typeA: 'pile', patteA: 0, typeB: 'led', patteB: 0 },
+      { typeA: 'led', patteA: 1, typeB: 'transistor', patteB: 2 },
+      { typeA: 'transistor', patteA: 0, typeB: 'pile', patteB: 1 },
+      { typeA: 'condensateur', patteA: 1, typeB: 'pile', patteB: 1 }
+    ]
+  },
+  alarme: {
+    id: 'alarme', nom: '🚨 Alarme de Porte', icone: '🚨',
+    categorie: 'maison',
+    desc: 'Déclenche un buzzer quand la porte s\'ouvre (interrupteur).',
+    composants_requis: ['pile', 'interrupteur', 'buzzer'],
+    cablages_requis: [
+      { typeA: 'pile', patteA: 0, typeB: 'interrupteur', patteB: 0 },
+      { typeA: 'interrupteur', patteA: 1, typeB: 'buzzer', patteB: 0 },
+      { typeA: 'buzzer', patteA: 1, typeB: 'pile', patteB: 1 }
+    ]
+  },
   serre: {
     id: 'serre', nom: '🌱 La Serre Connectée', icone: '🌱',
+    categorie: 'ecologie',
     desc: 'Allume la pompe (Moteur DC) automatiquement quand la terre est sèche (LDR à l\'ombre).',
     composants_requis: ['pile', 'ldr', 'transistor', 'moteurDc'],
     cablages_requis: [
@@ -718,19 +771,8 @@ var DEFIS = {
       { typeA: 'moteurDc', patteA: 1, typeB: 'transistor', patteB: 2 },
       { typeA: 'transistor', patteA: 0, typeB: 'pile', patteB: 1 }
     ]
-  },
-  alarme: {
-    id: 'alarme', nom: '🚨 Alarme de Porte', icone: '🚨',
-    desc: 'Déclenche un buzzer quand la porte s\'ouvre (interrupteur).',
-    composants_requis: ['pile', 'interrupteur', 'buzzer'],
-    cablages_requis: [
-      { typeA: 'pile', patteA: 0, typeB: 'interrupteur', patteB: 0 },
-      { typeA: 'interrupteur', patteA: 1, typeB: 'buzzer', patteB: 0 },
-      { typeA: 'buzzer', patteA: 1, typeB: 'pile', patteB: 1 }
-    ]
   }
 };
-
 var defiActif = null;
 
 /* =========================================================
@@ -864,15 +906,56 @@ var compoClignotantTimer = null;
 function afficherDefis() {
   var div = document.getElementById('liste-defis');
   if (!div) return;
+  
   var html = '';
+  
+  // Définition des catégories (icônes et ordre d'affichage)
+  var categories = {
+    'maison': { nom: '🏠 Maison', ordre: 1 },
+    'ecologie': { nom: '🌱 Écologie', ordre: 2 },
+    'jeux': { nom: '🎮 Jeux & Sons', ordre: 3 },
+    'vehicules': { nom: '🚗 Véhicules', ordre: 4 },
+    'capteurs': { nom: '🔬 Capteurs', ordre: 5 },
+    'initiation': { nom: '💡 Initiation', ordre: 6 },
+    'autres': { nom: '📦 Autres', ordre: 99 }
+  };
+  
+  // Regrouper les défis par catégorie
+  var defisParCategorie = {};
   for (var id in DEFIS) {
     var d = DEFIS[id];
-    var actif = (defiActif && defiActif.id === d.id) ? ' actif' : '';
-    html += '<div class="item-palette item-tuto' + actif + '" onclick="demarrerDefi(\'' + d.id + '\')" style="background: linear-gradient(135deg, #7c2d12, #ea580c); border-color: #f97316;">';
-    html += '<div class="icone" style="background: linear-gradient(135deg, #fbbf24, #f59e0b);">' + d.icone + '</div>';
-    html += '<div class="texte"><strong>' + d.nom + '</strong><small>Défi d\'ingénierie</small></div>';
-    html += '</div>';
+    var cat = d.categorie || 'autres';
+    if (!defisParCategorie[cat]) defisParCategorie[cat] = [];
+    defisParCategorie[cat].push(d);
   }
+  
+  // Trier les catégories par ordre d'affichage
+  var catsTriees = Object.keys(defisParCategorie).sort(function(a, b) {
+    var ordreA = categories[a] ? categories[a].ordre : 99;
+    var ordreB = categories[b] ? categories[b].ordre : 99;
+    return ordreA - ordreB;
+  });
+  
+  // Générer le HTML
+  for (var i = 0; i < catsTriees.length; i++) {
+    var cat = catsTriees[i];
+    var listeDefis = defisParCategorie[cat];
+    var nomCat = categories[cat] ? categories[cat].nom : '📦 ' + cat;
+    
+    // Titre de la catégorie
+    html += '<div style="font-size:0.8em;color:#fbbf24;margin:12px 0 6px 0;padding:6px 10px;background:#0f1420;border-radius:6px;border-left:3px solid #f97316;font-weight:bold;">' + nomCat + ' (' + listeDefis.length + ')</div>';
+    
+    // Liste des défis de la catégorie
+    for (var j = 0; j < listeDefis.length; j++) {
+      var d = listeDefis[j];
+      var actif = (defiActif && defiActif.id === d.id) ? ' actif' : '';
+      html += '<div class="item-palette item-tuto' + actif + '" onclick="demarrerDefi(\'' + d.id + '\')" style="background: linear-gradient(135deg, #7c2d12, #ea580c); border-color: #f97316;">';
+      html += '<div class="icone" style="background: linear-gradient(135deg, #fbbf24, #f59e0b);">' + d.icone + '</div>';
+      html += '<div class="texte"><strong>' + d.nom + '</strong><small>Défi d\'ingénierie</small></div>';
+      html += '</div>';
+    }
+  }
+  
   div.innerHTML = html;
 }
 
@@ -1886,12 +1969,21 @@ function clicCanvas(event) {
       sauvegarderLocal(true);
       dessiner(); return;
     }
-    if (comp.type === 'bouton' || comp.type === 'boutonPoussoir') {
-      comp.appuye = !comp.appuye;
-      mettreMessage('🧲 Bouton ' + (comp.appuye ? 'appuyé ✅' : 'relâché ❌'), 'info');
-      if (testActif) recalculerLED();
+     if (comp.type === 'bouton' || comp.type === 'boutonPoussoir') {
+      comp.appuye = true;
+      mettreMessage('🧲 Bouton appuyé ✅ (la LED va s\'éteindre dans 3s)', 'info');
+      if (testActif) {
+        recalculerLED();
+        // Temporisation : après 3 secondes, on relâche le bouton
+        if (window.timerBouton) clearTimeout(window.timerBouton);
+        window.timerBouton = setTimeout(function() {
+          comp.appuye = false;
+          recalculerLED();
+          mettreMessage('⏱️ La LED s\'est éteinte automatiquement.', 'avertissement');
+        }, 3000);
+      }
       dessiner(); return;
-    }
+    }   
   }
 }
 function supprimerComposant(id) {
