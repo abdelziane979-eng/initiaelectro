@@ -8,6 +8,7 @@
 <link rel="manifest" href="manifest-bac.json">
 <meta name="theme-color" content="#6b21a8">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="EspaceElectronic">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <style>
@@ -1806,7 +1807,20 @@ function clicCanvas(event) {
   if (enDeplacementVue || dragVuePretPourDeplacement) return;
   fermerMenuContextuel();
   var pos = coordonneesSouris(event);
+  
   if (multimetreActif) { gererClicMultimetre(pos.x, pos.y); return; }
+  
+  // PRIORITÉ 1 : Placer un composant
+  if (composantSelectionne) {
+    placerComposant(composantSelectionne, pos.x, pos.y, composantAValeur);
+    composantSelectionne = null;
+    composantAValeur = null;
+    afficherPalette();
+    document.getElementById('statut-mode').textContent = '🖱️ Mode : Placer';
+    return;
+  }
+
+  // PRIORITÉ 2 : Placer un bloc
   if (blocSelectionne) {
     var b = BLOCS[blocSelectionne];
     var avecCab = document.getElementById('opt-cablage').checked;
@@ -1827,14 +1841,8 @@ function clicCanvas(event) {
     dessiner();
     return;
   }
-  if (composantSelectionne) {
-    placerComposant(composantSelectionne, pos.x, pos.y, composantAValeur);
-    composantSelectionne = null;
-    composantAValeur = null;
-    afficherPalette();
-    document.getElementById('statut-mode').textContent = '🖱️ Mode : Placer';
-    return;
-  }
+
+  // PRIORITÉ 3 : Câblage
   if (modeCablage) {
     var patte = trouverPatteSousSouris(pos.x, pos.y);
     if (patte) {
@@ -1867,6 +1875,8 @@ function clicCanvas(event) {
       dessiner(); return;
     }
   }
+
+  // PRIORITÉ 4 : Cliquer sur un composant existant (interrupteur, bouton)
   var comp = trouverComposantSousSouris(pos.x, pos.y);
   if (comp) {
     if (comp.type === 'interrupteur') {
@@ -1884,16 +1894,6 @@ function clicCanvas(event) {
     }
   }
 }
-
-function doubleClicCanvas(event) {
-  if (multimetreActif) return;
-  var pos = coordonneesSouris(event);
-  var comp = trouverComposantSousSouris(pos.x, pos.y);
-  if (comp) {
-    if (confirm('Supprimer ce composant ?')) supprimerComposant(comp.id);
-  }
-}
-
 function supprimerComposant(id) {
   composants = composants.filter(function(c) { return c.id !== id; });
   fils = fils.filter(function(f) { return f.compA !== id && f.compB !== id; });
@@ -2744,13 +2744,737 @@ window.addEventListener('beforeunload', function(e) {
   if (composants.length > 0) sauvegarderLocal(true);
 });
 
+function afficherPanneauComposants() {
+  var div = document.getElementById('panneau-composants-liste');
+  var nbSpan = document.getElementById('panneau-nb');
+  if (!div) return;
+  nbSpan.textContent = '(' + composants.length + ')';
+  if (composants.length === 0) {
+    div.innerHTML = '<div class="panneau-composants-vide">Aucun composant placé</div>';
+    return;
+  }
+  var html = '';
+  for (var i = 0; i < composants.length; i++) {
+    var comp = composants[i];
+    var cat = CATALOGUE[comp.type];
+    if (!cat) continue;
+    var nom = cat.nom;
+    var valeur = comp.valeur ? ' ' + comp.valeur : '';
+    html += '<div class="composant-item">';
+    html += '<div class="composant-item-nom">';
+    html += '<span>' + cat.icone + '</span>';
+    html += '<span>#' + comp.id + ' ' + nom + valeur + '</span>';
+    html += '</div>';
+    html += '<div class="composant-item-actions">';
+    html += '<button class="btn-item-centrer" onclick="centrerSurComposant(' + comp.id + ')">🎯 Centrer</button>';
+    html += '<button class="btn-item-supprimer" onclick="supprimerComposantDepuisPanneau(' + comp.id + ')">🗑️ Supprimer</button>';
+    html += '</div>';
+    html += '</div>';
+  }
+  div.innerHTML = html;
+}
+
+function centrerSurComposant(id) {
+  var comp = trouverComposant(id);
+  if (!comp) return;
+  panX = canvas.width / 2 - (comp.x + comp.largeur/2) * zoomLevel;
+  panY = canvas.height / 2 - (comp.y + comp.hauteur/2) * zoomLevel;
+  limiterPan();
+  compoClignotantId = id;
+  if (compoClignotantTimer) clearTimeout(compoClignotantTimer);
+  compoClignotantTimer = setTimeout(function() {
+    compoClignotantId = null;
+    afficherPanneauComposants();
+    dessiner();
+  }, 2200);
+  afficherPanneauComposants();
+  dessiner();
+}
+
+function supprimerComposantDepuisPanneau(id) {
+  var comp = trouverComposant(id);
+  if (!comp) return;
+  var cat = CATALOGUE[comp.type];
+  var nom = cat ? cat.nom : 'Composant';
+  if (confirm('Supprimer ' + nom + ' #' + id + ' ?')) {
+    supprimerComposant(id);
+    if (compoClignotantId === id) compoClignotantId = null;
+  }
+}
+
+/* =========================================================
+   FONCTIONS DE DESSIN (Ajoutées pour corriger le bug)
+   ========================================================= */
+function dessinerPile(comp) {
+  var grd = ctx.createLinearGradient(comp.x, comp.y, comp.x, comp.y + comp.hauteur);
+  grd.addColorStop(0, '#4a4a4a'); grd.addColorStop(0.5, '#2a2a2a'); grd.addColorStop(1, '#1a1a1a');
+  ctx.fillStyle = grd;
+  ctx.beginPath(); if (ctx.roundRect) ctx.roundRect(comp.x, comp.y, comp.largeur, comp.hauteur, 6); else ctx.rect(comp.x, comp.y, comp.largeur, comp.hauteur); ctx.fill();
+  ctx.fillStyle = 'rgba(255,255,255,0.15)';
+  ctx.beginPath(); if (ctx.roundRect) ctx.roundRect(comp.x + 3, comp.y + 2, comp.largeur - 6, comp.hauteur/3, 4); else ctx.rect(comp.x + 3, comp.y + 2, comp.largeur - 6, comp.hauteur/3); ctx.fill();
+  var grdDore = ctx.createLinearGradient(comp.x, comp.y + 5, comp.x, comp.y + 13);
+  grdDore.addColorStop(0, '#f0c987'); grdDore.addColorStop(0.5, '#d4a76a'); grdDore.addColorStop(1, '#a67c3d');
+  ctx.fillStyle = grdDore;
+  ctx.fillRect(comp.x + 5, comp.y + 5, comp.largeur - 10, 8);
+  ctx.fillStyle = 'rgba(255,255,255,0.5)';
+  ctx.fillRect(comp.x + 5, comp.y + 5, comp.largeur - 10, 2);
+  ctx.fillStyle = '#3b82f6';
+  ctx.font = 'bold 18px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.shadowColor = 'rgba(59,130,246,0.8)'; ctx.shadowBlur = 8;
+  ctx.fillText('+', comp.x + 15, comp.y + 12);
+  ctx.fillStyle = '#dc2626';
+  ctx.font = 'bold 22px sans-serif';
+  ctx.shadowColor = 'rgba(220,38,38,0.8)'; ctx.shadowBlur = 8;
+  ctx.fillText('−', comp.x + comp.largeur - 15, comp.y + 13);
+  ctx.shadowBlur = 0;
+  ctx.fillStyle = '#fff';
+  ctx.font = 'bold 18px sans-serif';
+  ctx.shadowColor = 'rgba(0,0,0,0.6)'; ctx.shadowBlur = 4;
+  ctx.fillText('9V', comp.x + comp.largeur/2, comp.y + comp.hauteur/2 + 8);
+  ctx.shadowBlur = 0;
+  var grdRouge = ctx.createRadialGradient(comp.x + comp.largeur - 17, comp.y + 6, 1, comp.x + comp.largeur - 15, comp.y + 8, 6);
+  grdRouge.addColorStop(0, '#ff8a8a'); grdRouge.addColorStop(1, '#8b0000');
+  ctx.fillStyle = grdRouge;
+  ctx.beginPath(); ctx.arc(comp.x + comp.largeur - 15, comp.y + 8, 6, 0, Math.PI * 2); ctx.fill();
+  var grdBleu = ctx.createRadialGradient(comp.x + 13, comp.y + 6, 1, comp.x + 15, comp.y + 8, 6);
+  grdBleu.addColorStop(0, '#7ab8ff'); grdBleu.addColorStop(1, '#003366');
+  ctx.fillStyle = grdBleu;
+  ctx.beginPath(); ctx.arc(comp.x + 15, comp.y + 8, 6, 0, Math.PI * 2); ctx.fill();
+}
+
+function dessinerResistance(comp) {
+  var grd = ctx.createLinearGradient(comp.x, comp.y, comp.x, comp.y + comp.hauteur);
+  grd.addColorStop(0, '#f0d4a0'); grd.addColorStop(0.3, '#d4a76a'); grd.addColorStop(0.7, '#b8905a'); grd.addColorStop(1, '#8a6a40');
+  ctx.fillStyle = grd;
+  ctx.beginPath(); if (ctx.roundRect) ctx.roundRect(comp.x, comp.y, comp.largeur, comp.hauteur, comp.hauteur/2); else ctx.rect(comp.x, comp.y, comp.largeur, comp.hauteur); ctx.fill();
+  ctx.fillStyle = 'rgba(255,255,255,0.4)';
+  ctx.beginPath(); if (ctx.roundRect) ctx.roundRect(comp.x + 8, comp.y + 3, comp.largeur - 16, 4, 2); else ctx.rect(comp.x + 8, comp.y + 3, comp.largeur - 16, 4); ctx.fill();
+  var bandes = [{pos:15,col:'#FFD700'},{pos:35,col:'#8B00FF'},{pos:55,col:'#8B4513'},{pos:85,col:'#FFD700'}];
+  for (var i = 0; i < bandes.length; i++) {
+    var b = bandes[i];
+    ctx.fillStyle = b.col;
+    ctx.fillRect(comp.x + b.pos, comp.y + 2, 6, comp.hauteur - 4);
+    ctx.fillStyle = 'rgba(255,255,255,0.35)';
+    ctx.fillRect(comp.x + b.pos, comp.y + 2, 6, 2);
+  }
+}
+
+function dessinerLED(comp, allumee) {
+  var cx = comp.x + comp.largeur/2;
+  var cy = comp.y + comp.hauteur/2;
+  var r = comp.largeur/2;
+  var baseCouleur, glowCouleur, refletCouleur;
+  if (comp.valeur === 'vert') { baseCouleur = allumee ? '#4ade80' : '#166534'; glowCouleur = 'rgba(34,197,94,'; refletCouleur = '#86efac'; }
+  else if (comp.valeur === 'bleu') { baseCouleur = allumee ? '#60a5fa' : '#1e3a8a'; glowCouleur = 'rgba(59,130,246,'; refletCouleur = '#93c5fd'; }
+  else { baseCouleur = allumee ? '#ff3333' : '#b30000'; glowCouleur = 'rgba(255,50,50,'; refletCouleur = '#ff9999'; }
+  if (allumee) {
+    var pulse = 1 + 0.15 * Math.sin(ledPulsePhase);
+    var haloR = r * 4 * pulse;
+    var grdHalo = ctx.createRadialGradient(cx, cy, r, cx, cy, haloR);
+    grdHalo.addColorStop(0, glowCouleur + '0.7)');
+    grdHalo.addColorStop(0.5, glowCouleur + '0.2)');
+    grdHalo.addColorStop(1, glowCouleur + '0)');
+    ctx.fillStyle = grdHalo;
+    ctx.beginPath(); ctx.arc(cx, cy, haloR, 0, Math.PI * 2); ctx.fill();
+  }
+  var grd = ctx.createRadialGradient(cx - r/3, cy - r/3, 2, cx, cy, r);
+  grd.addColorStop(0, refletCouleur);
+  grd.addColorStop(0.4, baseCouleur);
+  grd.addColorStop(1, allumee ? '#880000' : '#550000');
+  ctx.fillStyle = grd;
+  ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.fill();
+  ctx.strokeStyle = 'rgba(0,0,0,0.5)'; ctx.lineWidth = 1.5; ctx.stroke();
+  ctx.fillStyle = allumee ? 'rgba(255,255,255,0.9)' : 'rgba(255,255,255,0.6)';
+  ctx.beginPath();
+  ctx.ellipse(cx - r/3, cy - r/3, r/3, r/4, -Math.PI/4, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = 'rgba(255,255,255,0.4)';
+  ctx.beginPath();
+  ctx.arc(cx - r/4, cy + r/3, r/8, 0, Math.PI * 2);
+  ctx.fill();
+}
+
+function dessinerInterrupteur(comp) {
+  var grd = ctx.createLinearGradient(comp.x, comp.y, comp.x, comp.y + comp.hauteur);
+  grd.addColorStop(0, '#666'); grd.addColorStop(0.5, '#3a3a3a'); grd.addColorStop(1, '#1a1a1a');
+  ctx.fillStyle = grd;
+  ctx.beginPath(); if (ctx.roundRect) ctx.roundRect(comp.x, comp.y, comp.largeur, comp.hauteur, 6); else ctx.rect(comp.x, comp.y, comp.largeur, comp.hauteur); ctx.fill();
+  ctx.fillStyle = 'rgba(255,255,255,0.15)';
+  ctx.beginPath(); if (ctx.roundRect) ctx.roundRect(comp.x + 3, comp.y + 3, comp.largeur - 6, 6, 3); else ctx.rect(comp.x + 3, comp.y + 3, comp.largeur - 6, 6); ctx.fill();
+  var grdBorne = ctx.createRadialGradient(comp.x + 13, comp.y + comp.hauteur/2 - 2, 1, comp.x + 15, comp.y + comp.hauteur/2, 7);
+  grdBorne.addColorStop(0, '#fff'); grdBorne.addColorStop(0.5, '#c0c0c0'); grdBorne.addColorStop(1, '#666');
+  ctx.fillStyle = grdBorne;
+  ctx.beginPath(); ctx.arc(comp.x + 15, comp.y + comp.hauteur/2, 6, 0, Math.PI * 2); ctx.fill();
+  ctx.beginPath(); ctx.arc(comp.x + comp.largeur - 15, comp.y + comp.hauteur/2, 6, 0, Math.PI * 2); ctx.fill();
+  ctx.strokeStyle = 'rgba(0,0,0,0.4)'; ctx.lineWidth = 7; ctx.lineCap = 'round';
+  ctx.beginPath();
+  if (comp.ferme) {
+    ctx.moveTo(comp.x + 15, comp.y + comp.hauteur/2);
+    ctx.lineTo(comp.x + comp.largeur - 15, comp.y + comp.hauteur/2);
+  } else {
+    ctx.moveTo(comp.x + 15, comp.y + comp.hauteur/2);
+    ctx.lineTo(comp.x + comp.largeur - 25, comp.y + 10);
+  }
+  ctx.stroke();
+  ctx.strokeStyle = comp.ferme ? '#22c55e' : '#ef4444';
+  ctx.lineWidth = 5;
+  ctx.beginPath();
+  if (comp.ferme) {
+    ctx.moveTo(comp.x + 15, comp.y + comp.hauteur/2);
+    ctx.lineTo(comp.x + comp.largeur - 15, comp.y + comp.hauteur/2);
+  } else {
+    ctx.moveTo(comp.x + 15, comp.y + comp.hauteur/2);
+    ctx.lineTo(comp.x + comp.largeur - 25, comp.y + 10);
+  }
+  ctx.stroke();
+  ctx.fillStyle = '#fff';
+  ctx.font = 'bold 10px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.shadowColor = 'rgba(0,0,0,0.8)'; ctx.shadowBlur = 3;
+  ctx.fillText(comp.ferme ? 'ON' : 'OFF', comp.x + comp.largeur/2, comp.y + comp.hauteur - 3);
+  ctx.shadowBlur = 0;
+}
+
+function dessinerNE555(comp) {
+  var grd = ctx.createLinearGradient(comp.x, comp.y, comp.x + comp.largeur, comp.y + comp.hauteur);
+  grd.addColorStop(0, '#3a3a3a'); grd.addColorStop(0.4, '#1a1a1a'); grd.addColorStop(1, '#000');
+  ctx.fillStyle = grd;
+  ctx.beginPath(); if (ctx.roundRect) ctx.roundRect(comp.x, comp.y, comp.largeur, comp.hauteur, 5); else ctx.rect(comp.x, comp.y, comp.largeur, comp.hauteur); ctx.fill();
+  ctx.fillStyle = 'rgba(255,255,255,0.12)';
+  ctx.beginPath(); if (ctx.roundRect) ctx.roundRect(comp.x + 4, comp.y + 4, comp.largeur - 8, 15, 3); else ctx.rect(comp.x + 4, comp.y + 4, comp.largeur - 8, 15); ctx.fill();
+  ctx.fillStyle = '#000';
+  ctx.beginPath(); ctx.arc(comp.x + comp.largeur/2, comp.y + 8, 8, 0, Math.PI, true); ctx.fill();
+  ctx.fillStyle = '#555';
+  ctx.beginPath(); ctx.arc(comp.x + comp.largeur/2, comp.y + 8, 8, 0, Math.PI); ctx.fill();
+  ctx.fillStyle = '#ccc';
+  ctx.font = 'bold 11px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.shadowColor = 'rgba(0,0,0,0.8)'; ctx.shadowBlur = 3;
+  ctx.fillText('NE555', comp.x + comp.largeur/2, comp.y + comp.hauteur/2 + 5);
+  ctx.shadowBlur = 0;
+}
+
+function dessinerCD4017(comp) {
+  var grd = ctx.createLinearGradient(comp.x, comp.y, comp.x + comp.largeur, comp.y + comp.hauteur);
+  grd.addColorStop(0, '#4a3a5a'); grd.addColorStop(0.4, '#2a1a3a'); grd.addColorStop(1, '#1a0a2a');
+  ctx.fillStyle = grd;
+  ctx.beginPath(); if (ctx.roundRect) ctx.roundRect(comp.x, comp.y, comp.largeur, comp.hauteur, 5); else ctx.rect(comp.x, comp.y, comp.largeur, comp.hauteur); ctx.fill();
+  ctx.fillStyle = 'rgba(255,255,255,0.12)';
+  ctx.beginPath(); if (ctx.roundRect) ctx.roundRect(comp.x + 4, comp.y + 4, comp.largeur - 8, 15, 3); else ctx.rect(comp.x + 4, comp.y + 4, comp.largeur - 8, 15); ctx.fill();
+  ctx.fillStyle = '#000';
+  ctx.beginPath(); ctx.arc(comp.x + comp.largeur/2, comp.y + 8, 8, 0, Math.PI, true); ctx.fill();
+  ctx.fillStyle = '#8b5cf6';
+  ctx.beginPath(); ctx.arc(comp.x + comp.largeur/2, comp.y + 8, 8, 0, Math.PI); ctx.fill();
+  ctx.fillStyle = '#e9d5ff';
+  ctx.font = 'bold 11px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.shadowColor = 'rgba(139,92,246,0.8)'; ctx.shadowBlur = 6;
+  ctx.fillText('CD4017', comp.x + comp.largeur/2, comp.y + comp.hauteur/2 + 5);
+  ctx.shadowBlur = 0;
+}
+
+function dessinerCondensateur(comp) {
+  var grd = ctx.createRadialGradient(comp.x + comp.largeur/2 - 5, comp.y + comp.hauteur/2 - 5, 2, comp.x + comp.largeur/2, comp.y + comp.hauteur/2, comp.largeur/2);
+  grd.addColorStop(0, '#60a5fa'); grd.addColorStop(0.5, '#0369a1'); grd.addColorStop(1, '#082f49');
+  ctx.fillStyle = grd;
+  ctx.beginPath(); ctx.arc(comp.x + comp.largeur/2, comp.y + comp.hauteur/2, comp.largeur/2, 0, Math.PI * 2); ctx.fill();
+  ctx.strokeStyle = 'rgba(0,0,0,0.5)'; ctx.lineWidth = 1.5; ctx.stroke();
+  ctx.fillStyle = 'rgba(255,255,255,0.5)';
+  ctx.beginPath(); ctx.ellipse(comp.x + comp.largeur/2 - 6, comp.y + comp.hauteur/2 - 6, 5, 3, -Math.PI/4, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = '#fff';
+  ctx.font = 'bold 12px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.shadowColor = 'rgba(0,0,0,0.8)'; ctx.shadowBlur = 3;
+  ctx.fillText('C', comp.x + comp.largeur/2, comp.y + comp.hauteur/2 + 4);
+  ctx.shadowBlur = 0;
+}
+
+function dessinerTransistor(comp) {
+  var grd = ctx.createRadialGradient(comp.x + comp.largeur/2 - 8, comp.y + comp.hauteur/2 - 8, 3, comp.x + comp.largeur/2, comp.y + comp.hauteur/2, comp.largeur/2);
+  grd.addColorStop(0, '#4a4a4a'); grd.addColorStop(0.5, '#222'); grd.addColorStop(1, '#000');
+  ctx.fillStyle = grd;
+  ctx.beginPath(); ctx.arc(comp.x + comp.largeur/2, comp.y + comp.hauteur/2, comp.largeur/2, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = 'rgba(255,255,255,0.15)';
+  ctx.beginPath(); ctx.ellipse(comp.x + comp.largeur/2 - 8, comp.y + comp.hauteur/2 - 8, 10, 6, -Math.PI/4, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = '#fff';
+  ctx.font = 'bold 11px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.shadowColor = 'rgba(0,0,0,0.8)'; ctx.shadowBlur = 3;
+  ctx.fillText('2N', comp.x + comp.largeur/2, comp.y + comp.hauteur/2 + 4);
+  ctx.shadowBlur = 0;
+}
+
+function dessinerLDR(comp) {
+  var grd = ctx.createLinearGradient(comp.x, comp.y, comp.x, comp.y + comp.hauteur);
+  grd.addColorStop(0, '#f0d4a0'); grd.addColorStop(0.5, '#d4a76a'); grd.addColorStop(1, '#a67c3d');
+  ctx.fillStyle = grd;
+  ctx.beginPath(); if (ctx.roundRect) ctx.roundRect(comp.x, comp.y, comp.largeur, comp.hauteur, 4); else ctx.rect(comp.x, comp.y, comp.largeur, comp.hauteur); ctx.fill();
+  ctx.strokeStyle = '#8B4513'; ctx.lineWidth = 2;
+  for (var i = 0; i < 4; i++) {
+    ctx.beginPath();
+    ctx.moveTo(comp.x + 8 + i * 13, comp.y + 4);
+    ctx.lineTo(comp.x + 8 + i * 13, comp.y + comp.hauteur - 4);
+    ctx.stroke();
+  }
+  ctx.fillStyle = 'rgba(255,255,255,0.4)';
+  ctx.fillRect(comp.x + 2, comp.y + 2, comp.largeur - 4, 3);
+}
+
+function dessinerBouton(comp) {
+  var grd = ctx.createLinearGradient(comp.x, comp.y, comp.x, comp.y + comp.hauteur);
+  grd.addColorStop(0, '#666'); grd.addColorStop(0.5, '#3a3a3a'); grd.addColorStop(1, '#1a1a1a');
+  ctx.fillStyle = grd;
+  ctx.beginPath(); if (ctx.roundRect) ctx.roundRect(comp.x, comp.y, comp.largeur, comp.hauteur, 6); else ctx.rect(comp.x, comp.y, comp.largeur, comp.hauteur); ctx.fill();
+  var grdBouton = ctx.createRadialGradient(comp.x + comp.largeur/2 - 4, comp.y + comp.hauteur/2 - 9, 2, comp.x + comp.largeur/2, comp.y + comp.hauteur/2 - 5, 15);
+  if (comp.appuye) {
+    grdBouton.addColorStop(0, '#4ade80'); grdBouton.addColorStop(1, '#166534');
+  } else {
+    grdBouton.addColorStop(0, '#c0c0c0'); grdBouton.addColorStop(1, '#666');
+  }
+  ctx.fillStyle = grdBouton;
+  ctx.beginPath(); ctx.arc(comp.x + comp.largeur/2, comp.y + comp.hauteur/2 - 5, comp.appuye ? 12 : 15, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = '#fff';
+  ctx.font = 'bold 10px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.shadowColor = 'rgba(0,0,0,0.8)'; ctx.shadowBlur = 3;
+  ctx.fillText('BP', comp.x + comp.largeur/2, comp.y + comp.hauteur - 5);
+  ctx.shadowBlur = 0;
+}
+
+function dessinerBuzzer(comp) {
+  var grd = ctx.createRadialGradient(comp.x + comp.largeur/2 - 5, comp.y + comp.hauteur/2 - 5, 2, comp.x + comp.largeur/2, comp.y + comp.hauteur/2, comp.largeur/2);
+  grd.addColorStop(0, '#4a4a4a'); grd.addColorStop(0.5, '#222'); grd.addColorStop(1, '#000');
+  ctx.fillStyle = grd;
+  ctx.beginPath(); ctx.arc(comp.x + comp.largeur/2, comp.y + comp.hauteur/2, comp.largeur/2, 0, Math.PI * 2); ctx.fill();
+  ctx.strokeStyle = '#fbbf24'; ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.arc(comp.x + comp.largeur/2, comp.y + comp.hauteur/2, comp.largeur/4, 0, Math.PI * 2); ctx.stroke();
+  ctx.fillStyle = '#fbbf24';
+  ctx.font = 'bold 10px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.shadowColor = 'rgba(251,191,36,0.8)'; ctx.shadowBlur = 6;
+  ctx.fillText('BZ', comp.x + comp.largeur/2, comp.y + comp.hauteur/2 + 4);
+  ctx.shadowBlur = 0;
+}
+
+function dessinerDiodeGenerique(comp) {
+  var grd = ctx.createLinearGradient(comp.x, comp.y, comp.x, comp.y + comp.hauteur);
+  grd.addColorStop(0, '#333'); grd.addColorStop(1, '#111');
+  ctx.fillStyle = grd;
+  ctx.beginPath(); if (ctx.roundRect) ctx.roundRect(comp.x, comp.y, comp.largeur, comp.hauteur, 4); else ctx.rect(comp.x, comp.y, comp.largeur, comp.hauteur); ctx.fill();
+  ctx.fillStyle = '#fff';
+  ctx.beginPath();
+  ctx.moveTo(comp.x + 20, comp.y + 5); ctx.lineTo(comp.x + 20, comp.y + comp.hauteur - 5); ctx.lineTo(comp.x + 5, comp.y + comp.hauteur/2); ctx.fill();
+  ctx.fillRect(comp.x + 20, comp.y + 5, 3, comp.hauteur - 10);
+}
+
+function dessinerCIGenerique(comp) {
+  var grd = ctx.createLinearGradient(comp.x, comp.y, comp.x + comp.largeur, comp.y + comp.hauteur);
+  grd.addColorStop(0, '#3a3a3a'); grd.addColorStop(0.4, '#1a1a1a'); grd.addColorStop(1, '#000');
+  ctx.fillStyle = grd;
+  ctx.beginPath(); if (ctx.roundRect) ctx.roundRect(comp.x, comp.y, comp.largeur, comp.hauteur, 5); else ctx.rect(comp.x, comp.y, comp.largeur, comp.hauteur); ctx.fill();
+  ctx.fillStyle = '#000';
+  ctx.beginPath(); ctx.arc(comp.x + comp.largeur/2, comp.y + 8, 8, 0, Math.PI, true); ctx.fill();
+  ctx.fillStyle = '#555';
+  ctx.beginPath(); ctx.arc(comp.x + comp.largeur/2, comp.y + 8, 8, 0, Math.PI); ctx.fill();
+  ctx.fillStyle = '#ccc';
+  ctx.font = 'bold 10px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.shadowColor = 'rgba(0,0,0,0.8)'; ctx.shadowBlur = 3;
+  ctx.fillText('CI', comp.x + comp.largeur/2, comp.y + comp.hauteur/2 + 4);
+  ctx.shadowBlur = 0;
+}
+
+function dessinerCapteurGenerique(comp) {
+  ctx.fillStyle = '#0ea5e9';
+  ctx.beginPath(); if (ctx.roundRect) ctx.roundRect(comp.x, comp.y, comp.largeur, comp.hauteur, 4); else ctx.rect(comp.x, comp.y, comp.largeur, comp.hauteur); ctx.fill();
+  ctx.fillStyle = '#fff';
+  ctx.font = 'bold 20px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('📡', comp.x + comp.largeur/2, comp.y + comp.hauteur/2 + 7);
+}
+
+function dessinerMoteurGenerique(comp) {
+  var grd = ctx.createRadialGradient(comp.x + comp.largeur/2, comp.y + comp.hauteur/2, 5, comp.x + comp.largeur/2, comp.y + comp.hauteur/2, comp.largeur/2);
+  grd.addColorStop(0, '#4a4a4a'); grd.addColorStop(1, '#222');
+  ctx.fillStyle = grd;
+  ctx.beginPath(); ctx.arc(comp.x + comp.largeur/2, comp.y + comp.hauteur/2, comp.largeur/2, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = '#fff';
+  ctx.font = 'bold 20px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('⚙️', comp.x + comp.largeur/2, comp.y + comp.hauteur/2 + 7);
+}
+
+function dessinerComposant(comp, estMesure) {
+  var c = CATALOGUE[comp.type];
+  if (!c) return;
+  if (estMesure) {
+    ctx.fillStyle = 'rgba(6,182,212,0.2)';
+    ctx.beginPath();
+    ctx.ellipse(comp.x + comp.largeur/2, comp.y + comp.hauteur/2, comp.largeur, comp.hauteur * 0.9, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = '#06b6d4'; ctx.lineWidth = 3;
+    ctx.setLineDash([6, 4]);
+    ctx.beginPath();
+    ctx.ellipse(comp.x + comp.largeur/2, comp.y + comp.hauteur/2, comp.largeur * 0.7, comp.hauteur * 0.8, 0, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.setLineDash([]);
+  }
+  ctx.fillStyle = 'rgba(0,0,0,0.18)';
+  ctx.beginPath();
+  ctx.ellipse(comp.x + comp.largeur/2, comp.y + comp.hauteur + 4, comp.largeur/2 + 3, 6, 0, 0, Math.PI * 2);
+  ctx.fill();
+  
+  var typeDessin = mapperTypeDessin(comp.type);
+  
+  if (typeDessin === 'pile') dessinerPile(comp);
+  else if (typeDessin === 'resistance') dessinerResistance(comp);
+  else if (typeDessin === 'led') dessinerLED(comp, comp.allume);
+  else if (typeDessin === 'interrupteur') dessinerInterrupteur(comp);
+  else if (typeDessin === 'ne555') dessinerNE555(comp);
+  else if (typeDessin === 'cd4017') dessinerCD4017(comp);
+  else if (typeDessin === 'condensateur') dessinerCondensateur(comp);
+  else if (typeDessin === 'transistor') dessinerTransistor(comp);
+  else if (typeDessin === 'ldr') dessinerLDR(comp);
+  else if (typeDessin === 'bouton') dessinerBouton(comp);
+  else if (typeDessin === 'buzzer') dessinerBuzzer(comp);
+  else if (typeDessin === 'diode') dessinerDiodeGenerique(comp);
+  else if (typeDessin === 'ci') dessinerCIGenerique(comp);
+  else if (typeDessin === 'capteur') dessinerCapteurGenerique(comp);
+  else if (typeDessin === 'moteur') dessinerMoteurGenerique(comp);
+  else {
+    ctx.fillStyle = '#94a3b8';
+    ctx.fillRect(comp.x, comp.y, comp.largeur, comp.hauteur);
+    ctx.fillStyle = '#1a1f2e';
+    ctx.font = 'bold 12px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('?', comp.x + comp.largeur/2, comp.y + comp.hauteur/2 + 4);
+  }
+
+  for (var i = 0; i < c.pattes.length; i++) {
+    var p = obtenirPatteAbsolue(comp, i);
+    var estEnAttente = patteEnAttente && patteEnAttente.compId === comp.id && patteEnAttente.patteIndex === i;
+    var estPointeRouge = pointeRouge && pointeRouge.compId === comp.id && pointeRouge.patteIndex === i;
+    var estPointeNoire = pointeNoire && pointeNoire.compId === comp.id && pointeNoire.patteIndex === i;
+    var estPattePilePlus = comp.type === 'pile' && i === 0;
+    var estPattePileMoins = comp.type === 'pile' && i === 1;
+    ctx.fillStyle = 'rgba(0,0,0,0.3)';
+    ctx.beginPath(); ctx.arc(p.x + 1, p.y + 1, 6, 0, Math.PI * 2); ctx.fill();
+    var grdPatte = ctx.createRadialGradient(p.x - 2, p.y - 2, 1, p.x, p.y, 6);
+    if (estEnAttente || estPointeRouge || estPointeNoire) {
+      grdPatte.addColorStop(0, '#fff8b0'); grdPatte.addColorStop(0.5, '#fbbf24'); grdPatte.addColorStop(1, '#b45309');
+    } else if (estPattePilePlus) {
+      grdPatte.addColorStop(0, '#93c5fd'); grdPatte.addColorStop(0.5, '#3b82f6'); grdPatte.addColorStop(1, '#1e40af');
+    } else if (estPattePileMoins) {
+      grdPatte.addColorStop(0, '#fca5a5'); grdPatte.addColorStop(0.5, '#dc2626'); grdPatte.addColorStop(1, '#7f1d1d');
+    } else {
+      grdPatte.addColorStop(0, '#e0e0e0'); grdPatte.addColorStop(0.5, '#a0a0a0'); grdPatte.addColorStop(1, '#606060');
+    }
+    ctx.fillStyle = grdPatte;
+    ctx.beginPath(); ctx.arc(p.x, p.y, 7, 0, Math.PI * 2); ctx.fill();
+    ctx.strokeStyle = '#333'; ctx.lineWidth = 1; ctx.stroke();
+    if (estPattePilePlus) {
+      ctx.fillStyle = '#1e40af';
+      ctx.font = 'bold 14px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('+', p.x, p.y + 22);
+    }
+    if (estPattePileMoins) {
+      ctx.fillStyle = '#7f1d1d';
+      ctx.font = 'bold 16px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('−', p.x, p.y + 22);
+    }
+  }
+  ctx.fillStyle = '#333';
+  ctx.font = 'bold 11px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText(c.nom, comp.x + comp.largeur/2, comp.y - 5);
+  if (comp.valeur) {
+    ctx.fillStyle = '#0369a1';
+    ctx.font = '10px sans-serif';
+    ctx.fillText(comp.valeur, comp.x + comp.largeur/2, comp.y + comp.hauteur + 15);
+  }
+}
+
+function mapperTypeDessin(type) {
+  if (type === 'pile9v' || type === 'pile15v' || type === 'pile12v' || type === 'alimStabilisee') return 'pile';
+  if (type === 'resistance470' || type === 'resistance220' || type === 'resistance1k' || type === 'resistance10k' || type === 'thermistance' || type === 'bobine') return 'resistance';
+  if (type === 'ledRouge' || type === 'ledVerte' || type === 'ledBleue' || type === 'ledJaune' || type === 'ledRgb' || type === 'afficheur7seg' || type === 'afficheurLcd') return 'led';
+  if (type === 'boutonPoussoir') return 'bouton';
+  if (type === 'potentiometre') return 'resistance';
+  if (type === 'condensateur10uF' || type === 'condensateur100uF') return 'condensateur';
+  if (type === 'diode1n4148' || type === 'diode1n4007' || type === 'diodeZener') return 'diode';
+  if (type === 'ne555' || type === 'ne555Cms' || type === 'cd4017' || type === 'cd4027' || type === 'ci74hc00' || type === 'microcontroleur' || type === 'porteAnd' || type === 'porteOr' || type === 'porteNot' || type === 'porteXor') return 'ci';
+  if (type === 'transistorPnp' || type === 'mosfet' || type === 'aop' || type === 'relais') return 'transistor';
+  if (type === 'capteurIr' || type === 'microphone' || type === 'capteurHumidite' || type === 'moduleBluetooth') return 'capteur';
+  if (type === 'hautParleur' || type === 'moteurDc' || type === 'servomoteur' || type === 'servomoteurAmeliore') return 'moteur';
+  return type;
+}
+/* =========================================================
+   FONCTIONS DE SAUVEGARDE ET DE NAVIGATION (MANQUANTES)
+   ========================================================= */
+function sauvegarderLocal(silencieux) {
+  try {
+    var data = {
+      version: 1,
+      date: new Date().toISOString(),
+      composants: composants,
+      fils: fils,
+      prochainId: prochainId,
+      prochainFilId: prochainFilId
+    };
+    localStorage.setItem('alerte_electro_bac_a_sable_v1', JSON.stringify(data));
+    if (!silencieux) mettreMessage('💾 Sauvegarde locale effectuée.', 'succes');
+  } catch (e) { console.log('Erreur sauvegarde locale:', e); }
+}
+
+function effacerLocal() {
+  try { localStorage.removeItem('alerte_electro_bac_a_sable_v1'); } catch (e) {}
+}
+
+function demarrerAutoSave() {
+  setInterval(function() {
+    if (composants.length > 0) sauvegarderLocal(true);
+  }, 30000);
+}
+
+function chargerLocal() {
+  try {
+    var raw = localStorage.getItem('alerte_electro_bac_a_sable_v1');
+    if (!raw) return false;
+    var data = JSON.parse(raw);
+    if (!data.composants || !data.fils) return false;
+    if (data.composants.length === 0) return false;
+    if (confirm('📂 Un circuit sauvegardé a été trouvé (' + data.composants.length + ' composants).\nVoulez-vous le reprendre ?')) {
+      composants = data.composants;
+      fils = data.fils;
+      prochainId = data.prochainId || 1;
+      prochainFilId = data.prochainFilId || 1;
+      mettreMessage('📂 Circuit restauré ! ' + composants.length + ' composant(s).', 'succes');
+      mettreAJourStatut();
+      afficherPanneauComposants();
+      dessiner();
+      return true;
+    } else {
+      localStorage.removeItem('alerte_electro_bac_a_sable_v1');
+      return false;
+    }
+  } catch (e) { console.log('Erreur chargement local:', e); return false; }
+}
+
+function faireSnapshot() {
+  if (sauvegarde_en_cours) return;
+  historique = historique.slice(0, historiqueIndex + 1);
+  var snapshot = {
+    composants: JSON.parse(JSON.stringify(composants)),
+    fils: JSON.parse(JSON.stringify(fils)),
+    prochainId: prochainId,
+    prochainFilId: prochainFilId
+  };
+  historique.push(snapshot);
+  if (historique.length > MAX_HISTORIQUE) historique.shift();
+  historiqueIndex = historique.length - 1;
+}
+
+function gererDragVueMousedown(event) {
+  if (event.button !== 0) return;
+  if (composantSelectionne || modeCablage || blocSelectionne || multimetreActif || tutoActif) {
+    return;
+  }
+  var pos = coordonneesSouris(event);
+  var comp = trouverComposantSousSouris(pos.x, pos.y);
+  if (comp) return;
+  var patte = trouverPatteSousSouris(pos.x, pos.y);
+  if (patte) return;
+  var rect = canvas.getBoundingClientRect();
+  var scaleX = canvas.width / rect.width;
+  var scaleY = canvas.height / rect.height;
+  dragVueStartX = (event.clientX - rect.left) * scaleX;
+  dragVueStartY = (event.clientY - rect.top) * scaleY;
+  dragVuePanStartX = panX;
+  dragVuePanStartY = panY;
+  dragVueSeuil = 5;
+  dragVuePretPourDeplacement = true;
+}
+
+function gererDragVueMousemove(event) {
+  if (!dragVuePretPourDeplacement) return;
+  var rect = canvas.getBoundingClientRect();
+  var scaleX = canvas.width / rect.width;
+  var scaleY = canvas.height / rect.height;
+  var sx = (event.clientX - rect.left) * scaleX;
+  var sy = (event.clientY - rect.top) * scaleY;
+  var dx = sx - dragVueStartX;
+  var dy = sy - dragVueStartY;
+  if (!enDeplacementVue) {
+    if (Math.abs(dx) < dragVueSeuil && Math.abs(dy) < dragVueSeuil) return;
+    enDeplacementVue = true;
+    canvas.style.cursor = 'grabbing';
+  }
+  panX = dragVuePanStartX + dx;
+  panY = dragVuePanStartY + dy;
+  limiterPan();
+  dessiner();
+}
+
+function gererDragVueMouseup(event) {
+  if (enDeplacementVue) {
+    enDeplacementVue = false;
+    canvas.style.cursor = 'crosshair';
+  }
+  dragVuePretPourDeplacement = false;
+}
+
+function limiterPan() {
+  var marge = 300;
+  var largeurMonde = canvas.width * zoomLevel;
+  var hauteurMonde = canvas.height * zoomLevel;
+  var minX = -(largeurMonde - canvas.width) - marge;
+  var maxX = marge;
+  var minY = -(hauteurMonde - canvas.height) - marge;
+  var maxY = marge;
+  if (panX < minX) panX = minX;
+  if (panX > maxX) panX = maxX;
+  if (panY < minY) panY = minY;
+  if (panY > maxY) panY = maxY;
+}
+
+function gererMolette(event) {
+  event.preventDefault();
+  var rect = canvas.getBoundingClientRect();
+  var scaleX = canvas.width / rect.width;
+  var scaleY = canvas.height / rect.height;
+  var sx = (event.clientX - rect.left) * scaleX;
+  var sy = (event.clientY - rect.top) * scaleY;
+  var ancienZoom = zoomLevel;
+  var delta = event.deltaY < 0 ? 1.1 : 1 / 1.1;
+  var nouveauZoom = ancienZoom * delta;
+  nouveauZoom = Math.max(zoomMin, Math.min(zoomMax, nouveauZoom));
+  var wx = (sx - panX) / ancienZoom;
+  var wy = (sy - panY) / ancienZoom;
+  zoomLevel = nouveauZoom;
+  panX = sx - wx * zoomLevel;
+  panY = sy - wy * zoomLevel;
+  limiterPan();
+  dessiner();
+}
+
+function zoomPlus() {
+  var centreX = canvas.width / 2;
+  var centreY = canvas.height / 2;
+  var ancienZoom = zoomLevel;
+  var nouveauZoom = Math.min(zoomMax, zoomLevel * 1.2);
+  var wx = (centreX - panX) / ancienZoom;
+  var wy = (centreY - panY) / ancienZoom;
+  zoomLevel = nouveauZoom;
+  panX = centreX - wx * zoomLevel;
+  panY = centreY - wy * zoomLevel;
+  limiterPan();
+  dessiner();
+}
+
+function zoomMoins() {
+  var centreX = canvas.width / 2;
+  var centreY = canvas.height / 2;
+  var ancienZoom = zoomLevel;
+  var nouveauZoom = Math.max(zoomMin, zoomLevel / 1.2);
+  var wx = (centreX - panX) / ancienZoom;
+  var wy = (centreY - panY) / ancienZoom;
+  zoomLevel = nouveauZoom;
+  panX = centreX - wx * zoomLevel;
+  panY = centreY - wy * zoomLevel;
+  limiterPan();
+  dessiner();
+}
+
+function recentrerVue() {
+  zoomLevel = 1.0;
+  panX = 0;
+  panY = 0;
+  dessiner();
+  mettreMessage('🏠 Vue recentrée (zoom 100%)', 'info');
+}
+
+function gererClavier(event) {
+  var tag = (event.target.tagName || '').toLowerCase();
+  if (tag === 'input' || tag === 'textarea' || tag === 'select') return;
+
+  if (event.key === 'Delete' || event.key === 'Backspace') {
+    if (composantSurvoleClavier) {
+      event.preventDefault();
+      supprimerComposant(composantSurvoleClavier.id);
+      return;
+    }
+  }
+  if (event.key === 'Escape') { annulerMode(); return; }
+  if ((event.ctrlKey || event.metaKey) && (event.key === 'z' || event.key === 'Z')) { event.preventDefault(); annulerAction(); return; }
+  if ((event.ctrlKey || event.metaKey) && (event.key === 'y' || event.key === 'Y')) { event.preventDefault(); retablirAction(); return; }
+  if ((event.ctrlKey || event.metaKey) && (event.key === 's' || event.key === 'S')) { event.preventDefault(); exporterJSON(); return; }
+  if (event.key === '+' || event.key === '=') { zoomPlus(); return; }
+  if (event.key === '-' || event.key === '_') { zoomMoins(); return; }
+  if (event.key === '0') { recentrerVue(); return; }
+}
+
+function annulerMode() {
+  var actionFaite = false;
+  if (composantSelectionne) {
+    composantSelectionne = null;
+    composantAValeur = null;
+    afficherPalette();
+    document.getElementById('statut-mode').textContent = '🖱️ Mode : Placer';
+    mettreMessage('❌ Placement annulé.', 'info');
+    actionFaite = true;
+  } else if (blocSelectionne) {
+    blocSelectionne = null;
+    canvas.classList.remove('mode-bloc');
+    afficherBlocs();
+    document.getElementById('statut-mode').textContent = '🖱️ Mode : Placer';
+    mettreMessage('❌ Bloc annulé.', 'info');
+    actionFaite = true;
+  } else if (modeCablage) { basculerModeCablage(); actionFaite = true; }
+  else if (patteEnAttente) { patteEnAttente = null; mettreMessage('❌ Câblage annulé.', 'info'); actionFaite = true; }
+  else if (multimetreActif) { basculerMultimetre(); actionFaite = true; }
+  else if (tutoActif) { quitterTutoriel(); actionFaite = true; }
+  if (!actionFaite) { mettreMessage('💡 Rien à annuler.', 'info'); }
+  dessiner();
+}
+
+function annulerAction() {
+  if (historiqueIndex <= 0) { mettreMessage('↩️ Rien à annuler.', 'info'); return; }
+  historiqueIndex--;
+  restaurerSnapshot(historique[historiqueIndex]);
+  mettreMessage('↩️ Action annulée.', 'info');
+}
+
+function retablirAction() {
+  if (historiqueIndex >= historique.length - 1) { mettreMessage('↪️ Rien à rétablir.', 'info'); return; }
+  historiqueIndex++;
+  restaurerSnapshot(historique[historiqueIndex]);
+  mettreMessage('↪️ Action rétablie.', 'info');
+}
+
+function restaurerSnapshot(snap) {
+  sauvegarde_en_cours = true;
+  composants = JSON.parse(JSON.stringify(snap.composants));
+  fils = JSON.parse(JSON.stringify(snap.fils));
+  prochainId = snap.prochainId;
+  prochainFilId = snap.prochainFilId;
+  patteEnAttente = null;
+  filSurvole = null;
+  pointeRouge = null;
+  pointeNoire = null;
+  sauvegarde_en_cours = false;
+  mettreAJourStatut();
+  afficherPanneauComposants();
+  dessiner();
+}
 window.onload = function() {
   canvas = document.getElementById('sandbox');
   ctx = canvas.getContext('2d');
   afficherPalette(); afficherBlocs(); afficherTutoriels(); afficherDefis();
   mettreAJourStatut(); afficherPanneauComposants();
   canvas.addEventListener('click', clicCanvas);
-  canvas.addEventListener('dblclick', doubleClicCanvas);
   canvas.addEventListener('mousedown', gererDragVueMousedown);
   canvas.addEventListener('mousedown', sourisDown);
   canvas.addEventListener('mousemove', gererDragVueMousemove);
