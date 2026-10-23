@@ -348,6 +348,7 @@
       📲 Installer
     </button>
     <a href="bibliotheque.html" class="btn-retour" style="margin-left:10px;">📚 Bibliothèque</a>
+    <a href="projets.html" class="btn-retour" style="margin-left:10px;">🏆 Projets</a>
     <a href="index.html" class="btn-retour">← Retour à l'accueil</a>
   </div>
 </header>
@@ -751,7 +752,7 @@ var DEFIS = {
   },
   alarme: {
     id: 'alarme', nom: '🚨 Alarme de Porte', icone: '🚨',
-    categorie: 'maison',
+    categorie: 'securite',
     desc: 'Déclenche un buzzer quand la porte s\'ouvre (interrupteur).',
     composants_requis: ['pile', 'interrupteur', 'buzzer'],
     cablages_requis: [
@@ -773,6 +774,81 @@ var DEFIS = {
       { typeA: 'pile', patteA: 0, typeB: 'moteurDc', patteB: 0 },
       { typeA: 'moteurDc', patteA: 1, typeB: 'transistor', patteB: 2 },
       { typeA: 'transistor', patteA: 0, typeB: 'pile', patteB: 1 }
+    ]
+  },
+    /* ===== 🔬 CAPTEURS ===== */
+  thermometre: {
+    id: 'thermometre', nom: '🌡️ Thermomètre', icone: '🌡️',
+    categorie: 'capteurs',
+    desc: 'La LED s\'allume quand la température dépasse un seuil (thermistance).',
+    composants_requis: ['pile', 'thermistance', 'transistor', 'led', 'resistance'],
+    cablages_requis: [
+      { typeA: 'pile', patteA: 0, typeB: 'thermistance', patteB: 0 },
+      { typeA: 'thermistance', patteA: 1, typeB: 'transistor', patteB: 1 },
+      { typeA: 'pile', patteA: 0, typeB: 'led', patteB: 0 },
+      { typeA: 'led', patteA: 1, typeB: 'transistor', patteB: 2 },
+      { typeA: 'transistor', patteA: 0, typeB: 'pile', patteB: 1 },
+      { typeA: 'resistance', patteA: 0, typeB: 'transistor', patteB: 1 },
+      { typeA: 'resistance', patteA: 1, typeB: 'pile', patteB: 1 }
+    ]
+  },
+  detecteurMouvement: {
+    id: 'detecteurMouvement', nom: '📡 Détecteur de mouvement', icone: '📡',
+    categorie: 'capteurs',
+    desc: 'La LED s\'allume quand un mouvement est détecté (capteur IR).',
+    composants_requis: ['pile', 'capteurIr', 'transistor', 'led', 'resistance'],
+    cablages_requis: [
+      { typeA: 'pile', patteA: 0, typeB: 'capteurIr', patteB: 0 },
+      { typeA: 'capteurIr', patteA: 1, typeB: 'transistor', patteB: 1 },
+      { typeA: 'pile', patteA: 0, typeB: 'led', patteB: 0 },
+      { typeA: 'led', patteA: 1, typeB: 'transistor', patteB: 2 },
+      { typeA: 'transistor', patteA: 0, typeB: 'pile', patteB: 1 },
+      { typeA: 'resistance', patteA: 0, typeB: 'transistor', patteB: 1 },
+      { typeA: 'resistance', patteA: 1, typeB: 'pile', patteB: 1 }
+    ]
+  },
+  detecteurPluie: {
+    id: 'detecteurPluie', nom: '🌧️ Détecteur de pluie', icone: '🌧️',
+    categorie: 'capteurs',
+    desc: 'Le buzzer sonne quand la pluie est détectée (LDR + transistor).',
+    composants_requis: ['pile', 'ldr', 'transistor', 'buzzer', 'resistance'],
+    cablages_requis: [
+      { typeA: 'pile', patteA: 0, typeB: 'ldr', patteB: 0 },
+      { typeA: 'ldr', patteA: 1, typeB: 'transistor', patteB: 1 },
+      { typeA: 'pile', patteA: 0, typeB: 'buzzer', patteB: 0 },
+      { typeA: 'buzzer', patteA: 1, typeB: 'transistor', patteB: 2 },
+      { typeA: 'transistor', patteA: 0, typeB: 'pile', patteB: 1 },
+      { typeA: 'resistance', patteA: 0, typeB: 'transistor', patteB: 1 },
+      { typeA: 'resistance', patteA: 1, typeB: 'pile', patteB: 1 }
+    ]
+  },
+  
+  /* ===== 🔒 SÉCURITÉ ===== */
+  digicode: {
+    id: 'digicode', nom: '🔒 Digicode', icone: '🔒',
+    categorie: 'securite',
+    desc: 'Appuie sur les 3 boutons dans le bon ordre pour allumer la LED.',
+    composants_requis: ['pile', 'bouton', 'porteAnd', 'led', 'resistance'],
+    cablages_requis: [
+      { typeA: 'pile', patteA: 0, typeB: 'bouton', patteB: 0 },
+      { typeA: 'bouton', patteA: 1, typeB: 'porteAnd', patteB: 0 },
+      { typeA: 'porteAnd', patteA: 2, typeB: 'led', patteB: 0 },
+      { typeA: 'led', patteA: 1, typeB: 'pile', patteB: 1 }
+    ]
+  },
+  alarmeIncendie: {
+    id: 'alarmeIncendie', nom: '🔥 Alarme incendie', icone: '🔥',
+    categorie: 'securite',
+    desc: 'Le buzzer sonne quand la température dépasse un seuil (thermistance).',
+    composants_requis: ['pile', 'thermistance', 'transistor', 'buzzer', 'resistance'],
+    cablages_requis: [
+      { typeA: 'pile', patteA: 0, typeB: 'thermistance', patteB: 0 },
+      { typeA: 'thermistance', patteA: 1, typeB: 'transistor', patteB: 1 },
+      { typeA: 'pile', patteA: 0, typeB: 'buzzer', patteB: 0 },
+      { typeA: 'buzzer', patteA: 1, typeB: 'transistor', patteB: 2 },
+      { typeA: 'transistor', patteA: 0, typeB: 'pile', patteB: 1 },
+      { typeA: 'resistance', patteA: 0, typeB: 'transistor', patteB: 1 },
+      { typeA: 'resistance', patteA: 1, typeB: 'pile', patteB: 1 }
     ]
   },
   
@@ -1033,13 +1109,14 @@ function afficherDefis() {
   var html = '';
   
   // Définition des catégories (icônes et ordre d'affichage)
-  var categories = {
-    'maison': { nom: '🏠 Maison', ordre: 1 },
-    'ecologie': { nom: '🌱 Écologie', ordre: 2 },
-    'jeux': { nom: '🎮 Jeux & Sons', ordre: 3 },
-    'vehicules': { nom: '🚗 Véhicules', ordre: 4 },
-    'capteurs': { nom: '🔬 Capteurs', ordre: 5 },
-    'initiation': { nom: '💡 Initiation', ordre: 6 },
+    var categories = {
+    'initiation': { nom: '💡 Initiation', ordre: 1 },
+    'maison': { nom: '🏠 Maison', ordre: 2 },
+    'ecologie': { nom: '🌱 Écologie', ordre: 3 },
+    'jeux': { nom: '🎮 Jeux & Sons', ordre: 4 },
+    'vehicules': { nom: '🚗 Véhicules', ordre: 5 },
+    'capteurs': { nom: '🔬 Capteurs', ordre: 6 },
+    'securite': { nom: '🔒 Sécurité', ordre: 7 },
     'autres': { nom: '📦 Autres', ordre: 99 }
   };
   

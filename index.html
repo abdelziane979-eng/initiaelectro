@@ -456,6 +456,12 @@ function afficherAccueil() {
     html += '<div class="meta">⏱ ' + p.duree + ' · 📦 ' + p.composants.length + ' composants</div>';
     html += '</div>';
   }
+    html += '<div class="carte-projet" onclick="window.open(\'projets.html\', \'_blank\')" style="border-left-color: #f97316;">';
+    html += '<div class="emoji">🏆</div>';
+    html += '<h3>Projets d\'ingénierie<span class="niveau-badge niveau-ecolier">18 défis</span></h3>';
+    html += '<p>Découvre 18 défis pour construire des circuits utiles du quotidien.</p>';
+    html += '<div class="meta">🏠 Maison · 🌱 Écologie · 🎮 Jeux · 🚗 Véhicules · 🔬 Capteurs · 🔒 Sécurité</div>';
+    html += '</div>';
   html += '<div class="carte-projet carte-sandbox" onclick="ouvrirBacASable()">';
 html += '<div class="emoji">⚡</div>';
 html += '<h3>EspaceElectronic<span class="niveau-badge niveau-libre">Libre</span></h3>';
