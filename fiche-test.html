@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fiche de Test - InitiaElectro / EspaceElectronic</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0' stop-color='%236b21a8'/><stop offset='1' stop-color='%23a855f7'/></linearGradient></defs><rect width='512' height='512' rx='112' fill='url(%23g)'/><circle cx='220' cy='256' r='60' fill='%23ff3333' stroke='%23fff' stroke-width='12'/><circle cx='200' cy='236' r='14' fill='rgba(255,255,255,0.85)'/><rect x='300' y='238' width='140' height='36' rx='18' fill='%23D4A76A' stroke='%23fff' stroke-width='8'/><line x1='280' y1='256' x2='300' y2='256' stroke='%23fff' stroke-width='10' stroke-linecap='round'/></svg>">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f9ff; color: #1a1f2e; line-height: 1.6; }
+  
+  header { background: linear-gradient(135deg, #0369a1, #6b21a8); color: white;
+           padding: 40px 20px; text-align: center;
+           box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
+  header h1 { font-size: 2.2em; margin-bottom: 10px; }
+  header .sous-titre { font-size: 1.2em; opacity: 0.95; }
+  header .auteur { font-size: 0.9em; margin-top: 16px; opacity: 0.9; font-style: italic; }
+  
+  .conteneur { max-width: 900px; margin: 0 auto; padding: 32px 20px; }
+  
+  section { background: white; padding: 28px; border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08); margin-bottom: 24px; }
+  section h2 { color: #0369a1; font-size: 1.5em; margin-bottom: 16px;
+               padding-bottom: 10px; border-bottom: 3px solid #e0e0e0; }
+  section h3 { color: #6b21a8; font-size: 1.2em; margin: 20px 0 10px 0; }
+  section p { margin-bottom: 12px; }
+  section ul, section ol { padding-left: 24px; margin-bottom: 16px; }
+  section li { padding: 4px 0; }
+  
+  .info { background: #dbeafe; border-left: 4px solid #3b82f6;
+          padding: 14px 16px; border-radius: 6px; margin: 16px 0; }
+  .info strong { color: #1e40af; }
+  
+  .astuce { background: #fef3c7; border-left: 4px solid #fbbf24;
+            padding: 14px 16px; border-radius: 6px; margin: 16px 0; }
+  .astuce strong { color: #b45309; }
+  
+  .attention { background: #fee2e2; border-left: 4px solid #ef4444;
+               padding: 14px 16px; border-radius: 6px; margin: 16px 0; }
+  .attention strong { color: #991b1b; }
+  
+  table { width: 100%; border-collapse: collapse; margin: 16px 0;
+          background: white; border-radius: 8px; overflow: hidden;
+          box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+  th { background: #0369a1; color: white; padding: 12px; text-align: left; }
+  td { padding: 10px 12px; border-bottom: 1px solid #e0e0e0; }
+  tr:last-child td { border-bottom: none; }
+  tr:nth-child(even) td { background: #f8fbff; }
+  
+  .btn { display: inline-block; padding: 14px 24px; background: #0369a1;
+         color: white; text-decoration: none; border-radius: 8px;
+         font-weight: bold; margin: 8px 4px; transition: all 0.2s;
+         box-shadow: 0 4px 10px rgba(3,105,161,0.3); font-size: 1.05em; }
+  .btn:hover { background: #0284c7; transform: translateY(-2px);
+               box-shadow: 0 6px 14px rgba(3,105,161,0.4); }
+  
+  .bloc-etape { display: flex; gap: 16px; align-items: flex-start;
+                background: #f8fafc; padding: 16px; border-radius: 8px;
+                margin-bottom: 12px; border-left: 4px solid #0369a1; }
+  .bloc-etape .numero { background: #0369a1; color: white; width: 32px; height: 32px;
+                        border-radius: 50%; display: flex; align-items: center;
+                        justify-content: center; font-weight: bold; flex-shrink: 0; }
+  .bloc-etape .contenu { flex: 1; }
+  
+  footer { background: #1a1f2e; color: #94a3b8; padding: 24px;
+           text-align: center; margin-top: 40px; font-size: 0.9em; }
+  
+  @media print {
+    body { background: white; }
+    header { box-shadow: none; }
+    section { box-shadow: none; border: 1px solid #ddd; page-break-inside: avoid; }
+    .no-print { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🧪 Fiche de Test</h1>
+  <div class="sous-titre">InitiaElectro & EspaceElectronic</div>
+  <div class="auteur">Développé par M. Ziane</div>
+</header>
+
+<div class="conteneur">
+
+  <!-- INTRODUCTION -->
+  <section>
+    <h2>👋 Cher collègue,</h2>
+    <p>Merci d'avoir accepté de tester <strong>InitiaElectro</strong> et <strong>EspaceElectronic</strong> dans votre classe !</p>
+    <p>Ce document vous accompagne pas à pas pour faire tester l'application à vos élèves et recueillir leurs retours.</p>
+    <p><strong>Votre avis est précieux</strong> pour améliorer cet outil pédagogique.</p>
+  </section>
+
+  <!-- ACCES RAPIDE -->
+  <section>
+    <h2>🚀 Accès rapide à l'application</h2>
+    <p>Voici les liens pour accéder aux applications :</p>
+    
+    <div style="text-align:center; margin: 20px 0;">
+      <a href="https://abdelziane979-eng.github.io/initiaelectro/" class="btn no-print" target="_blank">🛠️ Lancer InitiaElectro</a>
+      <a href="https://abdelziane979-eng.github.io/initiaelectro/bac_a_sable.html" class="btn no-print" style="background:#6b21a8;" target="_blank">🧪 Lancer EspaceElectronic</a>
+    </div>
+
+    <div class="info">
+      <strong>📱 Astuce :</strong> Installez l'application sur vos appareils (PC, tablette) pour qu'elle fonctionne <strong>hors ligne</strong> et soit plus rapide. Le guide d'installation explique comment faire.
+    </div>
+  </section>
+
+  <!-- PREREQUIS -->
+  <section>
+    <h2>✅ Prérequis</h2>
+    <p>Pour tester, vous avez besoin de :</p>
+    <ul>
+      <li>💻 Un PC, une tablette ou un smartphone (1 par élève ou par binôme)</li>
+      <li>🌐 Un navigateur récent : <strong>Chrome</strong>, <strong>Edge</strong>, Firefox ou Safari</li>
+      <li>📶 Une connexion Internet (ou installation préalable pour fonctionner hors ligne)</li>
+      <li>⏱️ Environ <strong>45 minutes</strong> pour une séance de test</li>
+    </ul>
+  </section>
+
+  <!-- PROTOCOLE DE TEST -->
+  <section>
+    <h2>📋 Protocole de test</h2>
+    <p>Voici comment organiser la séance de test avec vos élèves.</p>
+
+    <h3>🎯 Objectifs du test</h3>
+    <ul>
+      <li>Vérifier que l'application fonctionne correctement dans votre contexte</li>
+      <li>Évaluer la facilité d'utilisation pour les élèves</li>
+      <li>Recueillir les retours pour améliorer l'outil</li>
+    </ul>
+
+    <h3>⏱️ Déroulé de la séance (45 minutes)</h3>
+
+    <div class="bloc-etape">
+      <div class="numero">1</div>
+      <div class="contenu">
+        <strong>Présentation (5 min)</strong>
+        <p>Présentez l'application aux élèves. Expliquez qu'il s'agit d'un outil pour apprendre l'électronique.</p>
+      </div>
+    </div>
+
+    <div class="bloc-etape">
+      <div class="numero">2</div>
+      <div class="contenu">
+        <strong>Découverte guidée (5 min)</strong>
+        <p>Montrez le fonctionnement du mode <strong>Démonstration</strong> sur un projecteur ou un écran.</p>
+        <p>Ouvrez <strong>InitiaElectro</strong> → cliquez sur "Allumer une LED" → choisissez le mode "🎬 Démonstration".</p>
+      </div>
+    </div>
+
+    <div class="bloc-etape">
+      <div class="numero">3</div>
+      <div class="contenu">
+        <strong>Travail des élèves (25 min)</strong>
+        <p>Les élèves travaillent en autonomie (ou en binôme) sur <strong>InitiaElectro</strong>.</p>
+        <p><strong>Consigne :</strong> "Réalisez au moins 2 projets guidés en mode Quiz Facile."</p>
+      </div>
+    </div>
+
+    <div class="bloc-etape">
+      <div class="numero">4</div>
+      <div class="contenu">
+        <strong>Exploration libre (5 min)</strong>
+        <p>Les élèves explorent <strong>EspaceElectronic</strong> : le bac à sable et les défis.</p>
+        <p><strong>Consigne :</strong> "Testez le bac à sable. Essayez de construire un circuit."</p>
+      </div>
+    </div>
+
+    <div class="bloc-etape">
+      <div class="numero">5</div>
+      <div class="contenu">
+        <strong>Bilan et questionnaire (5 min)</strong>
+        <p>Distribuez le questionnaire élève (en annexe) et recueillez les avis.</p>
+      </div>
+    </div>
+
+    <div class="astuce">
+      <strong>💡 Conseil :</strong> Notez vos propres observations pendant la séance : ce qui a bien fonctionné, ce qui a posé problème, les questions des élèves.
+    </div>
+  </section>
+
+  <!-- CE QU'ON ATTEND DE VOUS -->
+  <section>
+    <h2>📝 Ce qu'on attend de vous</h2>
+    <p>Votre retour est essentiel. Voici ce qu'il nous aiderait à faire :</p>
+
+    <h3>1️⃣ Un retour sur l'application</h3>
+    <ul>
+      <li>Est-ce que l'application fonctionne bien sur vos appareils ?</li>
+      <li>Est-elle facile à utiliser pour les élèves ?</li>
+      <li>Est-elle adaptée à leur niveau ?</li>
+    </ul>
+
+    <h3>2️⃣ Un retour des élèves</h3>
+    <ul>
+      <li>Distribuez le questionnaire (en annexe)</li>
+      <li>Recueillez les réponses</li>
+      <li>Partagez les retours les plus intéressants</li>
+    </ul>
+
+    <h3>3️⃣ Vos suggestions</h3>
+    <ul>
+      <li>Qu'est-ce qui manque ?</li>
+      <li>Qu'est-ce qui pourrait être amélioré ?</li>
+      <li>Avez-vous des idées de nouveaux projets ?</li>
+    </ul>
+  </section>
+
+  <!-- QUESTIONNAIRE PROF -->
+  <section>
+    <h2>📋 Questionnaire Professeur</h2>
+    <p>À remplir après la séance de test. Renvoyez-le à M. Ziane.</p>
+
+    <div class="info">
+      <strong>Nom :</strong> ___________________________<br>
+      <strong>Établissement :</strong> ___________________________<br>
+      <strong>Niveau de la classe :</strong> ___________________________<br>
+      <strong>Nombre d'élèves :</strong> ___________________________<br>
+      <strong>Date du test :</strong> ___________________________
+    </div>
+
+    <h3>1. Fonctionnement technique</h3>
+    <ul>
+      <li>L'application a-t-elle fonctionné correctement ? ☐ Oui ☐ Non</li>
+      <li>Avez-vous rencontré des bugs ? ☐ Oui ☐ Non<br>Si oui, lesquels : ___________________________</li>
+    </ul>
+
+    <h3>2. Facilité d'utilisation</h3>
+    <ul>
+      <li>Les élèves ont-ils compris comment utiliser l'application ? ☐ Oui ☐ Non ☐ Partiellement</li>
+      <li>Ont-ils eu besoin d'aide ? ☐ Oui ☐ Non<br>Si oui, pour quoi : ___________________________</li>
+    </ul>
+
+    <h3>3. Intérêt pédagogique</h3>
+    <ul>
+      <li>L'application vous semble-t-elle adaptée au niveau de vos élèves ? ☐ Oui ☐ Non ☐ Partiellement</li>
+      <li>Les contenus vous semblent-ils pédagogiquement pertinents ? ☐ Oui ☐ Non ☐ Partiellement</li>
+    </ul>
+
+    <h3>4. Vos observations</h3>
+    <p>Ce qui a bien fonctionné :</p>
+    <div style="border-bottom: 1px solid #ccc; height: 30px;"></div>
+    <div style="border-bottom: 1px solid #ccc; height: 30px;"></div>
+    <div style="border-bottom: 1px solid #ccc; height: 30px;"></div>
+
+    <p style="margin-top: 12px;">Ce qui pourrait être amélioré :</p>
+    <div style="border-bottom: 1px solid #ccc; height: 30px;"></div>
+    <div style="border-bottom: 1px solid #ccc; height: 30px;"></div>
+    <div style="border-bottom: 1px solid #ccc; height: 30px;"></div>
+
+    <h3>5. Souhaiteriez-vous utiliser cette application dans votre classe ?</h3>
+    <ul>
+      <li>☐ Oui, régulièrement</li>
+      <li>☐ Oui, occasionnellement</li>
+      <li>☐ Peut-être</li>
+      <li>☐ Non</li>
+    </ul>
+  </section>
+
+  <!-- QUESTIONNAIRE ELEVE -->
+  <section>
+    <h2>👦 Questionnaire Élève (à imprimer)</h2>
+    <p>À distribuer aux élèves en fin de séance.</p>
+
+    <div class="info">
+      <strong>Prénom :</strong> ___________________________<br>
+      <strong>Classe :</strong> ___________________________<br>
+      <strong>Date :</strong> ___________________________
+    </div>
+
+    <h3>1. As-tu aimé utiliser l'application ?</h3>
+    <ul>
+      <li>☐ Beaucoup ⭐⭐⭐</li>
+      <li>☐ Moyennement ⭐⭐</li>
+      <li>☐ Pas du tout ⭐</li>
+    </ul>
+
+    <h3>2. Quel projet as-tu préféré ?</h3>
+    <ul>
+      <li>☐ 💡 Allumer une LED</li>
+      <li>☐ 🔘 Avec interrupteur</li>
+      <li>☐ 💡💡 Deux LED en série</li>
+      <li>☐ ✨ Clignotant NE555</li>
+    </ul>
+
+    <h3>3. Était-ce facile à utiliser ?</h3>
+    <ul>
+      <li>☐ Très facile</li>
+      <li>☐ Facile</li>
+      <li>☐ Difficile</li>
+      <li>☐ Très difficile</li>
+    </ul>
+
+    <h3>4. Qu'as-tu appris ? (coche ce que tu sais maintenant)</h3>
+    <ul>
+      <li>☐ Ce qu'est une LED</li>
+      <li>☐ Ce qu'est une résistance</li>
+      <li>☐ Que le courant a un sens</li>
+      <li>☐ Comment faire un circuit</li>
+    </ul>
+
+    <h3>5. Ce que tu as aimé :</h3>
+    <div style="border-bottom: 1px solid #ccc; height: 30px;"></div>
+    <div style="border-bottom: 1px solid #ccc; height: 30px;"></div>
+
+    <h3>6. Ce que tu n'as pas aimé :</h3>
+    <div style="border-bottom: 1px solid #ccc; height: 30px;"></div>
+    <div style="border-bottom: 1px solid #ccc; height: 30px;"></div>
+
+    <h3>7. Veux-tu continuer à apprendre l'électronique ?</h3>
+    <ul>
+      <li>☐ Oui, beaucoup !</li>
+      <li>☐ Peut-être</li>
+      <li>☐ Non</li>
+    </ul>
+  </section>
+
+  <!-- REMERCIEMENTS -->
+  <section style="text-align:center; background: linear-gradient(135deg, #eff6ff, #dbeafe);">
+    <h2 style="color: #0369a1; border-bottom: none;">🙏 Merci !</h2>
+    <p style="font-size: 1.1em;">Merci d'avoir pris le temps de tester cette application.</p>
+    <p>Vos retours permettront de l'améliorer pour les élèves.</p>
+    <p style="font-size: 2em; margin-top: 20px;">🎓💡🚀</p>
+  </section>
+
+</div>
+
+<footer>
+  <div>📖 Fiche de test - InitiaElectro & EspaceElectronic</div>
+  <div style="margin-top:8px;">Développé par <strong>M. Ziane</strong></div>
+  <div style="font-size:0.85em; margin-top:8px; opacity:0.7;">Version 1.0 - Octobre 2026 - Usage pédagogique</div>
+</footer>
+
+</body>
+</html>
