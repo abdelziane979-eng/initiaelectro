@@ -2,12 +2,13 @@
    SERVICE WORKER - InitiaElectro / EspaceElectronic
    Permet le fonctionnement hors ligne et l'installation PWA
    ========================================================= */
-var CACHE_NAME = 'initiaelectro-v9';
+var CACHE_NAME = 'initiaelectro-v10';
 var FILES_TO_CACHE = [
   './',
   './index.html',
   './bac_a_sable.html',
   './bibliotheque.html',
+  './projets.html',        // ⭐ NOUVEAU
   './composants.js',
   './manifest.json',
   './manifest-bac.json'
