@@ -707,6 +707,7 @@ var BLOCS = {
    DEFIS D'INGENIERIE (MODE INNOVANT)
    ========================================================= */
 var DEFIS = {
+  /* ===== 🏠 MAISON ===== */
   sonnette: {
     id: 'sonnette', nom: '🚪 Sonnette', icone: '🚪',
     categorie: 'maison',
@@ -759,6 +760,8 @@ var DEFIS = {
       { typeA: 'buzzer', patteA: 1, typeB: 'pile', patteB: 1 }
     ]
   },
+  
+  /* ===== 🌱 ÉCOLOGIE ===== */
   serre: {
     id: 'serre', nom: '🌱 La Serre Connectée', icone: '🌱',
     categorie: 'ecologie',
@@ -770,6 +773,126 @@ var DEFIS = {
       { typeA: 'pile', patteA: 0, typeB: 'moteurDc', patteB: 0 },
       { typeA: 'moteurDc', patteA: 1, typeB: 'transistor', patteB: 2 },
       { typeA: 'transistor', patteA: 0, typeB: 'pile', patteB: 1 }
+    ]
+  },
+  
+  /* ===== 🎮 JEUX & SONS ===== */
+  clignotantReglable: {
+    id: 'clignotantReglable', nom: '✨ Clignotant réglable', icone: '✨',
+    categorie: 'jeux',
+    desc: 'La LED clignote en continu grâce au NE555.',
+    composants_requis: ['pile', 'ne555', 'condensateur', 'resistance', 'led'],
+    cablages_requis: [
+      { typeA: 'pile', patteA: 0, typeB: 'ne555', patteB: 0 },
+      { typeA: 'resistance', patteA: 0, typeB: 'ne555', patteB: 0 },
+      { typeA: 'resistance', patteA: 1, typeB: 'ne555', patteB: 6 },
+      { typeA: 'condensateur', patteA: 0, typeB: 'ne555', patteB: 7 },
+      { typeA: 'condensateur', patteA: 1, typeB: 'ne555', patteB: 5 },
+      { typeA: 'ne555', patteA: 2, typeB: 'led', patteB: 0 },
+      { typeA: 'led', patteA: 1, typeB: 'pile', patteB: 1 }
+    ]
+  },
+  piano: {
+    id: 'piano', nom: '🎹 Piano électronique', icone: '🎹',
+    categorie: 'jeux',
+    desc: 'Appuie sur le bouton pour faire sonner le buzzer (comme une note de piano).',
+    composants_requis: ['pile', 'bouton', 'buzzer', 'resistance'],
+    cablages_requis: [
+      { typeA: 'pile', patteA: 0, typeB: 'bouton', patteB: 0 },
+      { typeA: 'bouton', patteA: 1, typeB: 'resistance', patteB: 0 },
+      { typeA: 'resistance', patteA: 1, typeB: 'buzzer', patteB: 0 },
+      { typeA: 'buzzer', patteA: 1, typeB: 'pile', patteB: 1 }
+    ]
+  },
+  deElectronique: {
+    id: 'deElectronique', nom: '🎲 Dé électronique', icone: '🎲',
+    categorie: 'jeux',
+    desc: 'Appuie sur le bouton pour allumer une LED au hasard (simule un dé).',
+    composants_requis: ['pile', 'bouton', 'cd4017', 'led', 'resistance'],
+    cablages_requis: [
+      { typeA: 'pile', patteA: 0, typeB: 'bouton', patteB: 0 },
+      { typeA: 'bouton', patteA: 1, typeB: 'cd4017', patteB: 0 },
+      { typeA: 'pile', patteA: 0, typeB: 'cd4017', patteB: 7 },
+      { typeA: 'cd4017', patteA: 3, typeB: 'pile', patteB: 1 },
+      { typeA: 'cd4017', patteA: 1, typeB: 'resistance', patteB: 0 },
+      { typeA: 'resistance', patteA: 1, typeB: 'led', patteB: 0 },
+      { typeA: 'led', patteA: 1, typeB: 'pile', patteB: 1 }
+    ]
+  },
+  
+  /* ===== 🚗 VÉHICULES ===== */
+  feuTricolore: {
+    id: 'feuTricolore', nom: '🚦 Feu tricolore', icone: '🚦',
+    categorie: 'vehicules',
+    desc: 'Construis un feu tricolore : la LED rouge s\'allume, puis la verte.',
+    composants_requis: ['pile', 'bouton', 'led', 'resistance'],
+    cablages_requis: [
+      { typeA: 'pile', patteA: 0, typeB: 'bouton', patteB: 0 },
+      { typeA: 'bouton', patteA: 1, typeB: 'resistance', patteB: 0 },
+      { typeA: 'resistance', patteA: 1, typeB: 'led', patteB: 0 },
+      { typeA: 'led', patteA: 1, typeB: 'pile', patteB: 1 }
+    ]
+  },
+  clignotantVelo: {
+    id: 'clignotantVelo', nom: '🚴 Clignotant de vélo', icone: '🚴',
+    categorie: 'vehicules',
+    desc: 'Un clignotant qui s\'allume et s\'éteint en continu (NE555).',
+    composants_requis: ['pile', 'ne555', 'condensateur', 'resistance', 'led'],
+    cablages_requis: [
+      { typeA: 'pile', patteA: 0, typeB: 'ne555', patteB: 0 },
+      { typeA: 'resistance', patteA: 0, typeB: 'ne555', patteB: 0 },
+      { typeA: 'resistance', patteA: 1, typeB: 'ne555', patteB: 6 },
+      { typeA: 'condensateur', patteA: 0, typeB: 'ne555', patteB: 7 },
+      { typeA: 'condensateur', patteA: 1, typeB: 'ne555', patteB: 5 },
+      { typeA: 'ne555', patteA: 2, typeB: 'led', patteB: 0 },
+      { typeA: 'led', patteA: 1, typeB: 'pile', patteB: 1 }
+    ]
+  },
+  robotSimple: {
+    id: 'robotSimple', nom: '🤖 Robot simple', icone: '🤖',
+    categorie: 'vehicules',
+    desc: 'Appuie sur le bouton pour faire tourner le moteur (comme un robot qui avance).',
+    composants_requis: ['pile', 'bouton', 'moteurDc'],
+    cablages_requis: [
+      { typeA: 'pile', patteA: 0, typeB: 'bouton', patteB: 0 },
+      { typeA: 'bouton', patteA: 1, typeB: 'moteurDc', patteB: 0 },
+      { typeA: 'moteurDc', patteA: 1, typeB: 'pile', patteB: 1 }
+    ]
+  },
+  
+  /* ===== 💡 INITIATION ===== */
+  ledSimple: {
+    id: 'ledSimple', nom: '💡 LED simple', icone: '💡',
+    categorie: 'initiation',
+    desc: 'Le circuit le plus simple : allume une LED avec une pile et une résistance.',
+    composants_requis: ['pile', 'resistance', 'led'],
+    cablages_requis: [
+      { typeA: 'pile', patteA: 0, typeB: 'resistance', patteB: 0 },
+      { typeA: 'resistance', patteA: 1, typeB: 'led', patteB: 0 },
+      { typeA: 'led', patteA: 1, typeB: 'pile', patteB: 1 }
+    ]
+  },
+  interrupteurSimple: {
+    id: 'interrupteurSimple', nom: '🔘 Interrupteur simple', icone: '🔘',
+    categorie: 'initiation',
+    desc: 'Allume et éteins la LED avec un interrupteur.',
+    composants_requis: ['pile', 'interrupteur', 'resistance', 'led'],
+    cablages_requis: [
+      { typeA: 'pile', patteA: 0, typeB: 'interrupteur', patteB: 0 },
+      { typeA: 'interrupteur', patteA: 1, typeB: 'resistance', patteB: 0 },
+      { typeA: 'resistance', patteA: 1, typeB: 'led', patteB: 0 },
+      { typeA: 'led', patteA: 1, typeB: 'pile', patteB: 1 }
+    ]
+  },
+  boutonSonnette: {
+    id: 'boutonSonnette', nom: '🔔 Bouton sonnette', icone: '🔔',
+    categorie: 'initiation',
+    desc: 'Appuie sur le bouton pour faire sonner le buzzer.',
+    composants_requis: ['pile', 'bouton', 'buzzer'],
+    cablages_requis: [
+      { typeA: 'pile', patteA: 0, typeB: 'bouton', patteB: 0 },
+      { typeA: 'bouton', patteA: 1, typeB: 'buzzer', patteB: 0 },
+      { typeA: 'buzzer', patteA: 1, typeB: 'pile', patteB: 1 }
     ]
   }
 };
@@ -1969,21 +2092,24 @@ function clicCanvas(event) {
       sauvegarderLocal(true);
       dessiner(); return;
     }
-     if (comp.type === 'bouton' || comp.type === 'boutonPoussoir') {
+    if (comp.type === 'bouton' || comp.type === 'boutonPoussoir') {
       comp.appuye = true;
-      mettreMessage('🧲 Bouton appuyé ✅ (la LED va s\'éteindre dans 3s)', 'info');
-      if (testActif) {
-        recalculerLED();
-        // Temporisation : après 3 secondes, on relâche le bouton
+      mettreMessage('🧲 Bouton appuyé ✅', 'info');
+      
+      // Vérifier si c'est le défi Lumière automatique
+      if (defiActif && defiActif.id === 'lumièreWC') {
+        gererTemporisationLED(comp);
+      } else {
+        if (testActif) recalculerLED();
         if (window.timerBouton) clearTimeout(window.timerBouton);
         window.timerBouton = setTimeout(function() {
           comp.appuye = false;
-          recalculerLED();
-          mettreMessage('⏱️ La LED s\'est éteinte automatiquement.', 'avertissement');
+          if (testActif) recalculerLED();
         }, 3000);
       }
       dessiner(); return;
-    }   
+    }
+     
   }
 }
 function supprimerComposant(id) {
@@ -3560,6 +3686,74 @@ function restaurerSnapshot(snap) {
   mettreAJourStatut();
   afficherPanneauComposants();
   dessiner();
+}
+/* =========================================================
+   FONCTIONS MANQUANTES (Confettis + Temporisation LED)
+   ========================================================= */
+
+// 1. FONCTION CONFETTIS
+function lancerConfettis() {
+  var zone = document.getElementById('zone-confettis');
+  if (!zone) {
+    // Créer la zone si elle n'existe pas
+    zone = document.createElement('div');
+    zone.id = 'zone-confettis';
+    zone.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9999;';
+    document.body.appendChild(zone);
+  }
+  
+  zone.style.display = 'block';
+  zone.innerHTML = '';
+  var couleurs = ['#fbbf24', '#22c55e', '#ef4444', '#3b82f6', '#a855f7', '#ec4899', '#06b6d4'];
+  
+  for (var i = 0; i < 80; i++) {
+    var c = document.createElement('div');
+    c.style.cssText = 'position:absolute;width:12px;height:12px;' +
+      'left:' + (Math.random() * 100) + '%;' +
+      'top:-20px;' +
+      'background:' + couleurs[Math.floor(Math.random() * couleurs.length)] + ';' +
+      'border-radius:' + (Math.random() > 0.5 ? '50%' : '2px') + ';' +
+      'animation:chuteConfetti ' + (2 + Math.random() * 2) + 's linear ' + (Math.random() * 1.5) + 's forwards;';
+    zone.appendChild(c);
+  }
+  
+  // Ajouter l'animation CSS si elle n'existe pas
+  if (!document.getElementById('style-confettis')) {
+    var style = document.createElement('style');
+    style.id = 'style-confettis';
+    style.textContent = '@keyframes chuteConfetti { 0% { transform: translateY(-20px) rotate(0deg); opacity: 1; } 100% { transform: translateY(105vh) rotate(720deg); opacity: 0.3; } }';
+    document.head.appendChild(style);
+  }
+  
+  setTimeout(function() {
+    zone.style.display = 'none';
+    zone.innerHTML = '';
+  }, 5000);
+}
+
+// 2. TEMPORISATION DE LA LED (pour le défi Lumière automatique)
+// Cette fonction gère l'allumage de la LED quand on clique sur le bouton
+function gererTemporisationLED(compBouton) {
+  if (!compBouton) return;
+  
+  // Allumer la LED
+  var leds = composants.filter(function(c) { return mapperTypeDessin(c.type) === 'led'; });
+  for (var i = 0; i < leds.length; i++) {
+    leds[i].allume = true;
+  }
+  testActif = true;
+  mettreMessage('💡 LED allumée ! Elle s\'éteindra dans 3 secondes...', 'succes');
+  dessiner();
+  
+  // Éteindre après 3 secondes
+  if (window.timerLED) clearTimeout(window.timerLED);
+  window.timerLED = setTimeout(function() {
+    for (var j = 0; j < leds.length; j++) {
+      leds[j].allume = false;
+    }
+    mettreMessage('⏱️ La LED s\'est éteinte automatiquement.', 'avertissement');
+    dessiner();
+  }, 3000);
 }
 window.onload = function() {
   canvas = document.getElementById('sandbox');
