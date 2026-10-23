@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Projets d'ingénierie - EspaceElectronic</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0' stop-color='%236b21a8'/><stop offset='1' stop-color='%23a855f7'/></linearGradient></defs><rect width='512' height='512' rx='112' fill='url(%23g)'/><circle cx='220' cy='256' r='60' fill='%23ff3333' stroke='%23fff' stroke-width='12'/><circle cx='200' cy='236' r='14' fill='rgba(255,255,255,0.85)'/><rect x='300' y='238' width='140' height='36' rx='18' fill='%23D4A76A' stroke='%23fff' stroke-width='8'/><line x1='280' y1='256' x2='300' y2='256' stroke='%23fff' stroke-width='10' stroke-linecap='round'/></svg>">
+<meta name="theme-color" content="#6b21a8">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f9ff; color: #1a1f2e; line-height: 1.6; }
+  
+  /* EN-TETE */
+  header { background: linear-gradient(135deg, #6b21a8, #a855f7); color: white;
+           padding: 30px 20px; text-align: center;
+           box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
+  header h1 { font-size: 2em; margin-bottom: 8px; }
+  header .sous-titre { font-size: 1.1em; opacity: 0.95; margin-bottom: 20px; }
+  .btn-retour { display: inline-block; padding: 10px 20px; background: rgba(255,255,255,0.2); 
+                color: white; text-decoration: none; border-radius: 8px; font-weight: bold;
+                border: 2px solid rgba(255,255,255,0.4); transition: all 0.2s; }
+  .btn-retour:hover { background: rgba(255,255,255,0.35); transform: translateY(-2px); }
+  
+  /* CONTENEUR */
+  .conteneur { max-width: 1200px; margin: 0 auto; padding: 32px 20px; }
+  
+  /* BARRE DE RECHERCHE & FILTRES */
+  .barre-recherche { background: white; padding: 20px; border-radius: 12px;
+                     box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin-bottom: 24px;
+                     display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+  .champ-recherche { flex: 1; min-width: 200px; position: relative; }
+  .champ-recherche input { width: 100%; padding: 12px 16px 12px 40px; border: 2px solid #e0e0e0;
+                           border-radius: 8px; font-size: 1em; outline: none; transition: border-color 0.2s; }
+  .champ-recherche input:focus { border-color: #6b21a8; }
+  .champ-recherche::before { content: '🔍'; position: absolute; left: 14px; top: 50%; transform: translateY(-50%); font-size: 1.1em; }
+  .filtre-select { padding: 12px 16px; border: 2px solid #e0e0e0; border-radius: 8px;
+                   background: white; font-size: 1em; cursor: pointer; outline: none;
+                   transition: border-color 0.2s; min-width: 180px; }
+  .filtre-select:focus { border-color: #6b21a8; }
+  
+  /* CATEGORIES */
+  .categorie-titre { font-size: 1.4em; color: #6b21a8; margin: 32px 0 16px 0;
+                     padding-bottom: 8px; border-bottom: 3px solid #a855f7;
+                     display: flex; align-items: center; gap: 10px; }
+  .categorie-titre:first-of-type { margin-top: 0; }
+  
+  /* GRILLE DE CARTES */
+  .grille-defis { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+  .carte-defi { background: white; border-radius: 12px; padding: 20px; cursor: pointer;
+                box-shadow: 0 4px 10px rgba(0,0,0,0.06); transition: all 0.2s;
+                border-left: 4px solid #f97316; }
+  .carte-defi:hover { transform: translateY(-4px); box-shadow: 0 8px 20px rgba(249,115,22,0.15); }
+  .carte-defi .emoji { font-size: 2.5em; margin-bottom: 12px; }
+  .carte-defi h3 { font-size: 1.1em; color: #1a1f2e; margin-bottom: 8px; }
+  .carte-defi .desc { font-size: 0.85em; color: #64748b; margin-bottom: 12px; min-height: 40px; }
+  .carte-defi .meta { font-size: 0.8em; color: #f97316; font-weight: bold; }
+  
+  /* AUCUN RESULTAT */
+  .aucun-resultat { text-align: center; padding: 40px; color: #64748b; font-style: italic; }
+  
+  /* FICHE DETAILLEE (MODAL) */
+  .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+                   background: rgba(0,0,0,0.6); z-index: 100; justify-content: center; align-items: center;
+                   padding: 20px; overflow-y: auto; }
+  .modal-overlay.actif { display: flex; animation: fadeIn 0.2s; }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  .modal-boite { background: white; border-radius: 16px; padding: 32px; max-width: 700px;
+                 width: 100%; max-height: 90vh; overflow-y: auto;
+                 box-shadow: 0 20px 50px rgba(0,0,0,0.3); position: relative; }
+  .btn-fermer { position: absolute; top: 16px; right: 16px; background: #f1f5f9; border: none;
+                width: 36px; height: 36px; border-radius: 50%; font-size: 1.2em; cursor: pointer;
+                transition: background 0.2s; }
+  .btn-fermer:hover { background: #e2e8f0; }
+  .fiche-entete { text-align: center; margin-bottom: 24px; }
+  .fiche-entete .emoji { font-size: 4em; margin-bottom: 12px; }
+  .fiche-entete h2 { font-size: 1.6em; color: #1a1f2e; margin-bottom: 8px; }
+  .fiche-entete .categorie { font-size: 0.9em; color: #6b21a8; font-weight: bold; }
+  .fiche-section { margin-bottom: 20px; }
+  .fiche-section h4 { font-size: 1em; color: #6b21a8; margin-bottom: 8px; 
+                      padding-bottom: 4px; border-bottom: 2px solid #e0e0e0; }
+  .fiche-section p { margin-bottom: 8px; color: #334155; }
+  .fiche-section ul { padding-left: 20px; color: #334155; }
+  .fiche-section li { margin-bottom: 4px; }
+  .liste-composants { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+  .badge-composant { background: #f3e8ff; color: #6b21a8; padding: 6px 12px; border-radius: 6px;
+                     font-size: 0.85em; font-weight: bold; border: 1px solid #d8b4fe; }
+  .etapes-liste { counter-reset: etape; list-style: none; padding-left: 0; }
+  .etapes-liste li { background: #f8fafc; padding: 12px 12px 12px 48px; border-radius: 8px;
+                     margin-bottom: 8px; position: relative; border-left: 3px solid #f97316; }
+  .etapes-liste li::before { counter-increment: etape; content: counter(etape);
+                             position: absolute; left: 12px; top: 12px;
+                             width: 24px; height: 24px; background: #f97316; color: white;
+                             border-radius: 50%; display: flex; align-items: center;
+                             justify-content: center; font-weight: bold; font-size: 0.85em; }
+  .btn-lancer { display: block; width: 100%; padding: 14px; background: linear-gradient(135deg, #f97316, #ea580c);
+                color: white; border: none; border-radius: 10px; font-size: 1.05em;
+                font-weight: bold; cursor: pointer; margin-top: 20px; text-decoration: none;
+                text-align: center; transition: all 0.2s; box-shadow: 0 4px 10px rgba(249,115,22,0.3); }
+  .btn-lancer:hover { transform: translateY(-2px); box-shadow: 0 6px 14px rgba(249,115,22,0.4); }
+  
+  /* RESPONSIVE */
+  @media (max-width: 600px) {
+    header h1 { font-size: 1.5em; }
+    .conteneur { padding: 16px; }
+    .modal-boite { padding: 20px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🏆 Projets d'ingénierie</h1>
+  <div class="sous-titre">18 défis pour apprendre l'électronique en s'amusant</div>
+  <a href="index.html" class="btn-retour">← Retour à l'accueil</a>
+</header>
+
+<div class="conteneur">
+  
+  <!-- BARRE DE RECHERCHE ET FILTRES -->
+  <div class="barre-recherche">
+    <div class="champ-recherche">
+      <input type="text" id="recherche" placeholder="Rechercher un défi..." oninput="filtrerDefis()">
+    </div>
+    <select class="filtre-select" id="filtre-categorie" onchange="filtrerDefis()">
+      <option value="toutes">Toutes les catégories</option>
+      <option value="initiation">💡 Initiation</option>
+      <option value="maison">🏠 Maison</option>
+      <option value="ecologie">🌱 Écologie</option>
+      <option value="jeux">🎮 Jeux & Sons</option>
+      <option value="vehicules">🚗 Véhicules</option>
+      <option value="capteurs">🔬 Capteurs</option>
+      <option value="securite">🔒 Sécurité</option>
+    </select>
+  </div>
+
+  <!-- CONTENU DES DÉFIS -->
+  <div id="contenu-defis"></div>
+  
+</div>
+
+<!-- MODAL FICHE DETAILLEE -->
+<div class="modal-overlay" id="modal-fiche">
+  <div class="modal-boite">
+    <button class="btn-fermer" onclick="fermerFiche()">✖</button>
+    <div id="contenu-fiche"></div>
+  </div>
+</div>
+<script>
+/* =========================================================
+   BASE DE DONNÉES DES DÉFIS (copie de bac_a_sable.html)
+   ========================================================= */
+var DEFIS = {
+  /* ===== 💡 INITIATION ===== */
+  ledSimple: {
+    id: 'ledSimple', nom: '💡 LED simple', icone: '💡', categorie: 'initiation',
+    desc: 'Le circuit le plus simple : allume une LED avec une pile et une résistance.',
+    composants_requis: ['pile', 'resistance', 'led'],
+    explication: 'La pile fournit l\'énergie, la résistance limite le courant pour ne pas griller la LED, et la LED s\'allume.',
+    etapes: [
+      'Place la pile 9V sur le canvas.',
+      'Ajoute une résistance de 470Ω.',
+      'Branche la LED rouge.',
+      'Câble la pile (+) → résistance → LED → pile (-).',
+      'Clique sur "Tester" pour voir la LED s\'allumer !'
+    ]
+  },
+  interrupteurSimple: {
+    id: 'interrupteurSimple', nom: '🔘 Interrupteur simple', icone: '🔘', categorie: 'initiation',
+    desc: 'Allume et éteins la LED avec un interrupteur.',
+    composants_requis: ['pile', 'interrupteur', 'resistance', 'led'],
+    explication: 'L\'interrupteur permet d\'ouvrir ou de fermer le circuit. Quand il est fermé, la LED s\'allume.',
+    etapes: [
+      'Place la pile 9V.',
+      'Ajoute un interrupteur.',
+      'Place une résistance de 470Ω.',
+      'Branche la LED rouge.',
+      'Câble le tout : pile (+) → interrupteur → résistance → LED → pile (-).',
+      'Clique sur l\'interrupteur pour allumer/éteindre la LED !'
+    ]
+  },
+  boutonSonnette: {
+    id: 'boutonSonnette', nom: '🔔 Bouton sonnette', icone: '🔔', categorie: 'initiation',
+    desc: 'Appuie sur le bouton pour faire sonner le buzzer.',
+    composants_requis: ['pile', 'bouton', 'buzzer'],
+    explication: 'Le bouton poussoir laisse passer le courant seulement quand on appuie. Le buzzer transforme le courant en son.',
+    etapes: [
+      'Place la pile 9V.',
+      'Ajoute un bouton poussoir.',
+      'Place un buzzer.',
+      'Câble : pile (+) → bouton → buzzer → pile (-).',
+      'Appuie sur le bouton : le buzzer sonne !'
+    ]
+  },
+
+  /* ===== 🏠 MAISON ===== */
+  sonnette: {
+    id: 'sonnette', nom: '🚪 Sonnette', icone: '🚪', categorie: 'maison',
+    desc: 'Appuie sur le bouton pour faire sonner la sonnette.',
+    composants_requis: ['pile', 'bouton', 'buzzer'],
+    explication: 'C\'est le même principe que le bouton sonnette, mais dans le contexte d\'une maison.',
+    etapes: [
+      'Place la pile 9V.',
+      'Ajoute un bouton poussoir (la sonnette).',
+      'Place un buzzer.',
+      'Câble : pile (+) → bouton → buzzer → pile (-).',
+      'Appuie sur le bouton pour faire sonner la sonnette !'
+    ]
+  },
+  veilleuse: {
+    id: 'veilleuse', nom: '🌙 Veilleuse', icone: '🌙', categorie: 'maison',
+    desc: 'La LED s\'allume automatiquement quand il fait sombre (LDR).',
+    composants_requis: ['pile', 'ldr', 'transistor', 'led', 'resistance'],
+    explication: 'La LDR (résistance photo-sensible) change de valeur selon la lumière. Quand il fait sombre, elle laisse passer le courant qui active le transistor, allumant la LED.',
+    etapes: [
+      'Place la pile 9V.',
+      'Ajoute une LDR.',
+      'Place un transistor 2N2222.',
+      'Ajoute une LED rouge.',
+      'Place deux résistances (10kΩ et 470Ω).',
+      'Câble : pile (+) → LDR → base du transistor, etc.',
+      'Teste : la LED s\'allume quand tu caches la LDR !'
+    ]
+  },
+  lumièreWC: {
+    id: 'lumièreWC', nom: '🚿 Lumière automatique', icone: '🚿', categorie: 'maison',
+    desc: 'Appuie sur le bouton pour allumer la LED. Elle s\'éteint après 3 secondes.',
+    composants_requis: ['pile', 'bouton', 'condensateur', 'transistor', 'led', 'resistance'],
+    explication: 'Le condensateur se charge quand on appuie sur le bouton, puis se décharge lentement. Le transistor utilise cette énergie pour allumer la LED, qui s\'éteint quand le condensateur est vide.',
+    etapes: [
+      'Place la pile 9V.',
+      'Ajoute un bouton poussoir.',
+      'Place un condensateur 100µF.',
+      'Ajoute un transistor 2N2222.',
+      'Place une LED rouge et une résistance 470Ω.',
+      'Câble le tout.',
+      'Appuie sur le bouton : la LED s\'allume et s\'éteint après 3 secondes !'
+    ]
+  },
+
+  /* ===== 🌱 ÉCOLOGIE ===== */
+  serre: {
+    id: 'serre', nom: '🌱 La Serre Connectée', icone: '🌱', categorie: 'ecologie',
+    desc: 'Allume la pompe (Moteur DC) automatiquement quand la terre est sèche.',
+    composants_requis: ['pile', 'ldr', 'transistor', 'moteurDc'],
+    explication: 'La LDR détecte l\'obscurité (terre sèche). Le transistor amplifie le signal pour activer le moteur (la pompe).',
+    etapes: [
+      'Place la pile 9V.',
+      'Ajoute une LDR (capteur d\'humidité simulé).',
+      'Place un transistor 2N2222.',
+      'Ajoute un moteur DC (la pompe).',
+      'Câble : pile (+) → LDR → transistor → moteur → pile (-).',
+      'Teste : quand tu caches la LDR, le moteur tourne !'
+    ]
+  },
+
+  /* ===== 🎮 JEUX & SONS ===== */
+  clignotantReglable: {
+    id: 'clignotantReglable', nom: '✨ Clignotant réglable', icone: '✨', categorie: 'jeux',
+    desc: 'La LED clignote en continu grâce au NE555.',
+    composants_requis: ['pile', 'ne555', 'condensateur', 'resistance', 'led'],
+    explication: 'Le NE555 en mode astable génère un signal carré qui fait clignoter la LED. La fréquence dépend de la résistance et du condensateur.',
+    etapes: [
+      'Place la pile 9V.',
+      'Ajoute le NE555.',
+      'Place deux résistances (10kΩ et 10kΩ).',
+      'Ajoute un condensateur 10µF.',
+      'Branche la LED rouge.',
+      'Câble le tout.',
+      'Teste : la LED clignote !'
+    ]
+  },
+  piano: {
+    id: 'piano', nom: '🎹 Piano électronique', icone: '🎹', categorie: 'jeux',
+    desc: 'Appuie sur le bouton pour faire sonner le buzzer (comme une note de piano).',
+    composants_requis: ['pile', 'bouton', 'buzzer', 'resistance'],
+    explication: 'Chaque appui sur le bouton envoie une impulsion au buzzer, qui produit un son. En changeant la résistance, on change la fréquence (et donc la note).',
+    etapes: [
+      'Place la pile 9V.',
+      'Ajoute un bouton poussoir.',
+      'Place une résistance 470Ω.',
+      'Ajoute un buzzer.',
+      'Câble : pile (+) → bouton → résistance → buzzer → pile (-).',
+      'Appuie sur le bouton : tu entends une note !'
+    ]
+  },
+  deElectronique: {
+    id: 'deElectronique', nom: '🎲 Dé électronique', icone: '🎲', categorie: 'jeux',
+    desc: 'Appuie sur le bouton pour allumer une LED au hasard (simule un dé).',
+    composants_requis: ['pile', 'bouton', 'cd4017', 'led', 'resistance'],
+    explication: 'Le CD4017 est un compteur : à chaque impulsion du bouton, il active une sortie différente. La LED s\'allume donc de façon aléatoire.',
+    etapes: [
+      'Place la pile 9V.',
+      'Ajoute un bouton poussoir.',
+      'Place un CD4017.',
+      'Ajoute une résistance 470Ω.',
+      'Branche une LED rouge.',
+      'Câble le tout.',
+      'Appuie sur le bouton : la LED s\'allume au hasard !'
+    ]
+  },
+
+  /* ===== 🚗 VÉHICULES ===== */
+  feuTricolore: {
+    id: 'feuTricolore', nom: '🚦 Feu tricolore', icone: '🚦', categorie: 'vehicules',
+    desc: 'Construis un feu tricolore : la LED rouge s\'allume, puis la verte.',
+    composants_requis: ['pile', 'bouton', 'led', 'resistance'],
+    explication: 'Le bouton déclenche l\'allumage. On peut utiliser plusieurs LED (rouge, verte) pour simuler un feu.',
+    etapes: [
+      'Place la pile 9V.',
+      'Ajoute un bouton poussoir.',
+      'Place une résistance 470Ω.',
+      'Branche une LED rouge.',
+      'Câble le tout.',
+      'Appuie sur le bouton : la LED s\'allume !'
+    ]
+  },
+  clignotantVelo: {
+    id: 'clignotantVelo', nom: '🚴 Clignotant de vélo', icone: '🚴', categorie: 'vehicules',
+    desc: 'Un clignotant qui s\'allume et s\'éteint en continu (NE555).',
+    composants_requis: ['pile', 'ne555', 'condensateur', 'resistance', 'led'],
+    explication: 'Le NE555 génère un signal qui fait clignoter la LED, comme un clignotant de vélo.',
+    etapes: [
+      'Place la pile 9V.',
+      'Ajoute le NE555.',
+      'Place deux résistances (10kΩ et 10kΩ).',
+      'Ajoute un condensateur 10µF.',
+      'Branche une LED rouge.',
+      'Câble le tout.',
+      'Teste : la LED clignote !'
+    ]
+  },
+  robotSimple: {
+    id: 'robotSimple', nom: '🤖 Robot simple', icone: '🤖', categorie: 'vehicules',
+    desc: 'Appuie sur le bouton pour faire tourner le moteur (comme un robot qui avance).',
+    composants_requis: ['pile', 'bouton', 'moteurDc'],
+    explication: 'Le bouton active le moteur. C\'est le même principe que les roues d\'un robot.',
+    etapes: [
+      'Place la pile 9V.',
+      'Ajoute un bouton poussoir.',
+      'Place un moteur DC.',
+      'Câble : pile (+) → bouton → moteur → pile (-).',
+      'Appuie sur le bouton : le moteur tourne !'
+    ]
+  },
+
+  /* ===== 🔬 CAPTEURS ===== */
+  thermometre: {
+    id: 'thermometre', nom: '🌡️ Thermomètre', icone: '🌡️', categorie: 'capteurs',
+    desc: 'La LED s\'allume quand la température dépasse un seuil (thermistance).',
+    composants_requis: ['pile', 'thermistance', 'transistor', 'led', 'resistance'],
+    explication: 'La thermistance change de résistance avec la température. Le transistor amplifie le signal pour allumer la LED quand il fait chaud.',
+    etapes: [
+      'Place la pile 9V.',
+      'Ajoute une thermistance.',
+      'Place un transistor 2N2222.',
+      'Ajoute une résistance 10kΩ.',
+      'Branche une LED rouge.',
+      'Câble le tout.',
+      'Teste : si tu chauffes la thermistance, la LED s\'allume !'
+    ]
+  },
+  detecteurMouvement: {
+    id: 'detecteurMouvement', nom: '📡 Détecteur de mouvement', icone: '📡', categorie: 'capteurs',
+    desc: 'La LED s\'allume quand un mouvement est détecté (capteur IR).',
+    composants_requis: ['pile', 'capteurIr', 'transistor', 'led', 'resistance'],
+    explication: 'Le capteur IR détecte les variations de lumière infrarouge. Le transistor amplifie le signal pour allumer la LED.',
+    etapes: [
+      'Place la pile 9V.',
+      'Ajoute un capteur IR.',
+      'Place un transistor 2N2222.',
+      'Ajoute une résistance 10kΩ.',
+      'Branche une LED rouge.',
+      'Câble le tout.',
+      'Teste : si tu passes la main, la LED s\'allume !'
+    ]
+  },
+  detecteurPluie: {
+    id: 'detecteurPluie', nom: '🌧️ Détecteur de pluie', icone: '🌧️', categorie: 'capteurs',
+    desc: 'Le buzzer sonne quand la pluie est détectée (LDR + transistor).',
+    composants_requis: ['pile', 'ldr', 'transistor', 'buzzer', 'resistance'],
+    explication: 'Quand une goutte d\'eau tombe sur le capteur (simulé par la LDR), le courant passe et le buzzer sonne.',
+    etapes: [
+      'Place la pile 9V.',
+      'Ajoute une LDR (simule le capteur de pluie).',
+      'Place un transistor 2N2222.',
+      'Ajoute une résistance 10kΩ.',
+      'Branche un buzzer.',
+      'Câble le tout.',
+      'Teste : si tu couvres la LDR, le buzzer sonne !'
+    ]
+  },
+
+  /* ===== 🔒 SÉCURITÉ ===== */
+  digicode: {
+    id: 'digicode', nom: '🔒 Digicode', icone: '🔒', categorie: 'securite',
+    desc: 'Appuie sur les boutons dans le bon ordre pour allumer la LED.',
+    composants_requis: ['pile', 'bouton', 'porteAnd', 'led', 'resistance'],
+    explication: 'La porte logique AND (ET) ne s\'allume que si les 2 entrées sont actives. C\'est le principe d\'un code secret à 2 chiffres.',
+    etapes: [
+      'Place la pile 9V.',
+      'Ajoute 2 boutons poussoirs.',
+      'Place une porte logique AND.',
+      'Branche une LED rouge.',
+      'Câble le tout.',
+      'Appuie sur les 2 boutons en même temps : la LED s\'allume !'
+    ]
+  },
+  alarmeIncendie: {
+    id: 'alarmeIncendie', nom: '🔥 Alarme incendie', icone: '🔥', categorie: 'securite',
+    desc: 'Le buzzer sonne quand la température dépasse un seuil (thermistance).',
+    composants_requis: ['pile', 'thermistance', 'transistor', 'buzzer', 'resistance'],
+    explication: 'La thermistance détecte la chaleur. Quand la température est trop élevée, le transistor active le buzzer.',
+    etapes: [
+      'Place la pile 9V.',
+      'Ajoute une thermistance.',
+      'Place un transistor 2N2222.',
+      'Ajoute une résistance 10kΩ.',
+      'Branche un buzzer.',
+      'Câble le tout.',
+      'Teste : si tu chauffes la thermistance, le buzzer sonne !'
+    ]
+  },
+  alarme: {
+    id: 'alarme', nom: '🚨 Alarme de Porte', icone: '🚨', categorie: 'securite',
+    desc: 'Déclenche un buzzer quand la porte s\'ouvre (interrupteur).',
+    composants_requis: ['pile', 'interrupteur', 'buzzer'],
+    explication: 'L\'interrupteur est fixé sur la porte. Quand la porte s\'ouvre, le circuit se ferme et le buzzer sonne.',
+    etapes: [
+      'Place la pile 9V.',
+      'Ajoute un interrupteur (simule la porte).',
+      'Place un buzzer.',
+      'Câble : pile (+) → interrupteur → buzzer → pile (-).',
+      'Ferme l\'interrupteur : le buzzer sonne !'
+    ]
+  }
+};
+
+/* =========================================================
+   NOMS DES CATÉGORIES ET DES COMPOSANTS
+   ========================================================= */
+var NOMS_CATEGORIES = {
+  initiation: { nom: '💡 Initiation', ordre: 1 },
+  maison: { nom: '🏠 Maison', ordre: 2 },
+  ecologie: { nom: '🌱 Écologie', ordre: 3 },
+  jeux: { nom: '🎮 Jeux & Sons', ordre: 4 },
+  vehicules: { nom: '🚗 Véhicules', ordre: 5 },
+  capteurs: { nom: '🔬 Capteurs', ordre: 6 },
+  securite: { nom: '🔒 Sécurité', ordre: 7 },
+  autres: { nom: '📦 Autres', ordre: 99 }
+};
+
+var NOMS_COMPOSANTS = {
+  pile: '🔋 Pile 9V',
+  resistance: '🎨 Résistance',
+  led: '💡 LED',
+  interrupteur: '🔘 Interrupteur',
+  bouton: '🧲 Bouton poussoir',
+  boutonPoussoir: '🧲 Bouton poussoir',
+  buzzer: '🔊 Buzzer',
+  ne555: '⚡ NE555',
+  cd4017: '🔢 CD4017',
+  condensateur: '🔌 Condensateur',
+  transistor: '🎛️ Transistor 2N2222',
+  ldr: '📏 LDR',
+  thermistance: '🌡️ Thermistance',
+  capteurIr: '📡 Capteur IR',
+  moteurDc: '🔄 Moteur DC',
+  porteAnd: '🚪 Porte AND'
+};
+
+/* =========================================================
+   INITIALISATION
+   ========================================================= */
+window.onload = function() {
+  afficherTousDefis();
+};
+
+/* Afficher tous les défis (groupés par catégorie) */
+function afficherTousDefis() {
+  var conteneur = document.getElementById('contenu-defis');
+  if (!conteneur) return;
+  
+  var html = '';
+  var defisParCategorie = {};
+  for (var id in DEFIS) {
+    var d = DEFIS[id];
+    var cat = d.categorie || 'autres';
+    if (!defisParCategorie[cat]) defisParCategorie[cat] = [];
+    defisParCategorie[cat].push(d);
+  }
+  
+  var catsTriees = Object.keys(defisParCategorie).sort(function(a, b) {
+    return (NOMS_CATEGORIES[a] ? NOMS_CATEGORIES[a].ordre : 99) - (NOMS_CATEGORIES[b] ? NOMS_CATEGORIES[b].ordre : 99);
+  });
+  
+  for (var i = 0; i < catsTriees.length; i++) {
+    var cat = catsTriees[i];
+    var liste = defisParCategorie[cat];
+    var nomCat = NOMS_CATEGORIES[cat] ? NOMS_CATEGORIES[cat].nom : '📦 Autres';
+    
+    html += '<h2 class="categorie-titre">' + nomCat + ' <span style="font-size:0.6em;color:#94a3b8;font-weight:normal;">(' + liste.length + ' défis)</span></h2>';
+    html += '<div class="grille-defis">';
+    for (var j = 0; j < liste.length; j++) {
+      var d = liste[j];
+      html += '<div class="carte-defi" onclick="ouvrirFiche(\'' + d.id + '\')">';
+      html += '<div class="emoji">' + d.icone + '</div>';
+      html += '<h3>' + d.nom + '</h3>';
+      html += '<div class="desc">' + d.desc + '</div>';
+      html += '<div class="meta">📦 ' + (d.composants_requis ? d.composants_requis.length : 0) + ' composants</div>';
+      html += '</div>';
+    }
+    html += '</div>';
+  }
+  
+  conteneur.innerHTML = html;
+}
+
+/* Filtrer les défis */
+function filtrerDefis() {
+  var texte = document.getElementById('recherche').value.toLowerCase();
+  var cat = document.getElementById('filtre-categorie').value;
+  
+  var conteneur = document.getElementById('contenu-defis');
+  var html = '';
+  var defisParCategorie = {};
+  
+  for (var id in DEFIS) {
+    var d = DEFIS[id];
+    var okTexte = !texte || d.nom.toLowerCase().indexOf(texte) !== -1 || d.desc.toLowerCase().indexOf(texte) !== -1;
+    var okCat = (cat === 'toutes') || d.categorie === cat;
+    if (okTexte && okCat) {
+      var catD = d.categorie || 'autres';
+      if (!defisParCategorie[catD]) defisParCategorie[catD] = [];
+      defisParCategorie[catD].push(d);
+    }
+  }
+  
+  if (Object.keys(defisParCategorie).length === 0) {
+    html = '<div class="aucun-resultat">Aucun défi trouvé.</div>';
+  } else {
+    var catsTriees = Object.keys(defisParCategorie).sort(function(a, b) {
+      return (NOMS_CATEGORIES[a] ? NOMS_CATEGORIES[a].ordre : 99) - (NOMS_CATEGORIES[b] ? NOMS_CATEGORIES[b].ordre : 99);
+    });
+    
+    for (var i = 0; i < catsTriees.length; i++) {
+      var catN = catsTriees[i];
+      var liste = defisParCategorie[catN];
+      var nomCat = NOMS_CATEGORIES[catN] ? NOMS_CATEGORIES[catN].nom : '📦 Autres';
+      
+      html += '<h2 class="categorie-titre">' + nomCat + ' <span style="font-size:0.6em;color:#94a3b8;font-weight:normal;">(' + liste.length + ' défis)</span></h2>';
+      html += '<div class="grille-defis">';
+      for (var j = 0; j < liste.length; j++) {
+        var d = liste[j];
+        html += '<div class="carte-defi" onclick="ouvrirFiche(\'' + d.id + '\')">';
+        html += '<div class="emoji">' + d.icone + '</div>';
+        html += '<h3>' + d.nom + '</h3>';
+        html += '<div class="desc">' + d.desc + '</div>';
+        html += '<div class="meta">📦 ' + (d.composants_requis ? d.composants_requis.length : 0) + ' composants</div>';
+        html += '</div>';
+      }
+      html += '</div>';
+    }
+  }
+  
+  conteneur.innerHTML = html;
+}
+
+/* Ouvrir la fiche détaillée d'un défi */
+function ouvrirFiche(id) {
+  var d = DEFIS[id];
+  if (!d) return;
+  
+  var nomCat = NOMS_CATEGORIES[d.categorie] ? NOMS_CATEGORIES[d.categorie].nom : 'Autres';
+  
+  var html = '<div class="fiche-entete">';
+  html += '<div class="emoji">' + d.icone + '</div>';
+  html += '<h2>' + d.nom + '</h2>';
+  html += '<div class="categorie">' + nomCat + '</div>';
+  html += '</div>';
+  
+  html += '<div class="fiche-section">';
+  html += '<h4>📖 Description</h4>';
+  html += '<p>' + d.desc + '</p>';
+  html += '</div>';
+  
+  if (d.composants_requis && d.composants_requis.length > 0) {
+    html += '<div class="fiche-section">';
+    html += '<h4>📦 Composants nécessaires (' + d.composants_requis.length + ')</h4>';
+    html += '<div class="liste-composants">';
+    for (var i = 0; i < d.composants_requis.length; i++) {
+      var comp = d.composants_requis[i];
+      var nomComp = NOMS_COMPOSANTS[comp] || comp;
+      html += '<span class="badge-composant">' + nomComp + '</span>';
+    }
+    html += '</div>';
+    html += '</div>';
+  }
+  
+  if (d.explication) {
+    html += '<div class="fiche-section">';
+    html += '<h4>⚡ Comment ça marche ?</h4>';
+    html += '<p>' + d.explication + '</p>';
+    html += '</div>';
+  }
+  
+  if (d.etapes && d.etapes.length > 0) {
+    html += '<div class="fiche-section">';
+    html += '<h4>🔧 Étapes de construction</h4>';
+    html += '<ol class="etapes-liste">';
+    for (var j = 0; j < d.etapes.length; j++) {
+      html += '<li>' + d.etapes[j] + '</li>';
+    }
+    html += '</ol>';
+    html += '</div>';
+  }
+  
+  html += '<a href="bac_a_sable.html" class="btn-lancer" target="_blank">🧪 Lancer le défi dans le Bac à sable</a>';
+  
+  document.getElementById('contenu-fiche').innerHTML = html;
+  document.getElementById('modal-fiche').classList.add('actif');
+}
+
+/* Fermer la fiche */
+function fermerFiche() {
+  document.getElementById('modal-fiche').classList.remove('actif');
+}
+
+/* Fermer en cliquant en dehors */
+document.getElementById('modal-fiche').addEventListener('click', function(e) {
+  if (e.target === this) fermerFiche();
+});
+</script>
+
+</body>
+</html>
