@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Oscilloscope - Labo Technique</title>
+<link rel="stylesheet" href="style-labo.css">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='112' fill='%230f172a'/><path d='M 160 340 L 220 200 L 280 320 L 340 180' stroke='%230ea5e9' stroke-width='24' fill='none' stroke-linecap='round' stroke-linejoin='round'/><circle cx='160' cy='340' r='20' fill='%230ea5e9'/><circle cx='340' cy='180' r='20' fill='%230ea5e9'/></svg>">
+<style>
+  .oscillo-ecran {
+    background: #000;
+    border: 3px solid #334155;
+    border-radius: 10px;
+    padding: 0;
+    position: relative;
+    margin: 20px 0;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.4), inset 0 0 40px rgba(14,165,233,0.1);
+    overflow: hidden;
+  }
+  .oscillo-ecran canvas {
+    display: block;
+    width: 100%;
+    height: auto;
+    background: #000;
+  }
+  .oscillo-grille-info {
+    position: absolute;
+    top: 12px;
+    left: 16px;
+    color: #0ea5e9;
+    font-family: 'Courier New', monospace;
+    font-size: 0.85em;
+    background: rgba(0,0,0,0.7);
+    padding: 6px 12px;
+    border-radius: 4px;
+    border: 1px solid rgba(14,165,233,0.4);
+    pointer-events: none;
+  }
+  .oscillo-grille-info div { margin: 2px 0; }
+
+  .controles {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    margin: 20px 0;
+  }
+
+  .controle-item label {
+    display: block;
+    font-size: 0.85em;
+    color: #334155;
+    font-weight: 600;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .controle-item input[type="range"] {
+    width: 100%;
+    margin-bottom: 6px;
+    accent-color: #0ea5e9;
+  }
+
+  .controle-item .valeur-controle {
+    display: inline-block;
+    background: #0ea5e9;
+    color: white;
+    padding: 3px 10px;
+    border-radius: 4px;
+    font-family: 'Courier New', monospace;
+    font-weight: 600;
+    font-size: 0.9em;
+  }
+
+  .boutons-signal {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin: 16px 0;
+    align-items: center;
+  }
+  .btn-signal {
+    padding: 10px 20px;
+    background: #f1f5f9;
+    border: 2px solid #e2e8f0;
+    border-radius: 6px;
+    font-size: 0.9em;
+    font-weight: 600;
+    color: #64748b;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: inherit;
+  }
+  .btn-signal:hover {
+    background: #e2e8f0;
+    color: #0f172a;
+  }
+  .btn-signal.actif {
+    background: #0ea5e9;
+    border-color: #0ea5e9;
+    color: white;
+  }
+  .btn-pause {
+    padding: 10px 20px;
+    background: #f59e0b;
+    border: 2px solid #f59e0b;
+    border-radius: 6px;
+    font-size: 0.9em;
+    font-weight: 600;
+    color: white;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: inherit;
+    margin-left: auto;
+  }
+  .btn-pause:hover { background: #d97706; }
+
+  .mesures {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 12px;
+    margin: 24px 0;
+  }
+  .mesure-carte {
+    background: #0f172a;
+    color: #e2e8f0;
+    padding: 16px;
+    border-radius: 8px;
+    border-left: 4px solid #0ea5e9;
+  }
+  .mesure-carte .label-mesure {
+    font-size: 0.75em;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 6px;
+  }
+  .mesure-carte .valeur-mesure {
+    font-size: 1.4em;
+    font-weight: 700;
+    color: #0ea5e9;
+    font-family: 'Courier New', monospace;
+  }
+  .mesure-carte .unite-mesure {
+    font-size: 0.8em;
+    color: #94a3b8;
+    margin-left: 4px;
+  }
+</style>
+</head>
+<body>
+
+<header class="labo-header">
+  <div class="labo-header-top">
+    <a href="index.html" class="labo-logo">
+      <div class="icon">🔬</div>
+      <div>
+        <div class="titre">Labo Technique</div>
+        <div class="sous-titre">Électronique · BTS · IUT · Ingénieurs</div>
+      </div>
+    </a>
+    <a href="../index.html" class="btn-retour-app">← Retour InitiaElectro</a>
+  </div>
+  <nav class="labo-nav">
+    <a href="index.html">🏠 Accueil</a>
+    <a href="calculateur.html">🧮 Calculateur</a>
+    <a href="schemas.html">🔬 Schémas CEI</a>
+    <a href="oscilloscope.html" class="actif">📊 Oscilloscope</a>
+    <a href="pannes.html">🔧 Pannes</a>
+    <a href="datasheets.html">📄 Datasheets</a>
+    <a href="manuel.html">📖 Manuel</a>
+  </nav>
+</header>
+
+<div class="labo-conteneur">
+
+  <h1 class="labo-titre">📊 Oscilloscope virtuel</h1>
+  <p class="labo-sous-titre">Visualisation et analyse de signaux électroniques</p>
+
+  <div class="boutons-signal">
+    <button class="btn-signal actif" onclick="changerSignal('sinus', this)">〰️ Sinusoïdal</button>
+    <button class="btn-signal" onclick="changerSignal('carre', this)">⬛ Carré</button>
+    <button class="btn-signal" onclick="changerSignal('triangle', this)">△ Triangulaire</button>
+    <button class="btn-pause" id="btn-pause" onclick="togglePause()">⏸️ Pause</button>
+  </div>
+
+  <div class="oscillo-ecran">
+    <div class="oscillo-grille-info">
+      <div>🔵 CH1 · <span id="info-signal">Sinusoïdal</span></div>
+      <div>📏 <span id="info-vpp">Vpp = 20 V</span></div>
+      <div>⏱️ <span id="info-freq">f = 100 Hz</span></div>
+    </div>
+    <canvas id="ecran" width="900" height="400"></canvas>
+  </div>
+
+  <div class="controles">
+    <div class="controle-item">
+      <label>Fréquence</label>
+      <input type="range" id="ctrl-freq" min="1" max="1000" value="100" step="1" oninput="mettreAJour()">
+      <div style="text-align:center;margin-top:6px;">
+        <span class="valeur-controle" id="val-freq">100 Hz</span>
+      </div>
+    </div>
+    <div class="controle-item">
+      <label>Amplitude</label>
+      <input type="range" id="ctrl-amp" min="1" max="50" value="10" step="1" oninput="mettreAJour()">
+      <div style="text-align:center;margin-top:6px;">
+        <span class="valeur-controle" id="val-amp">10 V</span>
+      </div>
+    </div>
+    <div class="controle-item">
+      <label>Phase (°)</label>
+      <input type="range" id="ctrl-phase" min="0" max="360" value="0" step="1" oninput="mettreAJour()">
+      <div style="text-align:center;margin-top:6px;">
+        <span class="valeur-controle" id="val-phase">0°</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="mesures">
+    <div class="mesure-carte">
+      <div class="label-mesure">Amplitude crête</div>
+      <div><span class="valeur-mesure" id="mes-amplitude">10</span><span class="unite-mesure">V</span></div>
+    </div>
+    <div class="mesure-carte">
+      <div class="label-mesure">Vpp (crête-à-crête)</div>
+      <div><span class="valeur-mesure" id="mes-vpp">20</span><span class="unite-mesure">V</span></div>
+    </div>
+    <div class="mesure-carte">
+      <div class="label-mesure">Période</div>
+      <div><span class="valeur-mesure" id="mes-periode">10</span><span class="unite-mesure">ms</span></div>
+    </div>
+    <div class="mesure-carte">
+      <div class="label-mesure">Fréquence</div>
+      <div><span class="valeur-mesure" id="mes-frequence">100</span><span class="unite-mesure">Hz</span></div>
+    </div>
+    <div class="mesure-carte">
+      <div class="label-mesure">Valeur efficace (RMS)</div>
+      <div><span class="valeur-mesure" id="mes-rms">7.07</span><span class="unite-mesure">V</span></div>
+    </div>
+    <div class="mesure-carte">
+      <div class="label-mesure">Valeur moyenne</div>
+      <div><span class="valeur-mesure" id="mes-moyenne">0</span><span class="unite-mesure">V</span></div>
+    </div>
+  </div>
+
+  <div class="labo-info">
+    💡 <strong>Utilisation :</strong> Modifiez la fréquence, l'amplitude ou la phase. Le signal défile en temps réel. Cliquez sur <strong>⏸️ Pause</strong> pour figer l'affichage et analyser le signal.
+  </div>
+
+  <h2 class="labo-section">📐 À savoir : les formules</h2>
+
+  <div class="labo-formulaire">
+    <h3>Signaux et leurs caractéristiques</h3>
+    <table class="labo-tableau">
+      <thead>
+        <tr>
+          <th>Signal</th>
+          <th>Formule V(t)</th>
+          <th>Valeur efficace (RMS)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>〰️ Sinusoïdal</td>
+          <td><code>V(t) = A × sin(2πft + φ)</code></td>
+          <td><code>Vrms = A / √2 ≈ 0.707 × A</code></td>
+        </tr>
+        <tr>
+          <td>⬛ Carré</td>
+          <td><code>V(t) = A si t < T/2, sinon -A</code></td>
+          <td><code>Vrms = A</code></td>
+        </tr>
+        <tr>
+          <td>△ Triangulaire</td>
+          <td><code>V(t) = montée/descente linéaire</code></td>
+          <td><code>Vrms = A / √3 ≈ 0.577 × A</code></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+<footer class="labo-footer">
+  <div>🔬 <strong>Labo Technique</strong> - Électronique avancée</div>
+  <div style="margin-top:8px;">Développé par <strong>M. Ziane</strong> · Version 1.0</div>
+</footer>
+
+<script>
+var signalType = 'sinus';
+var canvas, ctx;
+var phaseCourante = 0; // phase animée (0 à 2π)
+var enPause = false;
+var dernierTemps = 0;
+
+/* ===== FORMATAGE INTELLIGENT ===== */
+function formaterNombre(valeur) {
+  if (valeur === 0) return '0';
+  if (Math.abs(valeur) < 0.001) return valeur.toExponential(2);
+  if (Math.abs(valeur) >= 1000) return valeur.toFixed(0);
+  if (Math.abs(valeur) >= 100) return valeur.toFixed(1);
+  if (Math.abs(valeur) >= 10) return valeur.toFixed(2);
+  if (Math.abs(valeur) >= 1) return valeur.toFixed(3);
+  return valeur.toFixed(4);
+}
+
+/* ===== CHANGEMENT DE SIGNAL ===== */
+function changerSignal(type, bouton) {
+  signalType = type;
+  document.querySelectorAll('.btn-signal').forEach(function(b) {
+    b.classList.remove('actif');
+  });
+  bouton.classList.add('actif');
+  
+  var noms = { sinus: 'Sinusoïdal', carre: 'Carré', triangle: 'Triangulaire' };
+  document.getElementById('info-signal').textContent = noms[type];
+  
+  mettreAJour();
+}
+
+/* ===== PAUSE / REPRISE ===== */
+function togglePause() {
+  enPause = !enPause;
+  var btn = document.getElementById('btn-pause');
+  if (enPause) {
+    btn.textContent = '▶️ Reprendre';
+    btn.style.background = '#22c55e';
+    btn.style.borderColor = '#22c55e';
+  } else {
+    btn.textContent = '⏸️ Pause';
+    btn.style.background = '#f59e0b';
+    btn.style.borderColor = '#f59e0b';
+  }
+}
+
+/* ===== MISE À JOUR DES MESURES ===== */
+function mettreAJour() {
+  var freq = parseFloat(document.getElementById('ctrl-freq').value);
+  var amp = parseFloat(document.getElementById('ctrl-amp').value);
+  var phase = parseFloat(document.getElementById('ctrl-phase').value);
+  
+  // Étiquettes des curseurs
+  document.getElementById('val-freq').textContent = freq + ' Hz';
+  document.getElementById('val-amp').textContent = amp + ' V';
+  document.getElementById('val-phase').textContent = phase + '°';
+  
+  // Info en haut
+  document.getElementById('info-vpp').textContent = 'Vpp = ' + (amp * 2) + ' V';
+  document.getElementById('info-freq').textContent = 'f = ' + freq + ' Hz';
+  
+  // Calculs des mesures
+  var periode = 1 / freq;
+  var periodeMs = periode * 1000;
+  var vpp = amp * 2;
+  
+  var rms = 0;
+  var moyenne = 0;
+  
+  if (signalType === 'sinus') {
+    rms = amp / Math.sqrt(2);
+    moyenne = 0;
+  } else if (signalType === 'carre') {
+    rms = amp;
+    moyenne = 0;
+  } else if (signalType === 'triangle') {
+    rms = amp / Math.sqrt(3);
+    moyenne = 0;
+  }
+  
+  // Mise à jour des cartes de mesures
+  document.getElementById('mes-amplitude').textContent = formaterNombre(amp);
+  document.getElementById('mes-vpp').textContent = formaterNombre(vpp);
+  document.getElementById('mes-periode').textContent = formaterNombre(periodeMs);
+  document.getElementById('mes-frequence').textContent = formaterNombre(freq);
+  document.getElementById('mes-rms').textContent = formaterNombre(rms);
+  document.getElementById('mes-moyenne').textContent = '0';
+}
+
+/* ===== DESSIN DE L'OSCILLOSCOPE ===== */
+function dessinerOscillo() {
+  var w = canvas.width;
+  var h = canvas.height;
+  var centreY = h / 2;
+  
+  var freq = parseFloat(document.getElementById('ctrl-freq').value);
+  var amp = parseFloat(document.getElementById('ctrl-amp').value);
+  var phaseDeg = parseFloat(document.getElementById('ctrl-phase').value);
+  var phaseRad = phaseDeg * Math.PI / 180;
+  
+  // Échelle : 30V max → h/60 pixels par volt
+  var echelleV = h / 60;
+  
+  // Fond noir
+  ctx.fillStyle = '#000';
+  ctx.fillRect(0, 0, w, h);
+  
+  // ===== GRILLE =====
+  ctx.strokeStyle = 'rgba(14,165,233,0.15)';
+  ctx.lineWidth = 1;
+  
+  // Lignes verticales (10 divisions)
+  var nbDivX = 10;
+  var stepX = w / nbDivX;
+  for (var i = 0; i <= nbDivX; i++) {
+    ctx.beginPath();
+    ctx.moveTo(i * stepX, 0);
+    ctx.lineTo(i * stepX, h);
+    ctx.stroke();
+  }
+  
+  // Lignes horizontales (8 divisions)
+  var nbDivY = 8;
+  var stepY = h / nbDivY;
+  for (var j = 0; j <= nbDivY; j++) {
+    ctx.beginPath();
+    ctx.moveTo(0, j * stepY);
+    ctx.lineTo(w, j * stepY);
+    ctx.stroke();
+  }
+  
+  // Axe central (0V)
+  ctx.strokeStyle = 'rgba(14,165,233,0.5)';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(0, centreY);
+  ctx.lineTo(w, centreY);
+  ctx.stroke();
+  
+  // Axe vertical gauche
+  ctx.beginPath();
+  ctx.moveTo(0, 0);
+  ctx.lineTo(0, h);
+  ctx.stroke();
+  
+  // ===== SIGNAL =====
+  ctx.strokeStyle = '#0ea5e9';
+  ctx.lineWidth = 3;
+  ctx.shadowColor = '#0ea5e9';
+  ctx.shadowBlur = 12;
+  ctx.beginPath();
+  
+  // Nombre de périodes visibles
+  var nbPeriodes = 3;
+  var totalPoints = w;
+  
+  for (var x = 0; x <= totalPoints; x++) {
+    // t normalisé : avance avec la phase courante pour créer l'animation
+    var t = (x / totalPoints) * nbPeriodes - phaseCourante + (phaseRad / (2 * Math.PI));
+    var positionCycle = t - Math.floor(t); // dans [0, 1)
+    var valeur = 0;
+    
+    if (signalType === 'sinus') {
+      valeur = amp * Math.sin(2 * Math.PI * t);
+    } else if (signalType === 'carre') {
+      valeur = positionCycle < 0.5 ? amp : -amp;
+    } else if (signalType === 'triangle') {
+      if (positionCycle < 0.5) {
+        valeur = -amp + (4 * amp * positionCycle);
+      } else {
+        valeur = 3 * amp - (4 * amp * positionCycle);
+      }
+    }
+    
+    var y = centreY - (valeur * echelleV);
+    
+    if (x === 0) ctx.moveTo(x, y);
+    else ctx.lineTo(x, y);
+  }
+  
+  ctx.stroke();
+  ctx.shadowBlur = 0;
+  
+  // Point de départ (décoratif)
+  ctx.fillStyle = '#0ea5e9';
+  ctx.beginPath();
+  ctx.arc(0, centreY, 5, 0, 2 * Math.PI);
+  ctx.fill();
+}
+
+/* ===== BOUCLE D'ANIMATION ===== */
+function animer(temps) {
+  if (!enPause && dernierTemps > 0) {
+    var deltaTemps = (temps - dernierTemps) / 1000; // secondes
+    var freq = parseFloat(document.getElementById('ctrl-freq').value);
+    // Vitesse d'animation proportionnelle à la fréquence (mais limitée)
+    var vitesse = Math.min(freq / 100, 3); // 1x à 100 Hz, 3x max
+    phaseCourante += deltaTemps * vitesse;
+    // Rebouclage
+    if (phaseCourante > 10) phaseCourante -= 10;
+  }
+  dernierTemps = temps;
+  
+  dessinerOscillo();
+  requestAnimationFrame(animer);
+}
+
+/* ===== INITIALISATION ===== */
+window.onload = function() {
+  canvas = document.getElementById('ecran');
+  ctx = canvas.getContext('2d');
+  
+  mettreAJour();
+  requestAnimationFrame(animer);
+};
+</script>
+
+</body>
+</html>
