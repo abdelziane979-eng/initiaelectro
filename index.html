@@ -3,110 +3,1628 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Labo Technique - Électronique Avancée</title>
-<link rel="stylesheet" href="style-labo.css">
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='112' fill='%230f172a'/><path d='M 160 340 L 220 200 L 280 320 L 340 180' stroke='%230ea5e9' stroke-width='24' fill='none' stroke-linecap='round' stroke-linejoin='round'/><circle cx='160' cy='340' r='20' fill='%230ea5e9'/><circle cx='340' cy='180' r='20' fill='%230ea5e9'/></svg>">
+<title>InitiaElectro</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0' stop-color='%230369a1'/><stop offset='1' stop-color='%230284c7'/></linearGradient></defs><rect width='512' height='512' rx='112' fill='url(%23g)'/><circle cx='220' cy='256' r='60' fill='%23ff3333' stroke='%23fff' stroke-width='12'/><circle cx='200' cy='236' r='14' fill='rgba(255,255,255,0.85)'/><rect x='300' y='238' width='140' height='36' rx='18' fill='%23D4A76A' stroke='%23fff' stroke-width='8'/><rect x='320' y='238' width='14' height='36' fill='%23FFD700'/><rect x='356' y='238' width='14' height='36' fill='%238B00FF'/><rect x='392' y='238' width='14' height='36' fill='%238B4513'/><line x1='280' y1='256' x2='300' y2='256' stroke='%23fff' stroke-width='10' stroke-linecap='round'/></svg>">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0369a1">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="InitiaElectro">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: sans-serif; background: #1a1f2e; color: #e0e0e0; padding: 16px;
+         background-image: radial-gradient(circle at 20% 30%, rgba(56,189,248,0.05) 0%, transparent 50%),
+                           radial-gradient(circle at 80% 70%, rgba(168,85,247,0.05) 0%, transparent 50%); }
+  header { background: linear-gradient(135deg, #0369a1, #075985); color: white;
+           padding: 20px; border-radius: 12px; text-align: center;
+           max-width: 1200px; margin: 0 auto 16px auto;
+           box-shadow: 0 8px 20px rgba(3,105,161,0.3); }
+  h1 { font-size: 1.4em; }
+  .sous-titre { font-size: 0.9em; margin-top: 6px; }
+  #ecran-accueil { max-width: 1200px; margin: 0 auto; }
+  .titre-section { color: #38bdf8; margin-bottom: 16px; padding-bottom: 8px;
+                   border-bottom: 2px solid #334155; font-size: 1.3em; }
+  .liste-projets { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+  .carte-projet { background: linear-gradient(135deg, #1e293b, #253044); border-radius: 12px; padding: 20px;
+                  cursor: pointer; border-left: 4px solid #38bdf8; transition: all 0.25s;
+                  box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+  .carte-projet:hover { background: linear-gradient(135deg, #334155, #3d4a5f);
+                        transform: translateY(-3px); box-shadow: 0 8px 20px rgba(56,189,248,0.3); }
+  .carte-projet .emoji { font-size: 2.5em; margin-bottom: 8px;
+                         filter: drop-shadow(0 4px 6px rgba(0,0,0,0.4)); }
+  .carte-projet h3 { color: #f1f5f9; margin-bottom: 8px; }
+  .carte-projet p { color: #94a3b8; font-size: 0.85em; margin-bottom: 12px; }
+  .carte-projet .meta { font-size: 0.8em; color: #94a3b8; }
+  .niveau-badge { display: inline-block; padding: 2px 8px; border-radius: 10px;
+                  font-size: 0.75em; margin-left: 6px; }
+  .niveau-ecolier { background: #065f46; color: #a7f3d0; }
+  .niveau-collegien { background: #92400e; color: #fde68a; }
+  .niveau-libre { background: #6b21a8; color: #e9d5ff; }
+  .carte-sandbox { border-left-color: #a855f7; background: linear-gradient(135deg, #1e293b, #2d1b4e); }
+  .carte-sandbox:hover { background: linear-gradient(135deg, #334155, #3d2b5e);
+                         box-shadow: 0 8px 20px rgba(168,85,247,0.3); }
+  #ecran-projet { display: none; max-width: 1200px; margin: 0 auto; }
+  .barre-retour { background: linear-gradient(135deg, #1e293b, #253044); padding: 12px 16px; border-radius: 8px;
+                  margin-bottom: 16px; display: flex; justify-content: space-between;
+                  align-items: center; flex-wrap: wrap; gap: 8px;
+                  box-shadow: 0 4px 8px rgba(0,0,0,0.3); }
+  .nom-projet { color: #38bdf8; font-weight: bold; }
+  .btn-retour { background: #334155; color: #e0e0e0; border: none;
+                padding: 8px 14px; border-radius: 6px; cursor: pointer; font-weight: bold;
+                transition: all 0.2s; }
+  .btn-retour:hover { background: #475569; transform: scale(1.05); }
+  .infos-session { display: flex; gap: 8px; font-size: 0.85em; flex-wrap: wrap; align-items: center; }
+  .info-badge { background: #0f1420; padding: 6px 12px; border-radius: 6px;
+                box-shadow: inset 0 2px 4px rgba(0,0,0,0.4); }
+  .btn-pause { background: linear-gradient(135deg, #eab308, #f59e0b); color: #1a1f2e;
+               border: none; padding: 6px 12px; border-radius: 6px;
+               cursor: pointer; font-weight: bold; font-size: 0.9em;
+               transition: all 0.2s;
+               box-shadow: 0 2px 6px rgba(234,179,8,0.4); }
+  .btn-pause:hover { transform: scale(1.08); box-shadow: 0 4px 10px rgba(234,179,8,0.6); }
+  .btn-pause.actif { background: linear-gradient(135deg, #22c55e, #16a34a); color: white;
+                     box-shadow: 0 0 12px rgba(34,197,94,0.6); }
+  .conteneur { display: grid; grid-template-columns: 2fr 1fr; gap: 16px; }
+  .canvas-zone { background: #0f1420; padding: 16px; border-radius: 12px;
+                 box-shadow: 0 8px 20px rgba(0,0,0,0.4); }
+  .canvas-header { display: flex; justify-content: space-between; margin-bottom: 8px; align-items: center; flex-wrap: wrap; gap: 8px; }
+  .btn-vue { background: #0369a1; color: white; border: none;
+             padding: 8px 14px; border-radius: 6px; cursor: pointer; font-weight: bold;
+             transition: all 0.2s; box-shadow: 0 4px 8px rgba(3,105,161,0.3); }
+  .btn-vue:hover { background: #0284c7; transform: translateY(-2px);
+                   box-shadow: 0 6px 12px rgba(3,105,161,0.4); }
+  canvas { width: 100%; background: #ffffff; border-radius: 8px; display: block; cursor: pointer;
+           box-shadow: inset 0 0 30px rgba(0,0,0,0.08); }
+  canvas.demo { cursor: default; }
+  canvas.shake { animation: shakeAnim 0.4s; }
+  @keyframes shakeAnim {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-8px); }
+    75% { transform: translateX(8px); }
+  }
+  .panneau { background: linear-gradient(135deg, #1e293b, #253044); padding: 16px; border-radius: 12px;
+             box-shadow: 0 8px 20px rgba(0,0,0,0.4); }
+  .panneau h2 { font-size: 1.1em; color: #38bdf8; margin-bottom: 12px;
+                padding-bottom: 6px; border-bottom: 2px solid #334155; }
+  .composant { display: flex; align-items: center; gap: 10px;
+               padding: 10px; background: #334155; border-radius: 8px;
+               margin-bottom: 8px; font-size: 0.85em; transition: all 0.2s;
+               box-shadow: 0 2px 4px rgba(0,0,0,0.3); }
+  .composant.placed { background: linear-gradient(135deg, #065f46, #047857); opacity: 0.85; }
+  .pastille { width: 28px; height: 28px; border-radius: 6px; flex-shrink: 0;
+              box-shadow: 0 2px 6px rgba(0,0,0,0.4), inset 0 -3px 6px rgba(0,0,0,0.3); }
+  .etape { padding: 10px; background: #334155; border-radius: 8px;
+           margin-bottom: 6px; font-size: 0.85em; border-left: 3px solid #38bdf8;
+           transition: all 0.3s; }
+  .etape.active { background: linear-gradient(135deg, #0369a1, #0284c7); border-left-color: #fbbf24;
+                  box-shadow: 0 4px 12px rgba(3,105,161,0.4); }
+  .etape.faite { background: linear-gradient(135deg, #065f46, #047857); opacity: 0.85; }
+  .boutons { display: flex; gap: 8px; margin-top: 16px; flex-wrap: wrap; }
+  button.action { flex: 1; min-width: 100px; padding: 12px; border: none; border-radius: 8px;
+                  font-weight: bold; cursor: pointer; font-size: 0.9em;
+                  transition: all 0.2s; box-shadow: 0 4px 8px rgba(0,0,0,0.3); }
+  button.action:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 12px rgba(0,0,0,0.4); }
+  .btn-primaire { background: linear-gradient(135deg, #0369a1, #0284c7); color: white; }
+  .btn-primaire:disabled { background: #475569; cursor: not-allowed; opacity: 0.5;
+                           box-shadow: none; }
+  .btn-secondaire { background: #334155; color: #e0e0e0; }
+  .info-etape { background: #0f1420; padding: 14px; border-radius: 8px;
+                margin-top: 12px; font-size: 0.9em; border-left: 3px solid #fbbf24;
+                box-shadow: inset 0 2px 4px rgba(0,0,0,0.4); }
+  .info-etape h3 { color: #fbbf24; margin-bottom: 6px; }
+  .info-etape.succes { border-left-color: #22c55e; }
+  .info-etape.succes h3 { color: #22c55e; }
+  .info-etape.erreur { border-left-color: #ef4444; }
+  .info-etape.erreur h3 { color: #ef4444; }
+  .indice-difficile { background: rgba(139,92,246,0.15); border-left-color: #a855f7;
+                      margin-top: 8px; padding: 8px 10px; border-radius: 6px;
+                      font-size: 0.85em; color: #c4b5fd; }
+  .indice-difficile strong { color: #a855f7; }
+
+  .modal-overlay {
+    display: none; position: fixed; top: 0; left: 0;
+    width: 100%; height: 100%; background: rgba(0,0,0,0.7);
+    z-index: 100; justify-content: center; align-items: center;
+    padding: 20px; overflow-y: auto;
+  }
+  .modal-overlay.actif { display: flex; animation: fadeIn 0.2s; }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  .modal-boite {
+    background: linear-gradient(135deg, #1e293b, #253044); border-radius: 16px; padding: 24px;
+    max-width: 500px; width: 100%; max-height: 90vh; overflow-y: auto;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+  }
+  .modal-boite h2 { color: #38bdf8; margin-bottom: 16px; }
+  .choix-mode { display: flex; flex-direction: column; gap: 10px; }
+  .bouton-mode {
+    padding: 14px; border: 2px solid #334155; border-radius: 10px;
+    background: #0f1420; color: #e0e0e0; cursor: pointer;
+    text-align: left; transition: all 0.2s;
+  }
+  .bouton-mode:hover { border-color: #38bdf8; background: #334155;
+                       transform: translateX(4px); }
+  .bouton-mode .mode-titre { font-weight: bold; color: #f1f5f9; }
+  .bouton-mode .mode-desc { font-size: 0.8em; color: #94a3b8; margin-top: 4px; }
+  .btn-fermer-modal {
+    margin-top: 16px; padding: 10px; background: #334155;
+    color: #e0e0e0; border: none; border-radius: 8px;
+    cursor: pointer; width: 100%; font-weight: bold;
+    transition: all 0.2s;
+  }
+  .btn-fermer-modal:hover { background: #475569; }
+  .champ-nom { margin-top: 12px; }
+  .champ-nom label { display: block; margin-bottom: 6px; font-size: 0.9em; color: #94a3b8; }
+  .champ-nom input {
+    width: 100%; padding: 10px; border: 2px solid #334155; border-radius: 8px;
+    background: #0f1420; color: white; font-size: 1em;
+  }
+  .champ-nom input:focus { border-color: #38bdf8; outline: none; }
+
+  #ecran-bilan { display: none; max-width: 800px; margin: 0 auto; }
+  .bilan-boite { background: linear-gradient(135deg, #1e293b, #253044); border-radius: 16px; padding: 24px;
+                 box-shadow: 0 20px 50px rgba(0,0,0,0.5); position: relative; overflow: hidden; }
+  .bilan-boite h2 { color: #38bdf8; margin-bottom: 20px; }
+  .bilan-stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 20px; }
+  .bilan-stat { background: #0f1420; padding: 14px; border-radius: 8px;
+                box-shadow: inset 0 2px 4px rgba(0,0,0,0.4); }
+  .bilan-stat .label { font-size: 0.8em; color: #94a3b8; }
+  .bilan-stat .valeur { font-size: 1.5em; font-weight: bold; color: #38bdf8; }
+  .bilan-detail { background: #0f1420; padding: 16px; border-radius: 8px; margin-bottom: 16px;
+                  box-shadow: inset 0 2px 4px rgba(0,0,0,0.4); }
+  .bilan-detail h3 { font-size: 0.95em; color: #fbbf24; margin-bottom: 12px; }
+  .ligne-detail { display: grid; grid-template-columns: 1fr auto auto auto; gap: 10px;
+                  font-size: 0.85em; padding: 6px 0; border-bottom: 1px solid #1e293b; }
+  .ligne-detail .nom { color: #e0e0e0; }
+  .ligne-detail .statut { font-weight: bold; }
+  .ligne-detail .statut.ok { color: #22c55e; }
+  .ligne-detail .statut.warn { color: #fbbf24; }
+  .ligne-detail .statut.ko { color: #ef4444; }
+  .ligne-detail .essais { color: #94a3b8; }
+  .ligne-detail .temps { color: #94a3b8; }
+  .bilan-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+  .bilan-actions button { flex: 1; min-width: 150px; }
+
+  .trophee-geant {
+    text-align: center; font-size: 5em; margin: 10px 0;
+    animation: tropheeAnim 1s ease-out;
+    filter: drop-shadow(0 0 20px rgba(251,191,36,0.8));
+  }
+  @keyframes tropheeAnim {
+    0% { transform: scale(0) rotate(-180deg); opacity: 0; }
+    60% { transform: scale(1.3) rotate(10deg); opacity: 1; }
+    100% { transform: scale(1) rotate(0deg); opacity: 1; }
+  }
+  .bravo-geant {
+    text-align: center; font-size: 2.5em; font-weight: bold;
+    background: linear-gradient(135deg, #fbbf24, #f59e0b, #fbbf24);
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: bravoAnim 0.8s ease-out;
+    margin-bottom: 12px;
+  }
+  @keyframes bravoAnim {
+    0% { transform: scale(0.3) rotate(-10deg); opacity: 0; }
+    70% { transform: scale(1.15) rotate(3deg); }
+    100% { transform: scale(1) rotate(0deg); opacity: 1; }
+  }
+
+  #zone-confettis {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    pointer-events: none; z-index: 200; display: none;
+  }
+  #zone-confettis.actif { display: block; }
+  .confetti {
+    position: absolute; width: 12px; height: 12px;
+    animation: chuteConfetti 3s linear forwards;
+  }
+  @keyframes chuteConfetti {
+    0% { transform: translateY(-20px) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(105vh) rotate(720deg); opacity: 0.3; }
+  }
+</style>
 </head>
 <body>
 
-<header class="labo-header">
-  <div class="labo-header-top">
-    <a href="index.html" class="labo-logo">
-      <div class="icon">🔬</div>
-      <div>
-        <div class="titre">Labo Technique</div>
-        <div class="sous-titre">Électronique · BTS · IUT · Ingénieurs</div>
-      </div>
-    </a>
-    <a href="../index.html" class="btn-retour-app">← Retour InitiaElectro</a>
-  </div>
-  <nav class="labo-nav">
-    <a href="index.html" class="actif">🏠 Accueil</a>
-    <a href="calculateur.html">🧮 Calculateur</a>
-    <a href="schemas.html">🔬 Schémas CEI</a>
-    <a href="oscilloscope.html">📊 Oscilloscope</a>
-    <a href="pannes.html">🔧 Pannes</a>
-    <a href="datasheets.html">📄 Datasheets</a>
-    <a href="manuel.html">📖 Manuel</a>
-  </nav>
+<header>
+  <h1>🛠️ InitiaElectro - Apprentissage</h1>
+  <div class="sous-titre">Choisissez un projet pour commencer</div>
+  <button id="btn-installer" onclick="installerPWA()" style="display:none;margin-top:12px;padding:10px 20px;background:#fbbf24;color:#1a1f2e;border:none;border-radius:8px;font-weight:bold;cursor:pointer;font-size:0.95em;box-shadow:0 4px 8px rgba(251,191,36,0.4);">
+    📲 Installer l'appli
+  </button>
 </header>
 
-<div class="labo-conteneur">
-
-  <h1 class="labo-titre">Bienvenue au Labo Technique</h1>
-  <p class="labo-sous-titre">
-    Outils d'électronique avancée pour lycées techniques, BTS, IUT et ingénieurs.
-  </p>
-
-  <div class="labo-info">
-    <strong>🎓 Public :</strong> Cette application s'adresse aux étudiants et professionnels de niveau avancé. Elle est indépendante de InitiaElectro et EspaceElectronic.
-  </div>
-
-  <h2 class="labo-section">Les 5 modules du Labo</h2>
-
-  <div class="labo-grille">
-
-    <a href="calculateur.html" class="labo-carte">
-      <div class="emoji">🧮</div>
-      <h3>Calculateur électronique</h3>
-      <p>Loi d'Ohm, diviseur de tension, filtres RC, code couleur des résistances, fréquence de coupure.</p>
-      <div class="meta">Calculs en temps réel</div>
-    </a>
-
-    <a href="schemas.html" class="labo-carte">
-      <div class="emoji">🔬</div>
-      <h3>Schémas CEI</h3>
-      <p>Bibliothèque de schémas normalisés : alimentations, filtres, amplificateurs, logique.</p>
-      <div class="meta">Normes internationales</div>
-    </a>
-
-    <a href="oscilloscope.html" class="labo-carte">
-      <div class="emoji">📊</div>
-      <h3>Oscilloscope virtuel</h3>
-      <p>Visualisation de signaux (sinusoïdal, carré, triangulaire). Mesures : Vpp, fréquence, période.</p>
-      <div class="meta">Signaux & mesures</div>
-    </a>
-
-    <a href="pannes.html" class="labo-carte">
-      <div class="emoji">🔧</div>
-      <h3>Analyse de pannes</h3>
-      <p>Scénarios de diagnostic : identifier le composant défectueux dans un circuit.</p>
-      <div class="meta">Dépannage</div>
-    </a>
-
-    <a href="datasheets.html" class="labo-carte">
-      <div class="emoji">📄</div>
-      <h3>Datasheets</h3>
-      <p>Fiches techniques : NE555, 2N2222, CD4017, LM358, etc. Brochage et caractéristiques.</p>
-      <div class="meta">Composants réels</div>
-    </a>
-
-  </div>
-
-  <h2 class="labo-section">Documentation</h2>
-
-  <div class="labo-grille">
-
-    <a href="manuel.html" class="labo-carte">
-      <div class="emoji">📖</div>
-      <h3>Manuel BTS / IUT</h3>
-      <p>Guide complet du Labo Technique : utilisation des modules, méthodes d'analyse, exercices.</p>
-      <div class="meta">Documentation pédagogique</div>
-    </a>
-
-  </div>
-
-  <div class="labo-attention">
-    <strong>⚠️ Version en construction :</strong> Les modules sont ajoutés progressivement. Le calculateur est disponible dès maintenant.
-  </div>
-
+<div id="ecran-accueil">
+  <h2 class="titre-section">📚 Projets disponibles</h2>
+  <div class="liste-projets" id="liste-projets"></div>
 </div>
 
-<footer class="labo-footer">
-  <div>🔬 <strong>Labo Technique</strong> - Électronique avancée</div>
-  <div style="margin-top:8px;">Développé par <strong>M. Ziane</strong> · Version 1.0</div>
-  <div style="margin-top:8px; opacity:0.7;">Pour BTS, IUT, lycées techniques et ingénieurs</div>
-</footer>
+<div class="modal-overlay" id="modal-mode">
+  <div class="modal-boite">
+    <h2 id="modal-titre">Choisir le mode</h2>
+    <div class="choix-mode">
+      <button class="bouton-mode" onclick="choisirMode('demo')">
+        <div class="mode-titre">🎬 Démonstration</div>
+        <div class="mode-desc">L'application construit le circuit automatiquement.</div>
+      </button>
+      <button class="bouton-mode" onclick="choisirMode('facile')">
+        <div class="mode-titre">🟢 Quiz Facile</div>
+        <div class="mode-desc">Cercle jaune clignotant : cliquez dedans pour placer.</div>
+      </button>
+      <button class="bouton-mode" onclick="choisirMode('moyen')">
+        <div class="mode-titre">🟠 Quiz Moyen</div>
+        <div class="mode-desc">Petit point discret à l'endroit exact.</div>
+      </button>
+      <button class="bouton-mode" onclick="choisirMode('difficile')">
+        <div class="mode-titre">🔴 Quiz Difficile</div>
+        <div class="mode-desc">Indice textuel, puis zone après 3 essais.</div>
+      </button>
+    </div>
+    <button class="btn-fermer-modal" onclick="fermerModal()">Annuler</button>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-nom">
+  <div class="modal-boite">
+    <h2>Avant de commencer</h2>
+    <div class="champ-nom">
+      <label for="champ-prenom">Ton prenom (pour le bilan) :</label>
+      <input type="text" id="champ-prenom" placeholder="Ex: Lucas" maxlength="30">
+    </div>
+    <button class="btn-fermer-modal" onclick="validerNom()" style="background:#0369a1;color:white;margin-top:16px;">▶ Commencer</button>
+    <button class="btn-fermer-modal" onclick="annulerNom()">Annuler</button>
+  </div>
+</div>
+
+<div id="ecran-projet">
+  <div class="barre-retour">
+    <button class="btn-retour" onclick="retourAccueil()">← Retour</button>
+    <span class="nom-projet" id="nom-projet-actif"></span>
+    <div class="infos-session">
+      <div class="info-badge" id="info-mode">Mode : —</div>
+      <div class="info-badge" id="info-chrono">⏱ 0:00</div>
+      <button class="btn-pause" id="btn-pause" onclick="basculerPause()">⏸ Pause</button>
+      <div class="info-badge" id="info-score">🎯 0 pts</div>
+      <div class="info-badge" id="info-essais">Essais : 0</div>
+    </div>
+  </div>
+  <div class="conteneur">
+    <div class="canvas-zone">
+      <div class="canvas-header">
+        <button class="btn-vue" id="btn-vue" onclick="basculerVue()">👁 Voir le dessous</button>
+        <span style="font-size:0.85em;color:#94a3b8;" id="label-vue">Vue : dessus</span>
+      </div>
+      <canvas id="circuit" width="900" height="600"></canvas>
+      <div class="info-etape" id="info-etape">
+        <h3>Bienvenue !</h3>
+        <p>Cliquez sur "Demarrer" pour commencer.</p>
+      </div>
+    </div>
+    <div class="panneau">
+      <h2>📦 Composants</h2>
+      <div id="liste-composants"></div>
+      <h2 style="margin-top: 16px;">📋 Etapes</h2>
+      <div id="liste-etapes"></div>
+      <div class="boutons">
+        <button class="action btn-primaire" id="btn-demarrer" onclick="demarrer()">▶ Demarrer</button>
+        <button class="action btn-primaire" id="btn-suivant" onclick="etapeSuivante()" disabled>Suivant →</button>
+        <button class="action btn-secondaire" onclick="reinitialiser()">↺ Reset</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="ecran-bilan">
+  <div class="bilan-boite">
+    <div id="bilan-message-special"></div>
+    <h2>📊 Bilan du Quiz</h2>
+    <div class="bilan-stats">
+      <div class="bilan-stat"><div class="label">Eleve</div><div class="valeur" id="bilan-eleve">—</div></div>
+      <div class="bilan-stat"><div class="label">Projet</div><div class="valeur" id="bilan-projet">—</div></div>
+      <div class="bilan-stat"><div class="label">Temps total</div><div class="valeur" id="bilan-temps">—</div></div>
+      <div class="bilan-stat"><div class="label">Score</div><div class="valeur" id="bilan-score">—</div></div>
+    </div>
+    <div class="bilan-detail">
+      <h3>Detail par etape</h3>
+      <div id="bilan-detail-liste"></div>
+    </div>
+    <div class="bilan-actions">
+      <button class="action btn-primaire" onclick="retourAccueil()">← Retour a l'accueil</button>
+      <button class="action btn-secondaire" onclick="recommencerQuiz()">↺ Recommencer</button>
+      <button class="action btn-secondaire" onclick="exporterBilan()">📄 Exporter .txt</button>
+    </div>
+  </div>
+</div>
+
+<div id="zone-confettis"></div>
+<script src="composants.js"></script>
+<script>
+/* =========================================================
+   BASE DE DONNEES DES PROJETS
+   Ajout : indices pour le mode difficile
+   ========================================================= */
+var PROJETS = {
+  "led_simple": {
+    id: "led_simple", nom: "Allumer une LED", emoji: "💡", niveau: "ecolier", niveauTexte: "Écolier", duree: "10 min",
+    description: "Le circuit le plus simple : une LED s'allume avec une pile et une resistance.",
+    composants: [
+      { id: "BT1", nom: "Pile 9V", valeur: "9V", x: 150, y: 450, largeur: 100, hauteur: 60, couleur: "#333333", cible: {x: 200, y: 480}, indice: "en bas à gauche", pattes: [{x: 170, y: 470}, {x: 230, y: 490}] },
+      { id: "R1",  nom: "Resistance", valeur: "470 ohm", x: 350, y: 250, largeur: 100, hauteur: 30, couleur: "#D4A76A", cible: {x: 400, y: 265}, indice: "en haut, au milieu", pattes: [{x: 330, y: 265}, {x: 470, y: 265}] },
+      { id: "D1",  nom: "LED rouge", valeur: "1.8V/20mA", x: 600, y: 250, largeur: 50, hauteur: 50, couleur: "#E63946", cible: {x: 625, y: 275}, indice: "en haut à droite", pattes: [{x: 590, y: 275}, {x: 660, y: 275}] }
+    ],
+    etapes: [
+      { titre: "Placer la pile", description: "Cliquez sur la zone pour placer la pile 9V.", composant_id: "BT1" },
+      { titre: "Ajouter la resistance", description: "Cliquez sur la zone pour placer la resistance.", composant_id: "R1" },
+      { titre: "Brancher la LED", description: "Cliquez sur la zone pour placer la LED.", composant_id: "D1" },
+      { titre: "Verifier", description: "Tout est en place ! La LED s'allume.", composant_id: null }
+    ]
+  },
+  "interrupteur": {
+    id: "interrupteur", nom: "Avec interrupteur", emoji: "🔘", niveau: "ecolier", niveauTexte: "Écolier", duree: "15 min",
+    description: "Ajoutez un interrupteur pour allumer et eteindre la LED a volonte.",
+    composants: [
+      { id: "BT1", nom: "Pile 9V", valeur: "9V", x: 120, y: 450, largeur: 100, hauteur: 60, couleur: "#333333", cible: {x: 170, y: 480}, indice: "en bas à gauche", pattes: [{x: 140, y: 470}, {x: 200, y: 490}] },
+      { id: "SW1", nom: "Interrupteur", valeur: "SPST", x: 320, y: 440, largeur: 100, hauteur: 50, couleur: "#555555", cible: {x: 370, y: 465}, indice: "en bas au milieu", pattes: [{x: 310, y: 465}, {x: 430, y: 465}] },
+      { id: "R1",  nom: "Resistance", valeur: "470 ohm", x: 530, y: 250, largeur: 100, hauteur: 30, couleur: "#D4A76A", cible: {x: 580, y: 265}, indice: "en haut, à droite du milieu", pattes: [{x: 510, y: 265}, {x: 650, y: 265}] },
+      { id: "D1",  nom: "LED rouge", valeur: "1.8V/20mA", x: 740, y: 250, largeur: 50, hauteur: 50, couleur: "#E63946", cible: {x: 765, y: 275}, indice: "en haut à droite", pattes: [{x: 730, y: 275}, {x: 800, y: 275}] }
+    ],
+    etapes: [
+      { titre: "Placer la pile", description: "Cliquez pour placer la pile.", composant_id: "BT1" },
+      { titre: "Ajouter l'interrupteur", description: "Cliquez pour placer l'interrupteur.", composant_id: "SW1" },
+      { titre: "Ajouter la resistance", description: "Cliquez pour placer la resistance.", composant_id: "R1" },
+      { titre: "Brancher la LED", description: "Cliquez pour placer la LED.", composant_id: "D1" },
+      { titre: "Verifier", description: "Cliquez sur l'interrupteur pour allumer/eteindre la LED !", composant_id: null }
+    ]
+  },
+  "deux_led": {
+    id: "deux_led", nom: "Deux LED en serie", emoji: "💡💡", niveau: "collegien", niveauTexte: "Collégien", duree: "20 min",
+    description: "Une LED rouge et une LED verte s'allument en meme temps.",
+    composants: [
+      { id: "BT1", nom: "Pile 9V", valeur: "9V", x: 150, y: 450, largeur: 100, hauteur: 60, couleur: "#333333", cible: {x: 200, y: 480}, indice: "en bas à gauche", pattes: [{x: 170, y: 470}, {x: 230, y: 490}] },
+      { id: "R1",  nom: "Resistance", valeur: "220 ohm", x: 320, y: 250, largeur: 100, hauteur: 30, couleur: "#D4A76A", cible: {x: 370, y: 265}, indice: "en haut à gauche", pattes: [{x: 300, y: 265}, {x: 440, y: 265}] },
+      { id: "D1",  nom: "LED rouge", valeur: "1.8V/20mA", x: 520, y: 250, largeur: 50, hauteur: 50, couleur: "#E63946", cible: {x: 545, y: 275}, indice: "en haut au milieu", pattes: [{x: 510, y: 275}, {x: 580, y: 275}] },
+      { id: "D2",  nom: "LED verte", valeur: "2.1V/20mA", x: 680, y: 250, largeur: 50, hauteur: 50, couleur: "#22C55E", cible: {x: 705, y: 275}, indice: "en haut à droite", pattes: [{x: 670, y: 275}, {x: 740, y: 275}] }
+    ],
+    etapes: [
+      { titre: "Placer la pile", description: "Cliquez pour placer la pile.", composant_id: "BT1" },
+      { titre: "Ajouter la resistance", description: "Cliquez pour placer la resistance.", composant_id: "R1" },
+      { titre: "Brancher la LED rouge", description: "Cliquez pour placer la LED rouge.", composant_id: "D1" },
+      { titre: "Brancher la LED verte", description: "Cliquez pour placer la LED verte.", composant_id: "D2" },
+      { titre: "Verifier", description: "Les deux LED s'allument en meme temps !", composant_id: null }
+    ]
+  },
+  "clignotant_ne555": {
+    id: "clignotant_ne555", nom: "Clignotant NE555", emoji: "✨", niveau: "collegien", niveauTexte: "Collégien", duree: "30 min",
+    description: "Une LED qui clignote grace au NE555 en mode astable.",
+    composants: [
+      { id: "BT1", nom: "Pile 9V", valeur: "9V", x: 100, y: 450, largeur: 100, hauteur: 60, couleur: "#333333", cible: {x: 150, y: 480}, indice: "en bas à gauche", pattes: [{x: 120, y: 470}, {x: 180, y: 490}] },
+      { id: "U1",  nom: "NE555", valeur: "DIP-8", x: 350, y: 200, largeur: 80, hauteur: 100, couleur: "#222222", cible: {x: 390, y: 250}, indice: "au centre", pattes: [{x: 335, y: 215}, {x: 335, y: 235}, {x: 335, y: 260}, {x: 335, y: 285}, {x: 445, y: 215}, {x: 445, y: 235}, {x: 445, y: 260}, {x: 445, y: 285}] },
+      { id: "R1",  nom: "Resistance", valeur: "10k ohm", x: 250, y: 130, largeur: 100, hauteur: 30, couleur: "#D4A76A", cible: {x: 300, y: 145}, indice: "en haut à gauche", pattes: [{x: 230, y: 145}, {x: 370, y: 145}] },
+      { id: "D1",  nom: "LED rouge", valeur: "1.8V/20mA", x: 720, y: 200, largeur: 50, hauteur: 50, couleur: "#E63946", cible: {x: 745, y: 225}, indice: "en haut à droite", pattes: [{x: 710, y: 225}, {x: 780, y: 225}] }
+    ],
+    etapes: [
+      { titre: "Placer la pile", description: "Cliquez pour placer la pile.", composant_id: "BT1" },
+      { titre: "Installer le NE555", description: "Cliquez pour placer le NE555.", composant_id: "U1" },
+      { titre: "Ajouter la resistance", description: "Cliquez pour placer R1.", composant_id: "R1" },
+      { titre: "Brancher la LED", description: "Cliquez pour placer la LED.", composant_id: "D1" },
+      { titre: "Verifier", description: "La LED clignote !", composant_id: null }
+    ]
+  }
+};
+
+var TOLERANCE_PX = 40;
+var MAX_ESSAIS = 3;
+
+var projetActif = null;
+var modeActuel = null;
+var etapeActuelle = -1;
+var composantsPlaces = [];
+var animationEnCours = false;
+var ledAllumee = false;
+var led2Allumee = false;
+var interrupteurFerme = false;
+var essaisEtape = 0;
+var zoneClignote = null;
+var zoneAfficheeApresEssais = false;
+var vueDessous = false;
+var prenomEleve = "";
+var chronoDebut = null;
+var chronoInterval = null;
+var chronoTempsEcoule = 0;
+var chronoEnPause = false;
+var etapeDebut = null;
+var detailEtapes = [];
+var scoreTotal = 0;
+var animationClignoteId = null;
+var animationPulseId = null;
+var etoilesActives = [];
+var ledPulsePhase = 0;
+
+/* =========================================================
+   ACCUEIL
+   ========================================================= */
+function afficherAccueil() {
+  var div = document.getElementById('liste-projets');
+  var html = '';
+  var keys = Object.keys(PROJETS);
+  for (var i = 0; i < keys.length; i++) {
+    var p = PROJETS[keys[i]];
+    var classeNiveau = p.niveau === 'ecolier' ? 'niveau-ecolier' : 'niveau-collegien';
+    html += '<div class="carte-projet" onclick="ouvrirProjet(\'' + p.id + '\')">';
+    html += '<div class="emoji">' + p.emoji + '</div>';
+    html += '<h3>' + p.nom + '<span class="niveau-badge ' + classeNiveau + '">' + p.niveauTexte + '</span></h3>';
+    html += '<p>' + p.description + '</p>';
+    html += '<div class="meta">⏱ ' + p.duree + ' · 📦 ' + p.composants.length + ' composants</div>';
+    html += '</div>';
+  }
+    html += '<div class="carte-projet" onclick="window.open(\'projets.html\', \'_blank\')" style="border-left-color: #f97316;">';
+    html += '<div class="emoji">🏆</div>';
+    html += '<h3>Projets d\'ingénierie<span class="niveau-badge niveau-ecolier">19 défis</span></h3>';
+    html += '<p>Découvre 18 défis pour construire des circuits utiles du quotidien.</p>';
+    html += '<div class="meta">🏠 Maison · 🌱 Écologie · 🎮 Jeux · 🚗 Véhicules · 🔬 Capteurs · 🔒 Sécurité</div>';
+    html += '</div>';
+  html += '<div class="carte-projet carte-sandbox" onclick="ouvrirBacASable()">';
+html += '<div class="emoji">⚡</div>';
+html += '<h3>EspaceElectronic<span class="niveau-badge niveau-libre">Libre</span></h3>';
+html += '<p>Atelier de création : place, câble et teste tes propres circuits électroniques.</p>';
+html += '<div class="meta">🎨 Créativité illimitée · 🔧 44 composants · 🏆 19 défis · 🔬 Multimètre</div>';
+html += '</div>';
+
+html += '<div class="carte-projet" onclick="window.open(\'fiche-test.html\', \'_blank\')" style="border-left-color: #22c55e;">';
+html += '<div class="emoji">🧪</div>';
+html += '<h3>Fiche de test<span class="niveau-badge niveau-libre">Professeurs</span></h3>';
+html += '<p>Guide de test pour les enseignants : protocole, questionnaires, retours.</p>';
+html += '<div class="meta">📋 Protocole · 📝 Questionnaire prof · 👦 Questionnaire élève</div>';
+html += '</div>';
+  div.innerHTML = html;
+}
+
+function ouvrirBacASable() { window.open('bac_a_sable.html', '_blank'); }
+
+function ouvrirProjet(id) {
+  projetActif = PROJETS[id];
+  document.getElementById('modal-titre').textContent = 'Choisir le mode - ' + projetActif.nom;
+  document.getElementById('modal-mode').classList.add('actif');
+}
+
+function fermerModal() {
+  document.getElementById('modal-mode').classList.remove('actif');
+  projetActif = null;
+}
+
+function choisirMode(mode) {
+  modeActuel = mode;
+  document.getElementById('modal-mode').classList.remove('actif');
+  if (mode === 'demo') activerProjet();
+  else {
+    document.getElementById('champ-prenom').value = "";
+    document.getElementById('modal-nom').classList.add('actif');
+    setTimeout(function() { document.getElementById('champ-prenom').focus(); }, 100);
+  }
+}
+
+function validerNom() {
+  var nom = document.getElementById('champ-prenom').value.trim();
+  prenomEleve = nom || "Anonyme";
+  document.getElementById('modal-nom').classList.remove('actif');
+  activerProjet();
+}
+
+function annulerNom() {
+  document.getElementById('modal-nom').classList.remove('actif');
+  projetActif = null;
+  modeActuel = null;
+}
+
+function activerProjet() {
+  document.getElementById('ecran-accueil').style.display = 'none';
+  document.getElementById('ecran-projet').style.display = 'block';
+  document.getElementById('ecran-bilan').style.display = 'none';
+  document.getElementById('nom-projet-actif').textContent = projetActif.emoji + ' ' + projetActif.nom;
+  var nomsModes = { demo: "🎬 Démonstration", facile: "🟢 Quiz Facile", moyen: "🟠 Quiz Moyen", difficile: "🔴 Quiz Difficile" };
+  document.getElementById('info-mode').textContent = nomsModes[modeActuel] || modeActuel;
+  var canvas = document.getElementById('circuit');
+  if (modeActuel === 'demo') canvas.classList.add('demo');
+  else canvas.classList.remove('demo');
+  vueDessous = false;
+  document.getElementById('btn-vue').textContent = "👁 Voir le dessous";
+  document.getElementById('label-vue').textContent = "Vue : dessus";
+  reinitialiser();
+}
+
+function retourAccueil() {
+  arreterAnimationClignote();
+  arreterAnimationPulse();
+  document.getElementById('ecran-accueil').style.display = 'block';
+  document.getElementById('ecran-projet').style.display = 'none';
+  document.getElementById('ecran-bilan').style.display = 'none';
+  projetActif = null;
+  modeActuel = null;
+  arreterChrono();
+}
+
+function basculerVue() {
+  vueDessous = !vueDessous;
+  document.getElementById('btn-vue').textContent = vueDessous ? "👁 Voir le dessus" : "👁 Voir le dessous";
+  document.getElementById('label-vue').textContent = "Vue : " + (vueDessous ? "dessous" : "dessus");
+  dessinerCircuit();
+}
+
+/* =========================================================
+   PANNEAU
+   ========================================================= */
+function afficherComposants() {
+  if (!projetActif) return;
+  var div = document.getElementById('liste-composants');
+  var html = '';
+  for (var i = 0; i < projetActif.composants.length; i++) {
+    var c = projetActif.composants[i];
+    var placed = composantsPlaces.indexOf(c.id) >= 0;
+    html += '<div class="composant ' + (placed ? 'placed' : '') + '">';
+    html += '<div class="pastille" style="background:' + c.couleur + '"></div>';
+    html += '<div><strong>' + c.nom + '</strong><br><span style="color:#94a3b8;font-size:0.8em;">' + c.valeur + '</span></div>';
+    html += '</div>';
+  }
+  div.innerHTML = html;
+}
+
+function afficherEtapes() {
+  if (!projetActif) return;
+  var div = document.getElementById('liste-etapes');
+  var html = '';
+  for (var i = 0; i < projetActif.etapes.length; i++) {
+    var e = projetActif.etapes[i];
+    var cls = 'etape';
+    if (i < etapeActuelle) cls += ' faite';
+    if (i === etapeActuelle) cls += ' active';
+    html += '<div class="' + cls + '"><strong>' + (i+1) + '. ' + e.titre + '</strong></div>';
+  }
+  div.innerHTML = html;
+}
+
+function afficherInfoEtape(statut, message) {
+  if (!projetActif) return;
+  var div = document.getElementById('info-etape');
+  div.className = 'info-etape';
+  if (statut === 'succes') div.classList.add('succes');
+  if (statut === 'erreur') div.classList.add('erreur');
+  if (etapeActuelle === -1) {
+    div.innerHTML = '<h3>Bienvenue !</h3><p>Cliquez sur "Demarrer".</p>';
+  } else if (etapeActuelle < projetActif.etapes.length) {
+    var e = projetActif.etapes[etapeActuelle];
+    var texte = '<h3>Etape ' + (etapeActuelle+1) + ' : ' + e.titre + '</h3><p>' + e.description + '</p>';
+    if (modeActuel === 'difficile' && e.composant_id) {
+      var compoInfo = null;
+      for (var k = 0; k < projetActif.composants.length; k++) {
+        if (projetActif.composants[k].id === e.composant_id) compoInfo = projetActif.composants[k];
+      }
+      if (compoInfo && compoInfo.indice) {
+        texte += '<div class="indice-difficile"><strong>💡 Indice :</strong> la position approximative est <strong>' + compoInfo.indice + '</strong>.</div>';
+      }
+    }
+    if (message) texte += '<p style="margin-top:8px;"><strong>' + message + '</strong></p>';
+    if (modeActuel !== 'demo' && e.composant_id && essaisEtape > 0) {
+      texte += '<p style="margin-top:8px;font-size:0.85em;color:#94a3b8;">Essai ' + essaisEtape + '/' + MAX_ESSAIS + '</p>';
+    }
+    div.innerHTML = texte;
+  } else {
+    div.innerHTML = '<h3>🎉 Circuit termine !</h3><p>Bravo !</p>';
+  }
+}
+
+function majEssais() {
+  document.getElementById('info-essais').textContent = 'Essais : ' + essaisEtape;
+}
+
+function majScore() {
+  document.getElementById('info-score').textContent = '🎯 ' + scoreTotal + ' pts';
+}
+
+/* =========================================================
+   CHRONO avec PAUSE
+   ========================================================= */
+function demarrerChrono() {
+  chronoDebut = Date.now();
+  chronoTempsEcoule = 0;
+  chronoEnPause = false;
+  majBoutonPause();
+  if (chronoInterval) clearInterval(chronoInterval);
+  chronoInterval = setInterval(function() {
+    if (chronoEnPause) return;
+    var elapsed = chronoTempsEcoule + Math.round((Date.now() - chronoDebut) / 1000);
+    var min = Math.floor(elapsed / 60);
+    var sec = elapsed % 60;
+    document.getElementById('info-chrono').textContent = '⏱ ' + min + ':' + (sec < 10 ? '0' : '') + sec;
+  }, 1000);
+}
+
+function arreterChrono() {
+  if (chronoInterval) { clearInterval(chronoInterval); chronoInterval = null; }
+  chronoEnPause = false;
+}
+
+function basculerPause() {
+  if (etapeActuelle < 0 || !projetActif) return;
+  if (chronoEnPause) {
+    chronoDebut = Date.now();
+    chronoEnPause = false;
+    majBoutonPause();
+    mettreMessage('▶ Chrono repris', 'info');
+  } else {
+    chronoTempsEcoule += Math.round((Date.now() - chronoDebut) / 1000);
+    chronoEnPause = true;
+    majBoutonPause();
+    mettreMessage('⏸ Chrono en pause', 'avertissement');
+  }
+}
+
+function majBoutonPause() {
+  var btn = document.getElementById('btn-pause');
+  if (!btn) return;
+  if (chronoEnPause) {
+    btn.textContent = '▶ Reprendre';
+    btn.classList.add('actif');
+  } else {
+    btn.textContent = '⏸ Pause';
+    btn.classList.remove('actif');
+  }
+}
+
+function pauseChronoAuto() {
+  if (!chronoEnPause && etapeActuelle >= 0) {
+    chronoTempsEcoule += Math.round((Date.now() - chronoDebut) / 1000);
+    chronoEnPause = true;
+    majBoutonPause();
+  }
+}
+
+function tempsTotalChrono() {
+  var total;
+  if (chronoEnPause) total = chronoTempsEcoule;
+  else total = chronoTempsEcoule + Math.round((Date.now() - chronoDebut) / 1000);
+  return total;
+}
+
+/* =========================================================
+   DESSIN
+   ========================================================= */
+function dessinerBreadboard(ctx, canvas) {
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = 'rgba(0,0,0,0.08)';
+  ctx.beginPath();
+  ctx.ellipse(canvas.width/2, canvas.height - 18, canvas.width/2 - 10, 14, 0, 0, Math.PI * 2);
+  ctx.fill();
+  var grd = ctx.createLinearGradient(20, 20, 20, canvas.height - 20);
+  grd.addColorStop(0, '#fafafa'); grd.addColorStop(1, '#ececec');
+  ctx.fillStyle = grd;
+  ctx.fillRect(20, 20, canvas.width - 40, canvas.height - 40);
+  ctx.fillStyle = 'rgba(255,255,255,0.9)';
+  ctx.fillRect(20, 20, canvas.width - 40, 3);
+  ctx.fillStyle = 'rgba(0,0,0,0.15)';
+  ctx.fillRect(20, canvas.height - 23, canvas.width - 40, 3);
+  ctx.strokeStyle = '#c8c8c8';
+  ctx.lineWidth = 2;
+  ctx.strokeRect(20, 20, canvas.width - 40, canvas.height - 40);
+  ctx.fillStyle = '#d8d8d8';
+  ctx.fillRect(35, canvas.height/2 - 8, canvas.width - 70, 16);
+  ctx.fillStyle = 'rgba(0,0,0,0.15)';
+  ctx.fillRect(35, canvas.height/2 - 8, canvas.width - 70, 3);
+  ctx.fillStyle = 'rgba(255,255,255,0.5)';
+  ctx.fillRect(35, canvas.height/2 + 5, canvas.width - 70, 3);
+  for (var row = 0; row < 12; row++) {
+    for (var col = 0; col < 30; col++) {
+      var x = 40 + col * ((canvas.width - 80) / 30);
+      var y1 = 70 + row * 14;
+      var y2 = canvas.height/2 + 25 + row * 14;
+      if (y1 < canvas.height/2 - 15) {
+        ctx.fillStyle = '#aaa';
+        ctx.beginPath(); ctx.arc(x, y1 + 1, 1.8, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = '#666';
+        ctx.beginPath(); ctx.arc(x, y1, 1.8, 0, Math.PI * 2); ctx.fill();
+      }
+      if (y2 < canvas.height - 55) {
+        ctx.fillStyle = '#aaa';
+        ctx.beginPath(); ctx.arc(x, y2 + 1, 1.8, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = '#666';
+        ctx.beginPath(); ctx.arc(x, y2, 1.8, 0, Math.PI * 2); ctx.fill();
+      }
+    }
+  }
+}
+
+function dessinerBreadboardDessous(ctx, canvas) {
+  var grd = ctx.createLinearGradient(0, 0, 0, canvas.height);
+  grd.addColorStop(0, '#ececec'); grd.addColorStop(1, '#d8d8d8');
+  ctx.fillStyle = grd;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = '#d0d0d0';
+  ctx.strokeStyle = '#999';
+  ctx.lineWidth = 2;
+  ctx.fillRect(20, 20, canvas.width - 40, canvas.height - 40);
+  ctx.strokeRect(20, 20, canvas.width - 40, canvas.height - 40);
+  for (var row = 0; row < 12; row++) {
+    var y1 = 70 + row * 14;
+    var y2 = canvas.height/2 + 25 + row * 14;
+    if (y1 < canvas.height/2 - 15) {
+      ctx.strokeStyle = '#a8a8a8'; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.moveTo(40, y1); ctx.lineTo(canvas.width - 40, y1); ctx.stroke();
+      ctx.strokeStyle = 'rgba(255,255,255,0.6)'; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(40, y1 - 1); ctx.lineTo(canvas.width - 40, y1 - 1); ctx.stroke();
+    }
+    if (y2 < canvas.height - 55) {
+      ctx.strokeStyle = '#a8a8a8'; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.moveTo(40, y2); ctx.lineTo(canvas.width - 40, y2); ctx.stroke();
+      ctx.strokeStyle = 'rgba(255,255,255,0.6)'; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(40, y2 - 1); ctx.lineTo(canvas.width - 40, y2 - 1); ctx.stroke();
+    }
+  }
+  ctx.fillStyle = '#b8b8b8';
+  ctx.fillRect(35, canvas.height/2 - 8, canvas.width - 70, 16);
+}
+
+function dessinerOmbre(ctx, c) {
+  ctx.fillStyle = 'rgba(0,0,0,0.18)';
+  ctx.beginPath();
+  ctx.ellipse(c.x + c.largeur/2, c.y + c.hauteur + 4, c.largeur/2 + 3, 6, 0, 0, Math.PI * 2);
+  ctx.fill();
+}
+
+function dessinerPile(ctx, c) {
+  dessinerOmbre(ctx, c);
+  var grd = ctx.createLinearGradient(c.x, c.y, c.x, c.y + c.hauteur);
+  grd.addColorStop(0, '#4a4a4a'); grd.addColorStop(0.5, '#2a2a2a'); grd.addColorStop(1, '#1a1a1a');
+  ctx.fillStyle = grd;
+  ctx.beginPath(); ctx.roundRect(c.x, c.y, c.largeur, c.hauteur, 6); ctx.fill();
+  ctx.fillStyle = 'rgba(255,255,255,0.15)';
+  ctx.beginPath(); ctx.roundRect(c.x + 3, c.y + 2, c.largeur - 6, c.hauteur/3, 4); ctx.fill();
+  var grdDore = ctx.createLinearGradient(c.x, c.y + 5, c.x, c.y + 13);
+  grdDore.addColorStop(0, '#f0c987'); grdDore.addColorStop(0.5, '#d4a76a'); grdDore.addColorStop(1, '#a67c3d');
+  ctx.fillStyle = grdDore;
+  ctx.fillRect(c.x + 5, c.y + 5, c.largeur - 10, 8);
+  ctx.fillStyle = 'rgba(255,255,255,0.5)';
+  ctx.fillRect(c.x + 5, c.y + 5, c.largeur - 10, 2);
+  ctx.fillStyle = '#fff';
+  ctx.font = 'bold 18px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.shadowColor = 'rgba(0,0,0,0.6)'; ctx.shadowBlur = 4;
+  ctx.fillText('9V', c.x + c.largeur/2, c.y + c.hauteur/2 + 8);
+  ctx.shadowBlur = 0;
+  var grdRouge = ctx.createRadialGradient(c.x + c.largeur - 17, c.y + 6, 1, c.x + c.largeur - 15, c.y + 8, 6);
+  grdRouge.addColorStop(0, '#ff8a8a'); grdRouge.addColorStop(1, '#8b0000');
+  ctx.fillStyle = grdRouge;
+  ctx.beginPath(); ctx.arc(c.x + c.largeur - 15, c.y + 8, 6, 0, Math.PI * 2); ctx.fill();
+  var grdBleu = ctx.createRadialGradient(c.x + 13, c.y + 6, 1, c.x + 15, c.y + 8, 6);
+  grdBleu.addColorStop(0, '#7ab8ff'); grdBleu.addColorStop(1, '#003366');
+  ctx.fillStyle = grdBleu;
+  ctx.beginPath(); ctx.arc(c.x + 15, c.y + 8, 6, 0, Math.PI * 2); ctx.fill();
+}
+
+function dessinerResistance(ctx, c) {
+  dessinerOmbre(ctx, c);
+  var grd = ctx.createLinearGradient(c.x, c.y, c.x, c.y + c.hauteur);
+  grd.addColorStop(0, '#f0d4a0'); grd.addColorStop(0.3, '#d4a76a'); grd.addColorStop(0.7, '#b8905a'); grd.addColorStop(1, '#8a6a40');
+  ctx.fillStyle = grd;
+  ctx.beginPath(); ctx.roundRect(c.x, c.y, c.largeur, c.hauteur, c.hauteur/2); ctx.fill();
+  ctx.fillStyle = 'rgba(255,255,255,0.4)';
+  ctx.beginPath(); ctx.roundRect(c.x + 8, c.y + 3, c.largeur - 16, 4, 2); ctx.fill();
+  var bandes = [{pos:15,col:'#FFD700'},{pos:35,col:'#8B00FF'},{pos:55,col:'#8B4513'},{pos:85,col:'#FFD700'}];
+  for (var i = 0; i < bandes.length; i++) {
+    var b = bandes[i];
+    ctx.fillStyle = b.col;
+    ctx.fillRect(c.x + b.pos, c.y + 2, 6, c.hauteur - 4);
+    ctx.fillStyle = 'rgba(255,255,255,0.35)';
+    ctx.fillRect(c.x + b.pos, c.y + 2, 6, 2);
+  }
+}
+
+function dessinerLED(ctx, c, allumee, couleur) {
+  dessinerOmbre(ctx, c);
+  var cx = c.x + c.largeur/2;
+  var cy = c.y + c.hauteur/2;
+  var r = c.largeur/2;
+  var baseCouleur, glowCouleur, refletCouleur;
+  if (couleur === '#22C55E') { baseCouleur = allumee ? '#4ade80' : '#166534'; glowCouleur = 'rgba(34,197,94,'; refletCouleur = '#86efac'; }
+  else { baseCouleur = allumee ? '#ff3333' : '#b30000'; glowCouleur = 'rgba(255,50,50,'; refletCouleur = '#ff9999'; }
+  if (allumee) {
+    var pulse = 1 + 0.15 * Math.sin(ledPulsePhase);
+    var haloR = r * 4 * pulse;
+    var grdHalo = ctx.createRadialGradient(cx, cy, r, cx, cy, haloR);
+    grdHalo.addColorStop(0, glowCouleur + '0.7)');
+    grdHalo.addColorStop(0.5, glowCouleur + '0.2)');
+    grdHalo.addColorStop(1, glowCouleur + '0)');
+    ctx.fillStyle = grdHalo;
+    ctx.beginPath(); ctx.arc(cx, cy, haloR, 0, Math.PI * 2); ctx.fill();
+  }
+  var grd = ctx.createRadialGradient(cx - r/3, cy - r/3, 2, cx, cy, r);
+  grd.addColorStop(0, refletCouleur);
+  grd.addColorStop(0.4, baseCouleur);
+  grd.addColorStop(1, allumee ? '#880000' : '#550000');
+  ctx.fillStyle = grd;
+  ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.fill();
+  ctx.strokeStyle = 'rgba(0,0,0,0.5)'; ctx.lineWidth = 1.5; ctx.stroke();
+  ctx.fillStyle = allumee ? 'rgba(255,255,255,0.9)' : 'rgba(255,255,255,0.6)';
+  ctx.beginPath();
+  ctx.ellipse(cx - r/3, cy - r/3, r/3, r/4, -Math.PI/4, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = 'rgba(255,255,255,0.4)';
+  ctx.beginPath();
+  ctx.arc(cx - r/4, cy + r/3, r/8, 0, Math.PI * 2);
+  ctx.fill();
+}
+
+function dessinerInterrupteur(ctx, c, ferme) {
+  dessinerOmbre(ctx, c);
+  var grd = ctx.createLinearGradient(c.x, c.y, c.x, c.y + c.hauteur);
+  grd.addColorStop(0, '#666'); grd.addColorStop(0.5, '#3a3a3a'); grd.addColorStop(1, '#1a1a1a');
+  ctx.fillStyle = grd;
+  ctx.beginPath(); ctx.roundRect(c.x, c.y, c.largeur, c.hauteur, 6); ctx.fill();
+  ctx.fillStyle = 'rgba(255,255,255,0.15)';
+  ctx.beginPath(); ctx.roundRect(c.x + 3, c.y + 3, c.largeur - 6, 6, 3); ctx.fill();
+  var grdBorne = ctx.createRadialGradient(c.x + 13, c.y + c.hauteur/2 - 2, 1, c.x + 15, c.y + c.hauteur/2, 7);
+  grdBorne.addColorStop(0, '#fff'); grdBorne.addColorStop(0.5, '#c0c0c0'); grdBorne.addColorStop(1, '#666');
+  ctx.fillStyle = grdBorne;
+  ctx.beginPath(); ctx.arc(c.x + 15, c.y + c.hauteur/2, 6, 0, Math.PI * 2); ctx.fill();
+  ctx.beginPath(); ctx.arc(c.x + c.largeur - 15, c.y + c.hauteur/2, 6, 0, Math.PI * 2); ctx.fill();
+  ctx.strokeStyle = 'rgba(0,0,0,0.4)'; ctx.lineWidth = 7; ctx.lineCap = 'round';
+  ctx.beginPath();
+  if (ferme) {
+    ctx.moveTo(c.x + 15, c.y + c.hauteur/2);
+    ctx.lineTo(c.x + c.largeur - 15, c.y + c.hauteur/2);
+  } else {
+    ctx.moveTo(c.x + 15, c.y + c.hauteur/2);
+    ctx.lineTo(c.x + c.largeur - 25, c.y + 10);
+  }
+  ctx.stroke();
+  ctx.strokeStyle = ferme ? '#22c55e' : '#ef4444';
+  ctx.lineWidth = 5;
+  ctx.beginPath();
+  if (ferme) {
+    ctx.moveTo(c.x + 15, c.y + c.hauteur/2);
+    ctx.lineTo(c.x + c.largeur - 15, c.y + c.hauteur/2);
+  } else {
+    ctx.moveTo(c.x + 15, c.y + c.hauteur/2);
+    ctx.lineTo(c.x + c.largeur - 25, c.y + 10);
+  }
+  ctx.stroke();
+  ctx.fillStyle = '#fff';
+  ctx.font = 'bold 10px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.shadowColor = 'rgba(0,0,0,0.8)'; ctx.shadowBlur = 3;
+  ctx.fillText(ferme ? 'ON' : 'OFF', c.x + c.largeur/2, c.y + c.hauteur - 3);
+  ctx.shadowBlur = 0;
+}
+
+function dessinerNE555(ctx, c) {
+  dessinerOmbre(ctx, c);
+  var grd = ctx.createLinearGradient(c.x, c.y, c.x + c.largeur, c.y + c.hauteur);
+  grd.addColorStop(0, '#3a3a3a'); grd.addColorStop(0.4, '#1a1a1a'); grd.addColorStop(1, '#000');
+  ctx.fillStyle = grd;
+  ctx.beginPath(); ctx.roundRect(c.x, c.y, c.largeur, c.hauteur, 5); ctx.fill();
+  ctx.fillStyle = 'rgba(255,255,255,0.12)';
+  ctx.beginPath(); ctx.roundRect(c.x + 4, c.y + 4, c.largeur - 8, 15, 3); ctx.fill();
+  ctx.fillStyle = '#000';
+  ctx.beginPath(); ctx.arc(c.x + c.largeur/2, c.y + 8, 8, 0, Math.PI, true); ctx.fill();
+  ctx.fillStyle = '#555';
+  ctx.beginPath(); ctx.arc(c.x + c.largeur/2, c.y + 8, 8, 0, Math.PI); ctx.fill();
+  ctx.fillStyle = '#ccc';
+  ctx.font = 'bold 12px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.shadowColor = 'rgba(0,0,0,0.8)'; ctx.shadowBlur = 3;
+  ctx.fillText('NE555', c.x + c.largeur/2, c.y + c.hauteur/2 + 5);
+  ctx.shadowBlur = 0;
+  ctx.fillStyle = '#fbbf24';
+  ctx.font = 'bold 9px sans-serif';
+  for (var i = 0; i < 4; i++) {
+    var y = c.y + 20 + i * 20;
+    ctx.textAlign = 'right'; ctx.fillText((i+1), c.x - 5, y + 3);
+    ctx.textAlign = 'left'; ctx.fillText((8-i), c.x + c.largeur + 5, y + 3);
+  }
+}
+
+function dessinerSoudure(ctx, x, y) {
+  ctx.fillStyle = 'rgba(0,0,0,0.4)';
+  ctx.beginPath(); ctx.arc(x + 1, y + 1, 9, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = '#000';
+  ctx.beginPath(); ctx.arc(x, y, 9, 0, Math.PI * 2); ctx.fill();
+  var grd = ctx.createRadialGradient(x - 2, y - 2, 1, x, y, 7);
+  grd.addColorStop(0, '#fff8b0'); grd.addColorStop(0.5, '#ffd700'); grd.addColorStop(1, '#b8860b');
+  ctx.fillStyle = grd;
+  ctx.beginPath(); ctx.arc(x, y, 7, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = 'rgba(255,255,255,0.9)';
+  ctx.beginPath(); ctx.arc(x - 2.5, y - 2.5, 2, 0, Math.PI * 2); ctx.fill();
+}
+
+function dessinerFilAvecOmbre(ctx, pathFn, couleur) {
+  ctx.strokeStyle = 'rgba(0,0,0,0.15)'; ctx.lineWidth = 6; ctx.lineCap = 'round';
+  ctx.beginPath(); pathFn(ctx, 2, 2); ctx.stroke();
+  ctx.strokeStyle = couleur; ctx.lineWidth = 4;
+  ctx.beginPath(); pathFn(ctx, 0, 0); ctx.stroke();
+  ctx.strokeStyle = 'rgba(255,255,255,0.3)'; ctx.lineWidth = 1;
+  ctx.beginPath(); pathFn(ctx, -1, -1); ctx.stroke();
+}
+
+function dessinerFilsLedSimple(ctx) {
+  if (composantsPlaces.indexOf("BT1") >= 0 && composantsPlaces.indexOf("R1") >= 0) {
+    dessinerFilAvecOmbre(ctx, function(c, dx, dy) {
+      c.moveTo(215 + dx, 450 + dy);
+      c.bezierCurveTo(260 + dx, 350 + dy, 260 + dx, 265 + dy, 350 + dx, 265 + dy);
+    }, '#E63946');
+  }
+  if (composantsPlaces.indexOf("R1") >= 0 && composantsPlaces.indexOf("D1") >= 0) {
+    dessinerFilAvecOmbre(ctx, function(c, dx, dy) {
+      c.moveTo(450 + dx, 265 + dy); c.lineTo(600 + dx, 265 + dy);
+    }, '#E63946');
+  }
+  if (composantsPlaces.indexOf("BT1") >= 0 && composantsPlaces.indexOf("D1") >= 0) {
+    dessinerFilAvecOmbre(ctx, function(c, dx, dy) {
+      c.moveTo(650 + dx, 275 + dy);
+      c.bezierCurveTo(750 + dx, 380 + dy, 500 + dx, 530 + dy, 165 + dx, 510 + dy);
+    }, '#000');
+  }
+}
+
+function dessinerFilsInterrupteur(ctx) {
+  if (composantsPlaces.indexOf("BT1") >= 0 && composantsPlaces.indexOf("SW1") >= 0) {
+    dessinerFilAvecOmbre(ctx, function(c, dx, dy) {
+      c.moveTo(190 + dx, 470 + dy);
+      c.bezierCurveTo(230 + dx, 460 + dy, 280 + dx, 465 + dy, 310 + dx, 465 + dy);
+    }, '#E63946');
+  }
+  if (composantsPlaces.indexOf("SW1") >= 0 && composantsPlaces.indexOf("R1") >= 0) {
+    dessinerFilAvecOmbre(ctx, function(c, dx, dy) {
+      c.moveTo(430 + dx, 465 + dy);
+      c.bezierCurveTo(470 + dx, 400 + dy, 480 + dx, 265 + dy, 510 + dx, 265 + dy);
+    }, '#E63946');
+  }
+  if (composantsPlaces.indexOf("R1") >= 0 && composantsPlaces.indexOf("D1") >= 0) {
+    dessinerFilAvecOmbre(ctx, function(c, dx, dy) {
+      c.moveTo(650 + dx, 265 + dy); c.lineTo(730 + dx, 275 + dy);
+    }, '#E63946');
+  }
+  if (composantsPlaces.indexOf("BT1") >= 0 && composantsPlaces.indexOf("D1") >= 0) {
+    dessinerFilAvecOmbre(ctx, function(c, dx, dy) {
+      c.moveTo(800 + dx, 275 + dy);
+      c.bezierCurveTo(860 + dx, 400 + dy, 400 + dx, 560 + dy, 140 + dx, 510 + dy);
+    }, '#000');
+  }
+}
+
+function dessinerFilsDeuxLed(ctx) {
+  if (composantsPlaces.indexOf("BT1") >= 0 && composantsPlaces.indexOf("R1") >= 0) {
+    dessinerFilAvecOmbre(ctx, function(c, dx, dy) {
+      c.moveTo(215 + dx, 450 + dy);
+      c.bezierCurveTo(260 + dx, 350 + dy, 260 + dx, 265 + dy, 300 + dx, 265 + dy);
+    }, '#E63946');
+  }
+  if (composantsPlaces.indexOf("R1") >= 0 && composantsPlaces.indexOf("D1") >= 0) {
+    dessinerFilAvecOmbre(ctx, function(c, dx, dy) {
+      c.moveTo(440 + dx, 265 + dy); c.lineTo(510 + dx, 275 + dy);
+    }, '#E63946');
+  }
+  if (composantsPlaces.indexOf("D1") >= 0 && composantsPlaces.indexOf("D2") >= 0) {
+    dessinerFilAvecOmbre(ctx, function(c, dx, dy) {
+      c.moveTo(580 + dx, 275 + dy); c.lineTo(670 + dx, 275 + dy);
+    }, '#E63946');
+  }
+  if (composantsPlaces.indexOf("BT1") >= 0 && composantsPlaces.indexOf("D2") >= 0) {
+    dessinerFilAvecOmbre(ctx, function(c, dx, dy) {
+      c.moveTo(740 + dx, 275 + dy);
+      c.bezierCurveTo(820 + dx, 420 + dy, 500 + dx, 550 + dy, 165 + dx, 510 + dy);
+    }, '#000');
+  }
+}
+
+function dessinerFils555(ctx) {
+  if (composantsPlaces.indexOf("BT1") >= 0 && composantsPlaces.indexOf("U1") >= 0) {
+    dessinerFilAvecOmbre(ctx, function(c, dx, dy) {
+      c.moveTo(150 + dx, 450 + dy);
+      c.bezierCurveTo(220 + dx, 300 + dy, 280 + dx, 240 + dy, 350 + dx, 220 + dy);
+    }, '#E63946');
+  }
+  if (composantsPlaces.indexOf("BT1") >= 0 && composantsPlaces.indexOf("R1") >= 0) {
+    dessinerFilAvecOmbre(ctx, function(c, dx, dy) {
+      c.moveTo(150 + dx, 450 + dy);
+      c.bezierCurveTo(180 + dx, 250 + dy, 220 + dx, 145 + dy, 250 + dx, 145 + dy);
+    }, '#E63946');
+  }
+  if (composantsPlaces.indexOf("R1") >= 0 && composantsPlaces.indexOf("U1") >= 0) {
+    dessinerFilAvecOmbre(ctx, function(c, dx, dy) {
+      c.moveTo(350 + dx, 145 + dy);
+      c.bezierCurveTo(380 + dx, 160 + dy, 380 + dx, 220 + dy, 430 + dx, 220 + dy);
+    }, '#E63946');
+  }
+  if (composantsPlaces.indexOf("U1") >= 0 && composantsPlaces.indexOf("D1") >= 0) {
+    dessinerFilAvecOmbre(ctx, function(c, dx, dy) {
+      c.moveTo(442 + dx, 260 + dy);
+      c.bezierCurveTo(560 + dx, 240 + dy, 620 + dx, 225 + dy, 720 + dx, 225 + dy);
+    }, '#E63946');
+  }
+  if (composantsPlaces.indexOf("D1") >= 0 && composantsPlaces.indexOf("BT1") >= 0) {
+    dessinerFilAvecOmbre(ctx, function(c, dx, dy) {
+      c.moveTo(770 + dx, 235 + dy);
+      c.bezierCurveTo(830 + dx, 400 + dy, 500 + dx, 530 + dy, 165 + dx, 510 + dy);
+    }, '#000');
+  }
+}
+
+function dessinerComposantParId(ctx, id, c, allumee) {
+  if (vueDessous) {
+    var compoOriginal = null;
+    for (var i = 0; i < projetActif.composants.length; i++) {
+      if (projetActif.composants[i].id === id) compoOriginal = projetActif.composants[i];
+    }
+    if (compoOriginal && compoOriginal.pattes) {
+      for (var j = 0; j < compoOriginal.pattes.length; j++) {
+        dessinerSoudure(ctx, compoOriginal.pattes[j].x, compoOriginal.pattes[j].y);
+      }
+    }
+    return;
+  }
+  if (id === 'BT1') dessinerPile(ctx, c);
+  else if (id === 'R1' || id === 'R2' || id === 'R3') dessinerResistance(ctx, c);
+  else if (id === 'D1') dessinerLED(ctx, c, ledAllumee, '#E63946');
+  else if (id === 'D2') dessinerLED(ctx, c, led2Allumee, '#22C55E');
+  else if (id === 'U1') dessinerNE555(ctx, c);
+  else if (id === 'SW1') dessinerInterrupteur(ctx, c, interrupteurFerme);
+}
+
+/* =========================================================
+   ANIMATIONS LUDIQUES
+   ========================================================= */
+function ajouterEtoile(x, y) {
+  etoilesActives.push({ x: x, y: y, taille: 0, alpha: 1, angle: Math.random() * Math.PI * 2 });
+  if (etoilesActives.length === 1) animerEtoiles();
+}
+
+function animerEtoiles() {
+  if (etoilesActives.length === 0) return;
+  dessinerCircuit();
+  requestAnimationFrame(animerEtoiles);
+}
+
+function dessinerEtoiles(ctx) {
+  for (var i = etoilesActives.length - 1; i >= 0; i--) {
+    var e = etoilesActives[i];
+    e.taille += 1.2;
+    e.alpha -= 0.015;
+    e.y -= 1.5;
+    e.angle += 0.08;
+    if (e.alpha <= 0) { etoilesActives.splice(i, 1); continue; }
+    ctx.save();
+    ctx.translate(e.x, e.y);
+    ctx.rotate(e.angle);
+    ctx.fillStyle = 'rgba(251, 191, 36, ' + e.alpha + ')';
+    ctx.shadowColor = 'rgba(251, 191, 36, ' + e.alpha + ')';
+    ctx.shadowBlur = 15;
+    dessinerEtoile(ctx, 0, 0, 5, e.taille, e.taille / 2.5);
+    ctx.restore();
+  }
+}
+
+function dessinerEtoile(ctx, cx, cy, pointes, rayonExt, rayonInt) {
+  var angle = Math.PI / 2;
+  var step = Math.PI / pointes;
+  ctx.beginPath();
+  for (var i = 0; i < pointes; i++) {
+    ctx.lineTo(cx + Math.cos(angle) * rayonExt, cy + Math.sin(angle) * rayonExt);
+    angle += step;
+    ctx.lineTo(cx + Math.cos(angle) * rayonInt, cy + Math.sin(angle) * rayonInt);
+    angle += step;
+  }
+  ctx.closePath();
+  ctx.fill();
+}
+
+function secouerCanvas() {
+  var c = document.getElementById('circuit');
+  c.classList.add('shake');
+  setTimeout(function() { c.classList.remove('shake'); }, 400);
+}
+
+function lancerConfettis() {
+  var zone = document.getElementById('zone-confettis');
+  zone.classList.add('actif');
+  zone.innerHTML = '';
+  var couleurs = ['#fbbf24', '#22c55e', '#ef4444', '#3b82f6', '#a855f7', '#ec4899', '#06b6d4'];
+  for (var i = 0; i < 80; i++) {
+    var c = document.createElement('div');
+    c.className = 'confetti';
+    c.style.left = Math.random() * 100 + '%';
+    c.style.background = couleurs[Math.floor(Math.random() * couleurs.length)];
+    c.style.animationDelay = (Math.random() * 1.5) + 's';
+    c.style.animationDuration = (2 + Math.random() * 2) + 's';
+    c.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+    zone.appendChild(c);
+  }
+  setTimeout(function() { zone.classList.remove('actif'); zone.innerHTML = ''; }, 5000);
+}
+
+function demarrerAnimationPulse() {
+  if (animationPulseId) return;
+  var anim = function() {
+    ledPulsePhase += 0.08;
+    if ((ledAllumee || led2Allumee) && !vueDessous && projetActif) dessinerCircuit();
+    animationPulseId = requestAnimationFrame(anim);
+  };
+  anim();
+}
+
+function arreterAnimationPulse() {
+  if (animationPulseId) { cancelAnimationFrame(animationPulseId); animationPulseId = null; }
+}
+
+/* =========================================================
+   DESSIN PRINCIPAL
+   ========================================================= */
+function dessinerCircuit() {
+  if (!projetActif) return;
+  var canvas = document.getElementById('circuit');
+  var ctx = canvas.getContext('2d');
+
+  if (vueDessous) dessinerBreadboardDessous(ctx, canvas);
+  else dessinerBreadboard(ctx, canvas);
+
+  if (!vueDessous) {
+    if (projetActif.id === "led_simple") dessinerFilsLedSimple(ctx);
+    else if (projetActif.id === "interrupteur") dessinerFilsInterrupteur(ctx);
+    else if (projetActif.id === "deux_led") dessinerFilsDeuxLed(ctx);
+    else if (projetActif.id === "clignotant_ne555") dessinerFils555(ctx);
+  }
+
+  for (var i = 0; i < projetActif.composants.length; i++) {
+    var c = projetActif.composants[i];
+    if (composantsPlaces.indexOf(c.id) < 0) continue;
+    dessinerComposantParId(ctx, c.id, c, ledAllumee);
+  }
+
+  if (zoneClignote && !vueDessous) {
+    if (modeActuel === 'facile') {
+      var t = Date.now() / 500;
+      var alpha = 0.6 + 0.4 * Math.abs(Math.sin(t));
+      var rayon = TOLERANCE_PX + 5 * Math.abs(Math.sin(t));
+      ctx.fillStyle = 'rgba(255, 200, 0, 0.15)';
+      ctx.beginPath();
+      ctx.arc(zoneClignote.x, zoneClignote.y, rayon, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(255, 200, 0, ' + alpha + ')';
+      ctx.lineWidth = 5;
+      ctx.setLineDash([8, 6]);
+      ctx.beginPath();
+      ctx.arc(zoneClignote.x, zoneClignote.y, rayon, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle = 'rgba(255, 200, 0, ' + (alpha + 0.3) + ')';
+      ctx.font = 'bold 14px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('Ici', zoneClignote.x, zoneClignote.y - rayon - 8);
+    } else if (modeActuel === 'moyen') {
+      ctx.fillStyle = 'rgba(255, 200, 0, 0.9)';
+      ctx.beginPath();
+      ctx.arc(zoneClignote.x, zoneClignote.y, 6, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(255, 150, 0, 0.8)';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+    } else if (modeActuel === 'difficile' && zoneAfficheeApresEssais) {
+      var t2 = Date.now() / 600;
+      var alpha2 = 0.3 + 0.3 * Math.abs(Math.sin(t2));
+      var rayon2 = TOLERANCE_PX + 5;
+      ctx.fillStyle = 'rgba(168, 85, 247, 0.08)';
+      ctx.beginPath();
+      ctx.arc(zoneClignote.x, zoneClignote.y, rayon2, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(168, 85, 247, ' + alpha2 + ')';
+      ctx.lineWidth = 3;
+      ctx.setLineDash([4, 6]);
+      ctx.beginPath();
+      ctx.arc(zoneClignote.x, zoneClignote.y, rayon2, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.setLineDash([]);
+    }
+  }
+
+  dessinerEtoiles(ctx);
+}
+
+/* =========================================================
+   PLACEMENT
+   ========================================================= */
+function animerPlacement(composant_id, callback) {
+  animationEnCours = true;
+  var canvas = document.getElementById('circuit');
+  var ctx = canvas.getContext('2d');
+  var c = null;
+  for (var i = 0; i < projetActif.composants.length; i++) {
+    if (projetActif.composants[i].id === composant_id) c = projetActif.composants[i];
+  }
+  var departX = canvas.width - 100;
+  var departY = 50;
+  var progress = 0;
+  var duree = 40;
+  function frame() {
+    progress++;
+    var t = Math.min(progress / duree, 1);
+    var ease = 1 - Math.pow(1 - t, 3);
+    var x = departX + (c.x - departX) * ease;
+    var y = departY + (c.y - departY) * ease;
+    dessinerCircuit();
+    if (!vueDessous) {
+      var cTemp = { id: c.id, x: x, y: y, largeur: c.largeur, hauteur: c.hauteur };
+      if (c.id === 'D1') dessinerLED(ctx, cTemp, false, '#E63946');
+      else if (c.id === 'D2') dessinerLED(ctx, cTemp, false, '#22C55E');
+      else if (c.id === 'SW1') dessinerInterrupteur(ctx, cTemp, false);
+      else dessinerComposantParId(ctx, c.id, cTemp, false);
+    }
+    if (progress < duree) requestAnimationFrame(frame);
+    else {
+      composantsPlaces.push(composant_id);
+      if (projetActif.id === 'led_simple' && composant_id === 'D1') ledAllumee = true;
+      if (projetActif.id === 'deux_led' && composant_id === 'D2') { ledAllumee = true; led2Allumee = true; }
+      if (projetActif.id === 'clignotant_ne555' && composant_id === 'D1') ledAllumee = true;
+      zoneClignote = null;
+      dessinerCircuit();
+      afficherComposants();
+      animationEnCours = false;
+      callback();
+    }
+  }
+  frame();
+}
+
+function clicCanvas(event) {
+  if (animationEnCours || !projetActif) return;
+  if (modeActuel === 'demo') return;
+  if (vueDessous) return;
+  var canvas = document.getElementById('circuit');
+  var rect = canvas.getBoundingClientRect();
+  var scaleX = canvas.width / rect.width;
+  var scaleY = canvas.height / rect.height;
+  var clickX = (event.clientX - rect.left) * scaleX;
+  var clickY = (event.clientY - rect.top) * scaleY;
+
+  if (projetActif.id === 'interrupteur' && composantsPlaces.indexOf('SW1') >= 0) {
+    var sw = null;
+    for (var k = 0; k < projetActif.composants.length; k++) {
+      if (projetActif.composants[k].id === 'SW1') sw = projetActif.composants[k];
+    }
+    if (sw && clickX >= sw.x && clickX <= sw.x + sw.largeur &&
+        clickY >= sw.y && clickY <= sw.y + sw.hauteur) {
+      interrupteurFerme = !interrupteurFerme;
+      if (composantsPlaces.indexOf('D1') >= 0) ledAllumee = interrupteurFerme;
+      if (interrupteurFerme) demarrerAnimationPulse();
+      dessinerCircuit();
+      return;
+    }
+  }
+
+  if (etapeActuelle < 0 || etapeActuelle >= projetActif.etapes.length) return;
+  var etape = projetActif.etapes[etapeActuelle];
+  if (!etape.composant_id) {
+    etapeActuelle++;
+    afficherEtapes();
+    afficherInfoEtape();
+    setTimeout(terminerQuiz, 500);
+    return;
+  }
+  var c = null;
+  for (var i = 0; i < projetActif.composants.length; i++) {
+    if (projetActif.composants[i].id === etape.composant_id) c = projetActif.composants[i];
+  }
+  if (!c || !c.cible) return;
+  var dx = clickX - c.cible.x;
+  var dy = clickY - c.cible.y;
+  var distance = Math.sqrt(dx * dx + dy * dy);
+  essaisEtape++;
+  majEssais();
+  if (distance <= TOLERANCE_PX) {
+    var points = essaisEtape === 1 ? 3 : (essaisEtape === 2 ? 2 : 1);
+    scoreTotal += points;
+    majScore();
+    ajouterEtoile(c.cible.x, c.cible.y);
+    var tempsEtape = Math.round((Date.now() - etapeDebut) / 1000);
+    detailEtapes.push({ numero: etapeActuelle+1, titre: etape.titre, statut: "ok", essais: essaisEtape, temps: tempsEtape, points: points });
+    afficherInfoEtape('succes', '✅ Bien joue ! +' + points + ' pts');
+    animerPlacement(etape.composant_id, function() {
+      etapeActuelle++;
+      essaisEtape = 0;
+      zoneAfficheeApresEssais = false;
+      etapeDebut = Date.now();
+      majEssais();
+      afficherEtapes();
+      majZoneClignote();
+      afficherInfoEtape();
+      if (ledAllumee || led2Allumee) demarrerAnimationPulse();
+      if (etapeActuelle >= projetActif.etapes.length) setTimeout(terminerQuiz, 500);
+    });
+  } else {
+    if (essaisEtape >= MAX_ESSAIS) {
+      var tempsEtape = Math.round((Date.now() - etapeDebut) / 1000);
+      detailEtapes.push({ numero: etapeActuelle+1, titre: etape.titre, statut: "ko", essais: essaisEtape, temps: tempsEtape, points: 0 });
+      afficherInfoEtape('erreur', '❌ Trop d\'essais. Position indiquee.');
+      zoneClignote = { x: c.cible.x, y: c.cible.y };
+      if (modeActuel === 'difficile') zoneAfficheeApresEssais = true;
+      secouerCanvas();
+      dessinerCircuit();
+      setTimeout(function() {
+        animerPlacement(etape.composant_id, function() {
+          etapeActuelle++;
+          essaisEtape = 0;
+          zoneAfficheeApresEssais = false;
+          etapeDebut = Date.now();
+          majEssais();
+          afficherEtapes();
+          majZoneClignote();
+          afficherInfoEtape();
+          if (ledAllumee || led2Allumee) demarrerAnimationPulse();
+          if (etapeActuelle >= projetActif.etapes.length) setTimeout(terminerQuiz, 500);
+        });
+      }, 2000);
+    } else {
+      afficherInfoEtape('erreur', '❌ Ce n\'est pas le bon endroit. Reessayez !');
+      if (modeActuel === 'difficile' && essaisEtape === MAX_ESSAIS - 1) {
+        mettreMessage('💡 Encore un essai... sinon la zone apparaîtra.', 'avertissement');
+      }
+      secouerCanvas();
+    }
+  }
+}
+
+function arreterAnimationClignote() {
+  if (animationClignoteId) { cancelAnimationFrame(animationClignoteId); animationClignoteId = null; }
+}
+
+function majZoneClignote() {
+  arreterAnimationClignote();
+  if (!projetActif) return;
+  if (etapeActuelle >= 0 && etapeActuelle < projetActif.etapes.length && modeActuel !== 'demo') {
+    var e = projetActif.etapes[etapeActuelle];
+    if (e.composant_id) {
+      var c = null;
+      for (var i = 0; i < projetActif.composants.length; i++) {
+        if (projetActif.composants[i].id === e.composant_id) c = projetActif.composants[i];
+      }
+      if (c && c.cible) {
+        zoneClignote = { x: c.cible.x, y: c.cible.y };
+        if (modeActuel === 'facile') {
+          var anim = function() {
+            if (!zoneClignote) { animationClignoteId = null; return; }
+            dessinerCircuit();
+            animationClignoteId = requestAnimationFrame(anim);
+          };
+          anim();
+        } else {
+          dessinerCircuit();
+        }
+        return;
+      }
+    }
+  }
+  zoneClignote = null;
+  dessinerCircuit();
+}
+
+function demarrer() {
+  if (animationEnCours || !projetActif) return;
+  etapeActuelle = 0;
+  composantsPlaces = [];
+  ledAllumee = false;
+  led2Allumee = false;
+  interrupteurFerme = false;
+  essaisEtape = 0;
+  scoreTotal = 0;
+  detailEtapes = [];
+  zoneAfficheeApresEssais = false;
+  etapeDebut = Date.now();
+  majEssais();
+  majScore();
+  afficherComposants();
+  afficherEtapes();
+  document.getElementById('btn-demarrer').disabled = true;
+  if (modeActuel === 'demo') {
+    document.getElementById('btn-suivant').disabled = false;
+    afficherInfoEtape();
+  } else {
+    document.getElementById('btn-suivant').disabled = true;
+    var msg = '';
+    if (modeActuel === 'facile') msg = '👆 Cliquez sur le cercle jaune clignotant.';
+    else if (modeActuel === 'moyen') msg = '👆 Cliquez sur le petit point jaune.';
+    else msg = '🔴 Regardez l\'indice dans le panneau. Après 3 essais, la zone apparaîtra.';
+    afficherInfoEtape('', msg);
+    demarrerChrono();
+  }
+  majZoneClignote();
+}
+
+function etapeSuivante() {
+  if (animationEnCours || !projetActif) return;
+  if (modeActuel !== 'demo') return;
+  if (etapeActuelle >= projetActif.etapes.length) return;
+  var etape = projetActif.etapes[etapeActuelle];
+  if (etape.composant_id) {
+    animerPlacement(etape.composant_id, function() {
+      etapeActuelle++;
+      afficherEtapes();
+      afficherInfoEtape();
+      if (etapeActuelle >= projetActif.etapes.length) {
+        document.getElementById('btn-suivant').disabled = true;
+        if (projetActif.id === 'deux_led') { ledAllumee = true; led2Allumee = true; }
+        if (projetActif.id === 'led_simple' || projetActif.id === 'clignotant_ne555') ledAllumee = true;
+        if (ledAllumee || led2Allumee) demarrerAnimationPulse();
+        dessinerCircuit();
+      }
+    });
+  } else {
+    etapeActuelle++;
+    afficherEtapes();
+    afficherInfoEtape();
+    if (etapeActuelle >= projetActif.etapes.length) {
+      document.getElementById('btn-suivant').disabled = true;
+    }
+  }
+}
+
+function terminerQuiz() {
+  pauseChronoAuto();
+  arreterAnimationClignote();
+
+  var tempsTotal = tempsTotalChrono();
+  var min = Math.floor(tempsTotal / 60);
+  var sec = tempsTotal % 60;
+  var scoreMax = projetActif.etapes.length * 3;
+  var pourcentage = Math.round((scoreTotal / scoreMax) * 100);
+
+  document.getElementById('ecran-projet').style.display = 'none';
+  document.getElementById('ecran-bilan').style.display = 'block';
+
+  var msgDiv = document.getElementById('bilan-message-special');
+  var htmlSpecial = '';
+  if (pourcentage === 100) htmlSpecial = '<div class="trophee-geant">🏆</div><div class="bravo-geant">PARFAIT !</div>';
+  else if (pourcentage >= 75) htmlSpecial = '<div class="trophee-geant">🥈</div><div class="bravo-geant">TRES BIEN !</div>';
+  else if (pourcentage >= 50) htmlSpecial = '<div class="trophee-geant">🥉</div><div class="bravo-geant">BIEN JOUE !</div>';
+  else htmlSpecial = '<div class="trophee-geant">💪</div><div class="bravo-geant">CONTINUE !</div>';
+  msgDiv.innerHTML = htmlSpecial;
+
+  document.getElementById('bilan-eleve').textContent = prenomEleve;
+  document.getElementById('bilan-projet').textContent = projetActif.nom;
+  document.getElementById('bilan-temps').textContent = min + ':' + (sec < 10 ? '0' : '') + sec;
+  document.getElementById('bilan-score').textContent = scoreTotal + '/' + scoreMax;
+
+  var div = document.getElementById('bilan-detail-liste');
+  var html = '';
+  for (var i = 0; i < detailEtapes.length; i++) {
+    var d = detailEtapes[i];
+    var cls = d.statut === 'ok' ? (d.essais === 1 ? 'ok' : 'warn') : 'ko';
+    var icone = d.statut === 'ok' ? (d.essais === 1 ? '✅' : '⚠️') : '❌';
+    html += '<div class="ligne-detail">';
+    html += '<span class="nom">' + d.numero + '. ' + d.titre + '</span>';
+    html += '<span class="statut ' + cls + '">' + icone + ' ' + d.points + ' pts</span>';
+    html += '<span class="essais">' + d.essais + ' essai' + (d.essais > 1 ? 's' : '') + '</span>';
+    html += '<span class="temps">' + d.temps + 's</span>';
+    html += '</div>';
+  }
+  div.innerHTML = html;
+
+  lancerConfettis();
+}
+
+function recommencerQuiz() {
+  document.getElementById('ecran-bilan').style.display = 'none';
+  document.getElementById('ecran-projet').style.display = 'block';
+  reinitialiser();
+}
+
+function exporterBilan() {
+  var tempsTotal = tempsTotalChrono();
+  var min = Math.floor(tempsTotal / 60);
+  var sec = tempsTotal % 60;
+  var scoreMax = projetActif.etapes.length * 3;
+  var texte = "BILAN QUIZ - INITIAELECTRO\n";
+  texte += "============================\n\n";
+  texte += "Eleve : " + prenomEleve + "\n";
+  texte += "Projet : " + projetActif.nom + "\n";
+  texte += "Mode : " + modeActuel + "\n";
+  texte += "Date : " + new Date().toLocaleString('fr-FR') + "\n\n";
+  texte += "Temps total : " + min + " min " + sec + " s\n";
+  texte += "Score : " + scoreTotal + "/" + scoreMax + "\n\n";
+  texte += "DETAIL PAR ETAPE :\n";
+  for (var i = 0; i < detailEtapes.length; i++) {
+    var d = detailEtapes[i];
+    texte += d.numero + ". " + d.titre + " - " + d.points + " pts (" + d.essais + " essai(s), " + d.temps + "s)\n";
+  }
+  var blob = new Blob([texte], { type: 'text/plain' });
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url;
+  a.download = "bilan_" + prenomEleve + "_" + Date.now() + ".txt";
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function reinitialiser() {
+  if (animationEnCours) return;
+  arreterAnimationClignote();
+  arreterAnimationPulse();
+  etapeActuelle = -1;
+  composantsPlaces = [];
+  ledAllumee = false;
+  led2Allumee = false;
+  interrupteurFerme = false;
+  essaisEtape = 0;
+  scoreTotal = 0;
+  detailEtapes = [];
+  zoneClignote = null;
+  zoneAfficheeApresEssais = false;
+  etoilesActives = [];
+  majEssais();
+  majScore();
+  afficherComposants();
+  afficherEtapes();
+  afficherInfoEtape();
+  dessinerCircuit();
+  document.getElementById('btn-demarrer').disabled = false;
+  document.getElementById('btn-suivant').disabled = true;
+  document.getElementById('info-chrono').textContent = '⏱ 0:00';
+  arreterChrono();
+  majBoutonPause();
+}
+
+function mettreMessage(texte, type) {
+  console.log('[INFO]', texte);
+}
+
+window.onload = function() {
+  afficherAccueil();
+  var canvas = document.getElementById('circuit');
+  canvas.addEventListener('click', clicCanvas);
+  setInterval(function() {
+    if (etoilesActives.length > 0) dessinerCircuit();
+  }, 50);
+  
+  // Enregistrer le Service Worker
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js').then(function(reg) {
+      console.log('✅ Service Worker enregistré');
+    }).catch(function(err) {
+      console.log('⚠️ Erreur Service Worker:', err);
+    });
+  }
+};
+  html += '<div class="carte-projet" onclick="window.open(\'bibliotheque.html\', \'_blank\')">';
+  html += '<div class="emoji">📚</div>';
+  html += '<h3>Bibliothèque<span class="niveau-badge niveau-ecolier">Tous</span></h3>';
+  html += '<p>Consulte les fiches détaillées des composants : caractéristiques, exemples et précautions.</p>';
+  html += '<div class="meta">🔍 Recherche · 📂 Filtres · 📖 Fiches détaillées</div>';
+  html += '</div>';
+/* =========================================================
+   INSTALLATION PWA
+   ========================================================= */
+var promptInstallation = null;
+
+window.addEventListener('beforeinstallprompt', function(e) {
+  e.preventDefault();
+  promptInstallation = e;
+  var btn = document.getElementById('btn-installer');
+  if (btn) btn.style.display = 'inline-block';
+});
+
+function installerPWA() {
+  if (!promptInstallation) {
+    alert('Pour installer l\'appli :\n\n1. Cliquez sur le menu du navigateur (⋮ ou ≡)\n2. Cherchez "Installer InitiaElectro"\n3. Cliquez dessus');
+    return;
+  }
+  promptInstallation.prompt();
+  promptInstallation.userChoice.then(function(choiceResult) {
+    if (choiceResult.outcome === 'accepted') {
+      console.log('✅ Installation acceptée');
+      var btn = document.getElementById('btn-installer');
+      if (btn) btn.style.display = 'none';
+    } else {
+      console.log('❌ Installation refusée');
+    }
+    promptInstallation = null;
+  });
+}
+</script>
 
 </body>
 </html>
