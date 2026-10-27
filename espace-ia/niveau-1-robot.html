@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EspaceIA - Jeu 2 : Le Chef d'Orchestre</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: #f4f7fb; color: #1a1f2e; line-height: 1.6; }
+  header { background: linear-gradient(135deg, #f59e0b, #f97316); color: white; padding: 20px; text-align: center; }
+  header h1 { font-size: 1.8em; }
+  .btn-retour { display: inline-block; margin-top: 12px; padding: 8px 16px; background: rgba(255,255,255,0.2); color: white; text-decoration: none; border-radius: 8px; font-weight: bold; border: 1px solid rgba(255,255,255,0.4); }
+  
+  .conteneur { max-width: 600px; margin: 0 auto; padding: 24px 20px; text-align: center; }
+  .plateau { background: white; border-radius: 16px; padding: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.06); margin-bottom: 20px; position: relative; overflow: hidden; }
+  
+  /* Grille 5x5 */
+  .grille { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; max-width: 300px; margin: 0 auto; background: #e2e8f0; padding: 4px; border-radius: 8px; }
+  .case { background: white; aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-size: 2em; border-radius: 4px; }
+  .case.robot { background: #dbeafe; }
+  .case.cible { background: #dcfce7; }
+  
+  /* Boutons de programmation */
+  .programme { background: white; border-radius: 16px; padding: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.06); margin-bottom: 20px; display: flex; justify-content: center; gap: 10px; }
+  .btn-dir { padding: 15px; font-size: 1.5em; border: 2px solid #cbd5e1; background: #f8fafc; border-radius: 12px; cursor: pointer; transition: all 0.2s; }
+  .btn-dir:hover { background: #e2e8f0; }
+  
+  /* File d'attente */
+  .file-attente { display: flex; justify-content: center; gap: 8px; margin-top: 15px; min-height: 50px; }
+  .instruction { background: #0ea5e9; color: white; padding: 10px 15px; border-radius: 8px; font-size: 1.2em; font-weight: bold; }
+  
+  .btn-lancer { background: #22c55e; color: white; border: none; padding: 15px 40px; border-radius: 12px; font-size: 1.2em; font-weight: bold; cursor: pointer; margin-top: 10px; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🤖 Le Chef d'Orchestre</h1>
+  <p>Programme le robot pour qu'il atteigne la pomme !</p>
+  <a href="niveau-1.html" class="btn-retour">← Retour au menu</a>
+</header>
+
+<div class="conteneur">
+  <div class="plateau">
+    <div class="grille" id="grille"></div>
+  </div>
+
+  <div class="programme">
+    <button class="btn-dir" onclick="ajouterInstruction('⬆️')">⬆️</button>
+    <button class="btn-dir" onclick="ajouterInstruction('⬅️')">⬅️</button>
+    <button class="btn-dir" onclick="ajouterInstruction('⬇️')">⬇️</button>
+    <button class="btn-dir" onclick="ajouterInstruction('➡️')">➡️</button>
+  </div>
+
+  <div>
+    <h3>Ton programme :</h3>
+    <div class="file-attente" id="file-attente"></div>
+    <button class="btn-lancer" onclick="lancerProgramme()" id="btn-lancer" style="display:none;">▶️ Lancer le programme</button>
+  </div>
+</div>
+
+<script>
+  var taille = 5;
+  var robotPos = { x: 0, y: 0 }; // En haut à gauche
+  var ciblePos = { x: 4, y: 4 }; // En bas à droite
+  var programme = [];
+  var enCours = false;
+
+  function dessinerGrille() {
+    var grilleDiv = document.getElementById('grille');
+    grilleDiv.innerHTML = '';
+    for (var y = 0; y < taille; y++) {
+      for (var x = 0; x < taille; x++) {
+        var caseDiv = document.createElement('div');
+        caseDiv.className = 'case';
+        if (x === robotPos.x && y === robotPos.y) {
+          caseDiv.classList.add('robot');
+          caseDiv.textContent = '🤖';
+        } else if (x === ciblePos.x && y === ciblePos.y) {
+          caseDiv.classList.add('cible');
+          caseDiv.textContent = '🍎';
+        }
+        grilleDiv.appendChild(caseDiv);
+      }
+    }
+  }
+
+  function ajouterInstruction(direction) {
+    if (enCours) return;
+    programme.push(direction);
+    mettreAJourFile();
+  }
+
+  function mettreAJourFile() {
+    var fileDiv = document.getElementById('file-attente');
+    fileDiv.innerHTML = '';
+    programme.forEach(function(dir) {
+      var span = document.createElement('span');
+      span.className = 'instruction';
+      span.textContent = dir;
+      fileDiv.appendChild(span);
+    });
+    
+    if (programme.length > 0) {
+      document.getElementById('btn-lancer').style.display = 'inline-block';
+    } else {
+      document.getElementById('btn-lancer').style.display = 'none';
+    }
+  }
+
+  function lancerProgramme() {
+    if (enCours) return;
+    enCours = true;
+    document.getElementById('btn-lancer').style.display = 'none';
+
+    var index = 0;
+    function etapeSuivante() {
+      if (index >= programme.length) {
+        enCours = false;
+        verifierVictoire();
+        return;
+      }
+
+      var dir = programme[index];
+      if (dir === '⬆️' && robotPos.y > 0) robotPos.y--;
+      if (dir === '⬇️' && robotPos.y < taille - 1) robotPos.y++;
+      if (dir === '⬅️' && robotPos.x > 0) robotPos.x--;
+      if (dir === '➡️' && robotPos.x < taille - 1) robotPos.x++;
+
+      dessinerGrille();
+      index++;
+      setTimeout(etapeSuivante, 400); // Vitesse de l'animation
+    }
+    etapeSuivante();
+  }
+
+  function verifierVictoire() {
+    if (robotPos.x === ciblePos.x && robotPos.y === ciblePos.y) {
+      setTimeout(function() {
+        alert("🎉 Gagné ! Tu as programmé le robot pour qu'il trouve la pomme !\n\nC'est ça, un algorithme : une suite d'instructions pour accomplir une tâche.");
+        reinitialiser();
+      }, 300);
+    } else {
+      setTimeout(function() {
+        alert("😅 Raté ! Le robot n'est pas sur la pomme. Efface ton programme et réessaie !");
+        reinitialiser();
+      }, 300);
+    }
+  }
+
+  function reinitialiser() {
+    programme = [];
+    robotPos = { x: 0, y: 0 };
+    mettreAJourFile();
+    dessinerGrille();
+  }
+
+  window.onload = dessinerGrille;
+</script>
+
+</body>
+</html>
