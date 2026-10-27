@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EspaceIA - Niveau 1</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='112' fill='%23f59e0b'/></svg>">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: #f4f7fb; color: #1a1f2e; line-height: 1.6; }
+  header { background: linear-gradient(135deg, #f59e0b, #f97316); color: white; padding: 20px; text-align: center; }
+  header h1 { font-size: 1.8em; }
+  .btn-retour { display: inline-block; margin-top: 12px; padding: 8px 16px; background: rgba(255,255,255,0.2); color: white; text-decoration: none; border-radius: 8px; font-weight: bold; border: 1px solid rgba(255,255,255,0.4); }
+  .conteneur { max-width: 800px; margin: 0 auto; padding: 24px 20px; }
+  .carte-jeu { background: white; border-radius: 16px; padding: 24px; box-shadow: 0 4px 12px rgba(0,0,0,0.06); margin-bottom: 20px; display: flex; align-items: center; gap: 20px; text-decoration: none; color: inherit; transition: transform 0.2s; border-left: 6px solid #f59e0b; }
+  .carte-jeu:hover { transform: translateY(-4px); box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
+  .carte-jeu .emoji { font-size: 3.5em; }
+  .carte-jeu h3 { color: #1a1f2e; margin-bottom: 4px; font-size: 1.2em; }
+  .carte-jeu p { color: #64748b; font-size: 0.95em; }
+</style>
+</head>
+<body>
+<header>
+  <h1>🧒 Parcours : Le Monde Magique</h1>
+  <a href="index.html" class="btn-retour">← Retour à EspaceIA</a>
+</header>
+<div class="conteneur">
+  <p style="margin-bottom:20px; font-size:1.1em; color:#475569;">Choisis un jeu pour découvrir comment fonctionne l'Intelligence Artificielle !</p>
+  
+  <a href="niveau-1-fruits.html" class="carte-jeu">
+    <div class="emoji">🍎</div>
+    <div>
+      <h3>Jeu 1 : L'Apprenti Dresseur</h3>
+      <p>Apprends à l'IA à reconnaître les fruits. Découvre pourquoi elle fait parfois des erreurs.</p>
+    </div>
+  </a>
+
+  <a href="niveau-1-robot.html" class="carte-jeu" style="border-left-color: #cbd5e1; opacity:0.6; pointer-events:none;">
+    <div class="emoji">🤖</div>
+    <div>
+      <h3>Jeu 2 : Le Chef d'Orchestre</h3>
+      <p>Programme un petit robot avec des blocs pour qu'il atteigne la cible. (Bientôt disponible)</p>
+    </div>
+  </a>
+
+  <a href="niveau-1-visages.html" class="carte-jeu" style="border-left-color: #cbd5e1; opacity:0.6; pointer-events:none;">
+    <div class="emoji">🕵️‍♂️</div>
+    <div>
+      <h3>Jeu 3 : Le Détective des Visages</h3>
+      <p>Règle les paramètres de l'IA pour qu'elle reconnaisse si un visage sourit ou tire la langue. (Bientôt disponible)</p>
+    </div>
+  </a>
+</div>
+</body>
+</html>
