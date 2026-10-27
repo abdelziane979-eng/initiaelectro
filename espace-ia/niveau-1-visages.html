@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EspaceIA - Jeu 3 : Le Détective des Visages</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: #f4f7fb; color: #1a1f2e; line-height: 1.6; }
+  header { background: linear-gradient(135deg, #f59e0b, #f97316); color: white; padding: 20px; text-align: center; }
+  header h1 { font-size: 1.8em; }
+  .btn-retour { display: inline-block; margin-top: 12px; padding: 8px 16px; background: rgba(255,255,255,0.2); color: white; text-decoration: none; border-radius: 8px; font-weight: bold; border: 1px solid rgba(255,255,255,0.4); }
+  
+  .conteneur { max-width: 700px; margin: 0 auto; padding: 24px 20px; }
+  .jeu-zone { background: white; border-radius: 16px; padding: 30px; box-shadow: 0 4px 12px rgba(0,0,0,0.06); text-align: center; }
+  
+  .consigne { background: #fef3c7; border-left: 4px solid #f59e0b; padding: 16px; border-radius: 8px; margin-bottom: 20px; text-align: left; }
+  
+  .grille-images { display: flex; justify-content: center; gap: 40px; margin: 30px 0; }
+  .visage { font-size: 6em; cursor: pointer; transition: all 0.2s; padding: 10px; border-radius: 16px; border: 3px solid transparent; }
+  .visage:hover { transform: scale(1.1); }
+  .visage.selectionne { border-color: #0ea5e9; background: #e0f2fe; }
+  
+  .reglages { background: #f8fafc; padding: 20px; border-radius: 12px; border: 2px solid #e2e8f0; margin: 20px 0; text-align: left; }
+  .ligne-reglage { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; }
+  .ligne-reglage label { flex: 1; font-weight: bold; color: #475569; }
+  .ligne-reglage input[type="range"] { flex: 2; accent-color: #0ea5e9; }
+  
+  .btn-lancer { background: #0ea5e9; color: white; border: none; padding: 15px 40px; border-radius: 12px; font-size: 1.2em; font-weight: bold; cursor: pointer; margin-top: 20px; }
+  .btn-lancer:hover { background: #0284c7; }
+  
+  .boite-ia { background: #0f172a; color: #0ea5e9; padding: 20px; border-radius: 12px; font-family: 'Courier New', monospace; font-size: 1.1em; text-align: left; margin-top: 20px; display: none; }
+  .boite-ia.visible { display: block; animation: fadeIn 0.3s; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🕵️‍♂️ Le Détective des Visages</h1>
+  <p>Apprends à l'IA à reconnaître les émotions !</p>
+  <a href="niveau-1.html" class="btn-retour">← Retour au menu</a>
+</header>
+
+<div class="conteneur">
+  <div class="jeu-zone">
+    <div class="consigne">
+      🤖 <strong>Mission :</strong> L'IA regarde un visage. Aide-la à régler ses paramètres pour qu'elle devine s'il est content 😀 ou s'il tire la langue 😛.
+    </div>
+
+    <div class="grille-images">
+      <div class="visage" id="visage-heureux" onclick="choisirVisage('heureux')">😀</div>
+      <div class="visage" id="visage-tire" onclick="choisirVisage('tire')">😛</div>
+    </div>
+
+    <div class="reglages" id="reglages" style="display:none;">
+      <h3 style="margin-bottom: 15px; color:#0f172a;">Paramètres de l'IA :</h3>
+      
+      <div class="ligne-reglage">
+        <label>Sourire (bouche)</label>
+        <input type="range" id="param-sourire" min="0" max="100" value="50" oninput="mettreAJourAffichage()">
+        <span id="val-sourire" style="width: 40px; text-align:right;">50%</span>
+      </div>
+
+      <div class="ligne-reglage">
+        <label>Langue tirée</label>
+        <input type="range" id="param-langue" min="0" max="100" value="50" oninput="mettreAJourAffichage()">
+        <span id="val-langue" style="width: 40px; text-align:right;">50%</span>
+      </div>
+
+      <button class="btn-lancer" onclick="analyser()">🧠 Lancer l'analyse</button>
+    </div>
+
+    <div class="boite-ia" id="boite-ia">
+      <div id="texte-ia"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  var visageChoisi = "";
+
+  function choisirVisage(type) {
+    // Réinitialiser
+    document.querySelectorAll('.visage').forEach(function(v) { v.classList.remove('selectionne'); });
+    document.getElementById('boite-ia').classList.remove('visible');
+    
+    // Sélectionner
+    if (type === 'heureux') document.getElementById('visage-heureux').classList.add('selectionne');
+    else document.getElementById('visage-tire').classList.add('selectionne');
+    
+    visageChoisi = type;
+    document.getElementById('reglages').style.display = 'block';
+  }
+
+  function mettreAJourAffichage() {
+    document.getElementById('val-sourire').textContent = document.getElementById('param-sourire').value + '%';
+    document.getElementById('val-langue').textContent = document.getElementById('param-langue').value + '%';
+  }
+
+  function analyser() {
+    var sourrire = parseInt(document.getElementById('param-sourire').value);
+    var langue = parseInt(document.getElementById('param-langue').value);
+    var boite = document.getElementById('boite-ia');
+    var texte = document.getElementById('texte-ia');
+
+    texte.innerHTML = "🤖 <strong>Analyse des pixels du visage...</strong><br><br>";
+    boite.classList.add('visible');
+
+    setTimeout(function() {
+      var deduction = "";
+      var explication = "";
+
+      // Règle de l'IA : si le paramètre "langue" est élevé, c'est un visage qui tire la langue.
+      // Si le paramètre "sourire" est élevé, c'est un visage content.
+      // Si les deux sont trop hauts ou trop bas, l'IA ne sait pas.
+      
+      if (langue > 70) {
+        deduction = "😛 Le visage TIRE LA LANGUE !";
+        explication = "L'IA a détecté beaucoup de pixels dans la zone de la bouche ouverte. Elle en déduit que la langue est tirée.";
+      } else if (sourrire > 70) {
+        deduction = "😀 Le visage est CONTENT !";
+        explication = "L'IA a détecté une courbe vers le haut au niveau de la bouche. Elle en déduit que la personne sourit.";
+      } else {
+        deduction = "🤷‍♂️ Je ne sais pas...";
+        explication = "Les paramètres sont ambigus. L'IA a besoin de règles claires pour comprendre l'image !";
+      }
+
+      texte.innerHTML = "🤖 <strong>Résultat de l'analyse :</strong><br><br>" + deduction + "<br><br>💡 <em>" + explication + "</em>";
+      
+      // Vérification
+      if ((visageChoisi === 'tire' && deduction.includes('LANGUE')) || (visageChoisi === 'heureux' && deduction.includes('CONTENT'))) {
+        setTimeout(function() {
+          alert("🎉 Bravo ! Tu as réglé l'IA correctement pour qu'elle reconnaisse ce visage !\n\nC'est exactement comme ça que fonctionne la reconnaissance faciale sur ton téléphone.");
+        }, 500);
+      } else if (deduction.includes('sais pas')) {
+        setTimeout(function() {
+          alert("🤔 L'IA est perdue ! Elle a besoin de paramètres plus précis. Essaie de pousser les curseurs un peu plus loin.");
+        }, 500);
+      } else {
+        setTimeout(function() {
+          alert("❌ Raté ! L'IA s'est trompée de visage. Tu as mal réglé ses paramètres. Réessaie !");
+        }, 500);
+      }
+    }, 1500);
+  }
+</script>
+
+</body>
+</html>
