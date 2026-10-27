@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EspaceIA - Niveau 1 : L'Apprenti Dresseur</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0' stop-color='%230ea5e9'/><stop offset='1' stop-color='%238b5cf6'/></linearGradient></defs><rect width='512' height='512' rx='112' fill='url(%23g)'/><path d='M 150 350 Q 256 150 362 350' stroke='white' stroke-width='20' fill='none' stroke-linecap='round'/><circle cx='256' cy='200' r='30' fill='white'/></svg>">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: #f4f7fb; color: #1a1f2e; line-height: 1.6; }
+  
+  header { background: linear-gradient(135deg, #f59e0b, #f97316); color: white; padding: 20px; text-align: center; }
+  header h1 { font-size: 1.8em; }
+  .btn-retour { display: inline-block; margin-top: 12px; padding: 8px 16px; background: rgba(255,255,255,0.2); color: white; text-decoration: none; border-radius: 8px; font-weight: bold; border: 1px solid rgba(255,255,255,0.4); }
+  
+  .conteneur { max-width: 800px; margin: 0 auto; padding: 24px 20px; }
+  .etape { background: white; border-radius: 16px; padding: 30px; box-shadow: 0 4px 12px rgba(0,0,0,0.06); text-align: center; display: none; }
+  .etape.active { display: block; animation: fadeIn 0.3s; }
+  
+  .etape h2 { color: #0ea5e9; margin-bottom: 16px; font-size: 1.4em; }
+  .etape p { font-size: 1.1em; color: #475569; margin-bottom: 24px; }
+  
+  .grille-fruits { display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; margin-bottom: 24px; }
+  .fruit { font-size: 5em; cursor: pointer; padding: 10px; border: 3px solid transparent; border-radius: 16px; transition: all 0.2s; }
+  .fruit:hover { transform: scale(1.1); background: #f8fafc; }
+  .fruit.selectionne { border-color: #f59e0b; background: #fef3c7; }
+
+  .btn-choix { padding: 16px 32px; border: none; border-radius: 12px; font-size: 1.2em; font-weight: bold; cursor: pointer; margin: 10px; }
+  .btn-pomme { background: #fee2e2; color: #991b1b; border: 2px solid #f87171; }
+  .btn-banane { background: #fef9c3; color: #854d0e; border: 2px solid #fde047; }
+  
+  .btn-suivant { background: #0ea5e9; color: white; border: none; padding: 16px 40px; border-radius: 12px; font-size: 1.2em; font-weight: bold; cursor: pointer; margin-top: 20px; }
+  .btn-suivant:hover { background: #0284c7; }
+  
+  .boite-ia { background: #0f172a; color: #0ea5e9; padding: 20px; border-radius: 12px; font-family: 'Courier New', monospace; font-size: 1.1em; text-align: left; margin: 20px 0; }
+  .resultat-ia { font-size: 1.5em; font-weight: bold; color: #22c55e; margin-top: 10px; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🧒 L'Apprenti Dresseur d'IA</h1>
+  <a href="index.html" class="btn-retour">← Retour à EspaceIA</a>
+</header>
+
+<div class="conteneur">
+  
+  <div class="etape active" id="etape1">
+    <h2>Étape 1 : Apprends à l'IA</h2>
+    <p>Clique sur un fruit, puis dis à l'IA ce que c'est.</p>
+    
+    <div class="grille-fruits" id="grille-fruits">
+      <div class="fruit" onclick="choisirFruit('pomme', this)">🍎</div>
+      <div class="fruit" onclick="choisirFruit('banane', this)">🍌</div>
+      <div class="fruit" onclick="choisirFruit('pomme', this)">🍎</div>
+      <div class="fruit" onclick="choisirFruit('banane', this)">🍌</div>
+    </div>
+
+    <div id="zone-boutons" style="display:none;">
+      <button class="btn-choix btn-pomme" onclick="apprendre('pomme')">C'est une Pomme</button>
+      <button class="btn-choix btn-banane" onclick="apprendre('banane')">C'est une Banane</button>
+    </div>
+  </div>
+
+  <div class="etape" id="etape2">
+    <h2>Étape 2 : Voyons ce que l'IA a appris !</h2>
+    <p>L'IA regarde une nouvelle image (une pomme verte). Que va-t-elle dire ?</p>
+    
+    <div class="grille-fruits">
+      <div class="fruit" style="cursor:default; font-size: 7em;">🍏</div>
+    </div>
+
+    <div class="boite-ia">
+      <div>🤖 <strong>Analyse de l'image en cours...</strong></div>
+      <div class="resultat-ia" id="reponse-ia"></div>
+    </div>
+
+    <button class="btn-suivant" id="btn-etape3" style="display:none;" onclick="passerEtape3()">Continuer</button>
+  </div>
+
+  <div class="etape" id="etape3">
+    <h2>💡 La leçon de l'IA</h2>
+    <p id="texte-lecon"></p>
+    <button class="btn-suivant" onclick="location.reload()">🔄 Rejouer</button>
+  </div>
+
+</div>
+
+<script>
+  var fruitSelectionne = "";
+  var memoireIA = { pomme: 0, banane: 0 };
+  var exemplesDonnes = 0;
+
+  function choisirFruit(type, element) {
+    document.querySelectorAll('.fruit').forEach(function(f) { f.classList.remove('selectionne'); });
+    element.classList.add('selectionne');
+    fruitSelectionne = type;
+    document.getElementById('zone-boutons').style.display = 'block';
+  }
+
+  function apprendre(type) {
+    if (!fruitSelectionne) return;
+    memoireIA[type]++;
+    exemplesDonnes++;
+
+    var elementSelectionne = document.querySelector('.fruit.selectionne');
+    if (elementSelectionne) elementSelectionne.style.visibility = 'hidden';
+    
+    document.getElementById('zone-boutons').style.display = 'none';
+    fruitSelectionne = "";
+
+    if (exemplesDonnes >= 4) setTimeout(passerEtape2, 500);
+  }
+
+  function passerEtape2() {
+    document.getElementById('etape1').classList.remove('active');
+    document.getElementById('etape2').classList.add('active');
+
+    setTimeout(function() {
+      var reponse = "";
+      var texteLecon = "";
+      
+      // NOUVELLE LOGIQUE : On gère l'égalité
+      if (memoireIA.pomme > memoireIA.banane) {
+        reponse = "C'est une POMME ! 🍎";
+        texteLecon = "L'IA a deviné que la pomme verte était une pomme !<br><br>Pourquoi ? Parce que tu lui as montré <strong>plus de pommes</strong> que de bananes. Elle a compris la forme ronde.<br><br>Mais si tu lui avais montré plus de bananes, elle se serait trompée !";
+      } else if (memoireIA.banane > memoireIA.pomme) {
+        reponse = "C'est une BANANE ! 🍌";
+        texteLecon = "L'IA s'est trompée ! Elle a dit que la pomme verte était une banane.<br><br>Pourquoi ? Parce que tu lui as montré <strong>plus de bananes</strong> que de pommes. Elle n'a pas assez vu de pommes pour comprendre.<br><br><strong>La leçon :</strong> Si on donne de mauvais exemples à l'IA, elle fait de mauvaises prédictions !";
+      } else {
+        // ÉGALITÉ
+        reponse = "Je ne sais pas ! 🤷‍♂️";
+        texteLecon = "L'IA a avoué qu'elle ne savait pas !<br><br>Pourquoi ? Parce que tu lui as montré <strong>autant de pommes que de bananes</strong>. Elle n'a pas pu décider laquelle choisir.<br><br><strong>La leçon :</strong> Une IA a besoin de données claires et variées pour apprendre. Si on lui donne des exemples contradictoires, elle est perdue !";
+      }
+      
+      document.getElementById('reponse-ia').textContent = reponse;
+      document.getElementById('btn-etape3').style.display = 'inline-block';
+      
+      // On stocke la leçon pour l'étape 3
+      window.leconActuelle = texteLecon;
+    }, 1500);
+  }
+
+  function passerEtape3() {
+    document.getElementById('etape2').classList.remove('active');
+    document.getElementById('etape3').classList.add('active');
+    document.getElementById('texte-lecon').innerHTML = window.leconActuelle;
+  }
+</script>
+
+</body>
+</html>
