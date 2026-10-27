@@ -9,26 +9,23 @@
   body { font-family: 'Segoe UI', Arial, sans-serif; background: #f4f7fb; color: #1a1f2e; line-height: 1.6; }
   header { background: linear-gradient(135deg, #f59e0b, #f97316); color: white; padding: 20px; text-align: center; }
   header h1 { font-size: 1.8em; }
-  .btn-retour { display: inline-block; margin-top: 12px; padding: 8px 16px; background: rgba(255,255,255,0.2); color: white; text-decoration: none; border-radius: 8px; font-weight: bold; border: 1px solid rgba(255,255,255,0.4); cursor: pointer; }
+  .btn-menu { display: none; margin-top: 12px; padding: 8px 16px; background: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.4); border-radius: 8px; font-weight: bold; cursor: pointer; }
   
   .conteneur { max-width: 800px; margin: 0 auto; padding: 24px 20px; }
   
-  /* Le menu */
+  /* Menu principal */
   .carte-jeu { background: white; border-radius: 16px; padding: 24px; box-shadow: 0 4px 12px rgba(0,0,0,0.06); margin-bottom: 20px; display: flex; align-items: center; gap: 20px; cursor: pointer; transition: transform 0.2s; border-left: 6px solid #f59e0b; }
   .carte-jeu:hover { transform: translateY(-4px); box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
   .carte-jeu .emoji { font-size: 3.5em; }
   .carte-jeu h3 { color: #1a1f2e; margin-bottom: 4px; font-size: 1.2em; }
   .carte-jeu p { color: #64748b; font-size: 0.95em; }
   
-  /* Les jeux (cachés par défaut) */
+  /* Zones de jeu (cachées par défaut) */
   .zone-jeu { display: none; background: white; border-radius: 16px; padding: 30px; box-shadow: 0 4px 12px rgba(0,0,0,0.06); text-align: center; }
   .zone-jeu.active { display: block; animation: fadeIn 0.3s; }
-  .menu.active { display: block; }
-  .menu.cache { display: none; }
   
   @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-  /* Boutons des jeux */
   .btn-action { background: #0ea5e9; color: white; border: none; padding: 12px 24px; border-radius: 8px; font-size: 1.1em; font-weight: bold; cursor: pointer; margin: 10px; transition: 0.2s; }
   .btn-action:hover { background: #0284c7; }
   .btn-choix { padding: 16px 32px; border: none; border-radius: 12px; font-size: 1.2em; font-weight: bold; cursor: pointer; margin: 10px; }
@@ -43,13 +40,13 @@
   
   .boite-ia { background: #0f172a; color: #0ea5e9; padding: 20px; border-radius: 12px; font-family: 'Courier New', monospace; font-size: 1.1em; text-align: left; margin: 20px 0; }
   
-  /* Styles pour le Robot */
+  /* Robot */
   .grille-robot { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; max-width: 300px; margin: 0 auto; background: #e2e8f0; padding: 4px; border-radius: 8px; }
   .case-robot { background: white; aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-size: 2em; border-radius: 4px; }
   .case-robot.robot { background: #dbeafe; }
   .case-robot.cible { background: #dcfce7; }
   
-  /* Styles pour les Visages */
+  /* Visages */
   .grille-visages { display: flex; justify-content: center; gap: 40px; margin: 20px 0; }
   .visage { font-size: 6em; cursor: pointer; padding: 10px; border-radius: 16px; border: 3px solid transparent; }
   .visage.selectionne { border-color: #0ea5e9; background: #e0f2fe; }
@@ -60,27 +57,27 @@
 <body>
 
 <header>
-  <h1>🧒 Le Monde Magique</h1>
-  <button class="btn-retour" onclick="retourMenu()">🏠 Menu des jeux</button>
+  <h1 id="titre-header">🧒 Le Monde Magique</h1>
+  <button id="btn-retour" class="btn-menu" onclick="retourMenu()">← Menu des jeux</button>
 </header>
 
 <div class="conteneur">
 
   <!-- ================= MENU ================= -->
-  <div id="menu" class="menu active">
-    <p style="margin-bottom:20px; font-size:1.1em; color:#475569;">Choisis un jeu pour découvrir l'Intelligence Artificielle !</p>
+  <div id="menu" class="zone-jeu active">
+    <p style="margin-bottom:20px; font-size:1.1em; color:#475569; text-align:left;">Choisis un jeu pour découvrir l'Intelligence Artificielle !</p>
     
-    <div class="carte-jeu" onclick="lancerJeu('fruits')">
+    <div class="carte-jeu" onclick="lancerJeu('fruits', '🍎 L\'Apprenti Dresseur')">
       <div class="emoji">🍎</div>
       <div><h3>Jeu 1 : L'Apprenti Dresseur</h3><p>Apprends à l'IA à reconnaître les fruits.</p></div>
     </div>
     
-    <div class="carte-jeu" onclick="lancerJeu('robot')">
+    <div class="carte-jeu" onclick="lancerJeu('robot', '🤖 Le Chef d\'Orchestre')">
       <div class="emoji">🤖</div>
       <div><h3>Jeu 2 : Le Chef d'Orchestre</h3><p>Programme un robot pour atteindre la cible.</p></div>
     </div>
     
-    <div class="carte-jeu" onclick="lancerJeu('visages')">
+    <div class="carte-jeu" onclick="lancerJeu('visages', '🕵️‍♂️ Le Détective des Visages')">
       <div class="emoji">🕵️‍♂️</div>
       <div><h3>Jeu 3 : Le Détective des Visages</h3><p>Règle l'IA pour reconnaître les émotions.</p></div>
     </div>
@@ -105,7 +102,6 @@
     
     <div id="resultat-fruits" style="display:none; margin-top:20px;">
       <div class="boite-ia" id="texte-fruits"></div>
-      <button class="btn-action" onclick="retourMenu()">Continuer</button>
     </div>
   </div>
 
@@ -161,19 +157,24 @@
 </div>
 
 <script>
-  // --- GESTION DU MENU ---
-  function lancerJeu(nom) {
-    document.getElementById('menu').classList.add('cache');
-    document.getElementById('menu').classList.remove('active');
+  // --- GESTION DU MENU (SANS CHANGEMENT DE PAGE) ---
+  function lancerJeu(nom, titre) {
+    document.querySelectorAll('.zone-jeu').forEach(function(z) { z.classList.remove('active'); });
     document.getElementById('jeu-' + nom).classList.add('active');
+    document.getElementById('titre-header').textContent = titre;
+    document.getElementById('btn-retour').style.display = 'inline-block';
+    
+    // Réinitialiser le jeu en cours
+    if(nom === 'fruits') reinitFruits();
+    if(nom === 'robot') reinitRobot();
+    if(nom === 'visages') reinitVisages();
   }
   
   function retourMenu() {
     document.querySelectorAll('.zone-jeu').forEach(function(z) { z.classList.remove('active'); });
-    document.getElementById('menu').classList.remove('cache');
     document.getElementById('menu').classList.add('active');
-    // Réinitialiser les jeux
-    reinitFruits(); reinitRobot(); reinitVisages();
+    document.getElementById('titre-header').textContent = '🧒 Le Monde Magique';
+    document.getElementById('btn-retour').style.display = 'none';
   }
 
   // ================= JEU 1 : FRUITS =================
@@ -306,7 +307,7 @@
     document.getElementById('resultat-visages').style.display = 'none';
   }
 
-  // Initialisation au chargement
+  // Initialisation
   window.onload = function() {
     initRobot();
   };
