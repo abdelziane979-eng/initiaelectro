@@ -146,19 +146,13 @@
   }
 
   // Effacer le canvas
-  function effacer() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    document.getElementById('resultat').classList.remove('visible');
-  }
-
-  // Vérification de l'IA (simulation par analyse de pixels)
-  function verifier() {
+    function verifier() {
     var imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
     var pixels = imageData.data;
     var points = [];
 
     // On récupère tous les points noirs (le dessin de l'enfant)
-    for (var y = 0; y < canvas.height; y += 4) { // On saute des lignes pour aller plus vite
+    for (var y = 0; y < canvas.height; y += 4) {
       for (var x = 0; x < canvas.width; x += 4) {
         var i = (y * canvas.width + x) * 4;
         if (pixels[i] < 100 && pixels[i+1] < 100 && pixels[i+2] < 100) {
@@ -172,58 +166,52 @@
       return;
     }
 
-    // --- L'IA calcule la "forme" ---
-    // 1. On trouve le centre du dessin
-    var sumX = 0, sumY = 0;
-    points.forEach(function(p) { sumX += p.x; sumY += p.y; });
-    var centreX = sumX / points.length;
-    var centreY = sumY / points.length;
-
-    // 2. On analyse comment les points sont répartis
+    // --- L'IA Analyse les bords (les "coins") ---
     var minX = 9999, maxX = 0, minY = 9999, maxY = 0;
-    var distances = [];
-    
     points.forEach(function(p) {
       if (p.x < minX) minX = p.x;
       if (p.x > maxX) maxX = p.x;
       if (p.y < minY) minY = p.y;
       if (p.y > maxY) maxY = p.y;
-      
-      var dx = p.x - centreX;
-      var dy = p.y - centreY;
-      distances.push(Math.sqrt(dx*dx + dy*dy));
     });
 
-    // Écart-type des distances (si c'est très régulier = cercle, sinon = carré/triangle)
-    var moyenneDistance = distances.reduce(function(a,b){return a+b;},0) / distances.length;
-    var variance = distances.reduce(function(a,b){return a + Math.pow(b - moyenneDistance, 2);},0) / distances.length;
-    var ecartType = Math.sqrt(variance);
-
-    // 3. Ratio largeur/hauteur
     var largeur = maxX - minX;
     var hauteur = maxY - minY;
     var ratio = largeur / hauteur;
-
-    // 4. Décision de l'IA (simplifiée)
-    var formeDevinee = "";
     
-    if (ecartType < moyenneDistance * 0.2 && ratio > 0.6 && ratio < 1.6) {
-      // Les points sont à peu près à la même distance du centre -> Cercle
-      formeDevinee = "cercle";
-    } else if (ratio > 1.5 || ratio < 0.66) {
-      // Très large ou très haut -> pas un carré
-      formeDevinee = "triangle"; // approximation
-    } else {
-      // Sinon, si les coins sont marqués, c'est un carré
-      formeDevinee = "carre";
+    var formeDevinee = "";
+    var noms = { cercle: 'cercle', carre: 'carré', triangle: 'triangle' };
+
+    // 1. Si c'est très allongé (plus large que haut, ou l'inverse) -> c'est un triangle
+    if (ratio > 1.4 || ratio < 0.7) {
+      formeDevinee = "triangle";
+    } 
+    // 2. Sinon, on vérifie si les coins sont "remplis" (carré) ou "vides" (cercle)
+    else {
+      var coins = 0;
+      // On regarde s'il y a des points dans les 4 coins du dessin
+      points.forEach(function(p) {
+        var dx = Math.min(p.x - minX, maxX - p.x);
+        var dy = Math.min(p.y - minY, maxY - p.y);
+        // Si le point est près du coin (à moins de 20% de la taille du dessin)
+        if (dx < largeur * 0.25 && dy < hauteur * 0.25) {
+          coins++;
+        }
+      });
+
+      // Si les coins sont remplis, c'est un carré. Sinon, c'est un cercle.
+      if (coins > points.length * 0.15) {
+        formeDevinee = "carre";
+      } else {
+        formeDevinee = "cercle";
+      }
     }
 
     // Résultat final
     if (formeDevinee === formeAttendue) {
-      afficherResultat("🎉 Bravo ! L'IA a reconnu ton " + formeAttendue + " ! C'est magique !", true);
+      afficherResultat("🎉 Bravo ! L'IA a reconnu ton " + noms[formeAttendue] + " ! C'est magique !", true);
     } else {
-      var noms = { cercle: 'cercle', carre: 'carré', triangle: 'triangle' };
-      afficherResultat("🤔 L'IA pensait que c'était un " + noms[formeDevinee] + ". Essaie de dessiner un plus beau " + noms[formeAttendue] + " !", false);
+      afficherResultat("🤔 L'IA pensait que c'était un " + noms[formeDevinee] + ". Elle est un peu stricte ! Essaie de dessiner un plus beau " + noms[formeAttendue] + ".", false);
     }
   }
 
