@@ -28,21 +28,22 @@
   .palette { display: flex; justify-content: center; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; }
   .btn-forme { padding: 12px 24px; border: 3px solid #e2e8f0; border-radius: 12px; background: white;
                font-size: 1em; font-weight: bold; color: #475569; cursor: pointer; transition: all 0.2s; font-family: inherit; }
-  .btn-forme:hover { background: #f8fafc; }
-  .btn-forme.actif { border-color: #f59e0b; background: #fef3c7; color: #92400e; transform: scale(1.05); }
+  .btn-forme:hover { background: #f8fafc; transform: translateY(-2px); }
+  .btn-forme.actif { border-color: #f59e0b; background: #fef3c7; color: #92400e; }
   
   .canvas-wrapper { position: relative; display: inline-block; margin: 16px 0; }
-  canvas { border: 3px dashed #cbd5e1; border-radius: 12px; cursor: crosshair; background: #fafafa; touch-action: none; }
+  canvas { border: 3px dashed #cbd5e1; border-radius: 12px; background: #fafafa; }
   
   .btn-action { padding: 14px 32px; border: none; border-radius: 12px; font-size: 1.1em; font-weight: bold;
                 cursor: pointer; transition: all 0.2s; font-family: inherit; margin: 8px; }
   .btn-effacer { background: #f1f5f9; color: #475569; border: 2px solid #cbd5e1; }
   .btn-effacer:hover { background: #e2e8f0; }
-  .btn-verifier { background: #f59e0b; color: white; }
-  .btn-verifier:hover { background: #d97706; transform: translateY(-2px); }
+  .btn-verifier { background: #0ea5e9; color: white; box-shadow: 0 4px 10px rgba(14,165,233,0.3); }
+  .btn-verifier:hover { background: #0284c7; transform: translateY(-2px); }
+  .btn-verifier:disabled { background: #cbd5e1; cursor: not-allowed; box-shadow: none; transform: none; }
   
-  .resultat { margin-top: 20px; padding: 20px; border-radius: 12px; font-size: 1.2em; font-weight: bold;
-              display: none; animation: fadeIn 0.3s; }
+  .resultat { margin-top: 20px; padding: 20px; border-radius: 12px; font-size: 1.1em; font-weight: bold;
+              display: none; animation: fadeIn 0.3s; text-align: left; }
   .resultat.visible { display: block; }
   .resultat.succes { background: #dcfce7; color: #166534; border: 2px solid #22c55e; }
   .resultat.erreur { background: #fee2e2; color: #991b1b; border: 2px solid #ef4444; }
@@ -54,22 +55,22 @@
 
 <header>
   <h1>🧒 Le Monde Magique</h1>
-  <p>Dessine une forme, et l'ordinateur va essayer de la deviner !</p>
+  <p>Génère une forme, et vois comment l'IA l'analyse !</p>
   <a href="index.html" class="btn-retour">← Retour à EspaceIA</a>
 </header>
 
 <div class="conteneur">
   
   <div class="consigne">
-    🤖 <strong>Comment ça marche ?</strong> Choisis une forme (cercle, carré ou triangle), dessine-la dans le cadre blanc, puis clique sur "Vérifier". L'IA va analyser tes pixels pour deviner ce que tu as dessiné !
+    🤖 <strong>Mission :</strong> Clique sur un bouton pour générer une forme (elle ne sera pas parfaite, comme si tu la dessinais à la main !). Ensuite, clique sur "Analyser avec l'IA" pour voir ce que l'ordinateur "voit".
   </div>
 
   <div class="zone-jeu">
     
     <div class="palette">
-      <button class="btn-forme actif" id="btn-cercle" onclick="choisirForme('cercle', this)">⭕ Cercle</button>
-      <button class="btn-forme" id="btn-carre" onclick="choisirForme('carre', this)">⬛ Carré</button>
-      <button class="btn-forme" id="btn-triangle" onclick="choisirForme('triangle', this)">🔺 Triangle</button>
+      <button class="btn-forme" onclick="genererForme('cercle')">⭕ Générer un Cercle</button>
+      <button class="btn-forme" onclick="genererForme('carre')">⬛ Générer un Carré</button>
+      <button class="btn-forme" onclick="genererForme('triangle')">🔺 Générer un Triangle</button>
     </div>
 
     <div class="canvas-wrapper">
@@ -78,7 +79,7 @@
 
     <div>
       <button class="btn-action btn-effacer" onclick="effacer()">🗑️ Effacer</button>
-      <button class="btn-action btn-verifier" onclick="verifier()">🤖 Vérifier</button>
+      <button class="btn-action btn-verifier" id="btn-analyser" onclick="analyser()" disabled>🤖 Analyser avec l'IA</button>
     </div>
 
     <div class="resultat" id="resultat"></div>
@@ -89,69 +90,79 @@
 <script>
   var canvas = document.getElementById('dessin');
   var ctx = canvas.getContext('2d');
-  var dessine = false;
-  var formeAttendue = 'cercle';
+  var formeActuelle = null;
 
-  // Initialisation du canvas
-  ctx.lineWidth = 6;
-  ctx.lineCap = 'round';
-  ctx.lineJoin = 'round';
-  ctx.strokeStyle = '#0f172a';
-
-  // Événements souris
-  canvas.addEventListener('mousedown', function(e) {
-    dessine = true;
-    ctx.beginPath();
-    var rect = canvas.getBoundingClientRect();
-    ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
-  });
-
-  canvas.addEventListener('mousemove', function(e) {
-    if (!dessine) return;
-    var rect = canvas.getBoundingClientRect();
-    ctx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
-    ctx.stroke();
-  });
-
-  canvas.addEventListener('mouseup', function() { dessine = false; });
-  canvas.addEventListener('mouseleave', function() { dessine = false; });
-
-  // Événements tactiles (tablettes/mobiles)
-  canvas.addEventListener('touchstart', function(e) {
-    e.preventDefault();
-    dessine = true;
-    ctx.beginPath();
-    var rect = canvas.getBoundingClientRect();
-    var touch = e.touches[0];
-    ctx.moveTo(touch.clientX - rect.left, touch.clientY - rect.top);
-  }, { passive: false });
-
-  canvas.addEventListener('touchmove', function(e) {
-    e.preventDefault();
-    if (!dessine) return;
-    var rect = canvas.getBoundingClientRect();
-    var touch = e.touches[0];
-    ctx.lineTo(touch.clientX - rect.left, touch.clientY - rect.top);
-    ctx.stroke();
-  }, { passive: false });
-
-  canvas.addEventListener('touchend', function() { dessine = false; });
-
-  // Choix de la forme
-  function choisirForme(forme, bouton) {
-    formeAttendue = forme;
-    document.querySelectorAll('.btn-forme').forEach(function(b) { b.classList.remove('actif'); });
-    bouton.classList.add('actif');
-    effacer();
+  function effacer() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    document.getElementById('resultat').classList.remove('visible');
+    document.getElementById('btn-analyser').disabled = true;
+    formeActuelle = null;
   }
 
-  // Effacer le canvas
-    function verifier() {
+  // Génère une forme "imparfaite"
+  function genererForme(type) {
+    effacer();
+    formeActuelle = type;
+    document.getElementById('btn-analyser').disabled = false;
+
+    var cx = canvas.width / 2;
+    var cy = canvas.height / 2;
+    var rayon = 80;
+
+    ctx.lineWidth = 5;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.strokeStyle = '#0f172a';
+    ctx.beginPath();
+
+    if (type === 'cercle') {
+      // Dessin approximatif d'un cercle (avec de petits tremblements)
+      for (var a = 0; a <= Math.PI * 2; a += 0.1) {
+        var r = rayon + (Math.random() * 6 - 3); // Ajoute un bruit de +/- 3px
+        var x = cx + Math.cos(a) * r;
+        var y = cy + Math.sin(a) * r;
+        if (a === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+    } else if (type === 'carre') {
+      // Dessin approximatif d'un carré
+      var c = rayon * 1.2;
+      var points = [
+        {x: cx - c, y: cy - c}, {x: cx + c, y: cy - c},
+        {x: cx + c, y: cy + c}, {x: cx - c, y: cy + c}, {x: cx - c, y: cy - c}
+      ];
+      points.forEach(function(p, i) {
+        var bruitX = p.x + (Math.random() * 8 - 4);
+        var bruitY = p.y + (Math.random() * 8 - 4);
+        if (i === 0) ctx.moveTo(bruitX, bruitY);
+        else ctx.lineTo(bruitX, bruitY);
+      });
+    } else if (type === 'triangle') {
+      // Dessin approximatif d'un triangle
+      var t = rayon * 1.3;
+      var points = [
+        {x: cx, y: cy - t}, 
+        {x: cx + t * 0.866, y: cy + t * 0.5},
+        {x: cx - t * 0.866, y: cy + t * 0.5}, 
+        {x: cx, y: cy - t}
+      ];
+      points.forEach(function(p, i) {
+        var bruitX = p.x + (Math.random() * 10 - 5);
+        var bruitY = p.y + (Math.random() * 10 - 5);
+        if (i === 0) ctx.moveTo(bruitX, bruitY);
+        else ctx.lineTo(bruitX, bruitY);
+      });
+    }
+    ctx.stroke();
+  }
+
+  // L'IA analyse le dessin
+  function analyser() {
     var imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
     var pixels = imageData.data;
     var points = [];
 
-    // On récupère tous les points noirs (le dessin de l'enfant)
+    // On récupère les pixels noirs
     for (var y = 0; y < canvas.height; y += 4) {
       for (var x = 0; x < canvas.width; x += 4) {
         var i = (y * canvas.width + x) * 4;
@@ -161,12 +172,9 @@
       }
     }
 
-    if (points.length < 20) {
-      afficherResultat("Dessine d'abord quelque chose dans le cadre ! ✏️", false);
-      return;
-    }
+    if (points.length === 0) return;
 
-    // --- L'IA Analyse les bords (les "coins") ---
+    // On trouve les limites du dessin
     var minX = 9999, maxX = 0, minY = 9999, maxY = 0;
     points.forEach(function(p) {
       if (p.x < minX) minX = p.x;
@@ -178,46 +186,48 @@
     var largeur = maxX - minX;
     var hauteur = maxY - minY;
     var ratio = largeur / hauteur;
-    
     var formeDevinee = "";
-    var noms = { cercle: 'cercle', carre: 'carré', triangle: 'triangle' };
 
-    // 1. Si c'est très allongé (plus large que haut, ou l'inverse) -> c'est un triangle
-    if (ratio > 1.4 || ratio < 0.7) {
+    // --- Logique de l'IA (simplifiée pour être tolérante) ---
+    // 1. Si c'est plus large que haut (ou inversement) -> c'est un triangle
+    if (ratio > 1.3 || ratio < 0.75) {
       formeDevinee = "triangle";
     } 
-    // 2. Sinon, on vérifie si les coins sont "remplis" (carré) ou "vides" (cercle)
+    // 2. Sinon, on regarde si les coins sont remplis (carré) ou vides (cercle)
     else {
-      var coins = 0;
-      // On regarde s'il y a des points dans les 4 coins du dessin
+      var pointsDansLesCoins = 0;
       points.forEach(function(p) {
         var dx = Math.min(p.x - minX, maxX - p.x);
         var dy = Math.min(p.y - minY, maxY - p.y);
-        // Si le point est près du coin (à moins de 20% de la taille du dessin)
-        if (dx < largeur * 0.25 && dy < hauteur * 0.25) {
-          coins++;
+        // Si un point est très proche d'un coin
+        if (dx < largeur * 0.2 && dy < hauteur * 0.2) {
+          pointsDansLesCoins++;
         }
       });
 
-      // Si les coins sont remplis, c'est un carré. Sinon, c'est un cercle.
-      if (coins > points.length * 0.15) {
+      // Un carré a des points dans les coins. Un cercle n'en a pas.
+      if (pointsDansLesCoins > points.length * 0.1) {
         formeDevinee = "carre";
       } else {
         formeDevinee = "cercle";
       }
     }
 
-    // Résultat final
-    if (formeDevinee === formeAttendue) {
-      afficherResultat("🎉 Bravo ! L'IA a reconnu ton " + noms[formeAttendue] + " ! C'est magique !", true);
+    var noms = { cercle: 'cercle', carre: 'carré', triangle: 'triangle' };
+    var message = "";
+    
+    if (formeDevinee === formeActuelle) {
+      message = "🎉 <strong>L'IA a reconnu la forme !</strong><br><br>Le dessin a été identifié comme un <strong>" + noms[formeDevinee] + "</strong>.<br><br>💡 <em>Pourquoi ?</em> L'IA regarde la largeur, la hauteur, et la présence de points dans les coins. Pour elle, un cercle n'a pas de coins, un carré en a 4.";
+      afficherResultat(message, true);
     } else {
-      afficherResultat("🤔 L'IA pensait que c'était un " + noms[formeDevinee] + ". Elle est un peu stricte ! Essaie de dessiner un plus beau " + noms[formeAttendue] + ".", false);
+      message = "🤔 <strong>L'IA s'est trompée (mais c'est normal !)</strong><br><br>Elle pensait que c'était un <strong>" + noms[formeDevinee] + "</strong>.<br><br>💡 <em>Pourquoi ?</em> La forme n'était pas parfaite. L'IA est très sensible aux petits défauts. Essaie de générer une autre forme !";
+      afficherResultat(message, false);
     }
   }
 
   function afficherResultat(message, succes) {
     var r = document.getElementById('resultat');
-    r.textContent = message;
+    r.innerHTML = message;
     r.className = 'resultat visible ' + (succes ? 'succes' : 'erreur');
   }
 </script>
