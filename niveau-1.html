@@ -3,234 +3,148 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>EspaceIA - Niveau 1 : Le Monde Magique</title>
+<title>EspaceIA - Niveau 1 : L'Apprenti Dresseur</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0' stop-color='%230ea5e9'/><stop offset='1' stop-color='%238b5cf6'/></linearGradient></defs><rect width='512' height='512' rx='112' fill='url(%23g)'/><path d='M 150 350 Q 256 150 362 350' stroke='white' stroke-width='20' fill='none' stroke-linecap='round'/><circle cx='256' cy='200' r='30' fill='white'/></svg>">
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: 'Segoe UI', Arial, sans-serif; background: #f4f7fb; color: #1a1f2e; line-height: 1.6; }
   
-  header { background: linear-gradient(135deg, #f59e0b, #f97316); color: white;
-           padding: 20px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+  header { background: linear-gradient(135deg, #f59e0b, #f97316); color: white; padding: 20px; text-align: center; }
   header h1 { font-size: 1.8em; }
-  header p { font-size: 1em; opacity: 0.95; }
-  .btn-retour { display: inline-block; margin-top: 12px; padding: 8px 16px; background: rgba(255,255,255,0.2); 
-                color: white; text-decoration: none; border-radius: 8px; font-weight: bold;
-                border: 1px solid rgba(255,255,255,0.4); transition: all 0.2s; }
-  .btn-retour:hover { background: rgba(255,255,255,0.35); }
+  .btn-retour { display: inline-block; margin-top: 12px; padding: 8px 16px; background: rgba(255,255,255,0.2); color: white; text-decoration: none; border-radius: 8px; font-weight: bold; border: 1px solid rgba(255,255,255,0.4); }
   
   .conteneur { max-width: 800px; margin: 0 auto; padding: 24px 20px; }
+  .etape { background: white; border-radius: 16px; padding: 30px; box-shadow: 0 4px 12px rgba(0,0,0,0.06); text-align: center; display: none; }
+  .etape.active { display: block; animation: fadeIn 0.3s; }
   
-  .consigne { background: #fef3c7; border-left: 4px solid #f59e0b; padding: 16px 20px;
-              border-radius: 8px; margin-bottom: 20px; font-size: 1.05em; color: #92400e; }
+  .etape h2 { color: #0ea5e9; margin-bottom: 16px; font-size: 1.4em; }
+  .etape p { font-size: 1.1em; color: #475569; margin-bottom: 24px; }
   
-  .zone-jeu { background: white; border-radius: 16px; padding: 24px; box-shadow: 0 4px 12px rgba(0,0,0,0.06); text-align: center; }
+  .grille-fruits { display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; margin-bottom: 24px; }
+  .fruit { font-size: 5em; cursor: pointer; padding: 10px; border: 3px solid transparent; border-radius: 16px; transition: all 0.2s; }
+  .fruit:hover { transform: scale(1.1); background: #f8fafc; }
+  .fruit.selectionne { border-color: #f59e0b; background: #fef3c7; }
+
+  .btn-choix { padding: 16px 32px; border: none; border-radius: 12px; font-size: 1.2em; font-weight: bold; cursor: pointer; margin: 10px; }
+  .btn-pomme { background: #fee2e2; color: #991b1b; border: 2px solid #f87171; }
+  .btn-banane { background: #fef9c3; color: #854d0e; border: 2px solid #fde047; }
   
-  .palette { display: flex; justify-content: center; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; }
-  .btn-forme { padding: 12px 24px; border: 3px solid #e2e8f0; border-radius: 12px; background: white;
-               font-size: 1em; font-weight: bold; color: #475569; cursor: pointer; transition: all 0.2s; font-family: inherit; }
-  .btn-forme:hover { background: #f8fafc; }
-  .btn-forme.actif { border-color: #f59e0b; background: #fef3c7; color: #92400e; transform: scale(1.05); }
+  .btn-suivant { background: #0ea5e9; color: white; border: none; padding: 16px 40px; border-radius: 12px; font-size: 1.2em; font-weight: bold; cursor: pointer; margin-top: 20px; }
+  .btn-suivant:hover { background: #0284c7; }
   
-  .canvas-wrapper { position: relative; display: inline-block; margin: 16px 0; }
-  canvas { border: 3px dashed #cbd5e1; border-radius: 12px; cursor: crosshair; background: #fafafa; touch-action: none; }
-  
-  .btn-action { padding: 14px 32px; border: none; border-radius: 12px; font-size: 1.1em; font-weight: bold;
-                cursor: pointer; transition: all 0.2s; font-family: inherit; margin: 8px; }
-  .btn-effacer { background: #f1f5f9; color: #475569; border: 2px solid #cbd5e1; }
-  .btn-effacer:hover { background: #e2e8f0; }
-  .btn-verifier { background: #f59e0b; color: white; }
-  .btn-verifier:hover { background: #d97706; transform: translateY(-2px); }
-  
-  .resultat { margin-top: 20px; padding: 20px; border-radius: 12px; font-size: 1.2em; font-weight: bold;
-              display: none; animation: fadeIn 0.3s; }
-  .resultat.visible { display: block; }
-  .resultat.succes { background: #dcfce7; color: #166534; border: 2px solid #22c55e; }
-  .resultat.erreur { background: #fee2e2; color: #991b1b; border: 2px solid #ef4444; }
-  
-  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+  .boite-ia { background: #0f172a; color: #0ea5e9; padding: 20px; border-radius: 12px; font-family: 'Courier New', monospace; font-size: 1.1em; text-align: left; margin: 20px 0; }
+  .resultat-ia { font-size: 1.5em; font-weight: bold; color: #22c55e; margin-top: 10px; }
 </style>
 </head>
 <body>
 
 <header>
-  <h1>🧒 Le Monde Magique</h1>
-  <p>Dessine une forme, et l'ordinateur va essayer de la deviner !</p>
+  <h1>🧒 L'Apprenti Dresseur d'IA</h1>
   <a href="index.html" class="btn-retour">← Retour à EspaceIA</a>
 </header>
 
 <div class="conteneur">
   
-  <div class="consigne">
-    🤖 <strong>Comment ça marche ?</strong> Choisis une forme (cercle, carré ou triangle), dessine-la dans le cadre blanc, puis clique sur "Vérifier". L'IA va analyser tes pixels pour deviner ce que tu as dessiné !
-  </div>
-
-  <div class="zone-jeu">
+  <div class="etape active" id="etape1">
+    <h2>Étape 1 : Apprends à l'IA</h2>
+    <p>Clique sur un fruit, puis dis à l'IA ce que c'est.</p>
     
-    <div class="palette">
-      <button class="btn-forme actif" id="btn-cercle" onclick="choisirForme('cercle', this)">⭕ Cercle</button>
-      <button class="btn-forme" id="btn-carre" onclick="choisirForme('carre', this)">⬛ Carré</button>
-      <button class="btn-forme" id="btn-triangle" onclick="choisirForme('triangle', this)">🔺 Triangle</button>
+    <div class="grille-fruits" id="grille-fruits">
+      <div class="fruit" onclick="choisirFruit('pomme', this)">🍎</div>
+      <div class="fruit" onclick="choisirFruit('banane', this)">🍌</div>
+      <div class="fruit" onclick="choisirFruit('pomme', this)">🍎</div>
+      <div class="fruit" onclick="choisirFruit('banane', this)">🍌</div>
     </div>
 
-    <div class="canvas-wrapper">
-      <canvas id="dessin" width="400" height="300"></canvas>
+    <div id="zone-boutons" style="display:none;">
+      <button class="btn-choix btn-pomme" onclick="apprendre('pomme')">C'est une Pomme</button>
+      <button class="btn-choix btn-banane" onclick="apprendre('banane')">C'est une Banane</button>
     </div>
-
-    <div>
-      <button class="btn-action btn-effacer" onclick="effacer()">🗑️ Effacer</button>
-      <button class="btn-action btn-verifier" onclick="verifier()">🤖 Vérifier</button>
-    </div>
-
-    <div class="resultat" id="resultat"></div>
-
   </div>
+
+  <div class="etape" id="etape2">
+    <h2>Étape 2 : Voyons ce que l'IA a appris !</h2>
+    <p>L'IA regarde une nouvelle image (une pomme verte). Que va-t-elle dire ?</p>
+    
+    <div class="grille-fruits">
+      <div class="fruit" style="cursor:default; font-size: 7em;">🍏</div>
+    </div>
+
+    <div class="boite-ia">
+      <div>🤖 <strong>Analyse de l'image en cours...</strong></div>
+      <div class="resultat-ia" id="reponse-ia"></div>
+    </div>
+
+    <button class="btn-suivant" id="btn-etape3" style="display:none;" onclick="passerEtape3()">Continuer</button>
+  </div>
+
+  <div class="etape" id="etape3">
+    <h2>💡 La leçon de l'IA</h2>
+    <p id="texte-lecon"></p>
+    <button class="btn-suivant" onclick="location.reload()">🔄 Rejouer</button>
+  </div>
+
 </div>
 
 <script>
-  var canvas = document.getElementById('dessin');
-  var ctx = canvas.getContext('2d');
-  var dessine = false;
-  var formeAttendue = 'cercle';
+  var fruitSelectionne = "";
+  var memoireIA = { pomme: 0, banane: 0 };
+  var exemplesDonnes = 0;
 
-  // Initialisation du canvas
-  ctx.lineWidth = 6;
-  ctx.lineCap = 'round';
-  ctx.lineJoin = 'round';
-  ctx.strokeStyle = '#0f172a';
-
-  // Événements souris
-  canvas.addEventListener('mousedown', function(e) {
-    dessine = true;
-    ctx.beginPath();
-    var rect = canvas.getBoundingClientRect();
-    ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
-  });
-
-  canvas.addEventListener('mousemove', function(e) {
-    if (!dessine) return;
-    var rect = canvas.getBoundingClientRect();
-    ctx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
-    ctx.stroke();
-  });
-
-  canvas.addEventListener('mouseup', function() { dessine = false; });
-  canvas.addEventListener('mouseleave', function() { dessine = false; });
-
-  // Événements tactiles (tablettes/mobiles)
-  canvas.addEventListener('touchstart', function(e) {
-    e.preventDefault();
-    dessine = true;
-    ctx.beginPath();
-    var rect = canvas.getBoundingClientRect();
-    var touch = e.touches[0];
-    ctx.moveTo(touch.clientX - rect.left, touch.clientY - rect.top);
-  }, { passive: false });
-
-  canvas.addEventListener('touchmove', function(e) {
-    e.preventDefault();
-    if (!dessine) return;
-    var rect = canvas.getBoundingClientRect();
-    var touch = e.touches[0];
-    ctx.lineTo(touch.clientX - rect.left, touch.clientY - rect.top);
-    ctx.stroke();
-  }, { passive: false });
-
-  canvas.addEventListener('touchend', function() { dessine = false; });
-
-  // Choix de la forme
-  function choisirForme(forme, bouton) {
-    formeAttendue = forme;
-    document.querySelectorAll('.btn-forme').forEach(function(b) { b.classList.remove('actif'); });
-    bouton.classList.add('actif');
-    effacer();
+  function choisirFruit(type, element) {
+    document.querySelectorAll('.fruit').forEach(function(f) { f.classList.remove('selectionne'); });
+    element.classList.add('selectionne');
+    fruitSelectionne = type;
+    document.getElementById('zone-boutons').style.display = 'block';
   }
 
-  // Effacer le canvas
-  function effacer() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    document.getElementById('resultat').classList.remove('visible');
-  }
+  function apprendre(type) {
+    if (!fruitSelectionne) return;
+    memoireIA[type]++;
+    exemplesDonnes++;
 
-  // Vérification de l'IA (simulation par analyse de pixels)
-  function verifier() {
-    var imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-    var pixels = imageData.data;
-    var points = [];
-
-    // On récupère tous les points noirs (le dessin de l'enfant)
-    for (var y = 0; y < canvas.height; y += 4) { // On saute des lignes pour aller plus vite
-      for (var x = 0; x < canvas.width; x += 4) {
-        var i = (y * canvas.width + x) * 4;
-        if (pixels[i] < 100 && pixels[i+1] < 100 && pixels[i+2] < 100) {
-          points.push({x: x, y: y});
-        }
-      }
-    }
-
-    if (points.length < 20) {
-      afficherResultat("Dessine d'abord quelque chose dans le cadre ! ✏️", false);
-      return;
-    }
-
-    // --- L'IA calcule la "forme" ---
-    // 1. On trouve le centre du dessin
-    var sumX = 0, sumY = 0;
-    points.forEach(function(p) { sumX += p.x; sumY += p.y; });
-    var centreX = sumX / points.length;
-    var centreY = sumY / points.length;
-
-    // 2. On analyse comment les points sont répartis
-    var minX = 9999, maxX = 0, minY = 9999, maxY = 0;
-    var distances = [];
+    var elementSelectionne = document.querySelector('.fruit.selectionne');
+    if (elementSelectionne) elementSelectionne.style.visibility = 'hidden';
     
-    points.forEach(function(p) {
-      if (p.x < minX) minX = p.x;
-      if (p.x > maxX) maxX = p.x;
-      if (p.y < minY) minY = p.y;
-      if (p.y > maxY) maxY = p.y;
+    document.getElementById('zone-boutons').style.display = 'none';
+    fruitSelectionne = "";
+
+    if (exemplesDonnes >= 4) setTimeout(passerEtape2, 500);
+  }
+
+  function passerEtape2() {
+    document.getElementById('etape1').classList.remove('active');
+    document.getElementById('etape2').classList.add('active');
+
+    setTimeout(function() {
+      var reponse = "";
+      var texteLecon = "";
       
-      var dx = p.x - centreX;
-      var dy = p.y - centreY;
-      distances.push(Math.sqrt(dx*dx + dy*dy));
-    });
-
-    // Écart-type des distances (si c'est très régulier = cercle, sinon = carré/triangle)
-    var moyenneDistance = distances.reduce(function(a,b){return a+b;},0) / distances.length;
-    var variance = distances.reduce(function(a,b){return a + Math.pow(b - moyenneDistance, 2);},0) / distances.length;
-    var ecartType = Math.sqrt(variance);
-
-    // 3. Ratio largeur/hauteur
-    var largeur = maxX - minX;
-    var hauteur = maxY - minY;
-    var ratio = largeur / hauteur;
-
-    // 4. Décision de l'IA (simplifiée)
-    var formeDevinee = "";
-    
-    if (ecartType < moyenneDistance * 0.2 && ratio > 0.6 && ratio < 1.6) {
-      // Les points sont à peu près à la même distance du centre -> Cercle
-      formeDevinee = "cercle";
-    } else if (ratio > 1.5 || ratio < 0.66) {
-      // Très large ou très haut -> pas un carré
-      formeDevinee = "triangle"; // approximation
-    } else {
-      // Sinon, si les coins sont marqués, c'est un carré
-      formeDevinee = "carre";
-    }
-
-    // Résultat final
-    if (formeDevinee === formeAttendue) {
-      afficherResultat("🎉 Bravo ! L'IA a reconnu ton " + formeAttendue + " ! C'est magique !", true);
-    } else {
-      var noms = { cercle: 'cercle', carre: 'carré', triangle: 'triangle' };
-      afficherResultat("🤔 L'IA pensait que c'était un " + noms[formeDevinee] + ". Essaie de dessiner un plus beau " + noms[formeAttendue] + " !", false);
-    }
+      // NOUVELLE LOGIQUE : On gère l'égalité
+      if (memoireIA.pomme > memoireIA.banane) {
+        reponse = "C'est une POMME ! 🍎";
+        texteLecon = "L'IA a deviné que la pomme verte était une pomme !<br><br>Pourquoi ? Parce que tu lui as montré <strong>plus de pommes</strong> que de bananes. Elle a compris la forme ronde.<br><br>Mais si tu lui avais montré plus de bananes, elle se serait trompée !";
+      } else if (memoireIA.banane > memoireIA.pomme) {
+        reponse = "C'est une BANANE ! 🍌";
+        texteLecon = "L'IA s'est trompée ! Elle a dit que la pomme verte était une banane.<br><br>Pourquoi ? Parce que tu lui as montré <strong>plus de bananes</strong> que de pommes. Elle n'a pas assez vu de pommes pour comprendre.<br><br><strong>La leçon :</strong> Si on donne de mauvais exemples à l'IA, elle fait de mauvaises prédictions !";
+      } else {
+        // ÉGALITÉ
+        reponse = "Je ne sais pas ! 🤷‍♂️";
+        texteLecon = "L'IA a avoué qu'elle ne savait pas !<br><br>Pourquoi ? Parce que tu lui as montré <strong>autant de pommes que de bananes</strong>. Elle n'a pas pu décider laquelle choisir.<br><br><strong>La leçon :</strong> Une IA a besoin de données claires et variées pour apprendre. Si on lui donne des exemples contradictoires, elle est perdue !";
+      }
+      
+      document.getElementById('reponse-ia').textContent = reponse;
+      document.getElementById('btn-etape3').style.display = 'inline-block';
+      
+      // On stocke la leçon pour l'étape 3
+      window.leconActuelle = texteLecon;
+    }, 1500);
   }
 
-  function afficherResultat(message, succes) {
-    var r = document.getElementById('resultat');
-    r.textContent = message;
-    r.className = 'resultat visible ' + (succes ? 'succes' : 'erreur');
+  function passerEtape3() {
+    document.getElementById('etape2').classList.remove('active');
+    document.getElementById('etape3').classList.add('active');
+    document.getElementById('texte-lecon').innerHTML = window.leconActuelle;
   }
 </script>
 
