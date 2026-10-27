@@ -12,231 +12,149 @@
   header { background: linear-gradient(135deg, #f59e0b, #f97316); color: white;
            padding: 20px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
   header h1 { font-size: 1.8em; }
-  header p { font-size: 1em; opacity: 0.95; }
   .btn-retour { display: inline-block; margin-top: 12px; padding: 8px 16px; background: rgba(255,255,255,0.2); 
                 color: white; text-decoration: none; border-radius: 8px; font-weight: bold;
-                border: 1px solid rgba(255,255,255,0.4); transition: all 0.2s; }
-  .btn-retour:hover { background: rgba(255,255,255,0.35); }
+                border: 1px solid rgba(255,255,255,0.4); }
   
-  .conteneur { max-width: 900px; margin: 0 auto; padding: 24px 20px; }
+  .conteneur { max-width: 800px; margin: 0 auto; padding: 24px 20px; }
   
-  .consigne { background: #fef3c7; border-left: 4px solid #f59e0b; padding: 16px 20px;
-              border-radius: 8px; margin-bottom: 20px; font-size: 1.05em; color: #92400e; }
+  .etape { background: white; border-radius: 16px; padding: 30px; box-shadow: 0 4px 12px rgba(0,0,0,0.06); text-align: center; display: none; }
+  .etape.active { display: block; animation: fadeIn 0.3s; }
   
-  .zone-jeu { background: white; border-radius: 16px; padding: 24px; box-shadow: 0 4px 12px rgba(0,0,0,0.06); text-align: center; }
+  .etape h2 { color: #0ea5e9; margin-bottom: 16px; font-size: 1.4em; }
+  .etape p { font-size: 1.1em; color: #475569; margin-bottom: 24px; }
   
-  .etape-titre { font-size: 1.3em; font-weight: bold; color: #0ea5e9; margin-bottom: 16px; }
+  .grille-fruits { display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; margin-bottom: 24px; }
+  .fruit { font-size: 5em; cursor: pointer; padding: 10px; border: 3px solid transparent; border-radius: 16px; transition: all 0.2s; }
+  .fruit:hover { transform: scale(1.1); background: #f8fafc; }
+  .fruit.selectionne { border-color: #f59e0b; background: #fef3c7; }
 
-  .grille-images { display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; margin: 20px 0; }
-  
-  .carte-image { background: #f8fafc; border: 3px solid #e2e8f0; border-radius: 12px; padding: 20px;
-                 cursor: pointer; transition: all 0.2s; width: 140px; }
-  .carte-image:hover { transform: scale(1.05); border-color: #cbd5e1; }
-  .carte-image .emoji { font-size: 4em; display: block; margin-bottom: 8px; }
-  .carte-image .nom { font-weight: bold; color: #475569; }
-  
-  /* Boutons de choix */
-  .btn-choix { padding: 10px 20px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;
-               font-size: 1em; margin: 0 5px; transition: all 0.2s; font-family: inherit; }
+  .btn-choix { padding: 16px 32px; border: none; border-radius: 12px; font-size: 1.2em; font-weight: bold; cursor: pointer; margin: 10px; transition: all 0.2s; }
   .btn-pomme { background: #fee2e2; color: #991b1b; border: 2px solid #f87171; }
-  .btn-pomme:hover { background: #fecaca; }
   .btn-banane { background: #fef9c3; color: #854d0e; border: 2px solid #fde047; }
-  .btn-banane:hover { background: #fef08a; }
-
-  /* Barre de progression */
-  .barre-progression { width: 100%; height: 20px; background: #e2e8f0; border-radius: 10px; margin: 20px 0; overflow: hidden; }
-  .barre-remplissage { height: 100%; background: #22c55e; width: 0%; transition: width 0.3s; }
   
-  /* Messages de l'IA */
-  .message-ia { background: #0f172a; color: #0ea5e9; padding: 16px; border-radius: 8px; font-family: 'Courier New', monospace; margin: 16px 0; text-align: left; }
+  .btn-suivant { background: #0ea5e9; color: white; border: none; padding: 16px 40px; border-radius: 12px; font-size: 1.2em; font-weight: bold; cursor: pointer; margin-top: 20px; box-shadow: 0 4px 12px rgba(14,165,233,0.3); }
+  .btn-suivant:hover { background: #0284c7; }
   
-  .resultat { margin-top: 20px; padding: 20px; border-radius: 12px; font-size: 1.1em; font-weight: bold;
-              display: none; animation: fadeIn 0.3s; text-align: left; }
-  .resultat.visible { display: block; }
-  .resultat.succes { background: #dcfce7; color: #166534; border: 2px solid #22c55e; }
-  .resultat.erreur { background: #fee2e2; color: #991b1b; border: 2px solid #ef4444; }
-  
-  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-  .cache { display: none !important; }
+  .boite-ia { background: #0f172a; color: #0ea5e9; padding: 20px; border-radius: 12px; font-family: 'Courier New', monospace; font-size: 1.1em; text-align: left; margin: 20px 0; }
+  .resultat-ia { font-size: 1.5em; font-weight: bold; color: #22c55e; margin-top: 10px; }
 </style>
 </head>
 <body>
 
 <header>
   <h1>🧒 L'Apprenti Dresseur d'IA</h1>
-  <p>Apprends à l'ordinateur à reconnaître les fruits !</p>
   <a href="index.html" class="btn-retour">← Retour à EspaceIA</a>
 </header>
 
 <div class="conteneur">
   
-  <div class="consigne">
-    🤖 <strong>Mission :</strong> Au début, l'IA ne sait pas ce qu'est une pomme ou une banane. C'est toi qui vas lui apprendre en lui montrant des exemples. Ensuite, on la testera !
-  </div>
-
-  <div class="zone-jeu">
+  <!-- ETAPE 1 : APPRENTISSAGE -->
+  <div class="etape active" id="etape1">
+    <h2>Étape 1 : Apprends à l'IA</h2>
+    <p>Clique sur un fruit, puis dis à l'IA ce que c'est.</p>
     
-    <!-- ETAPE 1 : APPRENTISSAGE -->
-    <div id="etape-apprentissage">
-      <div class="etape-titre">Étape 1 : Montre des exemples à l'IA</div>
-      <p>Clique sur le fruit, puis dis à l'IA ce que c'est.</p>
-      
-      <div class="grille-images" id="grille-apprentissage">
-        <!-- Les images seront générées par le script -->
-      </div>
-
-      <div style="margin-top: 20px;" id="boutons-apprentissage">
-        <button class="btn-choix btn-pomme" onclick="apprendre('pomme')">🍎 C'est une Pomme</button>
-        <button class="btn-choix btn-banane" onclick="apprendre('banane')">🍌 C'est une Banane</button>
-      </div>
-
-      <div class="barre-progression">
-        <div class="barre-remplissage" id="progression"></div>
-      </div>
-      <p id="texte-progression" style="font-weight:bold; color:#475569;">0 / 6 exemples donnés</p>
+    <div class="grille-fruits" id="grille-fruits">
+      <div class="fruit" onclick="choisirFruit('🍎', 'pomme', this)">🍎</div>
+      <div class="fruit" onclick="choisirFruit('🍌', 'banane', this)">🍌</div>
+      <div class="fruit" onclick="choisirFruit('🍎', 'pomme', this)">🍎</div>
+      <div class="fruit" onclick="choisirFruit('🍌', 'banane', this)">🍌</div>
     </div>
 
-    <!-- ETAPE 2 : TEST -->
-    <div id="etape-test" class="cache">
-      <div class="etape-titre">Étape 2 : Teste l'IA !</div>
-      <p>L'IA a fini d'apprendre. Voyons si elle est intelligente !</p>
-      
-      <div class="grille-images" id="grille-test">
-        <!-- L'image de test -->
-      </div>
-
-      <div class="message-ia" id="message-ia-test">En attente de l'analyse...</div>
-      
-      <div id="boutons-test">
-        <!-- Boutons de réponse -->
-      </div>
+    <div id="zone-boutons" style="display:none;">
+      <button class="btn-choix btn-pomme" onclick="apprendre('pomme')">C'est une Pomme</button>
+      <button class="btn-choix btn-banane" onclick="apprendre('banane')">C'est une Banane</button>
     </div>
-
-    <!-- ETAPE 3 : EXPLICATION -->
-    <div id="etape-explication" class="cache">
-      <div class="resultat visible succes" style="background:#f0f9ff; border-color:#0ea5e9; color:#0c4a6e;">
-        <h3>💡 La leçon de l'IA</h3>
-        <p id="texte-explication"></p>
-        <button onclick="location.reload()" style="margin-top:15px; padding:10px 20px; background:#0ea5e9; color:white; border:none; border-radius:8px; font-weight:bold; cursor:pointer;">🔄 Recommencer</button>
-      </div>
-    </div>
-
   </div>
+
+  <!-- ETAPE 2 : TEST -->
+  <div class="etape" id="etape2">
+    <h2>Étape 2 : Voyons ce que l'IA a appris !</h2>
+    <p>L'IA regarde une nouvelle image. Que va-t-elle dire ?</p>
+    
+    <div class="grille-fruits">
+      <div class="fruit" style="cursor:default; font-size: 7em;">🍏</div>
+    </div>
+
+    <div class="boite-ia">
+      <div>🤖 <strong>Analyse de l'image en cours...</strong></div>
+      <div class="resultat-ia" id="reponse-ia"></div>
+    </div>
+
+    <button class="btn-suivant" id="btn-etape3" style="display:none;" onclick="passerEtape3()">Continuer</button>
+  </div>
+
+  <!-- ETAPE 3 : EXPLICATION -->
+  <div class="etape" id="etape3">
+    <h2>💡 La leçon de l'IA</h2>
+    <p id="texte-lecon"></p>
+    <button class="btn-suivant" onclick="location.reload()">🔄 Rejouer</button>
+  </div>
+
 </div>
 
 <script>
-  // --- ÉTAT DE L'IA ---
+  var fruitSelectionne = "";
+  var memoireIA = { pomme: 0, banane: 0 };
   var exemplesDonnes = 0;
-  var memoireIA = { pomme: 0, banane: 0 }; // Ce que l'IA a retenu
-  var imageCourante = "";
-  var fruitCourant = "";
-  
-  // Base de données d'images (emojis)
-  var images = [
-    { emoji: '🍎', type: 'pomme' }, { emoji: '🍌', type: 'banane' },
-    { emoji: '🍏', type: 'pomme' }, { emoji: '🍌', type: 'banane' },
-    { emoji: '🍎', type: 'pomme' }, { emoji: '🍌', type: 'banane' }
-  ];
 
-  // Mélange le tableau
-  images.sort(function() { return 0.5 - Math.random(); });
-
-  window.onload = function() {
-    var grille = document.getElementById('grille-apprentissage');
-    for (var i = 0; i < 6; i++) {
-      var img = images[i];
-      var div = document.createElement('div');
-      div.className = 'carte-image';
-      div.innerHTML = '<span class="emoji">' + img.emoji + '</span>';
-      div.onclick = (function(image) {
-        return function() { selectionnerImage(image, div); };
-      })(img);
-      grille.appendChild(div);
-    }
-  };
-
-  function selectionnerImage(img, element) {
-    // Désélectionner les autres
-    document.querySelectorAll('.carte-image').forEach(function(c) { c.style.borderColor = '#e2e8f0'; c.style.background = '#f8fafc'; });
-    // Sélectionner celle-ci
-    element.style.borderColor = '#f59e0b';
-    element.style.background = '#fef3c7';
-    imageCourante = img.emoji;
-    fruitCourant = img.type;
-    document.getElementById('boutons-apprentissage').style.display = 'block';
+  function choisirFruit(emoji, type, element) {
+    // Enlever la sélection des autres
+    document.querySelectorAll('.fruit').forEach(function(f) { f.classList.remove('selectionne'); });
+    // Sélectionner celui-ci
+    element.classList.add('selectionne');
+    fruitSelectionne = type;
+    // Afficher les boutons
+    document.getElementById('zone-boutons').style.display = 'block';
   }
 
-  function apprendre(reponseEnfant) {
-    if (!imageCourante) {
-      alert("Clique d'abord sur une image !");
-      return;
-    }
+  function apprendre(type) {
+    if (!fruitSelectionne) return;
 
-    // L'IA enregistre la réponse
-    memoireIA[reponseEnfant]++;
+    // L'IA enregistre
+    memoireIA[type]++;
     exemplesDonnes++;
 
-    // Mise à jour de la barre
-    var pourcentage = (exemplesDonnes / 6) * 100;
-    document.getElementById('progression').style.width = pourcentage + '%';
-    document.getElementById('texte-progression').textContent = exemplesDonnes + ' / 6 exemples donnés';
+    // Cacher l'image qui vient d'être apprise
+    var elementSelectionne = document.querySelector('.fruit.selectionne');
+    if (elementSelectionne) {
+      elementSelectionne.style.visibility = 'hidden';
+    }
+    document.getElementById('zone-boutons').style.display = 'none';
+    fruitSelectionne = "";
 
-    // Retirer l'image de la grille
-    document.querySelector('.carte-image[style*="f59e0b"]').remove();
-    document.getElementById('boutons-apprentissage').style.display = 'none';
-    imageCourante = "";
-
-    if (exemplesDonnes >= 6) {
-      setTimeout(passerAuTest, 500);
+    // Si on a fait les 4 fruits, on passe à l'étape 2
+    if (exemplesDonnes >= 4) {
+      setTimeout(passerEtape2, 500);
     }
   }
 
-  function passerAuTest() {
-    document.getElementById('etape-apprentissage').classList.add('cache');
-    document.getElementById('etape-test').classList.remove('cache');
+  function passerEtape2() {
+    document.getElementById('etape1').classList.remove('active');
+    document.getElementById('etape2').classList.add('active');
 
-    // L'IA choisit une image pour le test (différente de celles montrées)
-    // Ici, on lui montre une pomme verte (qu'elle n'a jamais vue)
-    var grille = document.getElementById('grille-test');
-    grille.innerHTML = '<div class="carte-image" style="border-color:#0ea5e9; width:180px;"><span class="emoji" style="font-size:6em;">🍏</span></div>';
-    
-    // L'IA réfléchit
-    var message = document.getElementById('message-ia-test');
-    message.innerHTML = "🤖 <strong>Analyse en cours...</strong><br><br>Je regarde l'image...";
-
+    // L'IA réfléchit (simulation)
     setTimeout(function() {
-      var decision = "";
-      // L'IA est "bête" : elle se base uniquement sur ce qu'elle a appris
+      var reponse = "";
       if (memoireIA.pomme >= memoireIA.banane) {
-        decision = "pomme";
-        message.innerHTML = "🤖 <strong>Résultat de l'IA :</strong><br><br>D'après mon apprentissage, c'est une <strong>🍎 Pomme</strong> !";
+        reponse = "C'est une POMME ! 🍎";
       } else {
-        decision = "banane";
-        message.innerHTML = "🤖 <strong>Résultat de l'IA :</strong><br><br>D'après mon apprentissage, c'est une <strong>🍌 Banane</strong> !";
+        reponse = "C'est une BANANE ! 🍌";
       }
-
-      // Boutons pour valider ou non
-      var boutons = document.getElementById('boutons-test');
-      boutons.innerHTML = '<button class="btn-choix btn-pomme" onclick="verifierTest(\'pomme\')">Oui, c\'est une pomme</button>' +
-                          '<button class="btn-choix btn-banane" onclick="verifierTest(\'banane\')">Non, c\'est une banane</button>';
-    }, 2000);
+      document.getElementById('reponse-ia').textContent = reponse;
+      document.getElementById('btn-etape3').style.display = 'inline-block';
+    }, 1500);
   }
 
-  function verifierTest(reponseEnfant) {
-    document.getElementById('etape-test').classList.add('cache');
-    document.getElementById('etape-explication').classList.remove('cache');
-    
-    var texte = document.getElementById('texte-explication');
-    
-    if (reponseEnfant === 'pomme') {
-      texte.innerHTML = "✅ <strong>Bien joué !</strong> L'IA a reconnu que c'était une pomme (même si elle est verte).<br><br>" +
-                        "🧠 <strong>Pourquoi ?</strong> Parce que tu lui as montré beaucoup d'exemples de pommes rouges. Elle a compris que 'rouge + rond = pomme'. Elle a deviné pour la verte.<br><br>" +
-                        "L'IA apprend avec les exemples que TU lui donnes !";
+  function passerEtape3() {
+    document.getElementById('etape2').classList.remove('active');
+    document.getElementById('etape3').classList.add('active');
+
+    var texte = document.getElementById('texte-lecon');
+    if (memoireIA.pomme >= memoireIA.banane) {
+      texte.innerHTML = "L'IA a deviné que la pomme verte était une pomme !<br><br>Pourquoi ? Parce que tu lui as montré plus de pommes que de bananes. Elle a compris la forme ronde.<br><br><strong>Mais attention :</strong> si tu lui avais montré plus de bananes, elle se serait trompée ! L'IA apprend uniquement avec ce que TU lui donnes.";
     } else {
-      texte.innerHTML = "❌ <strong>L'IA s'est trompée !</strong> Elle a dit que c'était une pomme, mais c'est une banane ? Attends... non, c'est bien une pomme verte !<br><br>" +
-                        "🧠 <strong>Pourquoi ?</strong> Tu lui as peut-être montré plus de bananes que de pommes. Du coup, elle penche pour la banane par défaut.<br><br>" +
-                        "L'IA n'est pas magique : elle dépend des données qu'on lui donne. Si on lui donne de mauvais exemples, elle fait de mauvaises prédictions !";
+      texte.innerHTML = "L'IA s'est trompée ! Elle a dit que la pomme verte était une banane.<br><br>Pourquoi ? Parce que tu lui as montré plus de bananes que de pommes. Elle n'a pas assez vu de pommes pour comprendre.<br><br><strong>La leçon :</strong> L'IA n'est pas magique. Si on lui donne de mauvais exemples, elle fait de mauvaises prédictions. C'est à toi de bien l'entraîner !";
     }
   }
 </script>
