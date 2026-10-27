@@ -3,56 +3,314 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>EspaceIA - Niveau 1</title>
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='112' fill='%23f59e0b'/></svg>">
+<title>EspaceIA - Le Monde Magique</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: 'Segoe UI', Arial, sans-serif; background: #f4f7fb; color: #1a1f2e; line-height: 1.6; }
   header { background: linear-gradient(135deg, #f59e0b, #f97316); color: white; padding: 20px; text-align: center; }
   header h1 { font-size: 1.8em; }
-  .btn-retour { display: inline-block; margin-top: 12px; padding: 8px 16px; background: rgba(255,255,255,0.2); color: white; text-decoration: none; border-radius: 8px; font-weight: bold; border: 1px solid rgba(255,255,255,0.4); }
+  .btn-retour { display: inline-block; margin-top: 12px; padding: 8px 16px; background: rgba(255,255,255,0.2); color: white; text-decoration: none; border-radius: 8px; font-weight: bold; border: 1px solid rgba(255,255,255,0.4); cursor: pointer; }
+  
   .conteneur { max-width: 800px; margin: 0 auto; padding: 24px 20px; }
-  .carte-jeu { background: white; border-radius: 16px; padding: 24px; box-shadow: 0 4px 12px rgba(0,0,0,0.06); margin-bottom: 20px; display: flex; align-items: center; gap: 20px; text-decoration: none; color: inherit; transition: transform 0.2s; border-left: 6px solid #f59e0b; }
+  
+  /* Le menu */
+  .carte-jeu { background: white; border-radius: 16px; padding: 24px; box-shadow: 0 4px 12px rgba(0,0,0,0.06); margin-bottom: 20px; display: flex; align-items: center; gap: 20px; cursor: pointer; transition: transform 0.2s; border-left: 6px solid #f59e0b; }
   .carte-jeu:hover { transform: translateY(-4px); box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
   .carte-jeu .emoji { font-size: 3.5em; }
   .carte-jeu h3 { color: #1a1f2e; margin-bottom: 4px; font-size: 1.2em; }
   .carte-jeu p { color: #64748b; font-size: 0.95em; }
+  
+  /* Les jeux (cachés par défaut) */
+  .zone-jeu { display: none; background: white; border-radius: 16px; padding: 30px; box-shadow: 0 4px 12px rgba(0,0,0,0.06); text-align: center; }
+  .zone-jeu.active { display: block; animation: fadeIn 0.3s; }
+  .menu.active { display: block; }
+  .menu.cache { display: none; }
+  
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+  /* Boutons des jeux */
+  .btn-action { background: #0ea5e9; color: white; border: none; padding: 12px 24px; border-radius: 8px; font-size: 1.1em; font-weight: bold; cursor: pointer; margin: 10px; transition: 0.2s; }
+  .btn-action:hover { background: #0284c7; }
+  .btn-choix { padding: 16px 32px; border: none; border-radius: 12px; font-size: 1.2em; font-weight: bold; cursor: pointer; margin: 10px; }
+  .btn-pomme { background: #fee2e2; color: #991b1b; border: 2px solid #f87171; }
+  .btn-banane { background: #fef9c3; color: #854d0e; border: 2px solid #fde047; }
+  
+  .grille-fruits { display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; margin-bottom: 24px; }
+  .fruit { font-size: 5em; cursor: pointer; padding: 10px; border: 3px solid transparent; border-radius: 16px; transition: all 0.2s; }
+  .fruit:hover { transform: scale(1.1); background: #f8fafc; }
+  .fruit.selectionne { border-color: #f59e0b; background: #fef3c7; }
+  .fruit.cache { visibility: hidden; }
+  
+  .boite-ia { background: #0f172a; color: #0ea5e9; padding: 20px; border-radius: 12px; font-family: 'Courier New', monospace; font-size: 1.1em; text-align: left; margin: 20px 0; }
+  
+  /* Styles pour le Robot */
+  .grille-robot { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; max-width: 300px; margin: 0 auto; background: #e2e8f0; padding: 4px; border-radius: 8px; }
+  .case-robot { background: white; aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-size: 2em; border-radius: 4px; }
+  .case-robot.robot { background: #dbeafe; }
+  .case-robot.cible { background: #dcfce7; }
+  
+  /* Styles pour les Visages */
+  .grille-visages { display: flex; justify-content: center; gap: 40px; margin: 20px 0; }
+  .visage { font-size: 6em; cursor: pointer; padding: 10px; border-radius: 16px; border: 3px solid transparent; }
+  .visage.selectionne { border-color: #0ea5e9; background: #e0f2fe; }
+  .reglages { background: #f8fafc; padding: 20px; border-radius: 12px; border: 2px solid #e2e8f0; margin: 20px 0; text-align: left; }
+  .ligne-reglage { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; }
 </style>
 </head>
 <body>
+
 <header>
-  <h1>🧒 Parcours : Le Monde Magique</h1>
-  <a href="index.html" class="btn-retour">← Retour à EspaceIA</a>
+  <h1>🧒 Le Monde Magique</h1>
+  <button class="btn-retour" onclick="retourMenu()">🏠 Menu des jeux</button>
 </header>
+
 <div class="conteneur">
-  <p style="margin-bottom:20px; font-size:1.1em; color:#475569;">Choisis un jeu pour découvrir comment fonctionne l'Intelligence Artificielle !</p>
-  
-  <!-- JEU 1 -->
-  <a href="niveau-1-fruits.html" class="carte-jeu">
-    <div class="emoji">🍎</div>
-    <div>
-      <h3>Jeu 1 : L'Apprenti Dresseur</h3>
-      <p>Apprends à l'IA à reconnaître les fruits. Découvre pourquoi elle fait parfois des erreurs.</p>
-    </div>
-  </a>
 
-  <!-- JEU 2 -->
-  <a href="niveau-1-robot.html" class="carte-jeu">
-    <div class="emoji">🤖</div>
-    <div>
-      <h3>Jeu 2 : Le Chef d'Orchestre</h3>
-      <p>Programme un petit robot avec des blocs pour qu'il atteigne la cible.</p>
+  <!-- ================= MENU ================= -->
+  <div id="menu" class="menu active">
+    <p style="margin-bottom:20px; font-size:1.1em; color:#475569;">Choisis un jeu pour découvrir l'Intelligence Artificielle !</p>
+    
+    <div class="carte-jeu" onclick="lancerJeu('fruits')">
+      <div class="emoji">🍎</div>
+      <div><h3>Jeu 1 : L'Apprenti Dresseur</h3><p>Apprends à l'IA à reconnaître les fruits.</p></div>
     </div>
-  </a>
+    
+    <div class="carte-jeu" onclick="lancerJeu('robot')">
+      <div class="emoji">🤖</div>
+      <div><h3>Jeu 2 : Le Chef d'Orchestre</h3><p>Programme un robot pour atteindre la cible.</p></div>
+    </div>
+    
+    <div class="carte-jeu" onclick="lancerJeu('visages')">
+      <div class="emoji">🕵️‍♂️</div>
+      <div><h3>Jeu 3 : Le Détective des Visages</h3><p>Règle l'IA pour reconnaître les émotions.</p></div>
+    </div>
+  </div>
 
-  <!-- JEU 3 -->
-  <a href="niveau-1-visages.html" class="carte-jeu">
-    <div class="emoji">🕵️‍♂️</div>
-    <div>
-      <h3>Jeu 3 : Le Détective des Visages</h3>
-      <p>Règle les paramètres de l'IA pour qu'elle reconnaisse si un visage sourit ou tire la langue.</p>
+  <!-- ================= JEU 1 : FRUITS ================= -->
+  <div id="jeu-fruits" class="zone-jeu">
+    <h2 style="color:#0ea5e9; margin-bottom:20px;">Étape 1 : Montre des exemples à l'IA</h2>
+    <p>Clique sur un fruit, puis dis ce que c'est.</p>
+    
+    <div class="grille-fruits" id="grille-fruits">
+      <div class="fruit" onclick="choisirFruit('pomme', this)">🍎</div>
+      <div class="fruit" onclick="choisirFruit('banane', this)">🍌</div>
+      <div class="fruit" onclick="choisirFruit('pomme', this)">🍎</div>
+      <div class="fruit" onclick="choisirFruit('banane', this)">🍌</div>
     </div>
-  </a>
+    
+    <div id="zone-boutons" style="display:none;">
+      <button class="btn-choix btn-pomme" onclick="apprendre('pomme')">C'est une Pomme</button>
+      <button class="btn-choix btn-banane" onclick="apprendre('banane')">C'est une Banane</button>
+    </div>
+    
+    <div id="resultat-fruits" style="display:none; margin-top:20px;">
+      <div class="boite-ia" id="texte-fruits"></div>
+      <button class="btn-action" onclick="retourMenu()">Continuer</button>
+    </div>
+  </div>
+
+  <!-- ================= JEU 2 : ROBOT ================= -->
+  <div id="jeu-robot" class="zone-jeu">
+    <h2 style="color:#0ea5e9; margin-bottom:20px;">Programme le robot 🤖</h2>
+    <p>Utilise les flèches pour l'emmener vers la pomme 🍎.</p>
+    
+    <div class="grille-robot" id="grille-robot"></div>
+    
+    <div style="margin:20px 0;">
+      <button class="btn-action" style="background:#cbd5e1; color:#0f172a;" onclick="ajouterInstr('⬆️')">⬆️</button>
+      <button class="btn-action" style="background:#cbd5e1; color:#0f172a;" onclick="ajouterInstr('⬅️')">⬅️</button>
+      <button class="btn-action" style="background:#cbd5e1; color:#0f172a;" onclick="ajouterInstr('⬇️')">⬇️</button>
+      <button class="btn-action" style="background:#cbd5e1; color:#0f172a;" onclick="ajouterInstr('➡️')">➡️</button>
+    </div>
+    
+    <div id="file-robot" style="font-size:1.5em; min-height:40px; margin-bottom:20px;"></div>
+    
+    <button class="btn-action" style="background:#22c55e;" onclick="lancerRobot()" id="btn-lancer-robot" style="display:none;">▶️ Lancer</button>
+    <button class="btn-action" style="background:#ef4444;" onclick="reinitRobot()">🗑️ Effacer</button>
+    
+    <div id="resultat-robot" class="boite-ia" style="display:none; margin-top:20px;"></div>
+  </div>
+
+  <!-- ================= JEU 3 : VISAGES ================= -->
+  <div id="jeu-visages" class="zone-jeu">
+    <h2 style="color:#0ea5e9; margin-bottom:20px;">Règle les paramètres de l'IA</h2>
+    <p>Choisis un visage, puis ajuste les curseurs pour que l'IA le reconnaisse.</p>
+    
+    <div class="grille-visages">
+      <div class="visage" onclick="choisirVisage('heureux', this)">😀</div>
+      <div class="visage" onclick="choisirVisage('tire', this)">😛</div>
+    </div>
+    
+    <div id="reglages-visages" class="reglages" style="display:none;">
+      <div class="ligne-reglage">
+        <label>Sourire</label>
+        <input type="range" id="param-sourire" min="0" max="100" value="50" oninput="majTexteVisages()">
+        <span id="val-sourire">50%</span>
+      </div>
+      <div class="ligne-reglage">
+        <label>Langue</label>
+        <input type="range" id="param-langue" min="0" max="100" value="50" oninput="majTexteVisages()">
+        <span id="val-langue">50%</span>
+      </div>
+      <button class="btn-action" onclick="analyserVisage()">🧠 Analyser</button>
+    </div>
+    
+    <div id="resultat-visages" class="boite-ia" style="display:none; margin-top:20px;"></div>
+  </div>
+
 </div>
+
+<script>
+  // --- GESTION DU MENU ---
+  function lancerJeu(nom) {
+    document.getElementById('menu').classList.add('cache');
+    document.getElementById('menu').classList.remove('active');
+    document.getElementById('jeu-' + nom).classList.add('active');
+  }
+  
+  function retourMenu() {
+    document.querySelectorAll('.zone-jeu').forEach(function(z) { z.classList.remove('active'); });
+    document.getElementById('menu').classList.remove('cache');
+    document.getElementById('menu').classList.add('active');
+    // Réinitialiser les jeux
+    reinitFruits(); reinitRobot(); reinitVisages();
+  }
+
+  // ================= JEU 1 : FRUITS =================
+  var fruitSel = "", memoire = { pomme: 0, banane: 0 }, exemples = 0;
+  
+  function choisirFruit(type, el) {
+    document.querySelectorAll('#grille-fruits .fruit').forEach(function(f) { f.classList.remove('selectionne'); });
+    el.classList.add('selectionne');
+    fruitSel = type;
+    document.getElementById('zone-boutons').style.display = 'block';
+  }
+  
+  function apprendre(type) {
+    if (!fruitSel) return;
+    memoire[type]++; exemples++;
+    document.querySelector('#grille-fruits .fruit.selectionne').classList.add('cache');
+    document.getElementById('zone-boutons').style.display = 'none';
+    fruitSel = "";
+    if (exemples >= 4) {
+      setTimeout(function() {
+        document.getElementById('resultat-fruits').style.display = 'block';
+        var txt = "";
+        if (memoire.pomme > memoire.banane) txt = "🤖 : C'est une POMME ! 🍎 (Tu lui as montré plus de pommes).";
+        else if (memoire.banane > memoire.pomme) txt = "🤖 : C'est une BANANE ! 🍌 (Tu lui as montré plus de bananes).";
+        else txt = "🤖 : Je ne sais pas ! (Autant de pommes que de bananes).";
+        document.getElementById('texte-fruits').innerHTML = txt + "<br><br><em>La leçon : l'IA dépend de tes exemples !</em>";
+      }, 500);
+    }
+  }
+  
+  function reinitFruits() {
+    fruitSel = ""; memoire = { pomme: 0, banane: 0 }; exemples = 0;
+    document.querySelectorAll('#grille-fruits .fruit').forEach(function(f) { f.classList.remove('cache', 'selectionne'); });
+    document.getElementById('zone-boutons').style.display = 'none';
+    document.getElementById('resultat-fruits').style.display = 'none';
+  }
+
+  // ================= JEU 2 : ROBOT =================
+  var robPos = {x:0, y:0}, ciblePos = {x:4, y:4}, progRobot = [], animRobot = false;
+  
+  function initRobot() {
+    var g = document.getElementById('grille-robot');
+    g.innerHTML = '';
+    for(var y=0; y<5; y++) {
+      for(var x=0; x<5; x++) {
+        var d = document.createElement('div');
+        d.className = 'case-robot';
+        if (x===robPos.x && y===robPos.y) { d.classList.add('robot'); d.textContent='🤖'; }
+        else if (x===ciblePos.x && y===ciblePos.y) { d.classList.add('cible'); d.textContent='🍎'; }
+        g.appendChild(d);
+      }
+    }
+  }
+  
+  function ajouterInstr(dir) {
+    if(animRobot) return;
+    progRobot.push(dir);
+    document.getElementById('file-robot').textContent = progRobot.join(' ');
+    document.getElementById('btn-lancer-robot').style.display = 'inline-block';
+  }
+  
+  function lancerRobot() {
+    if(animRobot || progRobot.length === 0) return;
+    animRobot = true;
+    document.getElementById('btn-lancer-robot').style.display = 'none';
+    var i = 0;
+    function step() {
+      if(i >= progRobot.length) {
+        animRobot = false;
+        if(robPos.x === ciblePos.x && robPos.y === ciblePos.y) {
+          document.getElementById('resultat-robot').style.display = 'block';
+          document.getElementById('resultat-robot').innerHTML = "🎉 Gagné ! C'est ça un algorithme.";
+        } else {
+          document.getElementById('resultat-robot').style.display = 'block';
+          document.getElementById('resultat-robot').innerHTML = "😅 Raté ! Efface et réessaie.";
+        }
+        return;
+      }
+      var d = progRobot[i];
+      if(d==='⬆️' && robPos.y>0) robPos.y--;
+      if(d==='⬇️' && robPos.y<4) robPos.y++;
+      if(d==='⬅️' && robPos.x>0) robPos.x--;
+      if(d==='➡️' && robPos.x<4) robPos.x++;
+      initRobot(); i++; setTimeout(step, 400);
+    }
+    step();
+  }
+  
+  function reinitRobot() {
+    robPos = {x:0,y:0}; progRobot = []; animRobot = false;
+    document.getElementById('file-robot').textContent = '';
+    document.getElementById('btn-lancer-robot').style.display = 'none';
+    document.getElementById('resultat-robot').style.display = 'none';
+    initRobot();
+  }
+
+  // ================= JEU 3 : VISAGES =================
+  var visageSel = "";
+  
+  function choisirVisage(type, el) {
+    document.querySelectorAll('.visage').forEach(function(v) { v.classList.remove('selectionne'); });
+    el.classList.add('selectionne');
+    visageSel = type;
+    document.getElementById('reglages-visages').style.display = 'block';
+    document.getElementById('resultat-visages').style.display = 'none';
+  }
+  
+  function majTexteVisages() {
+    document.getElementById('val-sourire').textContent = document.getElementById('param-sourire').value + '%';
+    document.getElementById('val-langue').textContent = document.getElementById('param-langue').value + '%';
+  }
+  
+  function analyserVisage() {
+    var s = parseInt(document.getElementById('param-sourire').value);
+    var l = parseInt(document.getElementById('param-langue').value);
+    var res = document.getElementById('resultat-visages');
+    res.style.display = 'block';
+    res.innerHTML = "🤖 Analyse...";
+    setTimeout(function() {
+      if(l > 70) res.innerHTML = "🤖 : C'est un visage qui TIRE LA LANGUE 😛 !";
+      else if(s > 70) res.innerHTML = "🤖 : C'est un visage CONTENT 😀 !";
+      else res.innerHTML = "🤖 : Je ne sais pas, les paramètres sont flous...";
+    }, 800);
+  }
+  
+  function reinitVisages() {
+    visageSel = "";
+    document.querySelectorAll('.visage').forEach(function(v) { v.classList.remove('selectionne'); });
+    document.getElementById('reglages-visages').style.display = 'none';
+    document.getElementById('resultat-visages').style.display = 'none';
+  }
+
+  // Initialisation au chargement
+  window.onload = function() {
+    initRobot();
+  };
+</script>
+
 </body>
 </html>
