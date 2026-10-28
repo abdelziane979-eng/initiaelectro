@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EspaceIA - Niveau 2 : L'Apprenti Détective</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: #f4f7fb; color: #1a1f2e; line-height: 1.6; }
+  header { background: linear-gradient(135deg, #22c55e, #16a34a); color: white; padding: 20px; text-align: center; }
+  header h1 { font-size: 1.8em; }
+  .btn-retour { display: inline-block; margin-top: 12px; padding: 8px 16px; background: rgba(255,255,255,0.2); color: white; text-decoration: none; border-radius: 8px; font-weight: bold; border: 1px solid rgba(255,255,255,0.4); }
+  
+  .conteneur { max-width: 900px; margin: 0 auto; padding: 24px 20px; }
+  
+  /* Tableau de bord */
+  .tableau-bord { display: flex; justify-content: space-between; gap: 20px; margin-bottom: 24px; }
+  .panneau { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.06); flex: 1; }
+  .panneau h3 { color: #1a1f2e; margin-bottom: 12px; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; }
+  
+  /* Bac de tri */
+  .bacs { display: flex; gap: 15px; margin-top: 15px; }
+  .bac { flex: 1; text-align: center; padding: 15px; border-radius: 10px; border: 3px dashed #cbd5e1; cursor: pointer; transition: 0.2s; }
+  .bac:hover { background: #f8fafc; }
+  .bac.actif { border-style: solid; border-color: #22c55e; background: #f0fdf4; }
+  .bac .emoji { font-size: 2.5em; display: block; }
+  .bac .nom { font-weight: bold; color: #475569; }
+  
+  /* Zone de jeu */
+  .zone-jeu { background: white; border-radius: 16px; padding: 30px; box-shadow: 0 4px 12px rgba(0,0,0,0.06); text-align: center; }
+  .objet-courant { font-size: 8em; margin: 20px 0; transition: transform 0.3s; }
+  .objet-courant.secoue { animation: secousse 0.4s; }
+  @keyframes secousse { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-10px); } 75% { transform: translateX(10px); } }
+  
+  /* IA */
+  .bulle-ia { background: #0f172a; color: #0ea5e9; padding: 20px; border-radius: 12px; font-family: 'Courier New', monospace; font-size: 1.1em; text-align: left; margin: 20px 0; position: relative; }
+  .bulle-ia::before { content: '🤖'; position: absolute; top: -15px; left: 20px; font-size: 2em; }
+  
+  /* Boutons */
+  .btn { padding: 15px 30px; border: none; border-radius: 12px; font-size: 1.1em; font-weight: bold; cursor: pointer; transition: 0.2s; margin: 5px; }
+  .btn-primaire { background: #22c55e; color: white; box-shadow: 0 4px 10px rgba(34,197,94,0.3); }
+  .btn-primaire:hover { background: #16a34a; transform: translateY(-2px); }
+  .btn-danger { background: #ef4444; color: white; }
+  
+  /* Mode correction */
+  .mode-correction { background: #fef3c7; border-left: 4px solid #f59e0b; padding: 20px; border-radius: 8px; margin-top: 20px; text-align: left; display: none; }
+  .mode-correction.visible { display: block; animation: fadeIn 0.3s; }
+  .regle-item { background: white; padding: 10px 15px; border-radius: 6px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
+  .regle-item.bonne { border-left: 4px solid #22c55e; }
+  .regle-item.mauvaise { border-left: 4px solid #ef4444; }
+  
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🕵️‍♂️ L'Apprenti Détective</h1>
+  <p>Apprends à l'IA à trier les déchets correctement !</p>
+  <a href="https://abdelziane979-eng.github.io/initiaelectro/espace-ia/index.html" class="btn-retour">← Retour à EspaceIA</a>
+</header>
+
+<div class="conteneur">
+  
+  <div class="tableau-bord">
+    <div class="panneau">
+      <h3>📊 Score de l'IA</h3>
+      <div style="font-size: 2.5em; font-weight: bold; color: #0ea5e9; text-align: center;" id="score-ia">0 / 0</div>
+      <p style="text-align: center; color: #64748b; font-size: 0.9em; margin-top: 5px;">Réponses correctes</p>
+    </div>
+    <div class="panneau">
+      <h3>🧠 Règles actuelles de l'IA</h3>
+      <ul id="liste-regles" style="list-style: none; font-size: 0.95em; color: #475569;">
+        <!-- Les règles seront affichées ici -->
+      </ul>
+    </div>
+  </div>
+
+  <div class="zone-jeu">
+    <div id="etape-jeu">
+      <h2 style="color: #1a1f2e; margin-bottom: 20px;">Trie cet objet :</h2>
+      <div class="objet-courant" id="emoji-objet">🥤</div>
+      
+      <div class="bulle-ia" id="bulle-ia">
+        <span id="texte-ia">Clique sur "Analyser" pour que je devine où va cet objet.</span>
+      </div>
+
+      <div style="margin-top: 20px;">
+        <button class="btn btn-primaire" id="btn-analyser" onclick="analyserObjet()">🤖 Analyser l'objet</button>
+      </div>
+
+      <div class="bacs" id="zone-bacs" style="display: none; margin-top: 20px;">
+        <div class="bac" onclick="verifierTri('verre', this)">
+          <span class="emoji">🟢</span>
+          <span class="nom">Verre</span>
+        </div>
+        <div class="bac" onclick="verifierTri('plastique', this)">
+          <span class="emoji">🟡</span>
+          <span class="nom">Plastique</span>
+        </div>
+        <div class="bac" onclick="verifierTri('papier', this)">
+          <span class="emoji">🔵</span>
+          <span class="nom">Papier</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mode correction -->
+    <div class="mode-correction" id="mode-correction">
+      <h3>🛠️ Corrige les règles de l'IA</h3>
+      <p style="font-size: 0.9em; color: #92400e; margin-bottom: 15px;">L'IA a fait une erreur car elle se base sur des règles fausses. Clique sur les mauvaises règles pour les supprimer.</p>
+      <div id="liste-regles-correction"></div>
+      <button class="btn btn-primaire" style="margin-top: 15px; width: 100%;" onclick="appliquerCorrections()">✅ Valider les corrections</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  // ================= BASE DE DONNÉES =================
+  var objets = [
+    { emoji: '🍾', nom: 'Bouteille en verre', type: 'verre', couleur: 'vert' },
+    { emoji: '🥤', nom: 'Gobelet en plastique', type: 'plastique', couleur: 'blanc' },
+    { emoji: '📰', nom: 'Journal', type: 'papier', couleur: 'gris' },
+    { emoji: '🫙', nom: 'Bocal en verre', type: 'verre', couleur: 'transparent' },
+    { emoji: '🧴', nom: 'Flacon de shampoing', type: 'plastique', couleur: 'bleu' },
+    { emoji: '📦', nom: 'Boîte en carton', type: 'papier', couleur: 'marron' }
+  ];
+  
+  var indexObjet = 0;
+  var scoreIA = 0;
+  var totalEssais = 0;
+  
+  // Règles de l'IA (au départ, elle est bête : elle se base sur la couleur)
+  var regles = [
+    { id: 1, texte: "Si c'est vert, c'est du VERRE.", bonne: false },
+    { id: 2, texte: "Si c'est transparent, c'est du VERRE.", bonne: true },
+    { id: 3, texte: "Si c'est blanc, c'est du PLASTIQUE.", bonne: false },
+    { id: 4, texte: "Si c'est léger, c'est du PLASTIQUE.", bonne: true },
+    { id: 5, texte: "Si c'est gris, c'est du PAPIER.", bonne: false },
+    { id: 6, texte: "Si ça se déchire, c'est du PAPIER.", bonne: true }
+  ];
+
+  // ================= INITIALISATION =================
+  window.onload = function() {
+    afficherObjet();
+    afficherRegles();
+  };
+
+  function afficherObjet() {
+    if (indexObjet >= objets.length) {
+      // Fin du jeu
+      document.getElementById('etape-jeu').innerHTML = `
+        <h2 style="color: #22c55e; font-size: 2em;">🎉 Jeu terminé !</h2>
+        <p>Tu as aidé l'IA à mieux trier les déchets.</p>
+        <div class="bulle-ia" style="text-align:center;">
+          Score final de l'IA : <strong>${scoreIA} bonnes réponses sur ${totalEssais}</strong>.<br><br>
+          Grâce à toi, elle ne se trompe plus en se basant sur la couleur !
+        </div>
+        <button class="btn btn-primaire" onclick="location.reload()">🔄 Rejouer</button>
+      `;
+      return;
+    }
+    
+    document.getElementById('emoji-objet').textContent = objets[indexObjet].emoji;
+    document.getElementById('texte-ia').textContent = "Clique sur 'Analyser' pour que je devine où va cet objet.";
+    document.getElementById('zone-bacs').style.display = 'none';
+    document.getElementById('btn-analyser').style.display = 'inline-block';
+    document.getElementById('btn-analyser').disabled = false;
+    document.getElementById('mode-correction').classList.remove('visible');
+  }
+
+  function afficherRegles() {
+    var ul = document.getElementById('liste-regles');
+    ul.innerHTML = '';
+    regles.forEach(function(regle) {
+      var li = document.createElement('li');
+      li.textContent = "• " + regle.texte;
+      ul.appendChild(li);
+    });
+  }
+
+  // ================= LOGIQUE DU JEU =================
+  function analyserObjet() {
+    var obj = objets[indexObjet];
+    var texteIA = document.getElementById('texte-ia');
+    var btn = document.getElementById('btn-analyser');
+    
+    btn.disabled = true;
+    texteIA.textContent = "🤖 Analyse des pixels...";
+    
+    setTimeout(function() {
+      // L'IA utilise ses règles actuelles (qui peuvent être fausses)
+      var reponseIA = "";
+      
+      // Simulation de l'IA "bête" : elle se base sur la couleur
+      if (obj.couleur === 'vert' || obj.couleur === 'transparent') {
+        reponseIA = "verre";
+      } else if (obj.couleur === 'blanc' || obj.couleur === 'bleu') {
+        reponseIA = "plastique";
+      } else {
+        reponseIA = "papier";
+      }
+      
+      // Mais si l'IA a été corrigée (on le saura plus tard), elle se base sur la vraie matière
+      // Pour l'instant, on affiche sa réponse
+      
+      document.getElementById('bulle-ia').innerHTML = "🤖 : D'après mes règles, cet objet va dans la poubelle <strong>" + reponseIA.toUpperCase() + "</strong>.<br><br>Est-ce que j'ai raison ?";
+      
+      // On stocke la réponse de l'IA pour la vérification
+      window.reponseIA = reponseIA;
+      
+      document.getElementById('zone-bacs').style.display = 'flex';
+      
+    }, 1000);
+  }
+
+  function verifierTri(typeChoisi, elementBac) {
+    var obj = objets[indexObjet];
+    var estCorrect = (typeChoisi === obj.type);
+    
+    totalEssais++;
+    if (estCorrect) scoreIA++;
+    document.getElementById('score-ia').textContent = scoreIA + " / " + totalEssais;
+    
+    // Animation de l'objet
+    var emoji = document.getElementById('emoji-objet');
+    emoji.classList.add('secoue');
+    setTimeout(() => emoji.classList.remove('secoue'), 400);
+    
+    if (estCorrect) {
+      // L'IA a bien répondu ou l'élève a bien trié
+      document.getElementById('bulle-ia').innerHTML = "🤖 : <strong>Super !</strong> C'était bien du " + obj.type + ".<br><br>Je mémorise cet exemple pour la prochaine fois.";
+      
+      // Passer à l'objet suivant après 2 secondes
+      setTimeout(function() {
+        indexObjet++;
+        afficherObjet();
+      }, 2000);
+      
+    } else {
+      // L'IA s'est trompée
+      document.getElementById('bulle-ia').innerHTML = "🤖 : <strong>Oups !</strong> Je me suis trompée. Je pensais que c'était du " + window.reponseIA + ".<br><br>Il faut corriger mes règles de toute urgence !";
+      
+      setTimeout(function() {
+        afficherModeCorrection();
+      }, 1500);
+    }
+  }
+
+  // ================= MODE CORRECTION =================
+  function afficherModeCorrection() {
+    document.getElementById('zone-bacs').style.display = 'none';
+    document.getElementById('mode-correction').classList.add('visible');
+    
+    var conteneur = document.getElementById('liste-regles-correction');
+    conteneur.innerHTML = '';
+    
+    // On mélange les règles pour que l'élève doive réfléchir
+    var reglesMelangees = regles.sort(function() { return 0.5 - Math.random(); });
+    
+    reglesMelangees.forEach(function(regle) {
+      var div = document.createElement('div');
+      div.className = 'regle-item ' + (regle.bonne ? 'bonne' : 'mauvaise');
+      div.innerHTML = "<span>" + regle.texte + "</span>";
+      
+      if (!regle.bonne) {
+        div.innerHTML += "<button class='btn-danger' style='padding: 5px 10px; font-size: 0.8em;' onclick='supprimerRegle(" + regle.id + ", this)'>❌ Supprimer</button>";
+      } else {
+        div.innerHTML += "<span style='color: #22c55e; font-weight: bold;'>✅ Garder</span>";
+      }
+      
+      conteneur.appendChild(div);
+    });
+  }
+
+  function supprimerRegle(id, bouton) {
+    // On grise la règle pour dire qu'elle est supprimée
+    bouton.parentElement.style.opacity = '0.4';
+    bouton.parentElement.style.textDecoration = 'line-through';
+    bouton.disabled = true;
+    bouton.textContent = "Supprimée";
+    
+    // On retire la règle du tableau
+    regles = regles.filter(function(r) { return r.id !== id; });
+    afficherRegles();
+  }
+
+  function appliquerCorrections() {
+    // Une fois les corrections faites, on passe à l'objet suivant
+    document.getElementById('mode-correction').classList.remove('visible');
+    indexObjet++;
+    afficherObjet();
+  }
+</script>
+
+</body>
+</html>
