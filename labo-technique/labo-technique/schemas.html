@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Schémas CEI - Labo Technique</title>
+<link rel="stylesheet" href="style-labo.css">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='112' fill='%230f172a'/><path d='M 160 340 L 220 200 L 280 320 L 340 180' stroke='%230ea5e9' stroke-width='24' fill='none' stroke-linecap='round' stroke-linejoin='round'/><circle cx='160' cy='340' r='20' fill='%230ea5e9'/><circle cx='340' cy='180' r='20' fill='%230ea5e9'/></svg>">
+<style>
+  .schema-grille {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 24px;
+    margin: 24px 0;
+  }
+  .schema-carte {
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    border-top: 4px solid #0ea5e9;
+    transition: all 0.2s;
+  }
+  .schema-carte:hover {
+    box-shadow: 0 8px 20px rgba(14,165,233,0.15);
+    transform: translateY(-2px);
+  }
+  .schema-titre {
+    font-size: 1.1em;
+    font-weight: 600;
+    color: #0f172a;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .schema-desc {
+    font-size: 0.85em;
+    color: #64748b;
+    margin-bottom: 16px;
+    line-height: 1.5;
+    min-height: 40px;
+  }
+  .schema-svg-container {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 16px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 160px;
+  }
+  .schema-svg-container svg {
+    width: 100%;
+    max-width: 280px;
+    height: auto;
+    max-height: 180px;
+  }
+  .schema-categorie {
+    font-size: 1.3em;
+    color: #0f172a;
+    margin: 32px 0 16px 0;
+    padding-left: 12px;
+    border-left: 4px solid #0ea5e9;
+    font-weight: 600;
+  }
+  .schema-tag {
+    display: inline-block;
+    background: #e0f2fe;
+    color: #0369a1;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.75em;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-left: auto;
+  }
+</style>
+</head>
+<body>
+
+<header class="labo-header">
+  <div class="labo-header-top">
+    <a href="index.html" class="labo-logo">
+      <div class="icon">🔬</div>
+      <div>
+        <div class="titre">Labo Technique</div>
+        <div class="sous-titre">Électronique · BTS · IUT · Ingénieurs</div>
+      </div>
+    </a>
+    <a href="../index.html" class="btn-retour-app">← Retour InitiaElectro</a>
+  </div>
+  <nav class="labo-nav">
+    <a href="index.html">🏠 Accueil</a>
+    <a href="calculateur.html">🧮 Calculateur</a>
+    <a href="schemas.html" class="actif">🔬 Schémas CEI</a>
+    <a href="oscilloscope.html">📊 Oscilloscope</a>
+    <a href="pannes.html">🔧 Pannes</a>
+    <a href="datasheets.html">📄 Datasheets</a>
+    <a href="manuel.html">📖 Manuel</a>
+  </nav>
+</header>
+
+<div class="labo-conteneur">
+
+  <h1 class="labo-titre">🔬 Schémas CEI</h1>
+  <p class="labo-sous-titre">Bibliothèque de schémas électroniques normalisés</p>
+
+  <div class="labo-info">
+    💡 <strong>À propos :</strong> Tous les schémas respectent les normes CEI (Commission Électrotechnique Internationale). Ils sont dessinés en SVG pour une qualité optimale à l'écran et à l'impression.
+  </div>
+
+  <!-- ===== ALIMENTATIONS ===== -->
+  <h2 class="schema-categorie">🔋 Alimentations</h2>
+  <div class="schema-grille">
+    
+    <div class="schema-carte">
+      <div class="schema-titre">Régulateur de tension 7805 <span class="schema-tag">CEI</span></div>
+      <div class="schema-desc">Régule une tension d'entrée (ex: 12V) vers une tension stable de 5V.</div>
+      <div class="schema-svg-container">
+        <svg viewBox="0 0 300 180" xmlns="http://www.w3.org/2000/svg">
+          <!-- Entrée -->
+          <text x="20" y="30" font-size="10" fill="#334155">+12V</text>
+          <line x1="50" y1="25" x2="50" y2="70" stroke="#0ea5e9" stroke-width="2"/>
+          <line x1="50" y1="70" x2="100" y2="70" stroke="#0ea5e9" stroke-width="2"/>
+          <line x1="50" y1="120" x2="50" y2="150" stroke="#0f172a" stroke-width="2"/>
+          <line x1="50" y1="150" x2="100" y2="150" stroke="#0f172a" stroke-width="2"/>
+          <text x="20" y="145" font-size="10" fill="#334155">GND</text>
+          
+          <!-- Régulateur 7805 -->
+          <rect x="100" y="55" width="100" height="80" rx="4" fill="#f8fafc" stroke="#0f172a" stroke-width="2"/>
+          <text x="130" y="90" font-size="14" font-weight="bold" fill="#0f172a">7805</text>
+          <text x="125" y="110" font-size="9" fill="#64748b">Régulateur</text>
+          
+          <!-- Connexions internes -->
+          <line x1="100" y1="70" x2="120" y2="70" stroke="#0ea5e9" stroke-width="2"/>
+          <text x="105" y="65" font-size="8" fill="#0ea5e9">IN</text>
+          
+          <line x1="180" y1="70" x2="200" y2="70" stroke="#22c55e" stroke-width="2"/>
+          <text x="175" y="65" font-size="8" fill="#22c55e">OUT</text>
+          
+          <line x1="150" y1="135" x2="150" y2="150" stroke="#0f172a" stroke-width="2"/>
+          <text x="142" y="143" font-size="8" fill="#0f172a">GND</text>
+          
+          <!-- Sortie -->
+          <line x1="200" y1="70" x2="260" y2="70" stroke="#22c55e" stroke-width="2"/>
+          <text x="230" y="60" font-size="10" fill="#22c55e">+5V</text>
+          <line x1="260" y1="70" x2="260" y2="150" stroke="#0f172a" stroke-width="2"/>
+          
+          <!-- Condensateurs -->
+          <line x1="70" y1="70" x2="70" y2="90" stroke="#0ea5e9" stroke-width="2"/>
+          <line x1="65" y1="90" x2="75" y2="90" stroke="#0ea5e9" stroke-width="2"/>
+          <line x1="65" y1="98" x2="75" y2="98" stroke="#0ea5e9" stroke-width="2"/>
+          <line x1="70" y1="98" x2="70" y2="150" stroke="#0f172a" stroke-width="2"/>
+          <text x="80" y="97" font-size="8" fill="#64748b">100µF</text>
+          
+          <line x1="220" y1="70" x2="220" y2="90" stroke="#22c55e" stroke-width="2"/>
+          <line x1="215" y1="90" x2="225" y2="90" stroke="#22c55e" stroke-width="2"/>
+          <line x1="215" y1="98" x2="225" y2="98" stroke="#22c55e" stroke-width="2"/>
+          <line x1="220" y1="98" x2="220" y2="150" stroke="#0f172a" stroke-width="2"/>
+          <text x="230" y="97" font-size="8" fill="#64748b">10µF</text>
+        </svg>
+      </div>
+    </div>
+
+    <div class="schema-carte">
+      <div class="schema-titre">Redresseur simple alternance <span class="schema-tag">CEI</span></div>
+      <div class="schema-desc">Redresse une tension alternative (AC) en tension continue (DC) avec une diode.</div>
+      <div class="schema-svg-container">
+        <svg viewBox="0 0 300 180" xmlns="http://www.w3.org/2000/svg">
+          <!-- Source AC -->
+          <circle cx="50" cy="90" r="20" fill="none" stroke="#0ea5e9" stroke-width="2"/>
+          <path d="M 40 90 Q 45 80 50 90 Q 55 100 60 90" fill="none" stroke="#0ea5e9" stroke-width="2"/>
+          <text x="35" y="125" font-size="9" fill="#0ea5e9">~ 230V</text>
+          
+          <!-- Connexions -->
+          <line x1="70" y1="90" x2="100" y2="90" stroke="#0f172a" stroke-width="2"/>
+          <line x1="50" y1="110" x2="50" y2="150" stroke="#0f172a" stroke-width="2"/>
+          <line x1="50" y1="150" x2="250" y2="150" stroke="#0f172a" stroke-width="2"/>
+          
+          <!-- Diode -->
+          <polygon points="100,75 100,105 125,90" fill="#0f172a"/>
+          <line x1="125" y1="75" x2="125" y2="105" stroke="#0f172a" stroke-width="2"/>
+          <line x1="100" y1="90" x2="80" y2="90" stroke="#0f172a" stroke-width="2"/>
+          <line x1="125" y1="90" x2="160" y2="90" stroke="#0f172a" stroke-width="2"/>
+          
+          <!-- Résistance de charge -->
+          <rect x="160" y="80" width="40" height="20" fill="white" stroke="#0f172a" stroke-width="2"/>
+          <text x="175" y="94" font-size="10" fill="#0f172a">R</text>
+          <line x1="200" y1="90" x2="250" y2="90" stroke="#0f172a" stroke-width="2"/>
+          <line x1="250" y1="90" x2="250" y2="150" stroke="#0f172a" stroke-width="2"/>
+          
+          <!-- Tension de sortie -->
+          <line x1="220" y1="50" x2="220" y2="80" stroke="#22c55e" stroke-width="2"/>
+          <line x1="220" y1="80" x2="250" y2="90" stroke="#22c55e" stroke-width="2"/>
+          <text x="215" y="45" font-size="10" fill="#22c55e">Vdc</text>
+        </svg>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ===== FILTRES ===== -->
+  <h2 class="schema-categorie">📊 Filtres</h2>
+  <div class="schema-grille">
+
+    <div class="schema-carte">
+      <div class="schema-titre">Filtre passe-bas RC <span class="schema-tag">CEI</span></div>
+      <div class="schema-desc">Laisse passer les basses fréquences et atténue les hautes fréquences.</div>
+      <div class="schema-svg-container">
+        <svg viewBox="0 0 300 180" xmlns="http://www.w3.org/2000/svg">
+          <!-- Entrée -->
+          <text x="20" y="65" font-size="10" fill="#334155">Ve</text>
+          <line x1="40" y1="60" x2="80" y2="60" stroke="#0ea5e9" stroke-width="2"/>
+          <circle cx="40" cy="60" r="3" fill="#0ea5e9"/>
+          
+          <!-- Résistance -->
+          <rect x="80" y="50" width="60" height="20" fill="white" stroke="#0f172a" stroke-width="2"/>
+          <text x="105" y="64" font-size="10" fill="#0f172a">R</text>
+          <line x1="80" y1="60" x2="140" y2="60" stroke="#0f172a" stroke-width="2"/>
+          
+          <!-- Condensateur -->
+          <line x1="140" y1="60" x2="200" y2="60" stroke="#0f172a" stroke-width="2"/>
+          <line x1="200" y1="40" x2="200" y2="60" stroke="#0f172a" stroke-width="2"/>
+          <line x1="200" y1="60" x2="200" y2="80" stroke="#0f172a" stroke-width="2"/>
+          <line x1="190" y1="60" x2="210" y2="60" stroke="#0f172a" stroke-width="2"/>
+          <line x1="190" y1="68" x2="210" y2="68" stroke="#0f172a" stroke-width="2"/>
+          <line x1="200" y1="68" x2="200" y2="120" stroke="#0f172a" stroke-width="2"/>
+          <text x="215" y="65" font-size="10" fill="#0f172a">C</text>
+          
+          <!-- Sortie -->
+          <line x1="200" y1="60" x2="260" y2="60" stroke="#22c55e" stroke-width="2"/>
+          <circle cx="260" cy="60" r="3" fill="#22c55e"/>
+          <text x="265" y="55" font-size="10" fill="#22c55e">Vs</text>
+          
+          <!-- Masse -->
+          <line x1="40" y1="120" x2="260" y2="120" stroke="#0f172a" stroke-width="2"/>
+          <line x1="40" y1="60" x2="40" y2="120" stroke="#0f172a" stroke-width="2"/>
+          <line x1="40" y1="60" x2="40" y2="60" stroke="#0f172a" stroke-width="2"/>
+          
+          <!-- Symbole masse -->
+          <line x1="140" y1="120" x2="160" y2="120" stroke="#0f172a" stroke-width="2"/>
+          <line x1="145" y1="125" x2="155" y2="125" stroke="#0f172a" stroke-width="2"/>
+          <line x1="148" y1="130" x2="152" y2="130" stroke="#0f172a" stroke-width="2"/>
+        </svg>
+      </div>
+    </div>
+
+    <div class="schema-carte">
+      <div class="schema-titre">Filtre passe-haut RC <span class="schema-tag">CEI</span></div>
+      <div class="schema-desc">Laisse passer les hautes fréquences et atténue les basses fréquences.</div>
+      <div class="schema-svg-container">
+        <svg viewBox="0 0 300 180" xmlns="http://www.w3.org/2000/svg">
+          <!-- Entrée -->
+          <text x="20" y="65" font-size="10" fill="#334155">Ve</text>
+          <line x1="40" y1="60" x2="80" y2="60" stroke="#0ea5e9" stroke-width="2"/>
+          <circle cx="40" cy="60" r="3" fill="#0ea5e9"/>
+          
+          <!-- Condensateur -->
+          <line x1="80" y1="60" x2="100" y2="60" stroke="#0f172a" stroke-width="2"/>
+          <line x1="90" y1="40" x2="90" y2="80" stroke="#0f172a" stroke-width="2"/>
+          <line x1="100" y1="40" x2="100" y2="80" stroke="#0f172a" stroke-width="2"/>
+          <line x1="100" y1="60" x2="140" y2="60" stroke="#0f172a" stroke-width="2"/>
+          <text x="85" y="95" font-size="10" fill="#0f172a">C</text>
+          
+          <!-- Résistance -->
+          <rect x="140" y="50" width="60" height="20" fill="white" stroke="#0f172a" stroke-width="2"/>
+          <text x="165" y="64" font-size="10" fill="#0f172a">R</text>
+          <line x1="140" y1="60" x2="200" y2="60" stroke="#0f172a" stroke-width="2"/>
+          
+          <!-- Sortie -->
+          <line x1="200" y1="60" x2="260" y2="60" stroke="#22c55e" stroke-width="2"/>
+          <circle cx="260" cy="60" r="3" fill="#22c55e"/>
+          <text x="265" y="55" font-size="10" fill="#22c55e">Vs</text>
+          
+          <!-- Masse -->
+          <line x1="40" y1="120" x2="260" y2="120" stroke="#0f172a" stroke-width="2"/>
+          <line x1="40" y1="60" x2="40" y2="120" stroke="#0f172a" stroke-width="2"/>
+          
+          <!-- Symbole masse -->
+          <line x1="140" y1="120" x2="160" y2="120" stroke="#0f172a" stroke-width="2"/>
+          <line x1="145" y1="125" x2="155" y2="125" stroke="#0f172a" stroke-width="2"/>
+          <line x1="148" y1="130" x2="152" y2="130" stroke="#0f172a" stroke-width="2"/>
+        </svg>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ===== AMPLIFICATEURS ===== -->
+  <h2 class="schema-categorie">🔊 Amplificateurs</h2>
+  <div class="schema-grille">
+
+    <div class="schema-carte">
+      <div class="schema-titre">Amplificateur opérationnel <span class="schema-tag">CEI</span></div>
+      <div class="schema-desc">Amplifie une tension avec un gain défini par le rapport des résistances.</div>
+      <div class="schema-svg-container">
+        <svg viewBox="0 0 300 180" xmlns="http://www.w3.org/2000/svg">
+          <!-- Triangle AOP -->
+          <polygon points="100,40 100,140 200,90" fill="white" stroke="#0f172a" stroke-width="2"/>
+          
+          <!-- Entrées -->
+          <line x1="60" y1="60" x2="100" y2="60" stroke="#0ea5e9" stroke-width="2"/>
+          <text x="80" y="55" font-size="12" fill="#0ea5e9" text-anchor="middle">+</text>
+          
+          <line x1="60" y1="120" x2="100" y2="120" stroke="#ef4444" stroke-width="2"/>
+          <text x="80" y="125" font-size="12" fill="#ef4444" text-anchor="middle">−</text>
+          
+          <!-- Sortie -->
+          <line x1="200" y1="90" x2="260" y2="90" stroke="#22c55e" stroke-width="2"/>
+          <text x="265" y="85" font-size="10" fill="#22c55e">Vs</text>
+          
+          <!-- Alimentation -->
+          <line x1="150" y1="20" x2="150" y2="40" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="3,3"/>
+          <text x="155" y="25" font-size="8" fill="#f59e0b">+Vcc</text>
+          
+          <line x1="150" y1="140" x2="150" y2="160" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="3,3"/>
+          <text x="155" y="155" font-size="8" fill="#f59e0b">−Vcc</text>
+          
+          <!-- Nom -->
+          <text x="150" y="90" font-size="10" fill="#64748b" text-anchor="middle">AOP</text>
+        </svg>
+      </div>
+    </div>
+
+    <div class="schema-carte">
+      <div class="schema-titre">Montage transistor NPN <span class="schema-tag">CEI</span></div>
+      <div class="schema-desc">Transistor en commutation : un courant de base contrôle un courant collecteur.</div>
+      <div class="schema-svg-container">
+        <svg viewBox="0 0 300 180" xmlns="http://www.w3.org/2000/svg">
+          <!-- Collecteur -->
+          <line x1="150" y1="30" x2="150" y2="70" stroke="#0f172a" stroke-width="2"/>
+          <text x="155" y="30" font-size="9" fill="#0f172a">C</text>
+          
+          <!-- Base -->
+          <line x1="100" y1="100" x2="140" y2="100" stroke="#0ea5e9" stroke-width="2"/>
+          <line x1="140" y1="85" x2="140" y2="115" stroke="#0f172a" stroke-width="2"/>
+          <text x="105" y="95" font-size="9" fill="#0ea5e9">B</text>
+          
+          <!-- Émetteur -->
+          <line x1="150" y1="100" x2="170" y2="120" stroke="#0f172a" stroke-width="2"/>
+          <line x1="170" y1="120" x2="170" y2="150" stroke="#0f172a" stroke-width="2"/>
+          <text x="175" y="150" font-size="9" fill="#0f172a">E</text>
+          
+          <!-- Flèche émetteur -->
+          <polygon points="160,115 170,120 162,125" fill="#0f172a"/>
+          
+          <!-- Connexions -->
+          <line x1="150" y1="70" x2="150" y2="100" stroke="#0f172a" stroke-width="2"/>
+          <line x1="150" y1="100" x2="170" y2="100" stroke="#0f172a" stroke-width="2"/>
+          
+          <!-- Cercle -->
+          <circle cx="150" cy="100" r="30" fill="none" stroke="#0f172a" stroke-width="2"/>
+          
+          <!-- Symbole GND -->
+          <line x1="150" y1="150" x2="190" y2="150" stroke="#0f172a" stroke-width="2"/>
+        </svg>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ===== LOGIQUE ===== -->
+  <h2 class="schema-categorie">🧠 Logique</h2>
+  <div class="schema-grille">
+
+    <div class="schema-carte">
+      <div class="schema-titre">Porte ET (AND) <span class="schema-tag">CEI</span></div>
+      <div class="schema-desc">Sortie à 1 uniquement si les deux entrées sont à 1.</div>
+      <div class="schema-svg-container">
+        <svg viewBox="0 0 300 180" xmlns="http://www.w3.org/2000/svg">
+          <!-- Forme de la porte AND -->
+          <path d="M 100 50 L 150 50 A 40 40 0 0 1 150 130 L 100 130 Z" fill="white" stroke="#0f172a" stroke-width="2"/>
+          
+          <!-- Entrées -->
+          <line x1="60" y1="70" x2="100" y2="70" stroke="#0ea5e9" stroke-width="2"/>
+          <line x1="60" y1="110" x2="100" y2="110" stroke="#0ea5e9" stroke-width="2"/>
+          <text x="65" y="65" font-size="9" fill="#0ea5e9">A</text>
+          <text x="65" y="105" font-size="9" fill="#0ea5e9">B</text>
+          
+          <!-- Sortie -->
+          <line x1="190" y1="90" x2="240" y2="90" stroke="#22c55e" stroke-width="2"/>
+          <text x="245" y="85" font-size="9" fill="#22c55e">S</text>
+          
+          <!-- Texte -->
+          <text x="130" y="95" font-size="14" font-weight="bold" fill="#0f172a">AND</text>
+        </svg>
+      </div>
+    </div>
+
+    <div class="schema-carte">
+      <div class="schema-titre">Porte OU (OR) <span class="schema-tag">CEI</span></div>
+      <div class="schema-desc">Sortie à 1 si au moins une des deux entrées est à 1.</div>
+      <div class="schema-svg-container">
+        <svg viewBox="0 0 300 180" xmlns="http://www.w3.org/2000/svg">
+          <!-- Forme de la porte OR -->
+          <path d="M 100 50 Q 150 50 180 90 Q 150 130 100 130 Q 130 90 100 50 Z" fill="white" stroke="#0f172a" stroke-width="2"/>
+          
+          <!-- Entrées -->
+          <line x1="60" y1="70" x2="110" y2="70" stroke="#0ea5e9" stroke-width="2"/>
+          <line x1="60" y1="110" x2="110" y2="110" stroke="#0ea5e9" stroke-width="2"/>
+          <text x="65" y="65" font-size="9" fill="#0ea5e9">A</text>
+          <text x="65" y="105" font-size="9" fill="#0ea5e9">B</text>
+          
+          <!-- Sortie -->
+          <line x1="180" y1="90" x2="240" y2="90" stroke="#22c55e" stroke-width="2"/>
+          <text x="245" y="85" font-size="9" fill="#22c55e">S</text>
+          
+          <!-- Texte -->
+          <text x="125" y="95" font-size="14" font-weight="bold" fill="#0f172a">OR</text>
+        </svg>
+      </div>
+    </div>
+
+    <div class="schema-carte">
+      <div class="schema-titre">Porte NON (NOT) <span class="schema-tag">CEI</span></div>
+      <div class="schema-desc">Inverse le signal d'entrée (0 devient 1, et inversement).</div>
+      <div class="schema-svg-container">
+        <svg viewBox="0 0 300 180" xmlns="http://www.w3.org/2000/svg">
+          <!-- Triangle NOT -->
+          <polygon points="100,50 100,130 180,90" fill="white" stroke="#0f172a" stroke-width="2"/>
+          
+          <!-- Cercle d'inversion -->
+          <circle cx="188" cy="90" r="8" fill="white" stroke="#0f172a" stroke-width="2"/>
+          
+          <!-- Entrée -->
+          <line x1="60" y1="90" x2="100" y2="90" stroke="#0ea5e9" stroke-width="2"/>
+          <text x="65" y="85" font-size="9" fill="#0ea5e9">A</text>
+          
+          <!-- Sortie -->
+          <line x1="196" y1="90" x2="240" y2="90" stroke="#22c55e" stroke-width="2"/>
+          <text x="245" y="85" font-size="9" fill="#22c55e">S</text>
+          
+          <!-- Texte -->
+          <text x="125" y="95" font-size="14" font-weight="bold" fill="#0f172a">NOT</text>
+        </svg>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<footer class="labo-footer">
+  <div>🔬 <strong>Labo Technique</strong> - Électronique avancée</div>
+  <div style="margin-top:8px;">Développé par <strong>M. Ziane</strong> · Version 1.0</div>
+</footer>
+
+</body>
+</html>
