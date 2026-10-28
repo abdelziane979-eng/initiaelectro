@@ -3,141 +3,52 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>EspaceIA - L'Intelligence Artificielle pour tous</title>
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0' stop-color='%230ea5e9'/><stop offset='1' stop-color='%238b5cf6'/></linearGradient></defs><rect width='512' height='512' rx='112' fill='url(%23g)'/><path d='M 150 350 Q 256 150 362 350' stroke='white' stroke-width='20' fill='none' stroke-linecap='round'/><circle cx='256' cy='200' r='30' fill='white'/></svg>">
+<title>InitiaElectro - L'électronique pour tous</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0' stop-color='%230ea5e9'/><stop offset='1' stop-color='%238b5cf6'/></linearGradient></defs><rect width='512' height='512' rx='112' fill='url(%23g)'/><circle cx='220' cy='256' r='60' fill='%23ff3333' stroke='%23fff' stroke-width='12'/><rect x='300' y='238' width='140' height='36' rx='18' fill='%23D4A76A' stroke='%23fff' stroke-width='8'/><line x1='280' y1='256' x2='300' y2='256' stroke='%23fff' stroke-width='10' stroke-linecap='round'/></svg>">
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: 'Segoe UI', Arial, sans-serif; background: #f4f7fb; color: #1a1f2e; line-height: 1.6; }
-  
-  /* EN-TETE */
-  header { background: linear-gradient(135deg, #0ea5e9, #8b5cf6); color: white;
-           padding: 40px 20px; text-align: center;
-           box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f9ff; color: #1a1f2e; line-height: 1.6; text-align: center; }
+  header { background: linear-gradient(135deg, #0ea5e9, #8b5cf6); color: white; padding: 40px 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
   header h1 { font-size: 2.2em; margin-bottom: 10px; }
-  header .sous-titre { font-size: 1.1em; opacity: 0.95; margin-bottom: 20px; }
-  .btn-retour { display: inline-block; padding: 10px 20px; background: rgba(255,255,255,0.2); 
-                color: white; text-decoration: none; border-radius: 8px; font-weight: bold;
-                border: 2px solid rgba(255,255,255,0.4); transition: all 0.2s; }
-  .btn-retour:hover { background: rgba(255,255,255,0.35); transform: translateY(-2px); }
-  
-  /* CONTENEUR */
-  .conteneur { max-width: 1100px; margin: 0 auto; padding: 40px 20px; }
-  
-  .intro { text-align: center; margin-bottom: 40px; }
-  .intro h2 { font-size: 1.6em; color: #1a1f2e; margin-bottom: 12px; }
-  .intro p { font-size: 1.1em; color: #475569; max-width: 800px; margin: 0 auto; }
-  
-  /* GRILLE DES NIVEAUX */
-  .grille-niveaux { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 24px; margin-top: 32px; }
-  
-  .carte-niveau { background: white; border-radius: 16px; padding: 30px 24px; text-align: center;
-                  box-shadow: 0 4px 12px rgba(0,0,0,0.06); transition: all 0.3s;
-                  cursor: pointer; border-top: 6px solid; position: relative; overflow: hidden; }
-  .carte-niveau:hover { transform: translateY(-6px); box-shadow: 0 12px 24px rgba(0,0,0,0.12); }
-  
-  .carte-niveau .emoji { font-size: 3.5em; margin-bottom: 16px; display: block; }
-  .carte-niveau h3 { font-size: 1.3em; margin-bottom: 8px; color: #1a1f2e; }
-  .carte-niveau .public { font-size: 0.85em; color: #64748b; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 16px; }
-  .carte-niveau .desc { font-size: 0.95em; color: #475569; margin-bottom: 20px; min-height: 60px; }
-  
-  .btn-jouer { display: inline-block; padding: 10px 24px; border-radius: 8px; color: white; font-weight: bold;
-               text-decoration: none; font-size: 0.95em; transition: opacity 0.2s; }
-  .btn-jouer:hover { opacity: 0.9; }
-  
-  /* Couleurs par niveau */
-  .niveau-1 { border-top-color: #f59e0b; }
-  .niveau-1 .btn-jouer { background: #f59e0b; }
-  
-  .niveau-2 { border-top-color: #22c55e; }
-  .niveau-2 .btn-jouer { background: #22c55e; }
-  
-  .niveau-3 { border-top-color: #0ea5e9; }
-  .niveau-3 .btn-jouer { background: #0ea5e9; }
-  
-  .niveau-4 { border-top-color: #8b5cf6; }
-  .niveau-4 .btn-jouer { background: #8b5cf6; }
-  
-  /* BANNIERE INFO */
-  .banniere-info { background: #e0f2fe; border-left: 4px solid #0ea5e9; padding: 16px 20px;
-                   border-radius: 8px; margin-top: 40px; color: #0c4a6e; font-size: 0.95em; }
-  
-  /* FOOTER */
-  footer { background: #1a1f2e; color: #94a3b8; padding: 30px; text-align: center;
-           margin-top: 60px; font-size: 0.9em; }
-  footer strong { color: #0ea5e9; }
-  
-  @media (max-width: 600px) {
-    header h1 { font-size: 1.6em; }
-    .conteneur { padding: 24px 16px; }
-    .carte-niveau { padding: 24px 16px; }
-  }
+  header p { font-size: 1.1em; opacity: 0.95; }
+  .conteneur { max-width: 1000px; margin: 40px auto; padding: 0 20px; display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; }
+  .carte { background: white; border-radius: 16px; padding: 30px; text-decoration: none; color: inherit; box-shadow: 0 4px 12px rgba(0,0,0,0.06); transition: transform 0.3s; border-top: 6px solid; }
+  .carte:hover { transform: translateY(-6px); box-shadow: 0 12px 24px rgba(0,0,0,0.12); }
+  .carte .emoji { font-size: 4em; margin-bottom: 15px; display: block; }
+  .carte h2 { font-size: 1.3em; margin-bottom: 10px; color: #1a1f2e; }
+  .carte p { font-size: 0.95em; color: #64748b; }
+  .c1 { border-top-color: #3b82f6; }
+  .c2 { border-top-color: #8b5cf6; }
+  .c3 { border-top-color: #f59e0b; }
+  .c4 { border-top-color: #22c55e; }
 </style>
 </head>
 <body>
-
 <header>
-  <h1>🧠 EspaceIA</h1>
-  <div class="sous-titre">L'Intelligence Artificielle expliquée par la pratique, pour tous les âges</div>
-  <a href="../index.html" class="btn-retour">← Retour au menu principal</a>
+  <h1>⚡ InitiaElectro</h1>
+  <p>La plateforme d'apprentissage de l'électronique et du numérique</p>
 </header>
-
 <div class="conteneur">
-  
-  <div class="intro">
-    <h2>Bienvenue dans l'univers de l'IA !</h2>
-    <p>L'Intelligence Artificielle n'est pas magique, c'est de la logique et des données. Choisissez votre niveau pour commencer à explorer, comprendre et créer.</p>
-  </div>
-  
-  <div class="grille-niveaux">
-    
-    <!-- NIVEAU 1 -->
-    <div class="carte-niveau niveau-1">
-      <span class="emoji">🧒</span>
-      <h3>Le Monde Magique</h3>
-      <div class="public">Enfants (7-10 ans)</div>
-      <div class="desc">Dessine et découvre comment l'ordinateur apprend à reconnaître tes formes préférées.</div>
-      <a href="#" class="btn-jouer">Bientôt disponible</a>
-    </div>
-    
-    <!-- NIVEAU 2 -->
-    <div class="carte-niveau niveau-2">
-      <span class="emoji">👦</span>
-      <h3>L'Apprenti Détective</h3>
-      <div class="public">Collégiens (11-15 ans)</div>
-      <div class="desc">Apprends à l'IA à trier des objets et découvre pourquoi elle fait parfois des erreurs.</div>
-      <a href="#" class="btn-jouer">Bientôt disponible</a>
-    </div>
-    
-    <!-- NIVEAU 3 -->
-    <div class="carte-niveau niveau-3">
-      <span class="emoji">🧑</span>
-      <h3>Le Créateur</h3>
-      <div class="public">Lycéens & Étudiants</div>
-      <div class="desc">Entraîne un mini-réseau de neurones et ajuste les paramètres pour améliorer ses prédictions.</div>
-      <a href="#" class="btn-jouer">Bientôt disponible</a>
-    </div>
-    
-    <!-- NIVEAU 4 -->
-    <div class="carte-niveau niveau-4">
-      <span class="emoji">🎓</span>
-      <h3>L'Ingénieur</h3>
-      <div class="public">BTS, IUT, Ingénieurs</div>
-      <div class="desc">Analyse les biais algorithmiques et comprends les enjeux éthiques de l'IA moderne.</div>
-      <a href="#" class="btn-jouer">Bientôt disponible</a>
-    </div>
-    
-  </div>
-  
-  <div class="banniere-info">
-    💡 <strong>Note de développement :</strong> Cette plateforme est en cours de construction. Les modules interactifs seront ajoutés progressivement, niveau par niveau. Revenez bientôt !
-  </div>
-  
+  <a href="bac_a_sable.html" class="carte c1">
+    <span class="emoji">🧪</span>
+    <h2>EspaceElectronic</h2>
+    <p>Le bac à sable avec 44 composants, des défis et un multimètre.</p>
+  </a>
+  <a href="ia/index.html" class="carte c2">
+    <span class="emoji">🧠</span>
+    <h2>EspaceIA</h2>
+    <p>Découvre l'Intelligence Artificielle de façon ludique.</p>
+  </a>
+  <a href="labo-technique/index.html" class="carte c3">
+    <span class="emoji">🔬</span>
+    <h2>Labo Technique</h2>
+    <p>Outils avancés : oscilloscope, calculateur, pannes.</p>
+  </a>
+  <a href="projets.html" class="carte c4">
+    <span class="emoji">🏆</span>
+    <h2>Les 19 Défis</h2>
+    <p>Fiches détaillées pour construire de vrais circuits.</p>
+  </a>
 </div>
-
-<footer>
-  <div>🧠 <strong>EspaceIA</strong> - Une branche de l'écosystème InitiaElectro</div>
-  <div style="margin-top:8px;">Développé par <strong>M. Ziane</strong> · Version 1.0</div>
-</footer>
-
 </body>
 </html>
