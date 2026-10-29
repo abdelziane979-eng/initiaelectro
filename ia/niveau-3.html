@@ -35,7 +35,7 @@
 
 <header>
   <h1>🧑‍💻 Le Créateur : Entraîne ton IA</h1>
-  <p>Ajuste les paramètres pour que le réseau de neurones sépare correctement les pommes et les bananes.</p>
+  <p>Ajuste la ligne bleue pour qu'elle sépare les pommes (🔴) des bananes (🟡).</p>
   <a href="index.html" class="btn-retour">← Retour à EspaceIA</a>
 </header>
 
@@ -43,27 +43,27 @@
   
   <div class="zone-jeu">
     <h3>Espace de classification</h3>
-    <p style="font-size: 0.9em; color: #64748b; margin-bottom: 15px;">La ligne bleue est la frontière de décision de l'IA.</p>
+    <p style="font-size: 0.9em; color: #64748b; margin-bottom: 15px;">L'IA considère que tout ce qui est à droite de la ligne est une pomme.</p>
     <canvas id="canvas" width="400" height="400"></canvas>
   </div>
 
   <div class="panneau">
     <h3>⚙️ Paramètres de l'IA</h3>
-    <p style="font-size: 0.85em; color: #64748b; margin-bottom: 20px;">Modifie les "poids" (W1, W2) et le "biais" pour séparer les points rouges (pommes) des points jaunes (bananes).</p>
+    <p style="font-size: 0.85em; color: #64748b; margin-bottom: 20px;">Modifie les "poids" (W1, W2) et le "biais" pour faire pivoter et déplacer la ligne bleue.</p>
     
     <div class="reglage">
-      <label>Poids W1 (Taille) <span class="valeur" id="val-w1">1.0</span></label>
-      <input type="range" id="w1" min="-3" max="3" step="0.1" value="1" oninput="dessiner()">
+      <label>Poids W1 <span class="valeur" id="val-w1">1.0</span></label>
+      <input type="range" id="w1" min="-2" max="2" step="0.1" value="1" oninput="dessiner()">
     </div>
     
     <div class="reglage">
-      <label>Poids W2 (Forme) <span class="valeur" id="val-w2">1.0</span></label>
-      <input type="range" id="w2" min="-3" max="3" step="0.1" value="1" oninput="dessiner()">
+      <label>Poids W2 <span class="valeur" id="val-w2">1.0</span></label>
+      <input type="range" id="w2" min="-2" max="2" step="0.1" value="1" oninput="dessiner()">
     </div>
     
     <div class="reglage">
-      <label>Biais (B) <span class="valeur" id="val-b">-1.0</span></label>
-      <input type="range" id="b" min="-5" max="5" step="0.1" value="-1" oninput="dessiner()">
+      <label>Biais (B) <span class="valeur" id="val-b">-200</span></label>
+      <input type="range" id="b" min="-500" max="500" step="10" value="-200" oninput="dessiner()">
     </div>
 
     <button class="btn-valider" onclick="testerIA()">🧠 Tester l'IA</button>
@@ -76,9 +76,10 @@
   var canvas = document.getElementById('canvas');
   var ctx = canvas.getContext('2d');
   
+  // Les points : Pommes en haut à droite, Bananes en bas à gauche
   var donnees = [
-    { x: 80, y: 80, classe: 1 }, { x: 100, y: 60, classe: 1 }, { x: 70, y: 100, classe: 1 },
-    { x: 300, y: 300, classe: -1 }, { x: 320, y: 280, classe: -1 }, { x: 280, y: 320, classe: -1 }
+    { x: 280, y: 280, classe: 1 }, { x: 320, y: 280, classe: 1 }, { x: 300, y: 320, classe: 1 },
+    { x: 80, y: 80, classe: -1 }, { x: 120, y: 60, classe: -1 }, { x: 100, y: 100, classe: -1 }
   ];
 
   function dessiner() {
@@ -88,10 +89,11 @@
     
     document.getElementById('val-w1').textContent = w1.toFixed(1);
     document.getElementById('val-w2').textContent = w2.toFixed(1);
-    document.getElementById('val-b').textContent = b.toFixed(1);
+    document.getElementById('val-b').textContent = b.toFixed(0);
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+    // Grille
     ctx.strokeStyle = '#e2e8f0';
     ctx.lineWidth = 1;
     for (var i = 0; i <= 400; i += 50) {
@@ -99,31 +101,31 @@
       ctx.beginPath(); ctx.moveTo(0, i); ctx.lineTo(400, i); ctx.stroke();
     }
 
+    // Ligne de décision
+    if (w2 !== 0) {
+      ctx.beginPath();
+      ctx.strokeStyle = '#0ea5e9';
+      ctx.lineWidth = 3;
+      // Équation : w1*x + w2*y + b = 0  =>  y = -(w1*x + b) / w2
+      var x1 = 0;
+      var y1 = -(w1 * x1 + b) / w2;
+      var x2 = 400;
+      var y2 = -(w1 * x2 + b) / w2;
+      ctx.moveTo(x1, y1);
+      ctx.lineTo(x2, y2);
+      ctx.stroke();
+    }
+
+    // Dessiner les points
     donnees.forEach(function(p) {
       ctx.beginPath();
-      ctx.arc(p.x, p.y, 8, 0, Math.PI * 2);
+      ctx.arc(p.x, p.y, 10, 0, Math.PI * 2);
       ctx.fillStyle = p.classe === 1 ? '#ef4444' : '#eab308';
       ctx.fill();
       ctx.strokeStyle = 'white';
       ctx.lineWidth = 2;
       ctx.stroke();
     });
-
-    if (w2 !== 0) {
-      ctx.beginPath();
-      ctx.strokeStyle = '#0ea5e9';
-      ctx.lineWidth = 3;
-      
-      var x1 = 0;
-      var y1 = -(w1 * x1 + b) / w2;
-      
-      var x2 = 400;
-      var y2 = -(w1 * x2 + b) / w2;
-      
-      ctx.moveTo(x1, y1);
-      ctx.lineTo(x2, y2);
-      ctx.stroke();
-    }
   }
 
   function testerIA() {
@@ -133,9 +135,21 @@
     
     var corrects = 0;
     
+    // Si la ligne est verticale (w2=0), on met une valeur très grande pour ne pas diviser par 0
+    var safeW2 = w2 === 0 ? 0.0001 : w2;
+
     donnees.forEach(function(p) {
-      var prediction = (w1 * p.x) + (w2 * p.y) + b;
-      var classePredite = prediction > 0 ? 1 : -1;
+      // Équation de la ligne : y = -(w1*x + b) / w2
+      // On regarde si le point est au-dessus ou en-dessous de la ligne
+      var yLigne = -(w1 * p.x + b) / safeW2;
+      
+      var classePredite = (p.y > yLigne) ? 1 : -1; // 1 = en haut (pomme), -1 = en bas (banane)
+
+      // Cas particulier si la ligne est presque verticale
+      if (Math.abs(w2) < 0.1) {
+        classePredite = (p.x > -(b/w1)) ? 1 : -1;
+      }
+
       if (classePredite === p.classe) {
         corrects++;
       }
@@ -143,13 +157,16 @@
 
     var res = document.getElementById('resultat');
     res.style.display = 'block';
+    
+    // Fait défiler la page jusqu'au résultat
+    res.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 
     if (corrects === donnees.length) {
       res.className = 'resultat succes';
       res.innerHTML = "🎉 <strong>Parfait !</strong> Ton IA a réussi à séparer toutes les pommes des bananes.<br><br>Tu viens d'entraîner un vrai réseau de neurones !";
     } else {
       res.className = 'resultat erreur';
-      res.innerHTML = "❌ L'IA a fait " + (donnees.length - corrects) + " erreurs sur " + donnees.length + ".<br><br>Essaie d'ajuster la ligne bleue pour qu'elle passe bien entre les points rouges et les points jaunes.";
+      res.innerHTML = "❌ L'IA a fait " + (donnees.length - corrects) + " erreurs.<br><br>La ligne bleue n'est pas bien placée. Ajuste les curseurs pour qu'elle passe entre les points rouges et les points jaunes.";
     }
   }
 
