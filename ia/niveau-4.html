@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EspaceIA - Niveau 4 : L'Ingénieur</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: #f4f7fb; color: #1a1f2e; line-height: 1.6; }
+  header { background: linear-gradient(135deg, #8b5cf6, #6d28d9); color: white; padding: 20px; text-align: center; }
+  header h1 { font-size: 1.8em; }
+  .btn-retour { display: inline-block; margin-top: 12px; padding: 8px 16px; background: rgba(255,255,255,0.2); color: white; text-decoration: none; border-radius: 8px; font-weight: bold; border: 1px solid rgba(255,255,255,0.4); }
+  
+  .conteneur { max-width: 900px; margin: 0 auto; padding: 24px 20px; display: flex; flex-wrap: wrap; gap: 24px; }
+  
+  .zone-jeu { background: white; border-radius: 16px; padding: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.06); flex: 2; min-width: 300px; }
+  .zone-jeu h3 { color: #8b5cf6; margin-bottom: 16px; }
+  
+  .candidat { background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 12px; padding: 16px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
+  .candidat-info { font-size: 0.95em; }
+  .candidat-info strong { font-size: 1.1em; color: #1a1f2e; }
+  .decision { padding: 8px 16px; border-radius: 8px; font-weight: bold; font-size: 0.9em; }
+  .embauche { background: #dcfce7; color: #166534; }
+  .refuse { background: #fee2e2; color: #991b1b; }
+  
+  .panneau { background: white; border-radius: 16px; padding: 24px; box-shadow: 0 4px 12px rgba(0,0,0,0.06); flex: 1; min-width: 250px; }
+  .panneau h3 { color: #8b5cf6; margin-bottom: 16px; font-size: 1.2em; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; }
+  
+  .reglage { margin-bottom: 20px; }
+  .reglage label { display: flex; justify-content: space-between; font-weight: bold; color: #475569; margin-bottom: 6px; font-size: 0.9em; }
+  .reglage input[type="range"] { width: 100%; accent-color: #8b5cf6; }
+  .valeur { background: #8b5cf6; color: white; padding: 2px 8px; border-radius: 4px; font-family: monospace; font-size: 0.9em; }
+  
+  .resultat { margin-top: 20px; padding: 15px; border-radius: 8px; font-weight: bold; text-align: center; display: none; }
+  .resultat.succes { background: #dcfce7; color: #166534; border: 2px solid #22c55e; display: block; }
+  .resultat.erreur { background: #fee2e2; color: #991b1b; border: 2px solid #ef4444; display: block; }
+  
+  .btn-tester { width: 100%; padding: 15px; background: #8b5cf6; color: white; border: none; border-radius: 8px; font-size: 1.1em; font-weight: bold; cursor: pointer; margin-top: 10px; transition: 0.2s; }
+  .btn-tester:hover { background: #6d28d9; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🎓 L'Ingénieur : Corrige les biais de l'IA</h1>
+  <p>Une IA n'est pas parfaite : elle reproduit les erreurs de ceux qui l'ont entraînée. À toi de la rendre juste !</p>
+  <a href="index.html" class="btn-retour">← Retour à EspaceIA</a>
+</header>
+
+<div class="conteneur">
+  
+  <div class="zone-jeu">
+    <h3>📋 Liste des candidats</h3>
+    <p style="font-size: 0.9em; color: #64748b; margin-bottom: 15px;">L'IA doit décider qui embaucher pour un poste de développeur. Les meilleurs profils sont Sarah et Marc.</p>
+    
+    <div id="liste-candidats">
+      <!-- Les candidats seront générés ici -->
+    </div>
+  </div>
+
+  <div class="panneau">
+    <h3>⚙️ Paramètres de l'IA</h3>
+    <p style="font-size: 0.85em; color: #64748b; margin-bottom: 20px;">L'IA est actuellement <strong>biaisée</strong>. Ajuste ses critères pour qu'elle juge uniquement les compétences.</p>
+    
+    <div class="reglage">
+      <label>Poids de l'expérience <span class="valeur" id="val-exp">50%</span></label>
+      <input type="range" id="poids-exp" min="0" max="100" value="50" oninput="mettreAJour()">
+    </div>
+    
+    <div class="reglage">
+      <label>Poids du diplôme <span class="valeur" id="val-dip">50%</span></label>
+      <input type="range" id="poids-dip" min="0" max="100" value="50" oninput="mettreAJour()">
+    </div>
+    
+    <div class="reglage" style="border: 2px dashed #ef4444; padding: 10px; border-radius: 8px; background: #fef2f2;">
+      <label style="color: #991b1b;">⚠️ Poids du genre <span class="valeur" id="val-genre" style="background:#ef4444;">50%</span></label>
+      <input type="range" id="poids-genre" min="0" max="100" value="50" oninput="mettreAJour()">
+      <div style="font-size: 0.75em; color: #991b1b; margin-top: 5px;">Ceci est un biais ! L'IA favorise les hommes.</div>
+    </div>
+
+    <button class="btn-tester" onclick="testerIA()">🧠 Lancer le recrutement</button>
+    <div class="resultat" id="resultat"></div>
+  </div>
+
+</div>
+
+<script>
+  var candidats = [
+    { nom: 'Sarah', experience: 8, diplome: 1, genre: 'F' },
+    { nom: 'Thomas', experience: 5, diplome: 1, genre: 'M' },
+    { nom: 'Leila', experience: 2, diplome: 0, genre: 'F' },
+    { nom: 'Marc', experience: 10, diplome: 1, genre: 'M' }
+  ];
+
+  function mettreAJour() {
+    document.getElementById('val-exp').textContent = document.getElementById('poids-exp').value + '%';
+    document.getElementById('val-dip').textContent = document.getElementById('poids-dip').value + '%';
+    document.getElementById('val-genre').textContent = document.getElementById('poids-genre').value + '%';
+  }
+
+  function testerIA() {
+    var pExp = parseInt(document.getElementById('poids-exp').value);
+    var pDip = parseInt(document.getElementById('poids-dip').value);
+    var pGenre = parseInt(document.getElementById('poids-genre').value);
+    
+    var liste = document.getElementById('liste-candidats');
+    liste.innerHTML = '';
+    
+    var erreurs = 0;
+
+    candidats.forEach(function(c) {
+      var score = (c.experience * pExp) + (c.diplome * 100 * pDip);
+      
+      // Le biais de genre
+      if (c.genre === 'F') {
+        score = score - (pGenre * 150); 
+      } else {
+        score = score + (pGenre * 50);
+      }
+
+      var decision = score > 600 ? 'Embauché' : 'Refusé';
+      
+      var estJuste = (c.nom === 'Sarah' || c.nom === 'Marc'); // Les meilleurs profils
+      if ((estJuste && decision === 'Refusé') || (!estJuste && decision === 'Embauché')) {
+        erreurs++;
+      }
+
+      var div = document.createElement('div');
+      div.className = 'candidat';
+      div.innerHTML = `
+        <div class="candidat-info">
+          <strong>${c.nom}</strong> (${c.genre})<br>
+          Expérience : ${c.experience} ans · Diplôme : ${c.diplome ? 'Oui' : 'Non'}
+        </div>
+        <div class="decision ${decision === 'Embauché' ? 'embauche' : 'refuse'}">
+          ${decision}
+        </div>
+      `;
+      liste.appendChild(div);
+    });
+
+    var res = document.getElementById('resultat');
+    res.style.display = 'block';
+
+    if (pGenre > 0) {
+      res.className = 'resultat erreur';
+      res.innerHTML = "❌ <strong>Erreur éthique !</strong> L'IA est biaisée car elle prend en compte le genre. Elle a pénalisé Sarah et Leila.<br><br>👉 Mets le curseur <strong>Poids du genre à 0%</strong> et relance !";
+    } else {
+      res.className = 'resultat succes';
+      res.innerHTML = "🎉 <strong>Félicitations !</strong> Tu as corrigé le biais algorithmique. L'IA juge maintenant uniquement les compétences.<br><br>C'est le rôle de l'ingénieur en IA : garantir l'équité des algorithmes.";
+    }
+  }
+
+  window.onload = mettreAJour;
+</script>
+
+</body>
+</html>
