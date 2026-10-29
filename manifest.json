@@ -4,13 +4,13 @@
   "description": "L'électronique pour tous",
   "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#f0f9ff",
+  "background_color": "#0ea5e9",
   "theme_color": "#0ea5e9",
   "icons": [
     {
-      "src": "data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='112' fill='%230ea5e9'/%3E%3Cpath d='M 150 350 Q 256 150 362 350' stroke='white' stroke-width='24' fill='none' stroke-linecap='round'/%3E%3Ccircle cx='256' cy='200' r='30' fill='white'/%3E%3C/svg%3E",
-      "sizes": "192x192 512x512",
-      "type": "image/svg+xml",
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
       "purpose": "any maskable"
     }
   ]
