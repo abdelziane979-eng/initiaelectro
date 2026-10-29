@@ -1,17 +1,15 @@
 {
   "name": "InitiaElectro",
   "short_name": "InitiaElectro",
-  "description": "L'électronique pour tous",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#0ea5e9",
   "theme_color": "#0ea5e9",
   "icons": [
     {
-      "src": "icon-512.png",
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1c/Microchip-icon.svg/512px-Microchip-icon.svg.png",
       "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
+      "type": "image/png"
     }
   ]
 }
