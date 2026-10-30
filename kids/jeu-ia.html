@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>InitiaKids - Le Monde Magique</title>
+<title>InitiaKids - L'IA Magique</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: 'Comic Sans MS', 'Segoe UI', Arial, sans-serif; background: #fef3c7; color: #1a1f2e; line-height: 1.6; }
@@ -18,6 +18,7 @@
   .carte-jeu .emoji { font-size: 3.5em; }
   .carte-jeu h3 { color: #1a1f2e; margin-bottom: 4px; font-size: 1.2em; }
   .carte-jeu p { color: #64748b; font-size: 0.95em; }
+  
   .zone-jeu { display: none; background: white; border-radius: 16px; padding: 30px; box-shadow: 0 8px 0 #cbd5e1; text-align: center; }
   .zone-jeu.active { display: block; animation: fadeIn 0.3s; }
   @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
@@ -50,32 +51,39 @@
 <body>
 
 <header>
-  <h1 id="titre-header">🧒 Le Monde Magique</h1>
+  <h1 id="titre-header">🧠 L'IA Magique</h1>
   <div>
-    <!-- LE SEUL BOUTON DE RETOUR : Il pointe vers index.html dans le dossier KIDS -->
+    <!-- LE SEUL LIEN DE RETOUR : Il pointe vers index.html (le menu InitiaKids) -->
     <a href="index.html" class="btn-menu">🏠 Retour aux jeux</a>
-    <!-- Ce bouton sert à revenir au menu des 3 mini-jeux -->
     <button id="btn-retour" class="btn-menu" onclick="retourMenu()" style="display:none;">← Menu des 3 jeux</button>
   </div>
 </header>
 
 <div class="conteneur">
+  
+  <!-- MENU INTERNE DES 3 MINI-JEUX -->
   <div id="menu" class="zone-jeu active">
     <p style="margin-bottom:20px; font-size:1.1em; color:#475569; text-align:left;">Choisis un jeu pour découvrir les secrets de l'IA !</p>
+    
     <div class="carte-jeu" onclick="lancerJeu('fruits', '🍎 L\'Apprenti Dresseur')">
-      <div class="emoji">🍎</div><div><h3>Jeu 1 : L'Apprenti Dresseur</h3><p>Apprends à l'IA à reconnaître les fruits.</p></div>
+      <div class="emoji">🍎</div>
+      <div><h3>Jeu A : L'Apprenti Dresseur</h3><p>Apprends à l'IA à reconnaître les fruits.</p></div>
     </div>
+    
     <div class="carte-jeu" onclick="lancerJeu('robot', '🤖 Le Chef d\'Orchestre')">
-      <div class="emoji">🤖</div><div><h3>Jeu 2 : Le Chef d'Orchestre</h3><p>Programme un robot pour atteindre la cible.</p></div>
+      <div class="emoji">🤖</div>
+      <div><h3>Jeu B : Le Chef d'Orchestre</h3><p>Programme un robot pour atteindre la cible.</p></div>
     </div>
+    
     <div class="carte-jeu" onclick="lancerJeu('visages', '🕵️‍♂️ Le Détective des Visages')">
-      <div class="emoji">🕵️‍♂️</div><div><h3>Jeu 3 : Le Détective des Visages</h3><p>Règle l'IA pour reconnaître les émotions.</p></div>
+      <div class="emoji">🕵️‍♂️</div>
+      <div><h3>Jeu C : Le Détective des Visages</h3><p>Règle l'IA pour reconnaître les émotions.</p></div>
     </div>
   </div>
 
-  <!-- JEUX (cachés au début) -->
+  <!-- JEU A : FRUITS -->
   <div id="jeu-fruits" class="zone-jeu">
-    <h2 style="color:#0ea5e9; margin-bottom:20px;">Étape 1 : Montre des exemples à l'IA</h2>
+    <h2 style="color:#0ea5e9; margin-bottom:20px;">Montre des exemples à l'IA</h2>
     <p>Clique sur un fruit, puis dis ce que c'est.</p>
     <div class="grille-fruits" id="grille-fruits">
       <div class="fruit" onclick="choisirFruit('pomme', this)">🍎</div>
@@ -90,6 +98,7 @@
     <div id="resultat-fruits" style="display:none; margin-top:20px;"><div class="boite-ia" id="texte-fruits"></div></div>
   </div>
 
+  <!-- JEU B : ROBOT -->
   <div id="jeu-robot" class="zone-jeu">
     <h2 style="color:#0ea5e9; margin-bottom:20px;">Programme le robot 🤖</h2>
     <p>Utilise les flèches pour l'emmener vers la pomme 🍎.</p>
@@ -106,6 +115,7 @@
     <div id="resultat-robot" class="boite-ia" style="display:none; margin-top:20px;"></div>
   </div>
 
+  <!-- JEU C : VISAGES -->
   <div id="jeu-visages" class="zone-jeu">
     <h2 style="color:#0ea5e9; margin-bottom:20px;">Règle les paramètres de l'IA</h2>
     <p>Choisis un visage, puis ajuste les curseurs.</p>
@@ -133,7 +143,7 @@
   function retourMenu() {
     document.querySelectorAll('.zone-jeu').forEach(function(z) { z.classList.remove('active'); });
     document.getElementById('menu').classList.add('active');
-    document.getElementById('titre-header').textContent = '🧒 Le Monde Magique';
+    document.getElementById('titre-header').textContent = '🧠 L\'IA Magique';
     document.getElementById('btn-retour').style.display = 'none';
   }
   var fruitSel = "", memoire = { pomme: 0, banane: 0 }, exemples = 0;
