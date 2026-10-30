@@ -3,37 +3,43 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>EspaceIA - Le Monde Magique</title>
+<title>InitiaKids - Le Monde Magique</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: 'Segoe UI', Arial, sans-serif; background: #f4f7fb; color: #1a1f2e; line-height: 1.6; }
-  header { background: linear-gradient(135deg, #f59e0b, #f97316); color: white; padding: 20px; text-align: center; }
-  header h1 { font-size: 1.8em; }
-  .btn-menu { display: none; margin-top: 12px; padding: 8px 16px; background: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.4); border-radius: 8px; font-weight: bold; cursor: pointer; }
+  body { font-family: 'Comic Sans MS', 'Segoe UI', Arial, sans-serif; background: #fef3c7; color: #1a1f2e; line-height: 1.6; }
+  header { background: linear-gradient(135deg, #f59e0b, #f97316); color: white; padding: 20px; text-align: center; border-bottom: 5px solid #d97706; }
+  header h1 { font-size: 1.8em; text-shadow: 2px 2px 0 #d97706; }
+  .btn-menu { display: inline-block; margin-top: 15px; padding: 8px 16px; background: white; color: #d97706; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 1em; border: none; cursor: pointer; box-shadow: 0 4px 0 #cbd5e1; }
+  .btn-menu:active { transform: translateY(4px); box-shadow: none; }
+  
   .conteneur { max-width: 800px; margin: 0 auto; padding: 24px 20px; }
-  .carte-jeu { background: white; border-radius: 16px; padding: 24px; box-shadow: 0 4px 12px rgba(0,0,0,0.06); margin-bottom: 20px; display: flex; align-items: center; gap: 20px; cursor: pointer; transition: transform 0.2s; border-left: 6px solid #f59e0b; }
-  .carte-jeu:hover { transform: translateY(-4px); box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
+  .carte-jeu { background: white; border-radius: 16px; padding: 24px; box-shadow: 0 8px 0 #cbd5e1; margin-bottom: 20px; display: flex; align-items: center; gap: 20px; cursor: pointer; transition: transform 0.2s; border-left: 6px solid #f59e0b; }
+  .carte-jeu:hover { transform: translateY(-4px); }
   .carte-jeu .emoji { font-size: 3.5em; }
   .carte-jeu h3 { color: #1a1f2e; margin-bottom: 4px; font-size: 1.2em; }
   .carte-jeu p { color: #64748b; font-size: 0.95em; }
-  .zone-jeu { display: none; background: white; border-radius: 16px; padding: 30px; box-shadow: 0 4px 12px rgba(0,0,0,0.06); text-align: center; }
+  .zone-jeu { display: none; background: white; border-radius: 16px; padding: 30px; box-shadow: 0 8px 0 #cbd5e1; text-align: center; }
   .zone-jeu.active { display: block; animation: fadeIn 0.3s; }
   @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-  .btn-action { background: #0ea5e9; color: white; border: none; padding: 12px 24px; border-radius: 8px; font-size: 1.1em; font-weight: bold; cursor: pointer; margin: 10px; transition: 0.2s; }
-  .btn-action:hover { background: #0284c7; }
+  
+  .btn-action { background: #f59e0b; color: white; border: none; padding: 12px 24px; border-radius: 8px; font-size: 1.1em; font-weight: bold; cursor: pointer; margin: 10px; transition: 0.2s; box-shadow: 0 4px 0 #d97706; }
+  .btn-action:active { transform: translateY(4px); box-shadow: none; }
   .btn-choix { padding: 16px 32px; border: none; border-radius: 12px; font-size: 1.2em; font-weight: bold; cursor: pointer; margin: 10px; }
   .btn-pomme { background: #fee2e2; color: #991b1b; border: 2px solid #f87171; }
   .btn-banane { background: #fef9c3; color: #854d0e; border: 2px solid #fde047; }
+  
   .grille-fruits { display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; margin-bottom: 24px; }
   .fruit { font-size: 5em; cursor: pointer; padding: 10px; border: 3px solid transparent; border-radius: 16px; transition: all 0.2s; }
   .fruit:hover { transform: scale(1.1); background: #f8fafc; }
   .fruit.selectionne { border-color: #f59e0b; background: #fef3c7; }
   .fruit.cache { visibility: hidden; }
   .boite-ia { background: #0f172a; color: #0ea5e9; padding: 20px; border-radius: 12px; font-family: 'Courier New', monospace; font-size: 1.1em; text-align: left; margin: 20px 0; }
+  
   .grille-robot { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; max-width: 300px; margin: 0 auto; background: #e2e8f0; padding: 4px; border-radius: 8px; }
   .case-robot { background: white; aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-size: 2em; border-radius: 4px; }
   .case-robot.robot { background: #dbeafe; }
   .case-robot.cible { background: #dcfce7; }
+  
   .grille-visages { display: flex; justify-content: center; gap: 40px; margin: 20px 0; }
   .visage { font-size: 6em; cursor: pointer; padding: 10px; border-radius: 16px; border: 3px solid transparent; }
   .visage.selectionne { border-color: #0ea5e9; background: #e0f2fe; }
@@ -42,16 +48,20 @@
 </style>
 </head>
 <body>
+
 <header>
   <h1 id="titre-header">🧒 Le Monde Magique</h1>
-  <div style="margin-top: 15px;">
-    <a href="index.html" style="display:inline-block; margin-right:10px; padding: 8px 16px; background: #1a1f2e; color: white; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 0.9em;">🏠 Accueil EspaceIA</a>
-    <button id="btn-retour" class="btn-menu" onclick="retourMenu()" style="display:none; margin-top:0;">← Menu des 3 jeux</button>
+  <div>
+    <!-- LE SEUL BOUTON DE RETOUR : Il pointe vers index.html dans le dossier KIDS -->
+    <a href="index.html" class="btn-menu">🏠 Retour aux jeux</a>
+    <!-- Ce bouton sert à revenir au menu des 3 mini-jeux -->
+    <button id="btn-retour" class="btn-menu" onclick="retourMenu()" style="display:none;">← Menu des 3 jeux</button>
   </div>
 </header>
+
 <div class="conteneur">
   <div id="menu" class="zone-jeu active">
-    <p style="margin-bottom:20px; font-size:1.1em; color:#475569; text-align:left;">Choisis un jeu pour découvrir l'Intelligence Artificielle !</p>
+    <p style="margin-bottom:20px; font-size:1.1em; color:#475569; text-align:left;">Choisis un jeu pour découvrir les secrets de l'IA !</p>
     <div class="carte-jeu" onclick="lancerJeu('fruits', '🍎 L\'Apprenti Dresseur')">
       <div class="emoji">🍎</div><div><h3>Jeu 1 : L'Apprenti Dresseur</h3><p>Apprends à l'IA à reconnaître les fruits.</p></div>
     </div>
@@ -62,6 +72,8 @@
       <div class="emoji">🕵️‍♂️</div><div><h3>Jeu 3 : Le Détective des Visages</h3><p>Règle l'IA pour reconnaître les émotions.</p></div>
     </div>
   </div>
+
+  <!-- JEUX (cachés au début) -->
   <div id="jeu-fruits" class="zone-jeu">
     <h2 style="color:#0ea5e9; margin-bottom:20px;">Étape 1 : Montre des exemples à l'IA</h2>
     <p>Clique sur un fruit, puis dis ce que c'est.</p>
@@ -77,6 +89,7 @@
     </div>
     <div id="resultat-fruits" style="display:none; margin-top:20px;"><div class="boite-ia" id="texte-fruits"></div></div>
   </div>
+
   <div id="jeu-robot" class="zone-jeu">
     <h2 style="color:#0ea5e9; margin-bottom:20px;">Programme le robot 🤖</h2>
     <p>Utilise les flèches pour l'emmener vers la pomme 🍎.</p>
@@ -92,6 +105,7 @@
     <button class="btn-action" style="background:#ef4444;" onclick="reinitRobot()">🗑️ Effacer</button>
     <div id="resultat-robot" class="boite-ia" style="display:none; margin-top:20px;"></div>
   </div>
+
   <div id="jeu-visages" class="zone-jeu">
     <h2 style="color:#0ea5e9; margin-bottom:20px;">Règle les paramètres de l'IA</h2>
     <p>Choisis un visage, puis ajuste les curseurs.</p>
@@ -107,6 +121,7 @@
     <div id="resultat-visages" class="boite-ia" style="display:none; margin-top:20px;"></div>
   </div>
 </div>
+
 <script>
   function lancerJeu(nom, titre) {
     document.querySelectorAll('.zone-jeu').forEach(function(z) { z.classList.remove('active'); });
@@ -156,5 +171,6 @@
   function reinitVisages() { visageSel = ""; document.querySelectorAll('.visage').forEach(function(v) { v.classList.remove('selectionne'); }); document.getElementById('reglages-visages').style.display = 'none'; document.getElementById('resultat-visages').style.display = 'none'; }
   window.onload = function() { initRobot(); };
 </script>
+
 </body>
 </html>
