@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>InitiaKids - L'électronique magique</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='112' fill='%23f59e0b'/><text x='50%' y='55%' font-size='300' text-anchor='middle' dominant-baseline='middle'>🧸</text></svg>">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { 
+    font-family: 'Comic Sans MS', 'Segoe UI', Arial, sans-serif; 
+    background: linear-gradient(135deg, #fef3c7, #fde68a); 
+    color: #1a1f2e; line-height: 1.6; 
+    text-align: center; padding-bottom: 50px;
+  }
+  
+  header { 
+    background: #f59e0b; color: white; padding: 30px 20px; 
+    border-bottom: 6px solid #d97706;
+    box-shadow: 0 6px 0 rgba(0,0,0,0.1);
+  }
+  header h1 { font-size: 2.5em; text-shadow: 2px 2px 0 #d97706; margin-bottom: 10px; }
+  header p { font-size: 1.2em; font-weight: bold; }
+  
+  .conteneur { max-width: 800px; margin: 40px auto; padding: 0 20px; }
+  
+  .bienvenue { 
+    background: white; border-radius: 20px; padding: 30px; 
+    box-shadow: 0 8px 0 #cbd5e1; margin-bottom: 40px;
+    border: 4px dashed #f59e0b;
+  }
+  .bienvenue h2 { font-size: 1.8em; color: #b45309; margin-bottom: 15px; }
+  .bienvenue p { font-size: 1.2em; color: #475569; }
+  
+  /* Les gros boutons de jeux */
+  .grille-jeux { display: flex; flex-direction: column; gap: 20px; }
+  
+  .btn-jeu { 
+    display: flex; align-items: center; gap: 20px; 
+    background: white; border-radius: 20px; padding: 20px 30px;
+    text-decoration: none; color: #1a1f2e; 
+    box-shadow: 0 8px 0 #cbd5e1; border: 3px solid #e2e8f0;
+    transition: all 0.1s; cursor: pointer;
+  }
+  .btn-jeu:hover { transform: translateY(2px); box-shadow: 0 6px 0 #cbd5e1; }
+  .btn-jeu:active { transform: translateY(6px); box-shadow: 0 2px 0 #cbd5e1; }
+  
+  .btn-jeu .emoji { font-size: 4em; }
+  .btn-jeu .texte { text-align: left; }
+  .btn-jeu .texte h3 { font-size: 1.5em; color: #0f172a; margin-bottom: 5px; }
+  .btn-jeu .texte p { font-size: 1em; color: #64748b; }
+  
+  /* Couleurs des boutons */
+  .jeu-1 { border-color: #f87171; } .jeu-1:hover { background: #fef2f2; }
+  .jeu-2 { border-color: #60a5fa; } .jeu-2:hover { background: #eff6ff; }
+  .jeu-3 { border-color: #34d399; } .jeu-3:hover { background: #ecfdf5; }
+  
+  .btn-retour-parent {
+    display: inline-block; margin-top: 40px; padding: 10px 20px;
+    background: #64748b; color: white; text-decoration: none; 
+    border-radius: 10px; font-weight: bold; font-size: 0.9em;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🧸 InitiaKids</h1>
+  <p>Découvre les secrets de l'électricité en t'amusant !</p>
+</header>
+
+<div class="conteneur">
+  
+  <div class="bienvenue">
+    <h2>Salut, petit génie ! 👋</h2>
+    <p>Prêt à faire briller des lumières et à faire bouger des robots ? Choisis un jeu ci-dessous pour commencer !</p>
+  </div>
+
+  <div class="grille-jeux">
+    
+    <!-- Jeu 1 -->
+    <a href="#" class="btn-jeu jeu-1">
+      <div class="emoji">💡</div>
+      <div class="texte">
+        <h3>Jeu 1 : Allume la lampe</h3>
+        <p>Relie la pile à l'ampoule pour faire de la lumière !</p>
+      </div>
+    </a>
+
+    <!-- Jeu 2 -->
+    <a href="#" class="btn-jeu jeu-2">
+      <div class="emoji">🤖</div>
+      <div class="texte">
+        <h3>Jeu 2 : Le petit robot</h3>
+        <p>Aide le robot à avancer jusqu'à la batterie.</p>
+      </div>
+    </a>
+
+    <!-- Jeu 3 -->
+    <a href="#" class="btn-jeu jeu-3">
+      <div class="emoji">🎵</div>
+      <div class="texte">
+        <h3>Jeu 3 : La boîte à musique</h3>
+        <p>Appuie sur les boutons pour créer de la musique.</p>
+      </div>
+    </a>
+
+  </div>
+
+  <a href="../index.html" class="btn-retour-parent">← Retour au menu des grands</a>
+
+</div>
+
+</body>
+</html>
