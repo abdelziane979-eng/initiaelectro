@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>InitiaKids - La boîte à musique</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Comic Sans MS', 'Segoe UI', Arial, sans-serif; background: #ecfdf5; text-align: center; padding: 20px; }
+  header { background: #10b981; color: white; padding: 20px; border-radius: 20px; margin-bottom: 20px; box-shadow: 0 6px 0 #047857; }
+  header h1 { font-size: 2em; }
+  
+  .zone-jeu { background: white; max-width: 600px; margin: 0 auto; padding: 40px 20px; border-radius: 20px; box-shadow: 0 8px 0 #cbd5e1; }
+  
+  .instruction { font-size: 1.2em; color: #475569; margin-bottom: 30px; font-weight: bold; }
+  
+  .clavier { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; margin-top: 20px; }
+  
+  .touche { 
+    width: 60px; height: 150px; 
+    border: none; border-radius: 15px; 
+    font-size: 1.5em; font-weight: bold; color: white;
+    cursor: pointer; transition: all 0.1s;
+    display: flex; align-items: flex-end; justify-content: center;
+    padding-bottom: 15px;
+    box-shadow: 0 8px 0 rgba(0,0,0,0.2);
+  }
+  
+  .touche:active, .touche.joue { 
+    transform: translateY(8px); 
+    box-shadow: 0 0 0 rgba(0,0,0,0.2); 
+    filter: brightness(1.2);
+  }
+  
+  /* Couleurs des touches (comme un vrai xylophone) */
+  .t1 { background: #ef4444; height: 160px; }
+  .t2 { background: #f59e0b; height: 140px; }
+  .t3 { background: #eab308; height: 120px; }
+  .t4 { background: #22c55e; height: 140px; }
+  .t5 { background: #3b82f6; height: 160px; }
+  
+  .btn-retour { display: inline-block; margin-top: 40px; padding: 10px 20px; background: #64748b; color: white; text-decoration: none; border-radius: 10px; font-weight: bold; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🎵 La boîte à musique</h1>
+  <p>Appuie sur les touches pour faire de la musique !</p>
+</header>
+
+<div class="zone-jeu">
+  <div class="instruction">🎶 Clique sur les couleurs pour jouer des notes !</div>
+  
+  <div class="clavier">
+    <button class="touche t1" onclick="jouerNote(261.63, this)">Do</button>
+    <button class="touche t2" onclick="jouerNote(293.66, this)">Ré</button>
+    <button class="touche t3" onclick="jouerNote(329.63, this)">Mi</button>
+    <button class="touche t4" onclick="jouerNote(349.23, this)">Fa</button>
+    <button class="touche t5" onclick="jouerNote(392.00, this)">Sol</button>
+  </div>
+</div>
+
+<a href="index.html" class="btn-retour">← Retour aux jeux</a>
+
+<script>
+  // On crée un contexte audio pour générer le son (pas besoin de fichiers MP3 !)
+  var audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+  function jouerNote(frequence, bouton) {
+    // 1. Effet visuel (la touche s'enfonce)
+    bouton.classList.add('joue');
+    setTimeout(function() { bouton.classList.remove('joue'); }, 150);
+
+    // 2. Jouer le son
+    var oscillateur = audioCtx.createOscillator();
+    var gainNode = audioCtx.createGain();
+
+    oscillateur.type = 'sine'; // Bruit doux (sinusoïdal)
+    oscillateur.frequency.value = frequence;
+
+    oscillateur.connect(gainNode);
+    gainNode.connect(audioCtx.destination);
+
+    // Enveloppe du son (pour éviter les "clics" désagréables)
+    var maintenant = audioCtx.currentTime;
+    gainNode.gain.setValueAtTime(0, maintenant);
+    gainNode.gain.linearRampToValueAtTime(0.5, maintenant + 0.05);
+    gainNode.gain.exponentialRampToValueAtTime(0.001, maintenant + 0.8);
+
+    oscillateur.start(maintenant);
+    oscillateur.stop(maintenant + 0.8);
+  }
+</script>
+
+</body>
+</html>
