@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>InitiaKids - Le petit robot</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Comic Sans MS', 'Segoe UI', Arial, sans-serif; background: #e0f2fe; text-align: center; padding: 20px; }
+  header { background: #0ea5e9; color: white; padding: 20px; border-radius: 20px; margin-bottom: 20px; box-shadow: 0 6px 0 #0284c7; }
+  header h1 { font-size: 2em; }
+  
+  .zone-jeu { background: white; max-width: 600px; margin: 0 auto; padding: 20px; border-radius: 20px; box-shadow: 0 8px 0 #cbd5e1; }
+  
+  .plateau { 
+    display: grid; 
+    grid-template-columns: repeat(5, 1fr); 
+    gap: 5px; 
+    background: #cbd5e1; 
+    padding: 5px; 
+    border-radius: 10px; 
+    max-width: 350px; 
+    margin: 0 auto 20px auto; 
+  }
+  
+  .case { 
+    background: #f8fafc; 
+    aspect-ratio: 1; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    font-size: 2.5em; 
+    border-radius: 8px; 
+  }
+  
+  .mur { background: #64748b; font-size: 2em; }
+  .robot { background: #dbeafe; }
+  .batterie { background: #dcfce7; }
+  
+  /* Contrôles */
+  .controles { display: flex; flex-direction: column; align-items: center; gap: 10px; margin-top: 20px; }
+  .ligne-controles { display: flex; gap: 10px; }
+  
+  .btn-dir { 
+    width: 60px; height: 60px; font-size: 2em; 
+    background: #f59e0b; color: white; border: none; 
+    border-radius: 15px; cursor: pointer; 
+    box-shadow: 0 5px 0 #d97706; transition: all 0.1s; 
+  }
+  .btn-dir:active { transform: translateY(5px); box-shadow: 0 0 0 #d97706; }
+  .btn-dir:hover { background: #fbbf24; }
+  
+  .message-victoire { font-size: 1.5em; font-weight: bold; color: #22c55e; margin-top: 20px; display: none; background: #dcfce7; padding: 15px; border-radius: 10px; border: 2px solid #22c55e; }
+  
+  .btn-retour { display: inline-block; margin-top: 30px; padding: 10px 20px; background: #64748b; color: white; text-decoration: none; border-radius: 10px; font-weight: bold; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🤖 Le petit robot</h1>
+  <p>Aide le robot à atteindre la batterie 🔋 !</p>
+</header>
+
+<div class="zone-jeu">
+  <div class="plateau" id="plateau">
+    <!-- La grille sera générée par le script -->
+  </div>
+
+  <div class="controles">
+    <button class="btn-dir" onclick="deplacer(0, -1)">⬆️</button>
+    <div class="ligne-controles">
+      <button class="btn-dir" onclick="deplacer(-1, 0)">⬅️</button>
+      <button class="btn-dir" onclick="deplacer(0, 1)">⬇️</button>
+      <button class="btn-dir" onclick="deplacer(1, 0)">➡️</button>
+    </div>
+  </div>
+
+  <div class="message-victoire" id="victoire">
+    🎉 Bravo ! Le robot a trouvé la batterie !<br>
+    <button onclick="recommencer()" style="margin-top:10px; padding:8px 15px; background:#22c55e; color:white; border:none; border-radius:8px; font-size:0.7em; cursor:pointer;">🔄 Rejouer</button>
+  </div>
+</div>
+
+<a href="index.html" class="btn-retour">← Retour aux jeux</a>
+
+<script>
+  // Taille de la grille
+  var taille = 5;
+  
+  // Position du robot et de la batterie
+  var robotX = 0;
+  var robotY = 0;
+  var batterieX = 4;
+  var batterieY = 4;
+  
+  // Les murs (pour faire un petit labyrinthe)
+  var murs = [
+    {x: 1, y: 1},
+    {x: 2, y: 2},
+    {x: 3, y: 1},
+    {x: 1, y: 3}
+  ];
+
+  function dessinerPlateau() {
+    var plateau = document.getElementById('plateau');
+    plateau.innerHTML = '';
+    
+    for (var y = 0; y < taille; y++) {
+      for (var x = 0; x < taille; x++) {
+        var caseDiv = document.createElement('div');
+        caseDiv.className = 'case';
+        
+        // Est-ce un mur ?
+        if (murs.some(function(m) { return m.x === x && m.y === y; })) {
+          caseDiv.classList.add('mur');
+          caseDiv.textContent = '🪨';
+        }
+        // Est-ce le robot ?
+        else if (x === robotX && y === robotY) {
+          caseDiv.classList.add('robot');
+          caseDiv.textContent = '🤖';
+        }
+        // Est-ce la batterie ?
+        else if (x === batterieX && y === batterieY) {
+          caseDiv.classList.add('batterie');
+          caseDiv.textContent = '🔋';
+        }
+        
+        plateau.appendChild(caseDiv);
+      }
+    }
+  }
+
+  function deplacer(dx, dy) {
+    // Si on a déjà gagné, on ne bouge plus
+    if (document.getElementById('victoire').style.display === 'block') return;
+
+    var nouveauX = robotX + dx;
+    var nouveauY = robotY + dy;
+    
+    // Vérifier les bords du plateau
+    if (nouveauX < 0 || nouveauX >= taille || nouveauY < 0 || nouveauY >= taille) return;
+    
+    // Vérifier les murs
+    if (murs.some(function(m) { return m.x === nouveauX && m.y === nouveauY; })) return;
+    
+    // Déplacer le robot
+    robotX = nouveauX;
+    robotY = nouveauY;
+    
+    dessinerPlateau();
+    verifierVictoire();
+  }
+
+  function verifierVictoire() {
+    if (robotX === batterieX && robotY === batterieY) {
+      document.getElementById('victoire').style.display = 'block';
+    }
+  }
+
+  function recommencer() {
+    robotX = 0;
+    robotY = 0;
+    document.getElementById('victoire').style.display = 'none';
+    dessinerPlateau();
+  }
+
+  // Initialiser au chargement
+  window.onload = dessinerPlateau;
+</script>
+
+</body>
+</html>
