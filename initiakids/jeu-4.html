@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>InitiaKids - Le Train des Couleurs</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Comic Sans MS', 'Segoe UI', Arial, sans-serif; background: #fdf4ff; text-align: center; padding: 20px; }
+  header { background: #d946ef; color: white; padding: 20px; border-radius: 20px; margin-bottom: 20px; box-shadow: 0 6px 0 #a21caf; }
+  header h1 { font-size: 2em; }
+  .zone-jeu { background: white; max-width: 500px; margin: 0 auto; padding: 30px; border-radius: 20px; box-shadow: 0 8px 0 #cbd5e1; }
+  
+  .score-box { font-size: 1.5em; font-weight: bold; color: #86198f; margin-bottom: 20px; }
+  
+  /* Grille des LED */
+  .grille-leds { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin: 0 auto 30px auto; max-width: 300px; }
+  .led { 
+    height: 120px; border-radius: 20px; cursor: pointer; opacity: 0.3; 
+    transition: all 0.1s; box-shadow: inset 0 -10px 0 rgba(0,0,0,0.2);
+    display: flex; align-items: center; justify-content: center; font-size: 3em;
+  }
+  .led.allume { opacity: 1; transform: scale(1.05); box-shadow: 0 0 20px currentColor, inset 0 -10px 0 rgba(0,0,0,0.2); }
+  
+  .led-rouge { background: #ef4444; color: #ef4444; }
+  .led-vert { background: #22c55e; color: #22c55e; }
+  .led-bleu { background: #3b82f6; color: #3b82f6; }
+  .led-jaune { background: #eab308; color: #eab308; }
+
+  .btn-action { 
+    background: #d946ef; color: white; border: none; padding: 15px 30px; 
+    border-radius: 12px; font-size: 1.2em; font-weight: bold; cursor: pointer; 
+    box-shadow: 0 6px 0 #a21caf; transition: 0.1s; margin: 10px;
+  }
+  .btn-action:active { transform: translateY(6px); box-shadow: none; }
+  
+  .message { font-size: 1.5em; font-weight: bold; min-height: 40px; color: #d946ef; margin-bottom: 20px; }
+  
+  .btn-retour { display: inline-block; margin-top: 30px; padding: 10px 20px; background: #64748b; color: white; text-decoration: none; border-radius: 10px; font-weight: bold; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🚦 Le Train des Couleurs</h1>
+  <p>Regarde bien les lumières s'allumer, puis reproduis la séquence !</p>
+</header>
+
+<div class="zone-jeu">
+  <div class="score-box">Score : <span id="score">0</span></div>
+  <div class="message" id="message">Clique sur "Démarrer" pour jouer !</div>
+
+  <div class="grille-leds">
+    <div class="led led-rouge" id="led-0" onclick="clicJoueur(0)">🔴</div>
+    <div class="led led-vert" id="led-1" onclick="clicJoueur(1)">🟢</div>
+    <div class="led led-bleu" id="led-2" onclick="clicJoueur(2)">🔵</div>
+    <div class="led led-jaune" id="led-3" onclick="clicJoueur(3)">🟡</div>
+  </div>
+
+  <button class="btn-action" id="btn-demarrer" onclick="demarrerJeu()">▶️ Démarrer</button>
+</div>
+
+<a href="index.html" class="btn-retour">← Retour aux jeux</a>
+
+<script>
+  var sequence = [];
+  var sequenceJoueur = [];
+  var score = 0;
+  var enCoursDeLecture = false;
+  var audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  
+  // Fréquences pour les sons
+  var frequences = [261.63, 329.63, 392.00, 523.25]; 
+
+  function jouerSon(index) {
+    var oscillateur = audioCtx.createOscillator();
+    var gainNode = audioCtx.createGain();
+    oscillateur.type = 'triangle';
+    oscillateur.frequency.value = frequences[index];
+    oscillateur.connect(gainNode);
+    gainNode.connect(audioCtx.destination);
+    var maintenant = audioCtx.currentTime;
+    gainNode.gain.setValueAtTime(0, maintenant);
+    gainNode.gain.linearRampToValueAtTime(0.3, maintenant + 0.05);
+    gainNode.gain.exponentialRampToValueAtTime(0.001, maintenant + 0.4);
+    oscillateur.start(maintenant);
+    oscillateur.stop(maintenant + 0.4);
+  }
+
+  function allumerLED(index, duree) {
+    var led = document.getElementById('led-' + index);
+    led.classList.add('allume');
+    jouerSon(index);
+    setTimeout(function() {
+      led.classList.remove('allume');
+    }, duree);
+  }
+
+  function demarrerJeu() {
+    sequence = [];
+    score = 0;
+    document.getElementById('score').textContent = score;
+    document.getElementById('btn-demarrer').style.display = 'none';
+    document.getElementById('message').textContent = "Prépare-toi...";
+    ajouterEtape();
+  }
+
+  function ajouterEtape() {
+    sequenceJoueur = [];
+    // Ajouter une nouvelle couleur au hasard (0 à 3)
+    sequence.push(Math.floor(Math.random() * 4));
+    document.getElementById('message').textContent = "Observe bien...";
+    
+    setTimeout(function() {
+      jouerSequence();
+    }, 1000);
+  }
+
+  function jouerSequence() {
+    enCoursDeLecture = true;
+    var i = 0;
+    var intervalle = setInterval(function() {
+      if (i >= sequence.length) {
+        clearInterval(intervalle);
+        enCoursDeLecture = false;
+        document.getElementById('message').textContent = "À toi de jouer !";
+        return;
+      }
+      allumerLED(sequence[i], 400);
+      i++;
+    }, 700);
+  }
+
+  function clicJoueur(index) {
+    if (enCoursDeLecture) return; // On ne peut pas cliquer pendant que ça joue
+    if (sequence.length === 0) return; // Jeu pas commencé
+
+    allumerLED(index, 200);
+    sequenceJoueur.push(index);
+
+    // Vérifier si le joueur a fait une erreur
+    var indexActuel = sequenceJoueur.length - 1;
+    if (sequenceJoueur[indexActuel] !== sequence[indexActuel]) {
+      // Erreur !
+      document.getElementById('message').textContent = "❌ Oups ! C'était perdu...";
+      document.body.style.background = "#fee2e2";
+      setTimeout(function() {
+        document.body.style.background = "#fdf4ff";
+        document.getElementById('message').textContent = "Score final : " + score;
+        document.getElementById('btn-demarrer').style.display = 'inline-block';
+        document.getElementById('btn-demarrer').textContent = "🔄 Rejouer";
+        sequence = [];
+      }, 1500);
+      return;
+    }
+
+    // Si le joueur a reproduit toute la séquence correctement
+    if (sequenceJoueur.length === sequence.length) {
+      score++;
+      document.getElementById('score').textContent = score;
+      document.getElementById('message').textContent = "✅ Bravo ! Continue...";
+      enCoursDeLecture = true;
+      setTimeout(function() {
+        ajouterEtape();
+      }, 1500);
+    }
+  }
+</script>
+
+</body>
+</html>
