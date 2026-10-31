@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>InitiaKids - Allume la lampe</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Comic Sans MS', 'Segoe UI', Arial, sans-serif; background: #fef3c7; text-align: center; padding: 20px; }
+  header { background: #f59e0b; color: white; padding: 20px; border-radius: 20px; margin-bottom: 20px; box-shadow: 0 6px 0 #d97706; }
+  header h1 { font-size: 2em; }
+  .zone-jeu { background: white; max-width: 700px; margin: 0 auto; padding: 30px; border-radius: 20px; box-shadow: 0 8px 0 #cbd5e1; position: relative; min-height: 400px; }
+  .composant { position: absolute; font-size: 4em; cursor: pointer; transition: transform 0.2s; filter: drop-shadow(0 4px 4px rgba(0,0,0,0.2)); }
+  .composant:hover { transform: scale(1.1); }
+  .composant.selectionne { transform: scale(1.2); filter: drop-shadow(0 0 15px #f59e0b); }
+  #pile { left: 50px; top: 200px; }
+  #ampoule { right: 50px; top: 100px; }
+  #interrupteur { left: 300px; top: 250px; }
+  .fil { position: absolute; background: #ef4444; z-index: -1; display: none; }
+  .bulle-info { background: #eff6ff; border: 3px solid #3b82f6; padding: 15px; border-radius: 15px; margin-top: 30px; font-weight: bold; color: #1e40af; display: none; }
+  .btn-retour { display: inline-block; margin-top: 30px; padding: 10px 20px; background: #64748b; color: white; text-decoration: none; border-radius: 10px; font-weight: bold; }
+</style>
+</head>
+<body>
+<header>
+  <h1>💡 Allume la lampe !</h1>
+  <p>Clique sur la pile, puis sur l'interrupteur, puis sur l'ampoule.</p>
+</header>
+<div class="zone-jeu">
+  <div id="compteur" style="font-size: 1.5em; color: #b45309; font-weight: bold; margin-bottom: 20px;">Étape 1 : Choisis la Pile 🔋</div>
+  <div class="composant" id="pile" onclick="cliquerPile()">🔋</div>
+  <div class="composant" id="interrupteur" onclick="cliquerInterrupteur()">🔘</div>
+  <div class="composant" id="ampoule" onclick="cliquerAmpoule()">💡</div>
+  <div class="fil" id="fil1" style="width: 200px; height: 6px; left: 100px; top: 230px;"></div>
+  <div class="fil" id="fil2" style="width: 6px; height: 150px; left: 350px; top: 100px;"></div>
+  <div class="fil" id="fil3" style="width: 150px; height: 6px; right: 100px; top: 200px;"></div>
+  <div class="bulle-info" id="explication"></div>
+</div>
+<a href="index.html" class="btn-retour">← Retour aux jeux</a>
+<script>
+  var etape = 1;
+  function cliquerPile() { if (etape === 1) { document.getElementById('pile').classList.add('selectionne'); document.getElementById('compteur').textContent = "Étape 2 : Clique sur l'interrupteur 🔘"; etape = 2; afficherBulle("Super ! Tu as pris la pile. C'est elle qui donne l'énergie (le courant)."); } }
+  function cliquerInterrupteur() { if (etape === 2) { document.getElementById('interrupteur').classList.add('selectionne'); document.getElementById('compteur').textContent = "Étape 3 : Clique sur l'ampoule 💡"; etape = 3; afficherBulle("Bien joué ! L'interrupteur sert à ouvrir ou fermer le passage du courant. Ici, on le laisse passer."); } }
+  function cliquerAmpoule() {
+    if (etape === 3) {
+      document.getElementById('ampoule').classList.add('selectionne');
+      document.getElementById('ampoule').style.filter = "drop-shadow(0 0 30px #facc15)";
+      document.getElementById('compteur').textContent = "🎉 Bravo ! La lampe s'allume !";
+      document.getElementById('fil1').style.display = 'block'; document.getElementById('fil2').style.display = 'block'; document.getElementById('fil3').style.display = 'block';
+      afficherBulle("🎉 MAGIE ! Le courant a fait le tour complet : Pile ➡️ Fil ➡️ Interrupteur ➡️ Ampoule ➡️ Fil ➡️ Pile. C'est ça, un circuit fermé !"); etape = 4;
+    }
+  }
+  function afficherBulle(texte) { var bulle = document.getElementById('explication'); bulle.style.display = 'block'; bulle.textContent = texte; }
+</script>
+</body>
+</html>
