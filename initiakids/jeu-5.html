@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>InitiaKids - L'Aimant Magique</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Comic Sans MS', 'Segoe UI', Arial, sans-serif; background: #f0fdf4; text-align: center; padding: 20px; }
+  header { background: #10b981; color: white; padding: 20px; border-radius: 20px; margin-bottom: 20px; box-shadow: 0 6px 0 #047857; }
+  header h1 { font-size: 2em; }
+  
+  .zone-jeu { background: white; max-width: 600px; margin: 0 auto; padding: 30px; border-radius: 20px; box-shadow: 0 8px 0 #cbd5e1; }
+  
+  .instruction { font-size: 1.2em; color: #475569; margin-bottom: 20px; font-weight: bold; }
+  
+  /* L'aimant */
+  .aimant { 
+    font-size: 8em; margin: 20px auto; width: 200px; height: 200px;
+    display: flex; align-items: center; justify-content: center;
+    border: 5px dashed #cbd5e1; border-radius: 50%; background: #f8fafc;
+    transition: all 0.3s;
+  }
+  .aimant.attire { border-color: #10b981; background: #dcfce7; transform: scale(1.1); }
+  
+  /* Les objets à tester */
+  .objets { display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; margin-top: 30px; }
+  .objet { 
+    font-size: 4em; cursor: pointer; padding: 15px; 
+    background: #f8fafc; border: 3px solid #e2e8f0; border-radius: 15px;
+    transition: transform 0.2s; box-shadow: 0 4px 0 #cbd5e1;
+  }
+  .objet:hover { transform: translateY(-5px); background: #f1f5f9; }
+  .objet:active { transform: translateY(5px); box-shadow: none; }
+  
+  .message { font-size: 1.3em; font-weight: bold; margin-top: 20px; min-height: 50px; }
+  .succes { color: #10b981; }
+  .echec { color: #ef4444; }
+  
+  .btn-retour { display: inline-block; margin-top: 30px; padding: 10px 20px; background: #64748b; color: white; text-decoration: none; border-radius: 10px; font-weight: bold; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🧲 L'Aimant Magique</h1>
+  <p>Clique sur un objet pour le tester sur l'aimant !</p>
+</header>
+
+<div class="zone-jeu">
+  <div class="instruction">L'aimant attire-t-il cet objet ?</div>
+
+  <!-- L'aimant -->
+  <div class="aimant" id="aimant">🧲</div>
+
+  <!-- Message de résultat -->
+  <div class="message" id="message"></div>
+
+  <!-- Les objets à cliquer -->
+  <div class="objets">
+    <div class="objet" onclick="testerObjet('🪝', true, this)">🪝</div>
+    <div class="objet" onclick="testerObjet('🪵', false, this)">🪵</div>
+    <div class="objet" onclick="testerObjet('🔑', true, this)">🔑</div>
+    <div class="objet" onclick="testerObjet('🥤', false, this)">🥤</div>
+    <div class="objet" onclick="testerObjet('📎', true, this)">📎</div>
+  </div>
+</div>
+
+<a href="index.html" class="btn-retour">← Retour aux jeux</a>
+
+<script>
+  // Petit son magique
+  var audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  function jouerSon(frequence, duree, type) {
+    var oscillateur = audioCtx.createOscillator();
+    var gainNode = audioCtx.createGain();
+    oscillateur.type = type || 'sine';
+    oscillateur.frequency.value = frequence;
+    oscillateur.connect(gainNode);
+    gainNode.connect(audioCtx.destination);
+    var maintenant = audioCtx.currentTime;
+    gainNode.gain.setValueAtTime(0, maintenant);
+    gainNode.gain.linearRampToValueAtTime(0.2, maintenant + 0.05);
+    gainNode.gain.exponentialRampToValueAtTime(0.001, maintenant + duree);
+    oscillateur.start(maintenant);
+    oscillateur.stop(maintenant + duree);
+  }
+
+  function testerObjet(emoji, estMagnetique, element) {
+    var aimant = document.getElementById('aimant');
+    var msg = document.getElementById('message');
+    
+    // Réinitialiser
+    aimant.classList.remove('attire');
+    msg.textContent = "";
+    msg.className = "message";
+    
+    if (estMagnetique) {
+      // L'objet est attiré
+      aimant.textContent = emoji;
+      aimant.classList.add('attire');
+      msg.textContent = "✅ Magnétique ! L'aimant l'attire !";
+      msg.classList.add('succes');
+      jouerSon(600, 0.3, 'sine'); // Son joyeux
+      setTimeout(function() { jouerSon(800, 0.4, 'sine'); }, 150);
+      
+      // Remettre l'aimant après 2 secondes
+      setTimeout(function() {
+        aimant.textContent = "🧲";
+        aimant.classList.remove('attire');
+      }, 2000);
+      
+    } else {
+      // L'objet n'est pas attiré
+      element.style.transform = "translateX(10px)";
+      setTimeout(function() { element.style.transform = "translateX(-10px)"; }, 100);
+      setTimeout(function() { element.style.transform = "translateX(10px)"; }, 200);
+      setTimeout(function() { element.style.transform = "translateX(0)"; }, 300);
+      
+      msg.textContent = "❌ Pas magnétique ! L'aimant ne l'attire pas.";
+      msg.classList.add('echec');
+      jouerSon(200, 0.3, 'sawtooth'); // Son de "buzz"
+    }
+  }
+</script>
+
+</body>
+</html>
