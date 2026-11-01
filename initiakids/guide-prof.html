@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Guide Pédagogique - InitiaKids</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='112' fill='%23f59e0b'/><text x='50%' y='55%' font-size='300' text-anchor='middle' dominant-baseline='middle'>🧸</text></svg>">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: #f4f7fb; color: #1a1f2e; line-height: 1.6; }
+  
+  header { background: linear-gradient(135deg, #f59e0b, #f97316); color: white; padding: 40px 20px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+  header h1 { font-size: 2.2em; margin-bottom: 10px; }
+  header p { font-size: 1.1em; opacity: 0.95; }
+  
+  .conteneur { max-width: 900px; margin: 0 auto; padding: 40px 20px; }
+  
+  .intro-box { background: white; padding: 24px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 30px; border-left: 6px solid #f59e0b; }
+  .intro-box h2 { color: #b45309; margin-bottom: 12px; font-size: 1.4em; }
+  
+  .jeu-carte { background: white; border-radius: 12px; padding: 24px; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); border-top: 4px solid; }
+  .jeu-carte h3 { font-size: 1.3em; margin-bottom: 12px; display: flex; align-items: center; gap: 10px; }
+  .jeu-carte .emoji { font-size: 1.5em; }
+  
+  .jeu-carte p { margin-bottom: 10px; color: #334155; }
+  .jeu-carte strong { color: #0f172a; }
+  
+  .a-dire { background: #f0f9ff; border-left: 3px solid #0ea5e9; padding: 12px 16px; border-radius: 4px; margin-top: 12px; margin-bottom: 12px; font-style: italic; }
+  .a-dire strong { color: #0369a1; }
+  
+  .question { background: #fdf4ff; border-left: 3px solid #d946ef; padding: 12px 16px; border-radius: 4px; margin-top: 12px; }
+  .question strong { color: #86198f; }
+  
+  /* Couleurs par jeu */
+  .c1 { border-top-color: #f87171; } .c1 h3 { color: #b91c1c; }
+  .c2 { border-top-color: #60a5fa; } .c2 h3 { color: #1d4ed8; }
+  .c3 { border-top-color: #34d399; } .c3 h3 { color: #047857; }
+  .c4 { border-top-color: #a855f7; } .c4 h3 { color: #6b21a8; }
+  .c5 { border-top-color: #d946ef; } .c5 h3 { color: #86198f; }
+  .c6 { border-top-color: #10b981; } .c6 h3 { color: #047857; }
+  .c7 { border-top-color: #f59e0b; } .c7 h3 { color: #b45309; }
+
+  .btn-retour { display: inline-block; margin-top: 20px; padding: 10px 20px; background: #64748b; color: white; text-decoration: none; border-radius: 8px; font-weight: bold; }
+  
+  @media print {
+    body { background: white; }
+    header { box-shadow: none; background: #f59e0b; -webkit-print-color-adjust: exact; }
+    .jeu-carte, .intro-box { box-shadow: none; border: 1px solid #ccc; page-break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🧸 Guide Pédagogique : InitiaKids</h1>
+  <p>Manuel à l'usage des professeurs (Cycle 2 & 3 / 8-10 ans)</p>
+</header>
+
+<div class="conteneur">
+  
+  <div class="intro-box">
+    <h2>🎯 Objectifs de l'application</h2>
+    <p><strong>InitiaKids</strong> est une application web 100% sécurisée et cloisonnée, conçue pour initier les enfants à l'électricité, à la logique algorithmique et à l'Intelligence Artificielle de manière purement ludique.</p>
+    <p style="margin-top: 10px;"><strong>Aucune installation n'est requise</strong>, l'application fonctionne directement dans le navigateur (Chrome, Edge, Firefox). Les enfants peuvent y accéder depuis la page d'accueil de la plateforme.</p>
+    <p style="margin-top: 10px; font-size: 0.95em; color: #64748b;">
+      🌐 <strong>Accès en ligne :</strong> https://abdelziane979-eng.github.io/initiaelectro/initiakids/index.html
+    </p>
+  </div>
+
+  <!-- JEU 1 -->
+  <div class="jeu-carte c1">
+    <h3><span class="emoji">💡</span> Jeu 1 : Allume la lampe</h3>
+    <p><strong>Concept :</strong> L'enfant doit relier virtuellement la pile, l'interrupteur et l'ampoule pour fermer le circuit.</p>
+    <p><strong>Ce que ça enseigne :</strong> La notion de circuit fermé, le rôle de la pile (source d'énergie) et de l'interrupteur (ouvre/ferme le passage).</p>
+    <div class="a-dire">
+      <strong>💬 À dire aux élèves :</strong> "Pour que l'électricité passe, il faut un chemin complet, sans trou. La pile donne l'énergie, l'interrupteur ouvre ou ferme le chemin, et l'ampoule s'allume quand le courant arrive."
+    </div>
+    <div class="question">
+      <strong>❓ Question à poser :</strong> "Que se passe-t-il si on enlève un fil ? Pourquoi ?" (Le circuit est ouvert, le courant ne passe plus, l'ampoule s'éteint).
+    </div>
+  </div>
+
+  <!-- JEU 2 -->
+  <div class="jeu-carte c2">
+    <h3><span class="emoji">🤖</span> Jeu 2 : Le petit robot</h3>
+    <p><strong>Concept :</strong> L'enfant guide un robot à travers un labyrinthe pour trouver une batterie.</p>
+    <p><strong>Ce que ça enseigne :</strong> Les bases de l'algorithmique (instructions pas à pas), la logique spatiale et la résolution de problèmes.</p>
+    <div class="a-dire">
+      <strong>💬 À dire aux élèves :</strong> "Un ordinateur ou un robot ne pense pas tout seul. Il a besoin qu'on lui donne des instructions précises, dans le bon ordre. C'est ce qu'on appelle un algorithme."
+    </div>
+    <div class="question">
+      <strong>❓ Question à poser :</strong> "Que se passe-t-il si on se trompe de flèche ?" (Le robot tape dans le mur et on doit recommencer avec les bonnes instructions).
+    </div>
+  </div>
+
+  <!-- JEU 3 -->
+  <div class="jeu-carte c3">
+    <h3><span class="emoji">🎵</span> Jeu 3 : La boîte à musique</h3>
+    <p><strong>Concept :</strong> Un xylophone interactif où chaque couleur produit une note de musique.</p>
+    <p><strong>Ce que ça enseigne :</strong> Le lien entre l'électricité et le son (les signaux), et l'éveil musical (grave/aigu).</p>
+    <div class="a-dire">
+      <strong>💬 À dire aux élèves :</strong> "Chaque touche envoie un signal électrique différent. C'est ce signal qui fait vibrer un haut-parleur pour créer une note de musique. Plus le signal est rapide, plus le son est aigu."
+    </div>
+    <div class="question">
+      <strong>❓ Question à poser :</strong> "Est-ce que les sons sont graves ou aigus selon la touche ?" (Faire comparer la première et la dernière touche).
+    </div>
+  </div>
+
+  <!-- JEU 4 -->
+  <div class="jeu-carte c4">
+    <h3><span class="emoji">🧠</span> Jeu 4 : L'IA Magique</h3>
+    <p><strong>Concept :</strong> L'enfant entraîne une Intelligence Artificielle à reconnaître des fruits, à piloter un robot et à analyser des visages.</p>
+    <p><strong>Ce que ça enseigne :</strong> L'apprentissage par l'exemple. Comprendre que l'IA dépend entièrement des données qu'on lui fournit.</p>
+    <div class="a-dire">
+      <strong>💬 À dire aux élèves :</strong> "L'IA n'est pas magique ! Elle apprend avec les exemples qu'on lui donne. Si on lui montre 10 pommes et 0 banane, elle pensera que tout est une pomme. C'est pour ça qu'il faut lui donner de bons exemples."
+    </div>
+    <div class="question">
+      <strong>❓ Question à poser :</strong> "Pourquoi l'IA s'est-elle trompée quand on lui a montré une pomme verte ?" (Parce qu'elle n'avait vu que des rouges dans ses exemples).
+    </div>
+  </div>
+
+  <!-- JEU 5 -->
+  <div class="jeu-carte c5">
+    <h3><span class="emoji">🚦</span> Jeu 5 : Le Train des Couleurs</h3>
+    <p><strong>Concept :</strong> Un jeu de mémoire de type "Jacques a dit" (Simon). L'IA allume des couleurs dans un ordre précis, l'enfant doit reproduire la séquence.</p>
+    <p><strong>Ce que ça enseigne :</strong> La mémoire à court terme, la concentration et la reproduction de séquences logiques.</p>
+    <div class="a-dire">
+      <strong>💬 À dire aux élèves :</strong> "Comme un ordinateur, vous devez mémoriser une suite d'informations dans le bon ordre. Si vous vous trompez, la machine s'arrête !"
+    </div>
+  </div>
+
+  <!-- JEU 6 -->
+  <div class="jeu-carte c6">
+    <h3><span class="emoji">🧲</span> Jeu 6 : L'Aimant Magique</h3>
+    <p><strong>Concept :</strong> Tester différents objets sur un aimant pour voir s'ils sont attirés.</p>
+    <p><strong>Ce que ça enseigne :</strong> Le magnétisme et les propriétés des matériaux (métaux magnétiques vs isolants).</p>
+    <div class="a-dire">
+      <strong>💬 À dire aux élèves :</strong> "L'aimant attire certains métaux (comme le fer), mais il ne peut rien faire contre le bois ou le plastique. C'est ce qu'on appelle le magnétisme."
+    </div>
+    <div class="question">
+      <strong>❓ Question à poser :</strong> "Quels sont les objets qui ont été attirés ? De quoi sont-ils faits ?"
+    </div>
+  </div>
+
+  <!-- JEU 7 -->
+  <div class="jeu-carte c7">
+    <h3><span class="emoji">⚡</span> Jeu 7 : Le Labyrinthe de l'Électricité</h3>
+    <p><strong>Concept :</strong> Tracer un chemin avec la souris pour guider l'électricité de la pile à l'ampoule, sans toucher les murs en bois.</p>
+    <p><strong>Ce que ça enseigne :</strong> La conductivité, le tracé de circuit et l'anticipation spatiale.</p>
+    <div class="a-dire">
+      <strong>💬 À dire aux élèves :</strong> "Le courant électrique cherche toujours le chemin. Mais attention, il ne peut pas traverser le bois ! Il faut trouver les bonnes cases pour l'aider à avancer jusqu'à l'ampoule."
+    </div>
+    <div class="question">
+      <strong>❓ Question à poser :</strong> "Pourquoi l'électricité ne passe-t-elle pas à travers les murs ?" (Le bois est un isolant, il bloque le courant).
+    </div>
+  </div>
+
+  <div style="text-align: center;">
+    <a href="index.html" class="btn-retour">← Retour à l'application InitiaKids</a>
+  </div>
+
+</div>
+
+</body>
+</html>
