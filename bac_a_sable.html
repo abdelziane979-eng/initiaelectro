@@ -2927,6 +2927,9 @@ function exporterPDF() {
   html += '<div class="footer">Créé avec Alerte Electro - Bac à sable</div>';
   html += '<div class="no-print" style="margin-top:20px;"><button onclick="window.print()" style="padding:12px 24px;font-size:16px;background:#6b21a8;color:white;border:none;border-radius:8px;cursor:pointer;">🖨️ Imprimer / Enregistrer en PDF</button></div>';
   html += '<script>setTimeout(function(){ window.print(); }, 500);<\/script>';
+ <div style="text-align: center; padding: 20px; background: #f0f9ff; border-top: 2px solid #e2e8f0; margin-top: 20px;">
+  <a href="guide-enseignant.html" style="color: #0ea5e9; text-decoration: none; font-weight: bold; font-size: 0.95em;">👨‍🏫 Guide Enseignant (EspaceElectronic & EspaceIA)</a>
+</div>
   html += '</body></html>';
   var w = window.open('', '_blank');
   w.document.write(html);
