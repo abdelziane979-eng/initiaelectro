@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>InitiaKids - Le Labyrinthe de l'Électricité</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Comic Sans MS', 'Segoe UI', Arial, sans-serif; background: #fffbeb; text-align: center; padding: 20px; }
+  header { background: #f59e0b; color: white; padding: 20px; border-radius: 20px; margin-bottom: 20px; box-shadow: 0 6px 0 #d97706; }
+  header h1 { font-size: 2em; }
+  
+  .zone-jeu { background: white; max-width: 500px; margin: 0 auto; padding: 30px; border-radius: 20px; box-shadow: 0 8px 0 #cbd5e1; }
+  
+  .instruction { font-size: 1.2em; color: #475569; margin-bottom: 20px; font-weight: bold; }
+  
+  /* La grille du labyrinthe */
+  .grille { 
+    display: grid; 
+    grid-template-columns: repeat(5, 1fr); 
+    gap: 5px; 
+    max-width: 350px; 
+    margin: 0 auto; 
+    background: #cbd5e1; 
+    padding: 5px; 
+    border-radius: 10px; 
+  }
+  
+  .case { 
+    background: #f8fafc; 
+    aspect-ratio: 1; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    font-size: 2.5em; 
+    border-radius: 8px; 
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  
+  .case:hover { background: #e2e8f0; transform: scale(0.95); }
+  .case.mur { background: #78350f; cursor: not-allowed; color: #b45309; }
+  .case.mur:hover { transform: none; background: #78350f; }
+  .case.pile { background: #dcfce7; }
+  .case.ampoule { background: #fef08a; }
+  
+  /* Le chemin de l'électricité */
+  .case.chemin { background: #fbbf24; box-shadow: inset 0 0 10px #d97706; }
+  .case.chemin::after { content: '⚡'; font-size: 0.7em; position: absolute; opacity: 0.5; }
+  
+  .message { font-size: 1.3em; font-weight: bold; margin-top: 20px; min-height: 50px; color: #b45309; }
+  
+  .btn-rejouer { display: none; margin-top: 15px; padding: 10px 20px; background: #f59e0b; color: white; border: none; border-radius: 8px; font-size: 1.1em; font-weight: bold; cursor: pointer; box-shadow: 0 4px 0 #d97706; }
+  .btn-rejouer:active { transform: translateY(4px); box-shadow: none; }
+  
+  .btn-retour { display: inline-block; margin-top: 30px; padding: 10px 20px; background: #64748b; color: white; text-decoration: none; border-radius: 10px; font-weight: bold; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>⚡ Le Labyrinthe de l'Électricité</h1>
+  <p>Guide l'électricité de la pile 🔋 jusqu'à l'ampoule 💡 !</p>
+</header>
+
+<div class="zone-jeu">
+  <div class="instruction">Clique sur les cases pour tracer le chemin. Évite les murs en bois 🪵 !</div>
+
+  <div class="grille" id="grille"></div>
+  
+  <div class="message" id="message"></div>
+  <button class="btn-rejouer" id="btn-rejouer" onclick="initGrille()">🔄 Recommencer</button>
+</div>
+
+<a href="index.html" class="btn-retour">← Retour aux jeux</a>
+
+<script>
+  var taille = 5;
+  var positionJoueur = {x: 0, y: 0}; // Départ en haut à gauche (Pile)
+  var positionAmpoule = {x: 4, y: 4}; // Arrivée en bas à droite
+  var chemin = [{x: 0, y: 0}]; // Le chemin commence à la pile
+  var jeuTermine = false;
+
+  // Définition des murs (Labyrinthe)
+  var murs = [
+    {x: 1, y: 0}, {x: 3, y: 0},
+    {x: 1, y: 1}, {x: 2, y: 1}, {x: 3, y: 1},
+    {x: 1, y: 2}, 
+    {x: 1, y: 3}, {x: 2, y: 3}, {x: 3, y: 3}
+  ];
+
+  var audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  function jouerSon(frequence, duree, type) {
+    var oscillateur = audioCtx.createOscillator();
+    var gainNode = audioCtx.createGain();
+    oscillateur.type = type || 'sine';
+    oscillateur.frequency.value = frequence;
+    oscillateur.connect(gainNode);
+    gainNode.connect(audioCtx.destination);
+    var maintenant = audioCtx.currentTime;
+    gainNode.gain.setValueAtTime(0, maintenant);
+    gainNode.gain.linearRampToValueAtTime(0.2, maintenant + 0.05);
+    gainNode.gain.exponentialRampToValueAtTime(0.001, maintenant + duree);
+    oscillateur.start(maintenant);
+    oscillateur.stop(maintenant + duree);
+  }
+
+  function initGrille() {
+    jeuTermine = false;
+    positionJoueur = {x: 0, y: 0};
+    chemin = [{x: 0, y: 0}];
+    document.getElementById('message').textContent = "Clique sur une case voisine pour avancer !";
+    document.getElementById('btn-rejouer').style.display = 'none';
+    dessinerGrille();
+  }
+
+  function dessinerGrille() {
+    var grilleDiv = document.getElementById('grille');
+    grilleDiv.innerHTML = '';
+
+    for (var y = 0; y < taille; y++) {
+      for (var x = 0; x < taille; x++) {
+        var caseDiv = document.createElement('div');
+        caseDiv.className = 'case';
+        
+        // Est-ce un mur ?
+        if (murs.some(function(m) { return m.x === x && m.y === y; })) {
+          caseDiv.classList.add('mur');
+          caseDiv.textContent = '🪵';
+        }
+        // Est-ce la pile ?
+        else if (x === 0 && y === 0) {
+          caseDiv.classList.add('pile');
+          caseDiv.textContent = '🔋';
+        }
+        // Est-ce l'ampoule ?
+        else if (x === positionAmpoule.x && y === positionAmpoule.y) {
+          caseDiv.classList.add('ampoule');
+          caseDiv.textContent = '💡';
+        }
+        // Est-ce le chemin déjà parcouru ?
+        else if (chemin.some(function(c) { return c.x === x && c.y === y; })) {
+          caseDiv.classList.add('chemin');
+        }
+
+        // Ajouter l'événement de clic
+        caseDiv.onclick = (function(cx, cy) { return function() { cliquerCase(cx, cy); }; })(x, y);
+        
+        grilleDiv.appendChild(caseDiv);
+      }
+    }
+  }
+
+  function cliquerCase(x, y) {
+    if (jeuTermine) return;
+
+    // Vérifier si c'est un mur
+    if (murs.some(function(m) { return m.x === x && m.y === y; })) {
+      jouerSon(150, 0.3, 'sawtooth');
+      document.getElementById('message').textContent = "❌ Aïe ! Le bois ne laisse pas passer l'électricité !";
+      document.getElementById('message').style.color = "#ef4444";
+      setTimeout(function() { document.getElementById('message').style.color = "#b45309"; }, 1000);
+      return;
+    }
+
+    // Vérifier si la case est adjacente (haut, bas, gauche, droite)
+    var dx = Math.abs(x - positionJoueur.x);
+    var dy = Math.abs(y - positionJoueur.y);
+    
+    if ((dx === 1 && dy === 0) || (dx === 0 && dy === 1)) {
+      // C'est une case adjacente valide, on avance !
+      positionJoueur = {x: x, y: y};
+      chemin.push({x: x, y: y});
+      jouerSon(400 + (chemin.length * 50), 0.1, 'sine');
+      document.getElementById('message').textContent = "⚡ L'électricité avance !";
+      dessinerGrille();
+
+      // Vérifier la victoire
+      if (x === positionAmpoule.x && y === positionAmpoule.y) {
+        victoire();
+      }
+    } else {
+      // Clic sur une case trop loin
+      document.getElementById('message').textContent = "⚠️ Tu ne peux cliquer que sur une case voisine (pas en diagonale) !";
+    }
+  }
+
+  function victoire() {
+    jeuTermine = true;
+    document.getElementById('message').innerHTML = "🎉 <strong>BRAVO !</strong> Le courant est arrivé jusqu'à l'ampoule !";
+    document.getElementById('message').style.color = "#10b981";
+    
+    // Petite mélodie de victoire
+    jouerSon(523.25, 0.15, 'sine'); // Do
+    setTimeout(function() { jouerSon(659.25, 0.15, 'sine'); }, 150); // Mi
+    setTimeout(function() { jouerSon(783.99, 0.4, 'sine'); }, 300); // Sol
+
+    document.getElementById('btn-rejouer').style.display = 'inline-block';
+  }
+
+  // Lancer le jeu au chargement
+  window.onload = initGrille;
+</script>
+
+</body>
+</html>
