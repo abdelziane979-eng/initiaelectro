@@ -1,9 +1,10 @@
-var CACHE_NAME = 'initiamaths-v1';
+var CACHE_NAME = 'initiamaths-v2';
 var urlsToCache = [
   './',
   './index.html',
   './jeu-1.html',
   './jeu-2.html',
+  './jeu-3.html',
   './icone.svg',
   './manifest-maths.json'
 ];
