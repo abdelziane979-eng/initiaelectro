@@ -349,6 +349,7 @@
     </button>
     <a href="bibliotheque.html" class="btn-retour" style="margin-left:10px;">📚 Bibliothèque</a>
     <a href="projets.html" class="btn-retour" style="margin-left:10px;">🏆 Projets</a>
+    <a href="guide-enseignant.html" class="btn-retour" style="margin-left:10px; background:#f59e0b; border-color:#f59e0b;">👨‍🏫 Guide</a>
     <a href="index.html" class="btn-retour">← Retour à l'accueil</a>
   </div>
 </header>
@@ -518,9 +519,6 @@ var CATALOGUE = {
     pattes:[{x:10,y:60},{x:50,y:60}], valeurs:null }
 };
 
-/* =========================================================
-   FUSION AVEC composants.js
-   ========================================================= */
 if (typeof COMPOSANTS !== 'undefined') {
   var nbAjoutes = 0;
   var nbEnrichis = 0;
@@ -545,9 +543,6 @@ if (typeof COMPOSANTS !== 'undefined') {
   console.log('✅ ' + nbAjoutes + ' composants ajoutés, ' + nbEnrichis + ' enrichis');
 }
 
-/* =========================================================
-   FILTRE PAR NIVEAU
-   ========================================================= */
 var filtreNiveauActif = 'tous';
 function filtrerParNiveau() {
   var select = document.getElementById('select-niveau');
@@ -556,9 +551,6 @@ function filtrerParNiveau() {
   afficherPalette();
 }
 
-/* =========================================================
-   BLOCS PRETS
-   ========================================================= */
 var BLOCS = {
   alim5v: { id:'alim5v', nom:'Alimentation 5V', icone:'🔋', desc:'Pile + R + condo',
     fn: function(cx, cy, avecCablage) {
@@ -703,7 +695,7 @@ var BLOCS = {
     }
   }
 };
-
+ 
 /* =========================================================
    DEFIS D'INGENIERIE (MODE INNOVANT)
    ========================================================= */
@@ -951,7 +943,7 @@ var DEFIS = {
   interrupteurSimple: {
     id: 'interrupteurSimple', nom: '🔘 Interrupteur simple', icone: '🔘',
     categorie: 'initiation',
-    desc: 'Allume et éteins la LED avec un interrupteur.',
+    desc: 'Allume et éteint la LED avec un interrupteur.',
     composants_requis: ['pile', 'interrupteur', 'resistance', 'led'],
     cablages_requis: [
       { typeA: 'pile', patteA: 0, typeB: 'interrupteur', patteB: 0 },
@@ -1108,7 +1100,6 @@ function afficherDefis() {
   
   var html = '';
   
-  // Définition des catégories (icônes et ordre d'affichage)
     var categories = {
     'initiation': { nom: '💡 Initiation', ordre: 1 },
     'maison': { nom: '🏠 Maison', ordre: 2 },
@@ -1120,7 +1111,6 @@ function afficherDefis() {
     'autres': { nom: '📦 Autres', ordre: 99 }
   };
   
-  // Regrouper les défis par catégorie
   var defisParCategorie = {};
   for (var id in DEFIS) {
     var d = DEFIS[id];
@@ -1129,23 +1119,19 @@ function afficherDefis() {
     defisParCategorie[cat].push(d);
   }
   
-  // Trier les catégories par ordre d'affichage
   var catsTriees = Object.keys(defisParCategorie).sort(function(a, b) {
     var ordreA = categories[a] ? categories[a].ordre : 99;
     var ordreB = categories[b] ? categories[b].ordre : 99;
     return ordreA - ordreB;
   });
   
-  // Générer le HTML
   for (var i = 0; i < catsTriees.length; i++) {
     var cat = catsTriees[i];
     var listeDefis = defisParCategorie[cat];
     var nomCat = categories[cat] ? categories[cat].nom : '📦 ' + cat;
     
-    // Titre de la catégorie
     html += '<div style="font-size:0.8em;color:#fbbf24;margin:12px 0 6px 0;padding:6px 10px;background:#0f1420;border-radius:6px;border-left:3px solid #f97316;font-weight:bold;">' + nomCat + ' (' + listeDefis.length + ')</div>';
     
-    // Liste des défis de la catégorie
     for (var j = 0; j < listeDefis.length; j++) {
       var d = listeDefis[j];
       var actif = (defiActif && defiActif.id === d.id) ? ' actif' : '';
@@ -1336,7 +1322,7 @@ function quitterTutoriel() {
 function afficherPalette() {
   var div = document.getElementById('liste-palette');
   if (!div) return;
-  var html = ''; var keys = Object.keys(CATALOGUE); var nbAffiches = 0;
+  var html = ''; var keys = Object.keys(CATALOGUE);
   var niveaux = { decouverte: [], exploration: [], maitrise: [], expert: [], autres: [] };
   for (var i = 0; i < keys.length; i++) {
     var c = CATALOGUE[keys[i]]; var niveauComp = c.niveau || 'autres';
@@ -1361,12 +1347,12 @@ function afficherPalette() {
       var niv = ordre[k];
       if (niveaux[niv].length > 0) {
         html += '<div style="font-size:0.75em;color:#94a3b8;margin:10px 0 6px 0;padding:4px 8px;background:#0f1420;border-radius:4px;border-left:2px solid #38bdf8;">' + labels[niv] + ' (' + niveaux[niv].length + ')</div>';
-        html += htmlPourListe(niveaux[niv]); nbAffiches += niveaux[niv].length;
+        html += htmlPourListe(niveaux[niv]);
       }
     }
   } else {
     if (niveaux[filtreNiveauActif] && niveaux[filtreNiveauActif].length > 0) {
-      html += htmlPourListe(niveaux[filtreNiveauActif]); nbAffiches = niveaux[filtreNiveauActif].length;
+      html += htmlPourListe(niveaux[filtreNiveauActif]);
     } else {
       html += '<div style="padding:12px;color:#94a3b8;font-size:0.85em;text-align:center;font-style:italic;">Aucun composant dans ce niveau.</div>';
     }
@@ -2093,7 +2079,6 @@ function clicCanvas(event) {
   
   if (multimetreActif) { gererClicMultimetre(pos.x, pos.y); return; }
   
-  // PRIORITÉ 1 : Placer un composant
   if (composantSelectionne) {
     placerComposant(composantSelectionne, pos.x, pos.y, composantAValeur);
     composantSelectionne = null;
@@ -2103,7 +2088,6 @@ function clicCanvas(event) {
     return;
   }
 
-  // PRIORITÉ 2 : Placer un bloc
   if (blocSelectionne) {
     var b = BLOCS[blocSelectionne];
     var avecCab = document.getElementById('opt-cablage').checked;
@@ -2125,7 +2109,6 @@ function clicCanvas(event) {
     return;
   }
 
-  // PRIORITÉ 3 : Câblage
   if (modeCablage) {
     var patte = trouverPatteSousSouris(pos.x, pos.y);
     if (patte) {
@@ -2159,7 +2142,6 @@ function clicCanvas(event) {
     }
   }
 
-  // PRIORITÉ 4 : Cliquer sur un composant existant (interrupteur, bouton)
   var comp = trouverComposantSousSouris(pos.x, pos.y);
   if (comp) {
     if (comp.type === 'interrupteur') {
@@ -2173,7 +2155,6 @@ function clicCanvas(event) {
       comp.appuye = true;
       mettreMessage('🧲 Bouton appuyé ✅', 'info');
       
-      // Vérifier si c'est le défi Lumière automatique
       if (defiActif && defiActif.id === 'lumièreWC') {
         gererTemporisationLED(comp);
       } else {
@@ -2186,7 +2167,6 @@ function clicCanvas(event) {
       }
       dessiner(); return;
     }
-     
   }
 }
 function supprimerComposant(id) {
@@ -2591,7 +2571,8 @@ function quitterTutoriel() {
   tutoActif = null; tutoEtape = -1;
   document.getElementById('tuto-panneau').classList.remove('actif');
   document.getElementById('btn-tutoriels').classList.remove('actif');
-  document.getElementById('statut-mode').classList.remove('tuto');
+  document.getElementById('statut-mode').
+   
   document.getElementById('statut-mode').textContent = '🖱️ Mode : Placer';
   document.getElementById('tuto-nom').textContent = 'Aucun tutoriel sélectionné';
   document.getElementById('tuto-desc').textContent = 'Choisissez un tutoriel dans la palette à gauche.';
@@ -2927,9 +2908,6 @@ function exporterPDF() {
   html += '<div class="footer">Créé avec Alerte Electro - Bac à sable</div>';
   html += '<div class="no-print" style="margin-top:20px;"><button onclick="window.print()" style="padding:12px 24px;font-size:16px;background:#6b21a8;color:white;border:none;border-radius:8px;cursor:pointer;">🖨️ Imprimer / Enregistrer en PDF</button></div>';
   html += '<script>setTimeout(function(){ window.print(); }, 500);<\/script>';
- <div style="text-align: center; padding: 20px; background: #f0f9ff; border-top: 2px solid #e2e8f0; margin-top: 20px;">
-  <a href="guide-enseignant.html" style="color: #0ea5e9; text-decoration: none; font-weight: bold; font-size: 0.95em;">👨‍🏫 Guide Enseignant (EspaceElectronic & EspaceIA)</a>
-</div>
   html += '</body></html>';
   var w = window.open('', '_blank');
   w.document.write(html);
@@ -3101,416 +3079,7 @@ function supprimerComposantDepuisPanneau(id) {
 }
 
 /* =========================================================
-   FONCTIONS DE DESSIN (Ajoutées pour corriger le bug)
-   ========================================================= */
-function dessinerPile(comp) {
-  var grd = ctx.createLinearGradient(comp.x, comp.y, comp.x, comp.y + comp.hauteur);
-  grd.addColorStop(0, '#4a4a4a'); grd.addColorStop(0.5, '#2a2a2a'); grd.addColorStop(1, '#1a1a1a');
-  ctx.fillStyle = grd;
-  ctx.beginPath(); if (ctx.roundRect) ctx.roundRect(comp.x, comp.y, comp.largeur, comp.hauteur, 6); else ctx.rect(comp.x, comp.y, comp.largeur, comp.hauteur); ctx.fill();
-  ctx.fillStyle = 'rgba(255,255,255,0.15)';
-  ctx.beginPath(); if (ctx.roundRect) ctx.roundRect(comp.x + 3, comp.y + 2, comp.largeur - 6, comp.hauteur/3, 4); else ctx.rect(comp.x + 3, comp.y + 2, comp.largeur - 6, comp.hauteur/3); ctx.fill();
-  var grdDore = ctx.createLinearGradient(comp.x, comp.y + 5, comp.x, comp.y + 13);
-  grdDore.addColorStop(0, '#f0c987'); grdDore.addColorStop(0.5, '#d4a76a'); grdDore.addColorStop(1, '#a67c3d');
-  ctx.fillStyle = grdDore;
-  ctx.fillRect(comp.x + 5, comp.y + 5, comp.largeur - 10, 8);
-  ctx.fillStyle = 'rgba(255,255,255,0.5)';
-  ctx.fillRect(comp.x + 5, comp.y + 5, comp.largeur - 10, 2);
-  ctx.fillStyle = '#3b82f6';
-  ctx.font = 'bold 18px sans-serif';
-  ctx.textAlign = 'center';
-  ctx.shadowColor = 'rgba(59,130,246,0.8)'; ctx.shadowBlur = 8;
-  ctx.fillText('+', comp.x + 15, comp.y + 12);
-  ctx.fillStyle = '#dc2626';
-  ctx.font = 'bold 22px sans-serif';
-  ctx.shadowColor = 'rgba(220,38,38,0.8)'; ctx.shadowBlur = 8;
-  ctx.fillText('−', comp.x + comp.largeur - 15, comp.y + 13);
-  ctx.shadowBlur = 0;
-  ctx.fillStyle = '#fff';
-  ctx.font = 'bold 18px sans-serif';
-  ctx.shadowColor = 'rgba(0,0,0,0.6)'; ctx.shadowBlur = 4;
-  ctx.fillText('9V', comp.x + comp.largeur/2, comp.y + comp.hauteur/2 + 8);
-  ctx.shadowBlur = 0;
-  var grdRouge = ctx.createRadialGradient(comp.x + comp.largeur - 17, comp.y + 6, 1, comp.x + comp.largeur - 15, comp.y + 8, 6);
-  grdRouge.addColorStop(0, '#ff8a8a'); grdRouge.addColorStop(1, '#8b0000');
-  ctx.fillStyle = grdRouge;
-  ctx.beginPath(); ctx.arc(comp.x + comp.largeur - 15, comp.y + 8, 6, 0, Math.PI * 2); ctx.fill();
-  var grdBleu = ctx.createRadialGradient(comp.x + 13, comp.y + 6, 1, comp.x + 15, comp.y + 8, 6);
-  grdBleu.addColorStop(0, '#7ab8ff'); grdBleu.addColorStop(1, '#003366');
-  ctx.fillStyle = grdBleu;
-  ctx.beginPath(); ctx.arc(comp.x + 15, comp.y + 8, 6, 0, Math.PI * 2); ctx.fill();
-}
-
-function dessinerResistance(comp) {
-  var grd = ctx.createLinearGradient(comp.x, comp.y, comp.x, comp.y + comp.hauteur);
-  grd.addColorStop(0, '#f0d4a0'); grd.addColorStop(0.3, '#d4a76a'); grd.addColorStop(0.7, '#b8905a'); grd.addColorStop(1, '#8a6a40');
-  ctx.fillStyle = grd;
-  ctx.beginPath(); if (ctx.roundRect) ctx.roundRect(comp.x, comp.y, comp.largeur, comp.hauteur, comp.hauteur/2); else ctx.rect(comp.x, comp.y, comp.largeur, comp.hauteur); ctx.fill();
-  ctx.fillStyle = 'rgba(255,255,255,0.4)';
-  ctx.beginPath(); if (ctx.roundRect) ctx.roundRect(comp.x + 8, comp.y + 3, comp.largeur - 16, 4, 2); else ctx.rect(comp.x + 8, comp.y + 3, comp.largeur - 16, 4); ctx.fill();
-  var bandes = [{pos:15,col:'#FFD700'},{pos:35,col:'#8B00FF'},{pos:55,col:'#8B4513'},{pos:85,col:'#FFD700'}];
-  for (var i = 0; i < bandes.length; i++) {
-    var b = bandes[i];
-    ctx.fillStyle = b.col;
-    ctx.fillRect(comp.x + b.pos, comp.y + 2, 6, comp.hauteur - 4);
-    ctx.fillStyle = 'rgba(255,255,255,0.35)';
-    ctx.fillRect(comp.x + b.pos, comp.y + 2, 6, 2);
-  }
-}
-
-function dessinerLED(comp, allumee) {
-  var cx = comp.x + comp.largeur/2;
-  var cy = comp.y + comp.hauteur/2;
-  var r = comp.largeur/2;
-  var baseCouleur, glowCouleur, refletCouleur;
-  if (comp.valeur === 'vert') { baseCouleur = allumee ? '#4ade80' : '#166534'; glowCouleur = 'rgba(34,197,94,'; refletCouleur = '#86efac'; }
-  else if (comp.valeur === 'bleu') { baseCouleur = allumee ? '#60a5fa' : '#1e3a8a'; glowCouleur = 'rgba(59,130,246,'; refletCouleur = '#93c5fd'; }
-  else { baseCouleur = allumee ? '#ff3333' : '#b30000'; glowCouleur = 'rgba(255,50,50,'; refletCouleur = '#ff9999'; }
-  if (allumee) {
-    var pulse = 1 + 0.15 * Math.sin(ledPulsePhase);
-    var haloR = r * 4 * pulse;
-    var grdHalo = ctx.createRadialGradient(cx, cy, r, cx, cy, haloR);
-    grdHalo.addColorStop(0, glowCouleur + '0.7)');
-    grdHalo.addColorStop(0.5, glowCouleur + '0.2)');
-    grdHalo.addColorStop(1, glowCouleur + '0)');
-    ctx.fillStyle = grdHalo;
-    ctx.beginPath(); ctx.arc(cx, cy, haloR, 0, Math.PI * 2); ctx.fill();
-  }
-  var grd = ctx.createRadialGradient(cx - r/3, cy - r/3, 2, cx, cy, r);
-  grd.addColorStop(0, refletCouleur);
-  grd.addColorStop(0.4, baseCouleur);
-  grd.addColorStop(1, allumee ? '#880000' : '#550000');
-  ctx.fillStyle = grd;
-  ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.fill();
-  ctx.strokeStyle = 'rgba(0,0,0,0.5)'; ctx.lineWidth = 1.5; ctx.stroke();
-  ctx.fillStyle = allumee ? 'rgba(255,255,255,0.9)' : 'rgba(255,255,255,0.6)';
-  ctx.beginPath();
-  ctx.ellipse(cx - r/3, cy - r/3, r/3, r/4, -Math.PI/4, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.fillStyle = 'rgba(255,255,255,0.4)';
-  ctx.beginPath();
-  ctx.arc(cx - r/4, cy + r/3, r/8, 0, Math.PI * 2);
-  ctx.fill();
-}
-
-function dessinerInterrupteur(comp) {
-  var grd = ctx.createLinearGradient(comp.x, comp.y, comp.x, comp.y + comp.hauteur);
-  grd.addColorStop(0, '#666'); grd.addColorStop(0.5, '#3a3a3a'); grd.addColorStop(1, '#1a1a1a');
-  ctx.fillStyle = grd;
-  ctx.beginPath(); if (ctx.roundRect) ctx.roundRect(comp.x, comp.y, comp.largeur, comp.hauteur, 6); else ctx.rect(comp.x, comp.y, comp.largeur, comp.hauteur); ctx.fill();
-  ctx.fillStyle = 'rgba(255,255,255,0.15)';
-  ctx.beginPath(); if (ctx.roundRect) ctx.roundRect(comp.x + 3, comp.y + 3, comp.largeur - 6, 6, 3); else ctx.rect(comp.x + 3, comp.y + 3, comp.largeur - 6, 6); ctx.fill();
-  var grdBorne = ctx.createRadialGradient(comp.x + 13, comp.y + comp.hauteur/2 - 2, 1, comp.x + 15, comp.y + comp.hauteur/2, 7);
-  grdBorne.addColorStop(0, '#fff'); grdBorne.addColorStop(0.5, '#c0c0c0'); grdBorne.addColorStop(1, '#666');
-  ctx.fillStyle = grdBorne;
-  ctx.beginPath(); ctx.arc(comp.x + 15, comp.y + comp.hauteur/2, 6, 0, Math.PI * 2); ctx.fill();
-  ctx.beginPath(); ctx.arc(comp.x + comp.largeur - 15, comp.y + comp.hauteur/2, 6, 0, Math.PI * 2); ctx.fill();
-  ctx.strokeStyle = 'rgba(0,0,0,0.4)'; ctx.lineWidth = 7; ctx.lineCap = 'round';
-  ctx.beginPath();
-  if (comp.ferme) {
-    ctx.moveTo(comp.x + 15, comp.y + comp.hauteur/2);
-    ctx.lineTo(comp.x + comp.largeur - 15, comp.y + comp.hauteur/2);
-  } else {
-    ctx.moveTo(comp.x + 15, comp.y + comp.hauteur/2);
-    ctx.lineTo(comp.x + comp.largeur - 25, comp.y + 10);
-  }
-  ctx.stroke();
-  ctx.strokeStyle = comp.ferme ? '#22c55e' : '#ef4444';
-  ctx.lineWidth = 5;
-  ctx.beginPath();
-  if (comp.ferme) {
-    ctx.moveTo(comp.x + 15, comp.y + comp.hauteur/2);
-    ctx.lineTo(comp.x + comp.largeur - 15, comp.y + comp.hauteur/2);
-  } else {
-    ctx.moveTo(comp.x + 15, comp.y + comp.hauteur/2);
-    ctx.lineTo(comp.x + comp.largeur - 25, comp.y + 10);
-  }
-  ctx.stroke();
-  ctx.fillStyle = '#fff';
-  ctx.font = 'bold 10px sans-serif';
-  ctx.textAlign = 'center';
-  ctx.shadowColor = 'rgba(0,0,0,0.8)'; ctx.shadowBlur = 3;
-  ctx.fillText(comp.ferme ? 'ON' : 'OFF', comp.x + comp.largeur/2, comp.y + comp.hauteur - 3);
-  ctx.shadowBlur = 0;
-}
-
-function dessinerNE555(comp) {
-  var grd = ctx.createLinearGradient(comp.x, comp.y, comp.x + comp.largeur, comp.y + comp.hauteur);
-  grd.addColorStop(0, '#3a3a3a'); grd.addColorStop(0.4, '#1a1a1a'); grd.addColorStop(1, '#000');
-  ctx.fillStyle = grd;
-  ctx.beginPath(); if (ctx.roundRect) ctx.roundRect(comp.x, comp.y, comp.largeur, comp.hauteur, 5); else ctx.rect(comp.x, comp.y, comp.largeur, comp.hauteur); ctx.fill();
-  ctx.fillStyle = 'rgba(255,255,255,0.12)';
-  ctx.beginPath(); if (ctx.roundRect) ctx.roundRect(comp.x + 4, comp.y + 4, comp.largeur - 8, 15, 3); else ctx.rect(comp.x + 4, comp.y + 4, comp.largeur - 8, 15); ctx.fill();
-  ctx.fillStyle = '#000';
-  ctx.beginPath(); ctx.arc(comp.x + comp.largeur/2, comp.y + 8, 8, 0, Math.PI, true); ctx.fill();
-  ctx.fillStyle = '#555';
-  ctx.beginPath(); ctx.arc(comp.x + comp.largeur/2, comp.y + 8, 8, 0, Math.PI); ctx.fill();
-  ctx.fillStyle = '#ccc';
-  ctx.font = 'bold 11px sans-serif';
-  ctx.textAlign = 'center';
-  ctx.shadowColor = 'rgba(0,0,0,0.8)'; ctx.shadowBlur = 3;
-  ctx.fillText('NE555', comp.x + comp.largeur/2, comp.y + comp.hauteur/2 + 5);
-  ctx.shadowBlur = 0;
-}
-
-function dessinerCD4017(comp) {
-  var grd = ctx.createLinearGradient(comp.x, comp.y, comp.x + comp.largeur, comp.y + comp.hauteur);
-  grd.addColorStop(0, '#4a3a5a'); grd.addColorStop(0.4, '#2a1a3a'); grd.addColorStop(1, '#1a0a2a');
-  ctx.fillStyle = grd;
-  ctx.beginPath(); if (ctx.roundRect) ctx.roundRect(comp.x, comp.y, comp.largeur, comp.hauteur, 5); else ctx.rect(comp.x, comp.y, comp.largeur, comp.hauteur); ctx.fill();
-  ctx.fillStyle = 'rgba(255,255,255,0.12)';
-  ctx.beginPath(); if (ctx.roundRect) ctx.roundRect(comp.x + 4, comp.y + 4, comp.largeur - 8, 15, 3); else ctx.rect(comp.x + 4, comp.y + 4, comp.largeur - 8, 15); ctx.fill();
-  ctx.fillStyle = '#000';
-  ctx.beginPath(); ctx.arc(comp.x + comp.largeur/2, comp.y + 8, 8, 0, Math.PI, true); ctx.fill();
-  ctx.fillStyle = '#8b5cf6';
-  ctx.beginPath(); ctx.arc(comp.x + comp.largeur/2, comp.y + 8, 8, 0, Math.PI); ctx.fill();
-  ctx.fillStyle = '#e9d5ff';
-  ctx.font = 'bold 11px sans-serif';
-  ctx.textAlign = 'center';
-  ctx.shadowColor = 'rgba(139,92,246,0.8)'; ctx.shadowBlur = 6;
-  ctx.fillText('CD4017', comp.x + comp.largeur/2, comp.y + comp.hauteur/2 + 5);
-  ctx.shadowBlur = 0;
-}
-
-function dessinerCondensateur(comp) {
-  var grd = ctx.createRadialGradient(comp.x + comp.largeur/2 - 5, comp.y + comp.hauteur/2 - 5, 2, comp.x + comp.largeur/2, comp.y + comp.hauteur/2, comp.largeur/2);
-  grd.addColorStop(0, '#60a5fa'); grd.addColorStop(0.5, '#0369a1'); grd.addColorStop(1, '#082f49');
-  ctx.fillStyle = grd;
-  ctx.beginPath(); ctx.arc(comp.x + comp.largeur/2, comp.y + comp.hauteur/2, comp.largeur/2, 0, Math.PI * 2); ctx.fill();
-  ctx.strokeStyle = 'rgba(0,0,0,0.5)'; ctx.lineWidth = 1.5; ctx.stroke();
-  ctx.fillStyle = 'rgba(255,255,255,0.5)';
-  ctx.beginPath(); ctx.ellipse(comp.x + comp.largeur/2 - 6, comp.y + comp.hauteur/2 - 6, 5, 3, -Math.PI/4, 0, Math.PI * 2); ctx.fill();
-  ctx.fillStyle = '#fff';
-  ctx.font = 'bold 12px sans-serif';
-  ctx.textAlign = 'center';
-  ctx.shadowColor = 'rgba(0,0,0,0.8)'; ctx.shadowBlur = 3;
-  ctx.fillText('C', comp.x + comp.largeur/2, comp.y + comp.hauteur/2 + 4);
-  ctx.shadowBlur = 0;
-}
-
-function dessinerTransistor(comp) {
-  var grd = ctx.createRadialGradient(comp.x + comp.largeur/2 - 8, comp.y + comp.hauteur/2 - 8, 3, comp.x + comp.largeur/2, comp.y + comp.hauteur/2, comp.largeur/2);
-  grd.addColorStop(0, '#4a4a4a'); grd.addColorStop(0.5, '#222'); grd.addColorStop(1, '#000');
-  ctx.fillStyle = grd;
-  ctx.beginPath(); ctx.arc(comp.x + comp.largeur/2, comp.y + comp.hauteur/2, comp.largeur/2, 0, Math.PI * 2); ctx.fill();
-  ctx.fillStyle = 'rgba(255,255,255,0.15)';
-  ctx.beginPath(); ctx.ellipse(comp.x + comp.largeur/2 - 8, comp.y + comp.hauteur/2 - 8, 10, 6, -Math.PI/4, 0, Math.PI * 2); ctx.fill();
-  ctx.fillStyle = '#fff';
-  ctx.font = 'bold 11px sans-serif';
-  ctx.textAlign = 'center';
-  ctx.shadowColor = 'rgba(0,0,0,0.8)'; ctx.shadowBlur = 3;
-  ctx.fillText('2N', comp.x + comp.largeur/2, comp.y + comp.hauteur/2 + 4);
-  ctx.shadowBlur = 0;
-}
-
-function dessinerLDR(comp) {
-  var grd = ctx.createLinearGradient(comp.x, comp.y, comp.x, comp.y + comp.hauteur);
-  grd.addColorStop(0, '#f0d4a0'); grd.addColorStop(0.5, '#d4a76a'); grd.addColorStop(1, '#a67c3d');
-  ctx.fillStyle = grd;
-  ctx.beginPath(); if (ctx.roundRect) ctx.roundRect(comp.x, comp.y, comp.largeur, comp.hauteur, 4); else ctx.rect(comp.x, comp.y, comp.largeur, comp.hauteur); ctx.fill();
-  ctx.strokeStyle = '#8B4513'; ctx.lineWidth = 2;
-  for (var i = 0; i < 4; i++) {
-    ctx.beginPath();
-    ctx.moveTo(comp.x + 8 + i * 13, comp.y + 4);
-    ctx.lineTo(comp.x + 8 + i * 13, comp.y + comp.hauteur - 4);
-    ctx.stroke();
-  }
-  ctx.fillStyle = 'rgba(255,255,255,0.4)';
-  ctx.fillRect(comp.x + 2, comp.y + 2, comp.largeur - 4, 3);
-}
-
-function dessinerBouton(comp) {
-  var grd = ctx.createLinearGradient(comp.x, comp.y, comp.x, comp.y + comp.hauteur);
-  grd.addColorStop(0, '#666'); grd.addColorStop(0.5, '#3a3a3a'); grd.addColorStop(1, '#1a1a1a');
-  ctx.fillStyle = grd;
-  ctx.beginPath(); if (ctx.roundRect) ctx.roundRect(comp.x, comp.y, comp.largeur, comp.hauteur, 6); else ctx.rect(comp.x, comp.y, comp.largeur, comp.hauteur); ctx.fill();
-  var grdBouton = ctx.createRadialGradient(comp.x + comp.largeur/2 - 4, comp.y + comp.hauteur/2 - 9, 2, comp.x + comp.largeur/2, comp.y + comp.hauteur/2 - 5, 15);
-  if (comp.appuye) {
-    grdBouton.addColorStop(0, '#4ade80'); grdBouton.addColorStop(1, '#166534');
-  } else {
-    grdBouton.addColorStop(0, '#c0c0c0'); grdBouton.addColorStop(1, '#666');
-  }
-  ctx.fillStyle = grdBouton;
-  ctx.beginPath(); ctx.arc(comp.x + comp.largeur/2, comp.y + comp.hauteur/2 - 5, comp.appuye ? 12 : 15, 0, Math.PI * 2); ctx.fill();
-  ctx.fillStyle = '#fff';
-  ctx.font = 'bold 10px sans-serif';
-  ctx.textAlign = 'center';
-  ctx.shadowColor = 'rgba(0,0,0,0.8)'; ctx.shadowBlur = 3;
-  ctx.fillText('BP', comp.x + comp.largeur/2, comp.y + comp.hauteur - 5);
-  ctx.shadowBlur = 0;
-}
-
-function dessinerBuzzer(comp) {
-  var grd = ctx.createRadialGradient(comp.x + comp.largeur/2 - 5, comp.y + comp.hauteur/2 - 5, 2, comp.x + comp.largeur/2, comp.y + comp.hauteur/2, comp.largeur/2);
-  grd.addColorStop(0, '#4a4a4a'); grd.addColorStop(0.5, '#222'); grd.addColorStop(1, '#000');
-  ctx.fillStyle = grd;
-  ctx.beginPath(); ctx.arc(comp.x + comp.largeur/2, comp.y + comp.hauteur/2, comp.largeur/2, 0, Math.PI * 2); ctx.fill();
-  ctx.strokeStyle = '#fbbf24'; ctx.lineWidth = 2;
-  ctx.beginPath(); ctx.arc(comp.x + comp.largeur/2, comp.y + comp.hauteur/2, comp.largeur/4, 0, Math.PI * 2); ctx.stroke();
-  ctx.fillStyle = '#fbbf24';
-  ctx.font = 'bold 10px sans-serif';
-  ctx.textAlign = 'center';
-  ctx.shadowColor = 'rgba(251,191,36,0.8)'; ctx.shadowBlur = 6;
-  ctx.fillText('BZ', comp.x + comp.largeur/2, comp.y + comp.hauteur/2 + 4);
-  ctx.shadowBlur = 0;
-}
-
-function dessinerDiodeGenerique(comp) {
-  var grd = ctx.createLinearGradient(comp.x, comp.y, comp.x, comp.y + comp.hauteur);
-  grd.addColorStop(0, '#333'); grd.addColorStop(1, '#111');
-  ctx.fillStyle = grd;
-  ctx.beginPath(); if (ctx.roundRect) ctx.roundRect(comp.x, comp.y, comp.largeur, comp.hauteur, 4); else ctx.rect(comp.x, comp.y, comp.largeur, comp.hauteur); ctx.fill();
-  ctx.fillStyle = '#fff';
-  ctx.beginPath();
-  ctx.moveTo(comp.x + 20, comp.y + 5); ctx.lineTo(comp.x + 20, comp.y + comp.hauteur - 5); ctx.lineTo(comp.x + 5, comp.y + comp.hauteur/2); ctx.fill();
-  ctx.fillRect(comp.x + 20, comp.y + 5, 3, comp.hauteur - 10);
-}
-
-function dessinerCIGenerique(comp) {
-  var grd = ctx.createLinearGradient(comp.x, comp.y, comp.x + comp.largeur, comp.y + comp.hauteur);
-  grd.addColorStop(0, '#3a3a3a'); grd.addColorStop(0.4, '#1a1a1a'); grd.addColorStop(1, '#000');
-  ctx.fillStyle = grd;
-  ctx.beginPath(); if (ctx.roundRect) ctx.roundRect(comp.x, comp.y, comp.largeur, comp.hauteur, 5); else ctx.rect(comp.x, comp.y, comp.largeur, comp.hauteur); ctx.fill();
-  ctx.fillStyle = '#000';
-  ctx.beginPath(); ctx.arc(comp.x + comp.largeur/2, comp.y + 8, 8, 0, Math.PI, true); ctx.fill();
-  ctx.fillStyle = '#555';
-  ctx.beginPath(); ctx.arc(comp.x + comp.largeur/2, comp.y + 8, 8, 0, Math.PI); ctx.fill();
-  ctx.fillStyle = '#ccc';
-  ctx.font = 'bold 10px sans-serif';
-  ctx.textAlign = 'center';
-  ctx.shadowColor = 'rgba(0,0,0,0.8)'; ctx.shadowBlur = 3;
-  ctx.fillText('CI', comp.x + comp.largeur/2, comp.y + comp.hauteur/2 + 4);
-  ctx.shadowBlur = 0;
-}
-
-function dessinerCapteurGenerique(comp) {
-  ctx.fillStyle = '#0ea5e9';
-  ctx.beginPath(); if (ctx.roundRect) ctx.roundRect(comp.x, comp.y, comp.largeur, comp.hauteur, 4); else ctx.rect(comp.x, comp.y, comp.largeur, comp.hauteur); ctx.fill();
-  ctx.fillStyle = '#fff';
-  ctx.font = 'bold 20px sans-serif';
-  ctx.textAlign = 'center';
-  ctx.fillText('📡', comp.x + comp.largeur/2, comp.y + comp.hauteur/2 + 7);
-}
-
-function dessinerMoteurGenerique(comp) {
-  var grd = ctx.createRadialGradient(comp.x + comp.largeur/2, comp.y + comp.hauteur/2, 5, comp.x + comp.largeur/2, comp.y + comp.hauteur/2, comp.largeur/2);
-  grd.addColorStop(0, '#4a4a4a'); grd.addColorStop(1, '#222');
-  ctx.fillStyle = grd;
-  ctx.beginPath(); ctx.arc(comp.x + comp.largeur/2, comp.y + comp.hauteur/2, comp.largeur/2, 0, Math.PI * 2); ctx.fill();
-  ctx.fillStyle = '#fff';
-  ctx.font = 'bold 20px sans-serif';
-  ctx.textAlign = 'center';
-  ctx.fillText('⚙️', comp.x + comp.largeur/2, comp.y + comp.hauteur/2 + 7);
-}
-
-function dessinerComposant(comp, estMesure) {
-  var c = CATALOGUE[comp.type];
-  if (!c) return;
-  if (estMesure) {
-    ctx.fillStyle = 'rgba(6,182,212,0.2)';
-    ctx.beginPath();
-    ctx.ellipse(comp.x + comp.largeur/2, comp.y + comp.hauteur/2, comp.largeur, comp.hauteur * 0.9, 0, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.strokeStyle = '#06b6d4'; ctx.lineWidth = 3;
-    ctx.setLineDash([6, 4]);
-    ctx.beginPath();
-    ctx.ellipse(comp.x + comp.largeur/2, comp.y + comp.hauteur/2, comp.largeur * 0.7, comp.hauteur * 0.8, 0, 0, Math.PI * 2);
-    ctx.stroke();
-    ctx.setLineDash([]);
-  }
-  ctx.fillStyle = 'rgba(0,0,0,0.18)';
-  ctx.beginPath();
-  ctx.ellipse(comp.x + comp.largeur/2, comp.y + comp.hauteur + 4, comp.largeur/2 + 3, 6, 0, 0, Math.PI * 2);
-  ctx.fill();
-  
-  var typeDessin = mapperTypeDessin(comp.type);
-  
-  if (typeDessin === 'pile') dessinerPile(comp);
-  else if (typeDessin === 'resistance') dessinerResistance(comp);
-  else if (typeDessin === 'led') dessinerLED(comp, comp.allume);
-  else if (typeDessin === 'interrupteur') dessinerInterrupteur(comp);
-  else if (typeDessin === 'ne555') dessinerNE555(comp);
-  else if (typeDessin === 'cd4017') dessinerCD4017(comp);
-  else if (typeDessin === 'condensateur') dessinerCondensateur(comp);
-  else if (typeDessin === 'transistor') dessinerTransistor(comp);
-  else if (typeDessin === 'ldr') dessinerLDR(comp);
-  else if (typeDessin === 'bouton') dessinerBouton(comp);
-  else if (typeDessin === 'buzzer') dessinerBuzzer(comp);
-  else if (typeDessin === 'diode') dessinerDiodeGenerique(comp);
-  else if (typeDessin === 'ci') dessinerCIGenerique(comp);
-  else if (typeDessin === 'capteur') dessinerCapteurGenerique(comp);
-  else if (typeDessin === 'moteur') dessinerMoteurGenerique(comp);
-  else {
-    ctx.fillStyle = '#94a3b8';
-    ctx.fillRect(comp.x, comp.y, comp.largeur, comp.hauteur);
-    ctx.fillStyle = '#1a1f2e';
-    ctx.font = 'bold 12px sans-serif';
-    ctx.textAlign = 'center';
-    ctx.fillText('?', comp.x + comp.largeur/2, comp.y + comp.hauteur/2 + 4);
-  }
-
-  for (var i = 0; i < c.pattes.length; i++) {
-    var p = obtenirPatteAbsolue(comp, i);
-    var estEnAttente = patteEnAttente && patteEnAttente.compId === comp.id && patteEnAttente.patteIndex === i;
-    var estPointeRouge = pointeRouge && pointeRouge.compId === comp.id && pointeRouge.patteIndex === i;
-    var estPointeNoire = pointeNoire && pointeNoire.compId === comp.id && pointeNoire.patteIndex === i;
-    var estPattePilePlus = comp.type === 'pile' && i === 0;
-    var estPattePileMoins = comp.type === 'pile' && i === 1;
-    ctx.fillStyle = 'rgba(0,0,0,0.3)';
-    ctx.beginPath(); ctx.arc(p.x + 1, p.y + 1, 6, 0, Math.PI * 2); ctx.fill();
-    var grdPatte = ctx.createRadialGradient(p.x - 2, p.y - 2, 1, p.x, p.y, 6);
-    if (estEnAttente || estPointeRouge || estPointeNoire) {
-      grdPatte.addColorStop(0, '#fff8b0'); grdPatte.addColorStop(0.5, '#fbbf24'); grdPatte.addColorStop(1, '#b45309');
-    } else if (estPattePilePlus) {
-      grdPatte.addColorStop(0, '#93c5fd'); grdPatte.addColorStop(0.5, '#3b82f6'); grdPatte.addColorStop(1, '#1e40af');
-    } else if (estPattePileMoins) {
-      grdPatte.addColorStop(0, '#fca5a5'); grdPatte.addColorStop(0.5, '#dc2626'); grdPatte.addColorStop(1, '#7f1d1d');
-    } else {
-      grdPatte.addColorStop(0, '#e0e0e0'); grdPatte.addColorStop(0.5, '#a0a0a0'); grdPatte.addColorStop(1, '#606060');
-    }
-    ctx.fillStyle = grdPatte;
-    ctx.beginPath(); ctx.arc(p.x, p.y, 7, 0, Math.PI * 2); ctx.fill();
-    ctx.strokeStyle = '#333'; ctx.lineWidth = 1; ctx.stroke();
-    if (estPattePilePlus) {
-      ctx.fillStyle = '#1e40af';
-      ctx.font = 'bold 14px sans-serif';
-      ctx.textAlign = 'center';
-      ctx.fillText('+', p.x, p.y + 22);
-    }
-    if (estPattePileMoins) {
-      ctx.fillStyle = '#7f1d1d';
-      ctx.font = 'bold 16px sans-serif';
-      ctx.textAlign = 'center';
-      ctx.fillText('−', p.x, p.y + 22);
-    }
-  }
-  ctx.fillStyle = '#333';
-  ctx.font = 'bold 11px sans-serif';
-  ctx.textAlign = 'center';
-  ctx.fillText(c.nom, comp.x + comp.largeur/2, comp.y - 5);
-  if (comp.valeur) {
-    ctx.fillStyle = '#0369a1';
-    ctx.font = '10px sans-serif';
-    ctx.fillText(comp.valeur, comp.x + comp.largeur/2, comp.y + comp.hauteur + 15);
-  }
-}
-
-function mapperTypeDessin(type) {
-  if (type === 'pile9v' || type === 'pile15v' || type === 'pile12v' || type === 'alimStabilisee') return 'pile';
-  if (type === 'resistance470' || type === 'resistance220' || type === 'resistance1k' || type === 'resistance10k' || type === 'thermistance' || type === 'bobine') return 'resistance';
-  if (type === 'ledRouge' || type === 'ledVerte' || type === 'ledBleue' || type === 'ledJaune' || type === 'ledRgb' || type === 'afficheur7seg' || type === 'afficheurLcd') return 'led';
-  if (type === 'boutonPoussoir') return 'bouton';
-  if (type === 'potentiometre') return 'resistance';
-  if (type === 'condensateur10uF' || type === 'condensateur100uF') return 'condensateur';
-  if (type === 'diode1n4148' || type === 'diode1n4007' || type === 'diodeZener') return 'diode';
-  if (type === 'ne555' || type === 'ne555Cms' || type === 'cd4017' || type === 'cd4027' || type === 'ci74hc00' || type === 'microcontroleur' || type === 'porteAnd' || type === 'porteOr' || type === 'porteNot' || type === 'porteXor') return 'ci';
-  if (type === 'transistorPnp' || type === 'mosfet' || type === 'aop' || type === 'relais') return 'transistor';
-  if (type === 'capteurIr' || type === 'microphone' || type === 'capteurHumidite' || type === 'moduleBluetooth') return 'capteur';
-  if (type === 'hautParleur' || type === 'moteurDc' || type === 'servomoteur' || type === 'servomoteurAmeliore') return 'moteur';
-  return type;
-}
-/* =========================================================
-   FONCTIONS DE SAUVEGARDE ET DE NAVIGATION (MANQUANTES)
+   SAUVEGARDE ET NAVIGATION
    ========================================================= */
 function sauvegarderLocal(silencieux) {
   try {
@@ -3767,15 +3336,10 @@ function restaurerSnapshot(snap) {
   afficherPanneauComposants();
   dessiner();
 }
-/* =========================================================
-   FONCTIONS MANQUANTES (Confettis + Temporisation LED)
-   ========================================================= */
 
-// 1. FONCTION CONFETTIS
 function lancerConfettis() {
   var zone = document.getElementById('zone-confettis');
   if (!zone) {
-    // Créer la zone si elle n'existe pas
     zone = document.createElement('div');
     zone.id = 'zone-confettis';
     zone.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9999;';
@@ -3797,7 +3361,6 @@ function lancerConfettis() {
     zone.appendChild(c);
   }
   
-  // Ajouter l'animation CSS si elle n'existe pas
   if (!document.getElementById('style-confettis')) {
     var style = document.createElement('style');
     style.id = 'style-confettis';
@@ -3811,12 +3374,9 @@ function lancerConfettis() {
   }, 5000);
 }
 
-// 2. TEMPORISATION DE LA LED (pour le défi Lumière automatique)
-// Cette fonction gère l'allumage de la LED quand on clique sur le bouton
 function gererTemporisationLED(compBouton) {
   if (!compBouton) return;
   
-  // Allumer la LED
   var leds = composants.filter(function(c) { return mapperTypeDessin(c.type) === 'led'; });
   for (var i = 0; i < leds.length; i++) {
     leds[i].allume = true;
@@ -3825,7 +3385,6 @@ function gererTemporisationLED(compBouton) {
   mettreMessage('💡 LED allumée ! Elle s\'éteindra dans 3 secondes...', 'succes');
   dessiner();
   
-  // Éteindre après 3 secondes
   if (window.timerLED) clearTimeout(window.timerLED);
   window.timerLED = setTimeout(function() {
     for (var j = 0; j < leds.length; j++) {
@@ -3835,6 +3394,7 @@ function gererTemporisationLED(compBouton) {
     dessiner();
   }, 3000);
 }
+
 window.onload = function() {
   canvas = document.getElementById('sandbox');
   ctx = canvas.getContext('2d');
