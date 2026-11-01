@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Le Chaud et le Froid - InitiaKids</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='112' fill='%23f59e0b'/><text x='50%' y='55%' font-size='300' text-anchor='middle' dominant-baseline='middle'>🌡️</text></svg>">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Comic Sans MS', 'Segoe UI', Arial, sans-serif; 
+         background: linear-gradient(135deg, #fef3c7, #fde68a); 
+         color: #1a1f2e; text-align: center; min-height: 100vh;
+         padding: 20px; }
+  
+  header { background: linear-gradient(135deg, #f59e0b, #d97706); color: white; 
+           padding: 20px; border-radius: 20px; max-width: 900px; margin: 0 auto 20px;
+           box-shadow: 0 8px 0 #b45309; }
+  header h1 { font-size: 2em; text-shadow: 2px 2px 0 #b45309; margin-bottom: 5px; }
+  header p { font-size: 1.1em; opacity: 0.95; }
+  
+  .conteneur { max-width: 900px; margin: 0 auto; }
+  
+  .carte { background: white; border-radius: 24px; padding: 30px; 
+           box-shadow: 0 8px 0 #cbd5e1; border: 4px solid #f59e0b;
+           margin-bottom: 20px; }
+  
+  .zone-jeu { display: flex; gap: 30px; align-items: center; justify-content: center; flex-wrap: wrap; }
+  
+  .thermometre-zone { display: flex; flex-direction: column; align-items: center; }
+  .thermometre { width: 80px; height: 300px; background: #e2e8f0; 
+                 border-radius: 40px; border: 4px solid #475569;
+                 position: relative; overflow: hidden;
+                 box-shadow: inset 0 0 20px rgba(0,0,0,0.2); }
+  .thermometre-remplissage { position: absolute; bottom: 0; left: 0; right: 0;
+                              background: linear-gradient(to top, #3b82f6, #fbbf24, #ef4444);
+                              transition: height 0.3s ease; border-radius: 0 0 36px 36px; }
+  .thermometre-boule { width: 100px; height: 100px; background: radial-gradient(circle at 30% 30%, #60a5fa, #1e3a8a);
+                       border-radius: 50%; border: 4px solid #475569;
+                       margin-top: -20px; position: relative; z-index: 1;
+                       box-shadow: 0 4px 0 #1e293b; transition: background 0.3s; }
+  .thermometre-valeur { margin-top: 15px; font-size: 1.8em; font-weight: bold; 
+                        color: #0f172a; background: #f1f5f9; padding: 8px 20px;
+                        border-radius: 12px; border: 2px solid #cbd5e1; min-width: 100px; }
+  
+  .controles-zone { flex: 1; min-width: 300px; text-align: left; }
+  .defi { background: #fef3c7; border-radius: 16px; padding: 20px; 
+          border: 3px dashed #f59e0b; margin-bottom: 20px; }
+  .defi h2 { font-size: 1.5em; color: #b45309; margin-bottom: 8px; }
+  .defi p { font-size: 1em; color: #64748b; }
+  
+  .cible-zone { background: #dbeafe; border-radius: 12px; padding: 15px;
+                border-left: 5px solid #3b82f6; margin-bottom: 20px;
+                display: flex; justify-content: space-between; align-items: center; }
+  .cible-zone span { color: #1e40af; font-size: 1em; font-weight: bold; }
+  .cible-zone strong { color: #1e3a8a; font-size: 2em; }
+  
+  .slider-zone { margin: 20px 0; }
+  .slider-zone label { display: block; font-weight: bold; color: #0f172a;
+                       margin-bottom: 10px; font-size: 1.1em; }
+  input[type="range"] { width: 100%; height: 30px; -webkit-appearance: none;
+                        background: linear-gradient(to right, 
+                          #1e3a8a 0%, #3b82f6 25%, #22c55e 45%, 
+                          #fbbf24 65%, #f59e0b 80%, #ef4444 100%);
+                        border-radius: 15px; outline: none; border: 3px solid #475569; cursor: pointer; }
+  input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none;
+                        width: 40px; height: 40px; background: white; 
+                        border-radius: 50%; border: 4px solid #f59e0b;
+                        cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
+  input[type="range"]::-moz-range-thumb { width: 40px; height: 40px; background: white;
+                        border-radius: 50%; border: 4px solid #f59e0b; cursor: pointer; }
+  input[type="range"]:disabled { opacity: 0.6; cursor: not-allowed; }
+  
+  .btn-valider { width: 100%; padding: 18px; font-size: 1.3em; font-weight: bold;
+                 background: linear-gradient(135deg, #22c55e, #16a34a); color: white;
+                 border: none; border-radius: 16px; cursor: pointer;
+                 box-shadow: 0 6px 0 #15803d; transition: all 0.1s;
+                 font-family: inherit; }
+  .btn-valider:hover { transform: translateY(-2px); box-shadow: 0 8px 0 #15803d; }
+  .btn-valider:active { transform: translateY(4px); box-shadow: 0 2px 0 #15803d; }
+  
+  .message-zone { margin-top: 20px; padding: 15px; border-radius: 12px;
+                  font-size: 1.1em; font-weight: bold; min-height: 70px;
+                  display: flex; align-items: center; justify-content: center;
+                  text-align: center; }
+  .message-zone.succes { background: #dcfce7; color: #166534; }
+  .message-zone.erreur { background: #fee2e2; color: #991b1b; }
+  .message-zone.info { background: #dbeafe; color: #1e40af; }
+  
+  .score-bar { display: flex; justify-content: center; gap: 10px; margin-top: 20px; flex-wrap: wrap; }
+  .etoile { font-size: 2em; opacity: 0.3; transition: all 0.3s; }
+  .etoile.obtenue { opacity: 1; transform: scale(1.2); }
+  
+  .retour { display: inline-block; margin-top: 20px; padding: 12px 24px;
+            background: #64748b; color: white; text-decoration: none;
+            border-radius: 12px; font-weight: bold; box-shadow: 0 4px 0 #475569; }
+  .retour:hover { background: #475569; }
+  
+  .bouton-suivant { display: none; width: 100%; padding: 18px; margin-top: 15px;
+                    font-size: 1.3em; font-weight: bold; 
+                    background: linear-gradient(135deg, #f59e0b, #d97706); color: white;
+                    border: none; border-radius: 16px; cursor: pointer;
+                    box-shadow: 0 6px 0 #b45309; font-family: inherit; }
+  .bouton-suivant:hover { transform: translateY(-2px); box-shadow: 0 8px 0 #b45309; }
+  .bouton-suivant.visible { display: block; }
+  
+  @keyframes secouer { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-10px)} 75%{transform:translateX(10px)} }
+  
+  .confetti { position: fixed; width: 12px; height: 12px; z-index: 9999;
+              pointer-events: none; border-radius: 2px; }
+  
+  @media (max-width: 700px) {
+    .zone-jeu { flex-direction: column; }
+    .thermometre { width: 60px; height: 250px; }
+    .thermometre-boule { width: 80px; height: 80px; }
+    header h1 { font-size: 1.5em; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🌡️ Le Chaud et le Froid</h1>
+  <p>Trouve la bonne température pour chaque objet !</p>
+</header>
+
+<div class="conteneur">
+  <div class="carte" id="carte">
+    <div class="zone-jeu">
+      <div class="thermometre-zone">
+        <div class="thermometre">
+          <div class="thermometre-remplissage" id="remplissage" style="height: 50%"></div>
+        </div>
+        <div class="thermometre-boule" id="boule"></div>
+        <div class="thermometre-valeur" id="valeur-affichee">50°</div>
+      </div>
+      
+      <div class="controles-zone">
+        <div class="defi">
+          <h2 id="defi-titre">🍦 La glace au congélateur</h2>
+          <p id="defi-desc">Place le curseur sur la température idéale pour garder la glace bien solide !</p>
+        </div>
+        
+        <div class="cible-zone">
+          <span>🎯 Température cible :</span>
+          <strong id="cible-valeur">5</strong>
+        </div>
+        
+        <div class="slider-zone">
+          <label>🌡️ Ajuste la température :</label>
+          <input type="range" id="slider" min="0" max="100" value="50">
+        </div>
+        
+        <button class="btn-valider" id="btn-valider" onclick="validerTemperature()">
+          ✅ Valider ma température
+        </button>
+        
+        <button class="bouton-suivant" id="btn-suivant" onclick="niveauSuivant()">
+          ➡️ Niveau suivant
+        </button>
+        
+        <div class="message-zone info" id="message">
+          👋 Bouge le curseur et clique sur "Valider" !
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="score-bar" id="score-bar"></div>
+  
+  <a href="index.html" class="retour">← Retour aux jeux</a>
+</div>
+
+<script>
+var niveaux = [
+  { icone: '🍦', nom: 'La glace au congélateur', 
+    desc: 'Place le curseur sur la température idéale pour garder la glace bien solide !',
+    cible: 5, tempReelle: '-18°C', 
+    explication: 'À -18°C, la glace reste dure comme de la pierre ! 🧊' },
+  { icone: '❄️', nom: 'Le bonhomme de neige',
+    desc: 'À quelle température la neige tient-elle bien ?',
+    cible: 15, tempReelle: '0°C',
+    explication: 'À 0°C, l\'eau gèle et la neige tient ! ⛄' },
+  { icone: '☀️', nom: 'Une journée à la plage',
+    desc: 'Trouve la température parfaite pour bronzer sur le sable !',
+    cible: 45, tempReelle: '30°C',
+    explication: 'À 30°C, il fait bien chaud, c\'est l\'été ! 🏖️' },
+  { icone: '🛁', nom: 'Le bain de bébé',
+    desc: 'L\'eau du bain doit être à la température du corps. Trouve-la !',
+    cible: 55, tempReelle: '37°C',
+    explication: 'À 37°C, c\'est la température idéale pour un bain ! 👶' },
+  { icone: '🍫', nom: 'Le chocolat chaud',
+    desc: 'Trouve la température parfaite pour un chocolat chaud qui ne brûle pas !',
+    cible: 70, tempReelle: '60°C',
+    explication: 'À 60°C, le chocolat est chaud mais pas brûlant ! ☕' },
+  { icone: '🍕', nom: 'La pizza au four',
+    desc: 'Le four doit être très chaud pour cuire la pizza !',
+    cible: 95, tempReelle: '200°C',
+    explication: 'À 200°C, la pizza cuit parfaitement ! 🔥' }
+];
+
+var niveauActuel = 0;
+var etoilesObtenues = 0;
+var dejaValide = false;
+var audioCtx = null;
+
+function initAudio() {
+  if (!audioCtx) {
+    try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e) {}
+  }
+}
+
+function jouerSon(frequence, duree, type) {
+  initAudio();
+  if (!audioCtx) return;
+  try {
+    var osc = audioCtx.createOscillator();
+    var gain = audioCtx.createGain();
+    osc.type = type || 'sine';
+    osc.frequency.value = frequence;
+    gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duree);
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.start();
+    osc.stop(audioCtx.currentTime + duree);
+  } catch(e) {}
+}
+
+function jouerSucces() {
+  jouerSon(523, 0.15, 'sine');
+  setTimeout(function(){ jouerSon(659, 0.15, 'sine'); }, 150);
+  setTimeout(function(){ jouerSon(784, 0.3, 'sine'); }, 300);
+}
+
+function jouerEchec() {
+  jouerSon(300, 0.2, 'square');
+  setTimeout(function(){ jouerSon(200, 0.3, 'square'); }, 200);
+}
+
+function chargerNiveau() {
+  var n = niveaux[niveauActuel];
+  document.getElementById('defi-titre').textContent = n.icone + ' ' + n.nom;
+  document.getElementById('defi-desc').textContent = n.desc;
+  document.getElementById('cible-valeur').textContent = n.cible;
+  
+  var slider = document.getElementById('slider');
+  slider.value = 50;
+  slider.disabled = false;
+  
+  dejaValide = false;
+  document.getElementById('btn-suivant').classList.remove('visible');
+  document.getElementById('btn-valider').style.display = 'block';
+  
+  var msg = document.getElementById('message');
+  msg.className = 'message-zone info';
+  msg.textContent = '🎯 Trouve la température cible : ' + n.cible;
+  
+  mettreAJourThermometre(50);
+  mettreAJourScore();
+}
+
+function mettreAJourThermometre(valeur) {
+  var remplissage = document.getElementById('remplissage');
+  var boule = document.getElementById('boule');
+  var valeurAff = document.getElementById('valeur-affichee');
+  
+  remplissage.style.height = valeur + '%';
+  
+  var couleurBoule;
+  if (valeur < 25) couleurBoule = 'radial-gradient(circle at 30% 30%, #93c5fd, #1e3a8a)';
+  else if (valeur < 50) couleurBoule = 'radial-gradient(circle at 30% 30%, #86efac, #15803d)';
+  else if (valeur < 75) couleurBoule = 'radial-gradient(circle at 30% 30%, #fde047, #ca8a04)';
+  else couleurBoule = 'radial-gradient(circle at 30% 30%, #fca5a5, #991b1b)';
+  boule.style.background = couleurBoule;
+  valeurAff.textContent = valeur + '°';
+}
+
+function mettreAJourScore() {
+  var bar = document.getElementById('score-bar');
+  var html = '';
+  for (var i = 0; i < niveaux.length; i++) {
+    html += '<div class="etoile' + (i < etoilesObtenues ? ' obtenue' : '') + '">⭐</div>';
+  }
+  bar.innerHTML = html;
+}
+
+function validerTemperature() {
+  if (dejaValide) return;
+  var n = niveaux[niveauActuel];
+  var valeur = parseInt(document.getElementById('slider').value);
+  var diff = Math.abs(valeur - n.cible);
+  var msg = document.getElementById('message');
+  
+  if (diff <= 5) {
+    dejaValide = true;
+    etoilesObtenues++;
+    mettreAJourScore();
+    jouerSucces();
+    lancerConfetti();
+    msg.className = 'message-zone succes';
+    msg.innerHTML = '🎉 BRAVO ! ' + n.explication + '<br><small>Tu as visé ' + valeur + '° (cible ' + n.cible + '°) - ' + n.tempReelle + '</small>';
+    document.getElementById('slider').disabled = true;
+    document.getElementById('btn-valider').style.display = 'none';
+    if (niveauActuel < niveaux.length - 1) {
+      document.getElementById('btn-suivant').classList.add('visible');
+    } else {
+      msg.innerHTML = '🏆 FÉLICITATIONS ! Tu as terminé tous les niveaux ! 🏆<br><small>Tu es un champion des températures !</small>';
+      setTimeout(lancerConfetti, 500);
+      setTimeout(lancerConfetti, 1000);
+    }
+  } else if (diff <= 15) {
+    msg.className = 'message-zone info';
+    msg.textContent = valeur < n.cible ? '🌡️ Un peu trop froid ! Essaie de monter un peu la température.' : '🔥 Un peu trop chaud ! Essaie de baisser un peu la température.';
+    jouerSon(400, 0.15, 'triangle');
+  } else {
+    msg.className = 'message-zone erreur';
+    msg.textContent = valeur < n.cible ? '🥶 Beaucoup trop froid ! Regarde bien la cible : ' + n.cible + '°' : '🥵 Beaucoup trop chaud ! Regarde bien la cible : ' + n.cible + '°';
+    jouerEchec();
+    var carte = document.getElementById('carte');
+    carte.style.animation = 'secouer 0.3s';
+    setTimeout(function(){ carte.style.animation = ''; }, 300);
+  }
+}
+
+function niveauSuivant() {
+  if (niveauActuel < niveaux.length - 1) {
+    niveauActuel++;
+    chargerNiveau();
+  }
+}
+
+function lancerConfetti() {
+  var couleurs = ['#fbbf24', '#22c55e', '#ef4444', '#3b82f6', '#a855f7', '#ec4899', '#06b6d4'];
+  for (var i = 0; i < 60; i++) {
+    (function(idx) {
+      setTimeout(function() {
+        var c = document.createElement('div');
+        c.className = 'confetti';
+        c.style.left = Math.random() * 100 + '%';
+        c.style.top = '-20px';
+        c.style.background = couleurs[Math.floor(Math.random() * couleurs.length)];
+        c.style.transform = 'rotate(' + Math.random() * 360 + 'deg)';
+        document.body.appendChild(c);
+        var startY = -20;
+        var endY = window.innerHeight + 20;
+        var duration = 2000 + Math.random() * 1500;
+        var rotation = (Math.random() > 0.5 ? 1 : -1) * (360 + Math.random() * 720);
+        var startTime = null;
+        function animer(timestamp) {
+          if (!startTime) startTime = timestamp;
+          var progress = (timestamp - startTime) / duration;
+          if (progress < 1) {
+            var y = startY + (endY - startY) * progress;
+            c.style.top = y + 'px';
+            c.style.transform = 'rotate(' + (rotation * progress) + 'deg)';
+            requestAnimationFrame(animer);
+          } else {
+            if (c.parentNode) c.parentNode.removeChild(c);
+          }
+        }
+        requestAnimationFrame(animer);
+      }, idx * 30);
+    })(i);
+  }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  var slider = document.getElementById('slider');
+  var derniereValeur = 50;
+  slider.addEventListener('input', function() {
+    var val = parseInt(this.value);
+    mettreAJourThermometre(val);
+    if (Math.abs(val - derniereValeur) >= 5) {
+      jouerSon(200 + val * 4, 0.05, 'sine');
+      derniereValeur = val;
+    }
+  });
+  chargerNiveau();
+});
+
+document.addEventListener('click', function() { initAudio(); }, { once: true });
+</script>
+
+</body>
+</html>
