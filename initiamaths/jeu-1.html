@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Les Tables de Multiplication - InitiaMaths</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='112' fill='%23f87171'/><text x='50%' y='55%' font-size='300' text-anchor='middle' dominant-baseline='middle'>🧮</text></svg>">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Comic Sans MS', 'Segoe UI', Arial, sans-serif; 
+         background: linear-gradient(135deg, #dbeafe, #bfdbfe); 
+         color: #1a1f2e; text-align: center; min-height: 100vh;
+         padding: 20px; }
+  
+  header { background: linear-gradient(135deg, #f87171, #ef4444); color: white; 
+           padding: 20px; border-radius: 20px; max-width: 900px; margin: 0 auto 20px;
+           box-shadow: 0 8px 0 #b91c1c; }
+  header h1 { font-size: 2em; text-shadow: 2px 2px 0 #b91c1c; margin-bottom: 5px; }
+  header p { font-size: 1.1em; opacity: 0.95; }
+  
+  .conteneur { max-width: 900px; margin: 0 auto; }
+  
+  .carte { background: white; border-radius: 24px; padding: 30px; 
+           box-shadow: 0 8px 0 #cbd5e1; border: 4px solid #f87171;
+           margin-bottom: 20px; }
+  
+  /* Écran d'accueil */
+  #ecran-accueil { display: block; }
+  #ecran-jeu { display: none; }
+  #ecran-fin { display: none; }
+  
+  .titre-choix { font-size: 1.5em; color: #b91c1c; margin-bottom: 20px; }
+  
+  .grille-tables { display: grid; grid-template-columns: repeat(5, 1fr); gap: 15px; margin-bottom: 20px; }
+  .btn-table { padding: 25px 10px; font-size: 1.8em; font-weight: bold;
+               background: linear-gradient(135deg, #60a5fa, #3b82f6); color: white;
+               border: none; border-radius: 16px; cursor: pointer;
+               box-shadow: 0 6px 0 #1e40af; transition: all 0.1s;
+               font-family: inherit; }
+  .btn-table:hover { transform: translateY(-2px); box-shadow: 0 8px 0 #1e40af; }
+  .btn-table:active { transform: translateY(4px); box-shadow: 0 2px 0 #1e40af; }
+  
+  .btn-toutes { grid-column: span 5; padding: 20px; font-size: 1.3em;
+                background: linear-gradient(135deg, #f59e0b, #d97706); color: white;
+                border: none; border-radius: 16px; cursor: pointer;
+                box-shadow: 0 6px 0 #b45309; transition: all 0.1s;
+                font-family: inherit; font-weight: bold; }
+  .btn-toutes:hover { transform: translateY(-2px); box-shadow: 0 8px 0 #b45309; }
+  .btn-toutes:active { transform: translateY(4px); box-shadow: 0 2px 0 #b45309; }
+  
+  /* Écran de jeu */
+  .barre-progression { width: 100%; height: 20px; background: #e2e8f0; 
+                       border-radius: 10px; overflow: hidden; margin-bottom: 20px;
+                       border: 2px solid #cbd5e1; }
+  .barre-progression-remplissage { height: 100%; background: linear-gradient(90deg, #22c55e, #16a34a);
+                                   width: 0%; transition: width 0.4s; border-radius: 8px; }
+  
+  .info-partie { display: flex; justify-content: space-between; margin-bottom: 20px;
+                 font-size: 1em; font-weight: bold; color: #475569; }
+  
+  .question-zone { background: #fef3c7; border-radius: 20px; padding: 30px;
+                   border: 4px dashed #f59e0b; margin-bottom: 20px; }
+  .question { font-size: 3.5em; font-weight: bold; color: #1a1f2e; letter-spacing: 3px; }
+  
+  .reponse-zone { display: flex; gap: 15px; justify-content: center; align-items: center;
+                  margin-bottom: 20px; flex-wrap: wrap; }
+  .input-reponse { font-size: 2.5em; width: 200px; padding: 15px; text-align: center;
+                   border: 4px solid #3b82f6; border-radius: 16px; font-family: inherit;
+                   font-weight: bold; color: #1a1f2e; outline: none; }
+  .input-reponse:focus { border-color: #f59e0b; box-shadow: 0 0 0 4px rgba(245,158,11,0.3); }
+  .btn-valider { padding: 20px 40px; font-size: 1.5em; font-weight: bold;
+                 background: linear-gradient(135deg, #22c55e, #16a34a); color: white;
+                 border: none; border-radius: 16px; cursor: pointer;
+                 box-shadow: 0 6px 0 #15803d; transition: all 0.1s;
+                 font-family: inherit; }
+  .btn-valider:hover { transform: translateY(-2px); box-shadow: 0 8px 0 #15803d; }
+  .btn-valider:active { transform: translateY(4px); box-shadow: 0 2px 0 #15803d; }
+  .btn-valider:disabled { background: #94a3b8; box-shadow: 0 6px 0 #64748b; cursor: not-allowed; }
+  
+  .message-zone { padding: 20px; border-radius: 12px; font-size: 1.3em; font-weight: bold;
+                  min-height: 70px; display: flex; align-items: center; justify-content: center;
+                  text-align: center; margin-bottom: 20px; transition: all 0.3s; }
+  .message-zone.succes { background: #dcfce7; color: #166534; }
+  .message-zone.erreur { background: #fee2e2; color: #991b1b; }
+  .message-zone.info { background: #dbeafe; color: #1e40af; }
+  
+  .score-etoiles { display: flex; justify-content: center; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+  .etoile { font-size: 1.8em; opacity: 0.3; transition: all 0.3s; }
+  .etoile.obtenue { opacity: 1; transform: scale(1.2); }
+  
+  /* Pavé numérique */
+  .pave-numerique { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
+                    max-width: 300px; margin: 0 auto 20px; }
+  .btn-pave { padding: 20px; font-size: 1.8em; font-weight: bold;
+              background: #f1f5f9; color: #1a1f2e; border: 3px solid #cbd5e1;
+              border-radius: 12px; cursor: pointer; font-family: inherit;
+              transition: all 0.1s; }
+  .btn-pave:hover { background: #e2e8f0; }
+  .btn-pave:active { transform: scale(0.95); background: #cbd5e1; }
+  .btn-pave.btn-effacer { background: #fca5a5; border-color: #ef4444; color: #7f1d1d; }
+  .btn-pave.btn-effacer:hover { background: #f87171; }
+  
+  /* Écran de fin */
+  .titre-fin { font-size: 2.5em; color: #b45309; margin-bottom: 20px; }
+  .score-final { font-size: 1.5em; margin-bottom: 20px; }
+  .score-final strong { font-size: 2em; color: #16a34a; }
+  .btn-rejouer { padding: 20px 40px; font-size: 1.5em; font-weight: bold;
+                 background: linear-gradient(135deg, #f59e0b, #d97706); color: white;
+                 border: none; border-radius: 16px; cursor: pointer;
+                 box-shadow: 0 6px 0 #b45309; transition: all 0.1s;
+                 font-family: inherit; margin: 10px; }
+  .btn-rejouer:hover { transform: translateY(-2px); box-shadow: 0 8px 0 #b45309; }
+  .btn-rejouer:active { transform: translateY(4px); box-shadow: 0 2px 0 #b45309; }
+  
+  .retour { display: inline-block; margin-top: 20px; padding: 12px 24px;
+            background: #64748b; color: white; text-decoration: none;
+            border-radius: 12px; font-weight: bold; box-shadow: 0 4px 0 #475569; }
+  .retour:hover { background: #475569; }
+  
+  @keyframes secouer { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-15px)} 75%{transform:translateX(15px)} }
+  @keyframes rebondir { 0%,100%{transform:scale(1)} 50%{transform:scale(1.1)} }
+  
+  .confetti { position: fixed; width: 12px; height: 12px; z-index: 9999;
+              pointer-events: none; border-radius: 2px; }
+  
+  @media (max-width: 700px) {
+    .grille-tables { grid-template-columns: repeat(3, 1fr); }
+    .btn-toutes { grid-column: span 3; }
+    .question { font-size: 2.5em; }
+    .input-reponse { font-size: 2em; width: 150px; }
+    header h1 { font-size: 1.5em; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🧮 Les Tables de Multiplication</h1>
+  <p>Révise tes tables en t'amusant !</p>
+</header>
+
+<div class="conteneur">
+  <!-- ÉCRAN D'ACCUEIL -->
+  <div id="ecran-accueil">
+    <div class="carte">
+      <h2 class="titre-choix">Choisis une table à réviser :</h2>
+      <div class="grille-tables" id="grille-tables"></div>
+    </div>
+    <a href="index.html" class="retour">← Retour aux jeux</a>
+  </div>
+  
+  <!-- ÉCRAN DE JEU -->
+  <div id="ecran-jeu">
+    <div class="carte">
+      <div class="info-partie">
+        <span id="info-table">Table de 7</span>
+        <span id="info-question">Question 1/10</span>
+      </div>
+      <div class="barre-progression">
+        <div class="barre-progression-remplissage" id="barre-remplissage"></div>
+      </div>
+      
+      <div class="score-etoiles" id="score-etoiles"></div>
+      
+      <div class="question-zone">
+        <div class="question" id="question">7 × 8 = ?</div>
+      </div>
+      
+      <div class="reponse-zone">
+        <input type="number" class="input-reponse" id="input-reponse" placeholder="?" autofocus>
+        <button class="btn-valider" id="btn-valider" onclick="validerReponse()">✅ Valider</button>
+      </div>
+      
+      <div class="pave-numerique" id="pave-numerique"></div>
+      
+      <div class="message-zone info" id="message">Tape ta réponse et clique sur "Valider" !</div>
+    </div>
+    <a href="#" class="retour" onclick="recommencer(); return false;">🏠 Changer de table</a>
+  </div>
+  
+  <!-- ÉCRAN DE FIN -->
+  <div id="ecran-fin">
+    <div class="carte">
+      <div class="titre-fin" id="titre-fin">🏆 Bravo !</div>
+      <div class="score-final" id="score-final">Tu as <strong>10/10</strong> bonnes réponses !</div>
+      <div class="score-etoiles" id="score-final-etoiles"></div>
+      <button class="btn-rejouer" onclick="recommencer()">🔄 Rejouer</button>
+    </div>
+    <a href="index.html" class="retour">← Retour aux jeux</a>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// ÉTAT DU JEU
+// ============================================================
+var tableChoisie = null;
+var questions = [];
+var indexQuestion = 0;
+var bonnesReponses = 0;
+var NB_QUESTIONS = 10;
+var audioCtx = null;
+
+// ============================================================
+// AUDIO
+// ============================================================
+function initAudio() {
+  if (!audioCtx) {
+    try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e) {}
+  }
+}
+
+function jouerSon(frequence, duree, type) {
+  initAudio();
+  if (!audioCtx) return;
+  try {
+    var osc = audioCtx.createOscillator();
+    var gain = audioCtx.createGain();
+    osc.type = type || 'sine';
+    osc.frequency.value = frequence;
+    gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duree);
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.start();
+    osc.stop(audioCtx.currentTime + duree);
+  } catch(e) {}
+}
+
+function jouerSucces() {
+  jouerSon(523, 0.1, 'sine');
+  setTimeout(function(){ jouerSon(659, 0.1, 'sine'); }, 100);
+  setTimeout(function(){ jouerSon(784, 0.2, 'sine'); }, 200);
+}
+
+function jouerEchec() {
+  jouerSon(300, 0.15, 'square');
+  setTimeout(function(){ jouerSon(200, 0.25, 'square'); }, 150);
+}
+
+function jouerClic() {
+  jouerSon(600, 0.05, 'sine');
+}
+
+// ============================================================
+// INITIALISATION
+// ============================================================
+function initAccueil() {
+  var grille = document.getElementById('grille-tables');
+  var html = '';
+  for (var i = 1; i <= 10; i++) {
+    html += '<button class="btn-table" onclick="demarrerPartie(' + i + ')">×' + i + '</button>';
+  }
+  html += '<button class="btn-toutes" onclick="demarrerPartie(0)">🎲 Toutes les tables</button>';
+  grille.innerHTML = html;
+}
+
+function initPave() {
+  var pave = document.getElementById('pave-numerique');
+  var html = '';
+  for (var i = 1; i <= 9; i++) {
+    html += '<button class="btn-pave" onclick="ajouterChiffre(' + i + ')">' + i + '</button>';
+  }
+  html += '<button class="btn-pave btn-effacer" onclick="effacerChiffre()">⌫</button>';
+  html += '<button class="btn-pave" onclick="ajouterChiffre(0)">0</button>';
+  html += '<button class="btn-pave" style="background:#22c55e;color:white;border-color:#16a34a;" onclick="validerReponse()">✓</button>';
+  pave.innerHTML = html;
+}
+
+// ============================================================
+// DÉMARRAGE D'UNE PARTIE
+// ============================================================
+function demarrerPartie(table) {
+  tableChoisie = table;
+  questions = [];
+  indexQuestion = 0;
+  bonnesReponses = 0;
+  
+  for (var i = 0; i < NB_QUESTIONS; i++) {
+    var a, b;
+    if (table === 0) {
+      a = Math.floor(Math.random() * 10) + 1;
+      b = Math.floor(Math.random() * 10) + 1;
+    } else {
+      a = table;
+      b = Math.floor(Math.random() * 10) + 1;
+    }
+    questions.push({ a: a, b: b, reponse: a * b });
+  }
+  
+  document.getElementById('ecran-accueil').style.display = 'none';
+  document.getElementById('ecran-jeu').style.display = 'block';
+  document.getElementById('ecran-fin').style.display = 'none';
+  
+  document.getElementById('info-table').textContent = table === 0 ? '🎲 Toutes les tables' : 'Table de ' + table;
+  
+  afficherQuestion();
+}
+
+// ============================================================
+// AFFICHAGE D'UNE QUESTION
+// ============================================================
+function afficherQuestion() {
+  if (indexQuestion >= NB_QUESTIONS) {
+    finDePartie();
+    return;
+  }
+  
+  var q = questions[indexQuestion];
+  document.getElementById('question').textContent = q.a + ' × ' + q.b + ' = ?';
+  document.getElementById('info-question').textContent = 'Question ' + (indexQuestion + 1) + '/' + NB_QUESTIONS;
+  
+  var pourcentage = (indexQuestion / NB_QUESTIONS) * 100;
+  document.getElementById('barre-remplissage').style.width = pourcentage + '%';
+  
+  document.getElementById('input-reponse').value = '';
+  document.getElementById('input-reponse').disabled = false;
+  document.getElementById('btn-valider').disabled = false;
+  document.getElementById('input-reponse').focus();
+  
+  var msg = document.getElementById('message');
+  msg.className = 'message-zone info';
+  msg.textContent = '💭 À toi de jouer !';
+  
+  mettreAJourEtoiles();
+}
+
+function mettreAJourEtoiles() {
+  var zone = document.getElementById('score-etoiles');
+  var html = '';
+  for (var i = 0; i < NB_QUESTIONS; i++) {
+    html += '<div class="etoile' + (i < bonnesReponses ? ' obtenue' : '') + '">⭐</div>';
+  }
+  zone.innerHTML = html;
+}
+
+// ============================================================
+// VALIDATION
+// ============================================================
+function validerReponse() {
+  var input = document.getElementById('input-reponse');
+  var valeur = parseInt(input.value);
+  
+  if (isNaN(valeur)) {
+    var msg = document.getElementById('message');
+    msg.className = 'message-zone info';
+    msg.textContent = '🤔 Tape un nombre avant de valider !';
+    return;
+  }
+  
+  var q = questions[indexQuestion];
+  var msg = document.getElementById('message');
+  
+  document.getElementById('btn-valider').disabled = true;
+  document.getElementById('input-reponse').disabled = true;
+  
+  if (valeur === q.reponse) {
+    bonnesReponses++;
+    jouerSucces();
+    lancerConfetti();
+    msg.className = 'message-zone succes';
+    msg.textContent = '🎉 BRAVO ! ' + q.a + ' × ' + q.b + ' = ' + q.reponse;
+    mettreAJourEtoiles();
+  } else {
+    jouerEchec();
+    msg.className = 'message-zone erreur';
+    msg.textContent = '❌ Presque ! ' + q.a + ' × ' + q.b + ' = ' + q.reponse;
+    var carte = document.querySelector('#ecran-jeu .carte');
+    carte.style.animation = 'secouer 0.3s';
+    setTimeout(function(){ carte.style.animation = ''; }, 300);
+  }
+  
+  indexQuestion++;
+  setTimeout(afficherQuestion, 1800);
+}
+
+// ============================================================
+// PAVÉ NUMÉRIQUE
+// ============================================================
+function ajouterChiffre(chiffre) {
+  var input = document.getElementById('input-reponse');
+  if (input.disabled) return;
+  jouerClic();
+  if (input.value.length < 3) {
+    input.value += chiffre;
+  }
+}
+
+function effacerChiffre() {
+  var input = document.getElementById('input-reponse');
+  if (input.disabled) return;
+  jouerClic();
+  input.value = input.value.slice(0, -1);
+}
+
+// ============================================================
+// FIN DE PARTIE
+// ============================================================
+function finDePartie() {
+  document.getElementById('ecran-jeu').style.display = 'none';
+  document.getElementById('ecran-fin').style.display = 'block';
+  
+  var titre = document.getElementById('titre-fin');
+  var score = document.getElementById('score-final');
+  
+  if (bonnesReponses === NB_QUESTIONS) {
+    titre.textContent = '🏆 PARFAIT !';
+    score.innerHTML = 'Incroyable ! Tu as <strong>' + bonnesReponses + '/' + NB_QUESTIONS + '</strong> bonnes réponses !';
+    for (var i = 0; i < 3; i++) setTimeout(lancerConfetti, i * 400);
+  } else if (bonnesReponses >= 7) {
+    titre.textContent = '🎉 TRÈS BIEN !';
+    score.innerHTML = 'Tu as <strong>' + bonnesReponses + '/' + NB_QUESTIONS + '</strong> bonnes réponses !';
+    lancerConfetti();
+  } else if (bonnesReponses >= 5) {
+    titre.textContent = '👍 PAS MAL !';
+    score.innerHTML = 'Tu as <strong>' + bonnesReponses + '/' + NB_QUESTIONS + '</strong> bonnes réponses. Continue !';
+  } else {
+    titre.textContent = '💪 COURAGE !';
+    score.innerHTML = 'Tu as <strong>' + bonnesReponses + '/' + NB_QUESTIONS + '</strong> bonnes réponses. Réessaie !';
+  }
+  
+  var etoiles = document.getElementById('score-final-etoiles');
+  var html = '';
+  for (var j = 0; j < NB_QUESTIONS; j++) {
+    html += '<div class="etoile' + (j < bonnesReponses ? ' obtenue' : '') + '">⭐</div>';
+  }
+  etoiles.innerHTML = html;
+  
+  jouerSon(523, 0.15, 'sine');
+  setTimeout(function(){ jouerSon(659, 0.15, 'sine'); }, 150);
+  setTimeout(function(){ jouerSon(784, 0.15, 'sine'); }, 300);
+  setTimeout(function(){ jouerSon(1047, 0.4, 'sine'); }, 450);
+}
+
+function recommencer() {
+  document.getElementById('ecran-accueil').style.display = 'block';
+  document.getElementById('ecran-jeu').style.display = 'none';
+  document.getElementById('ecran-fin').style.display = 'none';
+}
+
+// ============================================================
+// CONFETTI
+// ============================================================
+function lancerConfetti() {
+  var couleurs = ['#fbbf24', '#22c55e', '#ef4444', '#3b82f6', '#a855f7', '#ec4899', '#06b6d4'];
+  for (var i = 0; i < 50; i++) {
+    (function(idx) {
+      setTimeout(function() {
+        var c = document.createElement('div');
+        c.className = 'confetti';
+        c.style.left = Math.random() * 100 + '%';
+        c.style.top = '-20px';
+        c.style.background = couleurs[Math.floor(Math.random() * couleurs.length)];
+        c.style.transform = 'rotate(' + Math.random() * 360 + 'deg)';
+        document.body.appendChild(c);
+        
+        var startY = -20;
+        var endY = window.innerHeight + 20;
+        var duration = 1800 + Math.random() * 1200;
+        var rotation = (Math.random() > 0.5 ? 1 : -1) * (360 + Math.random() * 720);
+        var startTime = null;
+        
+        function animer(timestamp) {
+          if (!startTime) startTime = timestamp;
+          var progress = (timestamp - startTime) / duration;
+          if (progress < 1) {
+            var y = startY + (endY - startY) * progress;
+            c.style.top = y + 'px';
+            c.style.transform = 'rotate(' + (rotation * progress) + 'deg)';
+            requestAnimationFrame(animer);
+          } else {
+            if (c.parentNode) c.parentNode.removeChild(c);
+          }
+        }
+        requestAnimationFrame(animer);
+      }, idx * 25);
+    })(i);
+  }
+}
+
+// ============================================================
+// INIT
+// ============================================================
+document.addEventListener('DOMContentLoaded', function() {
+  initAccueil();
+  initPave();
+  
+  document.getElementById('input-reponse').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') validerReponse();
+  });
+});
+
+document.addEventListener('click', function() { initAudio(); }, { once: true });
+</script>
+
+</body>
+</html>
