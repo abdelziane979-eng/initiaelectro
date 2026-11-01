@@ -496,6 +496,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
 document.addEventListener('click', function() { initAudio(); }, { once: true });
 </script>
-
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw-maths.js').then(function(reg) {
+      console.log('✅ Service Worker enregistré');
+    }).catch(function(err) {
+      console.log('⚠️ Erreur Service Worker:', err);
+    });
+  }
+</script>
 </body>
 </html>
