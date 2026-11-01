@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Guide Pédagogique - Collège & Lycée</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='112' fill='%230ea5e9'/><path d='M 160 340 L 220 200 L 280 320 L 340 180' stroke='white' stroke-width='24' fill='none' stroke-linecap='round' stroke-linejoin='round'/></svg>">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: #f4f7fb; color: #1a1f2e; line-height: 1.6; }
+  
+  header { background: linear-gradient(135deg, #0ea5e9, #8b5cf6); color: white; padding: 40px 20px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+  header h1 { font-size: 2.2em; margin-bottom: 10px; }
+  header p { font-size: 1.1em; opacity: 0.95; }
+  
+  .conteneur { max-width: 900px; margin: 0 auto; padding: 40px 20px; }
+  
+  .intro-box { background: white; padding: 24px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 30px; border-left: 6px solid #0ea5e9; }
+  .intro-box h2 { color: #0369a1; margin-bottom: 12px; font-size: 1.4em; }
+  
+  .section-titre { font-size: 1.6em; color: #0f172a; margin: 40px 0 20px 0; padding-bottom: 10px; border-bottom: 3px solid #e2e8f0; }
+  
+  .jeu-carte { background: white; border-radius: 12px; padding: 24px; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); border-top: 4px solid; }
+  .jeu-carte h3 { font-size: 1.3em; margin-bottom: 12px; display: flex; align-items: center; gap: 10px; }
+  .jeu-carte .emoji { font-size: 1.5em; }
+  
+  .jeu-carte p { margin-bottom: 10px; color: #334155; }
+  .jeu-carte strong { color: #0f172a; }
+  
+  .a-dire { background: #f0f9ff; border-left: 3px solid #0ea5e9; padding: 12px 16px; border-radius: 4px; margin-top: 12px; margin-bottom: 12px; font-style: italic; }
+  .a-dire strong { color: #0369a1; }
+  
+  .question { background: #fdf4ff; border-left: 3px solid #d946ef; padding: 12px 16px; border-radius: 4px; margin-top: 12px; }
+  .question strong { color: #86198f; }
+  
+  /* Couleurs EspaceElectronic (Bleu) */
+  .c-elec { border-top-color: #3b82f6; } .c-elec h3 { color: #1d4ed8; }
+  /* Couleurs EspaceIA (Violet/Bleu) */
+  .c-ia1 { border-top-color: #f59e0b; } .c-ia1 h3 { color: #b45309; }
+  .c-ia2 { border-top-color: #22c55e; } .c-ia2 h3 { color: #047857; }
+  .c-ia3 { border-top-color: #0ea5e9; } .c-ia3 h3 { color: #0369a1; }
+  .c-ia4 { border-top-color: #8b5cf6; } .c-ia4 h3 { color: #6b21a8; }
+
+  .btn-retour { display: inline-block; margin-top: 20px; padding: 10px 20px; background: #64748b; color: white; text-decoration: none; border-radius: 8px; font-weight: bold; }
+  
+  @media print {
+    body { background: white; }
+    header { box-shadow: none; background: #0ea5e9; -webkit-print-color-adjust: exact; }
+    .jeu-carte, .intro-box { box-shadow: none; border: 1px solid #ccc; page-break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🎓 Guide Enseignant : Collège & Lycée</h1>
+  <p>Mode d'emploi pédagogique pour EspaceElectronic et EspaceIA</p>
+</header>
+
+<div class="conteneur">
+  
+  <div class="intro-box">
+    <h2>🎯 Présentation générale</h2>
+    <p>Ce document accompagne les deux applications avancées de la plateforme : <strong>EspaceElectronic</strong> (pour les collégiens et lycéens) et <strong>EspaceIA</strong> (pour comprendre l'Intelligence Artificielle).</p>
+    <p style="margin-top: 10px;">Ces outils sont conçus pour être utilisés en autonomie par les élèves, mais ce guide vous donne les clés pour introduire les notions, guider les travaux pratiques et animer des débats.</p>
+  </div>
+
+  <!-- ==================== ESPACE ELECTRONIC ==================== -->
+  <h2 class="section-titre">🧪 EspaceElectronic (Technologie / Sciences Physiques)</h2>
+  
+  <div class="jeu-carte c-elec">
+    <h3><span class="emoji">🔌</span> Le Bac à Sable & Le Multimètre</h3>
+    <p><strong>Concept :</strong> Un espace de simulation où l'élève peut placer 44 composants virtuels (piles, LED, résistances, transistors, capteurs) et les câbler.</p>
+    <p><strong>Ce que ça enseigne :</strong> Le sens du courant, la loi d'Ohm, le rôle des composants, et l'utilisation d'un multimètre (tension, intensité, résistance).</p>
+    <div class="a-dire">
+      <strong>💬 À dire aux élèves :</strong> "Un circuit électrique est un chemin fermé. Si vous placez une LED sans résistance, elle grille. Le multimètre est votre outil de diagnostic pour comprendre ce qui se passe."
+    </div>
+  </div>
+
+  <div class="jeu-carte c-elec">
+    <h3><span class="emoji">🏆</span> Les 19 Défis d'Ingénierie</h3>
+    <p><strong>Concept :</strong> Des défis progressifs (Maison, Écologie, Jeux, Véhicules, Capteurs, Sécurité) où l'élève doit réaliser un circuit précis pour réussir.</p>
+    <p><strong>Exemples phares :</strong> La Lumière Automatique (temporisation RC), la Serre Connectée (capteur LDR + moteur), le Feu Tricolore.</p>
+    <div class="a-dire">
+      <strong>💬 À dire aux élèves :</strong> "Un ingénieur doit résoudre un problème concret. Pour chaque défi, lisez bien la consigne, choisissez les bons composants, et vérifiez votre câblage avant de valider."
+    </div>
+    <div class="question">
+      <strong>❓ Piste d'activité :</strong> Demandez aux élèves de dessiner sur papier le schéma du circuit de la "Lumière Automatique" avant de le reproduire à l'écran.
+    </div>
+  </div>
+
+  <!-- ==================== ESPACE IA ==================== -->
+  <h2 class="section-titre">🧠 EspaceIA (SNT / NSI / Mathématiques)</h2>
+
+  <div class="jeu-carte c-ia1">
+    <h3><span class="emoji">🍎</span> Niveau 1 : L'Apprenti Dresseur (Enfants/Débutants)</h3>
+    <p><strong>Concept :</strong> L'élève entraîne une IA à reconnaître des fruits en lui donnant des exemples.</p>
+    <p><strong>Ce que ça enseigne :</strong> L'importance des données d'entraînement. Si on donne des exemples déséquilibrés, l'IA fait de mauvaises prédictions.</p>
+    <div class="a-dire">
+      <strong>💬 À dire aux élèves :</strong> "L'IA ne 'voit' pas un fruit, elle calcule des probabilités basées sur ce qu'on lui a montré. C'est pour cela que les données sont le nouveau pétrole."
+    </div>
+  </div>
+
+  <div class="jeu-carte c-ia2">
+    <h3><span class="emoji">♻️</span> Niveau 2 : L'Apprenti Détective (Collégiens)</h3>
+    <p><strong>Concept :</strong> L'élève doit corriger les règles de tri des déchets d'une IA qui se base sur de mauvais critères (comme la couleur).</p>
+    <p><strong>Ce que ça enseigne :</strong> La notion d'algorithme de décision et la nécessité de définir de bons critères de classification.</p>
+    <div class="a-dire">
+      <strong>💬 À dire aux élèves :</strong> "Une IA suit des règles. Si vous lui donnez de mauvaises règles, elle triera mal. Vous devez agir comme des ingénieurs et corriger son algorithme."
+    </div>
+  </div>
+
+  <div class="jeu-carte c-ia3">
+    <h3><span class="emoji">🧑‍💻</span> Niveau 3 : Le Créateur (Lycéens)</h3>
+    <p><strong>Concept :</strong> Un simulateur de réseau de neurones. L'élève ajuste des poids (W1, W2) et un biais (B) pour tracer une ligne séparant deux groupes de points.</p>
+    <p><strong>Ce que ça enseigne :</strong> La frontière de décision, la séparation linéaire, et les bases des mathématiques derrière l'IA.</p>
+    <div class="a-dire">
+      <strong>💬 À dire aux élèves :</strong> "Un réseau de neurones cherche à séparer des données. En modifiant les paramètres, vous modifiez l'équation de la droite (y = ax + b). C'est de l'algèbre appliquée à l'IA."
+    </div>
+  </div>
+
+  <div class="jeu-carte c-ia4">
+    <h3><span class="emoji">🎓</span> Niveau 4 : L'Ingénieur (BTS / IUT)</h3>
+    <p><strong>Concept :</strong> Un algorithme de recrutement est biaisé (il favorise les hommes). L'élève doit détecter et corriger ce biais éthique.</p>
+    <p><strong>Ce que ça enseigne :</strong> L'éthique de l'IA, la notion de biais algorithmique, et la responsabilité humaine derrière les machines.</p>
+    <div class="a-dire">
+      <strong>💬 À dire aux élèves :</strong> "Une IA est le miroir de notre société. Si les données historiques sont discriminantes, l'IA le sera aussi. C'est aux humains de garantir l'équité des algorithmes."
+    </div>
+    <div class="question">
+      <strong>❓ Piste de débat :</strong> "Faut-il faire confiance à une IA pour recruter, prêter de l'argent ou juger un criminel ? Pourquoi ?"
+    </div>
+  </div>
+
+  <div style="text-align: center; margin-top: 40px;">
+    <a href="index.html" class="btn-retour">← Retour au menu principal</a>
+  </div>
+
+</div>
+
+</body>
+</html>
