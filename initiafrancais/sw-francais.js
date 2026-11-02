@@ -1,4 +1,4 @@
-var CACHE_NAME = 'initiafrancais-v3';
+var CACHE_NAME = 'initiafrancais-v5';
 var urlsToCache = [
   './',
   './index.html',
