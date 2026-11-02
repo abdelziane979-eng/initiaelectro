@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Plus Grand ou Plus Petit - InitiaMaths</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='112' fill='%23f59e0b'/><text x='50%' y='55%' font-size='300' text-anchor='middle' dominant-baseline='middle'>⚖️</text></svg>">
+<link rel="manifest" href="manifest-maths.json">
+<meta name="theme-color" content="#3b82f6">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="InitiaMaths">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Comic Sans MS', 'Segoe UI', Arial, sans-serif; 
+         background: linear-gradient(135deg, #fef3c7, #fde68a); 
+         color: #1a1f2e; text-align: center; min-height: 100vh;
+         padding: 20px; }
+  
+  header { background: linear-gradient(135deg, #f59e0b, #d97706); color: white; 
+           padding: 20px; border-radius: 20px; max-width: 900px; margin: 0 auto 20px;
+           box-shadow: 0 8px 0 #b45309; }
+  header h1 { font-size: 2em; text-shadow: 2px 2px 0 #b45309; margin-bottom: 5px; }
+  header p { font-size: 1.1em; opacity: 0.95; }
+  
+  .conteneur { max-width: 900px; margin: 0 auto; }
+  
+  .carte { background: white; border-radius: 24px; padding: 30px; 
+           box-shadow: 0 8px 0 #cbd5e1; border: 4px solid #f59e0b;
+           margin-bottom: 20px; }
+  
+  #ecran-accueil { display: block; }
+  #ecran-jeu { display: none; }
+  #ecran-fin { display: none; }
+  
+  .titre-choix { font-size: 1.5em; color: #b45309; margin-bottom: 20px; }
+  
+  .grille-niveaux { display: flex; flex-direction: column; gap: 15px; margin-bottom: 20px; }
+  .btn-niveau { padding: 25px 20px; font-size: 1.3em; font-weight: bold;
+                color: white; border: none; border-radius: 16px; cursor: pointer;
+                transition: all 0.1s; font-family: inherit; text-align: left;
+                display: flex; align-items: center; gap: 20px; }
+  .btn-niveau:hover { transform: translateY(-2px); }
+  .btn-niveau:active { transform: translateY(4px); }
+  .btn-niveau .icone { font-size: 2.5em; }
+  .btn-niveau .desc { display: block; font-size: 0.7em; opacity: 0.9; margin-top: 5px; font-weight: normal; }
+  
+  .btn-niveau.facile { background: linear-gradient(135deg, #22c55e, #16a34a); box-shadow: 0 6px 0 #15803d; }
+  .btn-niveau.facile:hover { box-shadow: 0 8px 0 #15803d; }
+  .btn-niveau.moyen { background: linear-gradient(135deg, #f59e0b, #d97706); box-shadow: 0 6px 0 #b45309; }
+  .btn-niveau.moyen:hover { box-shadow: 0 8px 0 #b45309; }
+  .btn-niveau.difficile { background: linear-gradient(135deg, #ef4444, #dc2626); box-shadow: 0 6px 0 #991b1b; }
+  .btn-niveau.difficile:hover { box-shadow: 0 8px 0 #991b1b; }
+  
+  .barre-progression { width: 100%; height: 20px; background: #e2e8f0; 
+                       border-radius: 10px; overflow: hidden; margin-bottom: 20px;
+                       border: 2px solid #cbd5e1; }
+  .barre-progression-remplissage { height: 100%; background: linear-gradient(90deg, #22c55e, #16a34a);
+                                   width: 0%; transition: width 0.4s; border-radius: 8px; }
+  
+  .info-partie { display: flex; justify-content: space-between; margin-bottom: 20px;
+                 font-size: 1em; font-weight: bold; color: #475569; }
+  
+  .question-texte { font-size: 1.5em; color: #1a1f2e; font-weight: bold; margin-bottom: 20px;
+                    background: #fef3c7; padding: 15px; border-radius: 12px;
+                    border-left: 5px solid #f59e0b; }
+  
+  .cartes-zone { display: flex; justify-content: center; gap: 30px; margin: 20px 0 30px; flex-wrap: wrap; }
+  
+  .carte-item { width: 180px; height: 220px; background: linear-gradient(135deg, #60a5fa, #3b82f6); 
+                border-radius: 20px; cursor: pointer; position: relative;
+                display: flex; flex-direction: column; align-items: center; justify-content: center;
+                box-shadow: 0 8px 0 #1e40af; transition: all 0.15s;
+                border: 4px solid white; padding: 15px; }
+  .carte-item:hover { transform: translateY(-4px); box-shadow: 0 12px 0 #1e40af; }
+  .carte-item:active { transform: translateY(4px); box-shadow: 0 4px 0 #1e40af; }
+  .carte-item.correct { background: linear-gradient(135deg, #22c55e, #16a34a); box-shadow: 0 8px 0 #15803d; }
+  .carte-item.incorrect { background: linear-gradient(135deg, #ef4444, #dc2626); box-shadow: 0 8px 0 #991b1b; }
+  .carte-item:disabled { cursor: not-allowed; }
+  .carte-item.desactivee { opacity: 0.6; }
+  
+  .carte-valeur { font-size: 3em; font-weight: bold; color: white; 
+                  text-shadow: 2px 2px 4px rgba(0,0,0,0.3); margin-bottom: 10px; }
+  .carte-valeur.expression { font-size: 2em; }
+  
+  .carte-visuel { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px;
+                  margin-top: 10px; max-width: 140px; }
+  .point { width: 18px; height: 18px; background: white; border-radius: 50%;
+           box-shadow: inset -2px -2px 0 rgba(0,0,0,0.2); }
+  
+  .symbole-zone { font-size: 2em; display: flex; align-items: center; color: #b45309; font-weight: bold; }
+  
+  .message-zone { padding: 20px; border-radius: 12px; font-size: 1.2em; font-weight: bold;
+                  min-height: 70px; display: flex; align-items: center; justify-content: center;
+                  text-align: center; margin-bottom: 20px; transition: all 0.3s; }
+  .message-zone.succes { background: #dcfce7; color: #166534; }
+  .message-zone.erreur { background: #fee2e2; color: #991b1b; }
+  .message-zone.info { background: #dbeafe; color: #1e40af; }
+  
+  .score-etoiles { display: flex; justify-content: center; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+  .etoile { font-size: 1.8em; opacity: 0.3; transition: all 0.3s; }
+  .etoile.obtenue { opacity: 1; transform: scale(1.2); }
+  
+  .titre-fin { font-size: 2.5em; color: #b45309; margin-bottom: 20px; }
+  .score-final { font-size: 1.5em; margin-bottom: 20px; }
+  .score-final strong { font-size: 2em; color: #16a34a; }
+  .btn-rejouer { padding: 20px 40px; font-size: 1.5em; font-weight: bold;
+                 background: linear-gradient(135deg, #f59e0b, #d97706); color: white;
+                 border: none; border-radius: 16px; cursor: pointer;
+                 box-shadow: 0 6px 0 #b45309; transition: all 0.1s;
+                 font-family: inherit; margin: 10px; }
+  .btn-rejouer:hover { transform: translateY(-2px); box-shadow: 0 8px 0 #b45309; }
+  .btn-rejouer:active { transform: translateY(4px); box-shadow: 0 2px 0 #b45309; }
+  
+  .retour { display: inline-block; margin-top: 20px; padding: 12px 24px;
+            background: #64748b; color: white; text-decoration: none;
+            border-radius: 12px; font-weight: bold; box-shadow: 0 4px 0 #475569; }
+  .retour:hover { background: #475569; }
+  
+  @keyframes secouer { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-15px)} 75%{transform:translateX(15px)} }
+  .confetti { position: fixed; width: 12px; height: 12px; z-index: 9999;
+              pointer-events: none; border-radius: 2px; }
+  
+  @media (max-width: 600px) {
+    .carte-item { width: 140px; height: 180px; }
+    .carte-valeur { font-size: 2.2em; }
+    .carte-valeur.expression { font-size: 1.4em; }
+    .cartes-zone { gap: 15px; }
+    header h1 { font-size: 1.5em; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>⚖️ Plus Grand ou Plus Petit</h1>
+  <p>Compare les nombres comme un champion !</p>
+</header>
+
+<div class="conteneur">
+  <!-- ÉCRAN D'ACCUEIL -->
+  <div id="ecran-accueil">
+    <div class="carte">
+      <h2 class="titre-choix">Choisis ton niveau de difficulté :</h2>
+      <div class="grille-niveaux">
+        <button class="btn-niveau facile" onclick="demarrerPartie('facile')">
+          <span class="icone">🟢</span>
+          <div><strong>Facile</strong><span class="desc">Nombres de 1 à 20 (avec dés)</span></div>
+        </button>
+        <button class="btn-niveau moyen" onclick="demarrerPartie('moyen')">
+          <span class="icone">🟡</span>
+          <div><strong>Moyen</strong><span class="desc">Nombres de 1 à 100</span></div>
+        </button>
+        <button class="btn-niveau difficile" onclick="demarrerPartie('difficile')">
+          <span class="icone">🔴</span>
+          <div><strong>Difficile</strong><span class="desc">Compare des calculs (5+3 vs 4+5)</span></div>
+        </button>
+      </div>
+    </div>
+    <a href="index.html" class="retour">← Retour aux jeux</a>
+  </div>
+  
+  <!-- ÉCRAN DE JEU -->
+  <div id="ecran-jeu">
+    <div class="carte">
+      <div class="info-partie">
+        <span id="info-niveau">🟢 Facile</span>
+        <span id="info-question">Question 1/10</span>
+      </div>
+      <div class="barre-progression">
+        <div class="barre-progression-remplissage" id="barre-remplissage"></div>
+      </div>
+      
+      <div class="score-etoiles" id="score-etoiles"></div>
+      
+      <div class="question-texte" id="question-texte">Lequel est le plus grand ?</div>
+      
+      <div class="cartes-zone" id="cartes-zone"></div>
+      
+      <div class="message-zone info" id="message">Clique sur la bonne carte !</div>
+    </div>
+    <a href="#" class="retour" onclick="recommencer(); return false;">🏠 Changer de niveau</a>
+  </div>
+  
+  <!-- ÉCRAN DE FIN -->
+  <div id="ecran-fin">
+    <div class="carte">
+      <div class="titre-fin" id="titre-fin">🏆 Bravo !</div>
+      <div class="score-final" id="score-final">Tu as <strong>10/10</strong> bonnes réponses !</div>
+      <div class="score-etoiles" id="score-final-etoiles"></div>
+      <button class="btn-rejouer" onclick="recommencer()">🔄 Rejouer</button>
+    </div>
+    <a href="index.html" class="retour">← Retour aux jeux</a>
+  </div>
+</div>
+
+<script>
+var niveauChoisi = 'facile';
+var questions = [];
+var indexQuestion = 0;
+var bonnesReponses = 0;
+var NB_QUESTIONS = 10;
+var audioCtx = null;
+
+function initAudio() {
+  if (!audioCtx) {
+    try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e) {}
+  }
+}
+
+function jouerSon(frequence, duree, type) {
+  initAudio();
+  if (!audioCtx) return;
+  try {
+    var osc = audioCtx.createOscillator();
+    var gain = audioCtx.createGain();
+    osc.type = type || 'sine';
+    osc.frequency.value = frequence;
+    gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duree);
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.start();
+    osc.stop(audioCtx.currentTime + duree);
+  } catch(e) {}
+}
+
+function jouerSucces() {
+  jouerSon(523, 0.1, 'sine');
+  setTimeout(function(){ jouerSon(659, 0.1, 'sine'); }, 100);
+  setTimeout(function(){ jouerSon(784, 0.2, 'sine'); }, 200);
+}
+
+function jouerEchec() {
+  jouerSon(300, 0.15, 'square');
+  setTimeout(function(){ jouerSon(200, 0.25, 'square'); }, 150);
+}
+
+// ============================================================
+// GÉNÉRATION DES QUESTIONS
+// ============================================================
+function genererQuestion(niveau) {
+  var q = {};
+  
+  if (niveau === 'facile') {
+    var a = Math.floor(Math.random() * 20) + 1;
+    var b = Math.floor(Math.random() * 20) + 1;
+    while (a === b) b = Math.floor(Math.random() * 20) + 1;
+    
+    var demanderPlusGrand = Math.random() < 0.5;
+    
+    q = {
+      valeurA: a,
+      valeurB: b,
+      affichageA: a,
+      affichageB: b,
+      demanderPlusGrand: demanderPlusGrand,
+      avecVisuel: true,
+      expressionA: false,
+      expressionB: false
+    };
+  } else if (niveau === 'moyen') {
+    var a2 = Math.floor(Math.random() * 100) + 1;
+    var b2 = Math.floor(Math.random() * 100) + 1;
+    while (a2 === b2) b2 = Math.floor(Math.random() * 100) + 1;
+    
+    q = {
+      valeurA: a2,
+      valeurB: b2,
+      affichageA: a2,
+      affichageB: b2,
+      demanderPlusGrand: Math.random() < 0.5,
+      avecVisuel: false,
+      expressionA: false,
+      expressionB: false
+    };
+  } else {
+    // Expressions à calculer
+    var typeA = Math.random() < 0.5 ? '+' : '-';
+    var typeB = Math.random() < 0.5 ? '+' : '-';
+    
+    var a1, b1, va;
+    if (typeA === '+') {
+      a1 = Math.floor(Math.random() * 15) + 1;
+      b1 = Math.floor(Math.random() * 15) + 1;
+      va = a1 + b1;
+    } else {
+      a1 = Math.floor(Math.random() * 20) + 10;
+      b1 = Math.floor(Math.random() * (a1 - 1)) + 1;
+      va = a1 - b1;
+    }
+    
+    var a2b, b2b, vb;
+    if (typeB === '+') {
+      a2b = Math.floor(Math.random() * 15) + 1;
+      b2b = Math.floor(Math.random() * 15) + 1;
+      vb = a2b + b2b;
+    } else {
+      a2b = Math.floor(Math.random() * 20) + 10;
+      b2b = Math.floor(Math.random() * (a2b - 1)) + 1;
+      vb = a2b - b2b;
+    }
+    
+    // Éviter l'égalité
+    if (va === vb) vb += 1;
+    
+    q = {
+      valeurA: va,
+      valeurB: vb,
+      affichageA: a1 + ' ' + typeA + ' ' + b1,
+      affichageB: a2b + ' ' + typeB + ' ' + b2b,
+      demanderPlusGrand: Math.random() < 0.5,
+      avecVisuel: false,
+      expressionA: true,
+      expressionB: true
+    };
+  }
+  
+  // Déterminer quelle carte est la bonne
+  if (q.demanderPlusGrand) {
+    q.bonneCarte = q.valeurA > q.valeurB ? 'A' : 'B';
+  } else {
+    q.bonneCarte = q.valeurA < q.valeurB ? 'A' : 'B';
+  }
+  
+  return q;
+}
+
+// ============================================================
+// DÉMARRAGE
+// ============================================================
+function demarrerPartie(niveau) {
+  niveauChoisi = niveau;
+  questions = [];
+  indexQuestion = 0;
+  bonnesReponses = 0;
+  
+  for (var i = 0; i < NB_QUESTIONS; i++) {
+    questions.push(genererQuestion(niveau));
+  }
+  
+  document.getElementById('ecran-accueil').style.display = 'none';
+  document.getElementById('ecran-jeu').style.display = 'block';
+  document.getElementById('ecran-fin').style.display = 'none';
+  
+  var nomsNiveaux = { facile: '🟢 Facile', moyen: '🟡 Moyen', difficile: '🔴 Difficile' };
+  document.getElementById('info-niveau').textContent = nomsNiveaux[niveau];
+  
+  afficherQuestion();
+}
+
+function afficherQuestion() {
+  if (indexQuestion >= NB_QUESTIONS) {
+    finDePartie();
+    return;
+  }
+  
+  var q = questions[indexQuestion];
+  
+  document.getElementById('info-question').textContent = 'Question ' + (indexQuestion + 1) + '/' + NB_QUESTIONS;
+  var pourcentage = (indexQuestion / NB_QUESTIONS) * 100;
+  document.getElementById('barre-remplissage').style.width = pourcentage + '%';
+  
+  document.getElementById('question-texte').textContent = q.demanderPlusGrand 
+    ? '🔍 Lequel est le PLUS GRAND ?' 
+    : '🔍 Lequel est le PLUS PETIT ?';
+  
+  mettreAJourEtoiles();
+  
+  var zone = document.getElementById('cartes-zone');
+  var html = '';
+  
+  // Carte A
+  html += '<button class="carte-item" id="carte-A" onclick="repondre(\'A\')">';
+  html += '<div class="carte-valeur' + (q.expressionA ? ' expression' : '') + '">' + q.affichageA + '</div>';
+  if (q.avecVisuel && !q.expressionA) {
+    html += '<div class="carte-visuel">';
+    for (var i = 0; i < q.valeurA; i++) {
+      html += '<div class="point"></div>';
+    }
+    html += '</div>';
+  }
+  html += '</button>';
+  
+  // Symbole central
+  html += '<div class="symbole-zone">VS</div>';
+  
+  // Carte B
+  html += '<button class="carte-item" id="carte-B" onclick="repondre(\'B\')">';
+  html += '<div class="carte-valeur' + (q.expressionB ? ' expression' : '') + '">' + q.affichageB + '</div>';
+  if (q.avecVisuel && !q.expressionB) {
+    html += '<div class="carte-visuel">';
+    for (var j = 0; j < q.valeurB; j++) {
+      html += '<div class="point"></div>';
+    }
+    html += '</div>';
+  }
+  html += '</button>';
+  
+  zone.innerHTML = html;
+  
+  var msg = document.getElementById('message');
+  msg.className = 'message-zone info';
+  msg.textContent = '👆 Clique sur la carte qui correspond !';
+}
+
+function mettreAJourEtoiles() {
+  var zone = document.getElementById('score-etoiles');
+  var html = '';
+  for (var i = 0; i < NB_QUESTIONS; i++) {
+    html += '<div class="etoile' + (i < bonnesReponses ? ' obtenue' : '') + '">⭐</div>';
+  }
+  zone.innerHTML = html;
+}
+
+// ============================================================
+// RÉPONSE
+// ============================================================
+function repondre(carteChoisie) {
+  var q = questions[indexQuestion];
+  var carteA = document.getElementById('carte-A');
+  var carteB = document.getElementById('carte-B');
+  
+  carteA.disabled = true;
+  carteB.disabled = true;
+  
+  var carteCorrecte = q.bonneCarte === 'A' ? carteA : carteB;
+  var carteChoisieEl = carteChoisie === 'A' ? carteA : carteB;
+  
+  carteCorrecte.classList.add('correct');
+  
+  var msg = document.getElementById('message');
+  var explication = '';
+  
+  if (q.demanderPlusGrand) {
+    if (q.valeurA > q.valeurB) {
+      explication = q.affichageA + ' > ' + q.affichageB + ' (' + q.valeurA + ' > ' + q.valeurB + ')';
+    } else {
+      explication = q.affichageB + ' > ' + q.affichageA + ' (' + q.valeurB + ' > ' + q.valeurA + ')';
+    }
+  } else {
+    if (q.valeurA < q.valeurB) {
+      explication = q.affichageA + ' < ' + q.affichageB + ' (' + q.valeurA + ' < ' + q.valeurB + ')';
+    } else {
+      explication = q.affichageB + ' < ' + q.affichageA + ' (' + q.valeurB + ' < ' + q.valeurA + ')';
+    }
+  }
+  
+  if (carteChoisie === q.bonneCarte) {
+    bonnesReponses++;
+    jouerSucces();
+    lancerConfetti();
+    msg.className = 'message-zone succes';
+    msg.textContent = '🎉 BRAVO ! ' + explication;
+    mettreAJourEtoiles();
+  } else {
+    carteChoisieEl.classList.add('incorrect');
+    jouerEchec();
+    msg.className = 'message-zone erreur';
+    msg.textContent = '❌ Presque ! La bonne réponse est ' + explication;
+    var carte = document.querySelector('#ecran-jeu .carte');
+    carte.style.animation = 'secouer 0.3s';
+    setTimeout(function(){ carte.style.animation = ''; }, 300);
+  }
+  
+  indexQuestion++;
+  setTimeout(afficherQuestion, 2200);
+}
+
+// ============================================================
+// FIN
+// ============================================================
+function finDePartie() {
+  document.getElementById('ecran-jeu').style.display = 'none';
+  document.getElementById('ecran-fin').style.display = 'block';
+  
+  var titre = document.getElementById('titre-fin');
+  var score = document.getElementById('score-final');
+  
+  if (bonnesReponses === NB_QUESTIONS) {
+    titre.textContent = '🏆 PARFAIT !';
+    score.innerHTML = 'Incroyable ! Tu as <strong>' + bonnesReponses + '/' + NB_QUESTIONS + '</strong> bonnes réponses !';
+    for (var i = 0; i < 3; i++) setTimeout(lancerConfetti, i * 400);
+  } else if (bonnesReponses >= 7) {
+    titre.textContent = '🎉 TRÈS BIEN !';
+    score.innerHTML = 'Tu as <strong>' + bonnesReponses + '/' + NB_QUESTIONS + '</strong> bonnes réponses !';
+    lancerConfetti();
+  } else if (bonnesReponses >= 5) {
+    titre.textContent = '👍 PAS MAL !';
+    score.innerHTML = 'Tu as <strong>' + bonnesReponses + '/' + NB_QUESTIONS + '</strong> bonnes réponses. Continue !';
+  } else {
+    titre.textContent = '💪 COURAGE !';
+    score.innerHTML = 'Tu as <strong>' + bonnesReponses + '/' + NB_QUESTIONS + '</strong> bonnes réponses. Réessaie !';
+  }
+  
+  var etoiles = document.getElementById('score-final-etoiles');
+  var html = '';
+  for (var j = 0; j < NB_QUESTIONS; j++) {
+    html += '<div class="etoile' + (j < bonnesReponses ? ' obtenue' : '') + '">⭐</div>';
+  }
+  etoiles.innerHTML = html;
+  
+  jouerSon(523, 0.15, 'sine');
+  setTimeout(function(){ jouerSon(659, 0.15, 'sine'); }, 150);
+  setTimeout(function(){ jouerSon(784, 0.15, 'sine'); }, 300);
+  setTimeout(function(){ jouerSon(1047, 0.4, 'sine'); }, 450);
+}
+
+function recommencer() {
+  document.getElementById('ecran-accueil').style.display = 'block';
+  document.getElementById('ecran-jeu').style.display = 'none';
+  document.getElementById('ecran-fin').style.display = 'none';
+}
+
+function lancerConfetti() {
+  var couleurs = ['#fbbf24', '#22c55e', '#ef4444', '#3b82f6', '#a855f7', '#ec4899', '#06b6d4'];
+  for (var i = 0; i < 50; i++) {
+    (function(idx) {
+      setTimeout(function() {
+        var c = document.createElement('div');
+        c.className = 'confetti';
+        c.style.left = Math.random() * 100 + '%';
+        c.style.top = '-20px';
+        c.style.background = couleurs[Math.floor(Math.random() * couleurs.length)];
+        c.style.transform = 'rotate(' + Math.random() * 360 + 'deg)';
+        document.body.appendChild(c);
+        var startY = -20;
+        var endY = window.innerHeight + 20;
+        var duration = 1800 + Math.random() * 1200;
+        var rotation = (Math.random() > 0.5 ? 1 : -1) * (360 + Math.random() * 720);
+        var startTime = null;
+        function animer(timestamp) {
+          if (!startTime) startTime = timestamp;
+          var progress = (timestamp - startTime) / duration;
+          if (progress < 1) {
+            var y = startY + (endY - startY) * progress;
+            c.style.top = y + 'px';
+            c.style.transform = 'rotate(' + (rotation * progress) + 'deg)';
+            requestAnimationFrame(animer);
+          } else {
+            if (c.parentNode) c.parentNode.removeChild(c);
+          }
+        }
+        requestAnimationFrame(animer);
+      }, idx * 25);
+    })(i);
+  }
+}
+
+document.addEventListener('click', function() { initAudio(); }, { once: true });
+
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw-maths.js').then(function(reg) {
+    console.log('✅ SW enregistré');
+  }).catch(function(err) {
+    console.log('⚠️ Erreur SW:', err);
+  });
+}
+</script>
+
+</body>
+</html>
