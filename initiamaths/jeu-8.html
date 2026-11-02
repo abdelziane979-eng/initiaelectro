@@ -331,24 +331,38 @@ function genererQuestion(niveau) {
 }
 
 function genererFacile() {
-  // Total de 2 articles
+  // Choisir une boutique au hasard
+  var clesBoutiques = Object.keys(BOUTIQUES);
+  var cleBoutique = clesBoutiques[rand(0, clesBoutiques.length - 1)];
+  var boutique = BOUTIQUES[cleBoutique];
+  
+  // Choisir 2 à 3 articles DIFFÉRENTS de cette boutique
   var nbArticles = rand(2, 3);
-  var articles = [];
+  var articlesChoisis = [];
+  var indicesUtilises = [];
   var total = 0;
   var detail = '';
   
   for (var i = 0; i < nbArticles; i++) {
-    var obj = OBJETS_FACILE[rand(0, OBJETS_FACILE.length - 1)];
+    var idx = rand(0, boutique.articles.length - 1);
+    var tentatives = 0;
+    while (indicesUtilises.indexOf(idx) !== -1 && tentatives < 20) {
+      idx = rand(0, boutique.articles.length - 1);
+      tentatives++;
+    }
+    indicesUtilises.push(idx);
+    
+    var obj = boutique.articles[idx];
     var prix = obj.prix();
-    articles.push({ emoji: obj.emoji, nom: obj.nom, prix: prix });
+    articlesChoisis.push({ emoji: obj.emoji, nom: obj.nom, prix: prix });
     total += prix;
     detail += '<div>' + obj.emoji + ' ' + obj.nom + ' : ' + formatPrix(prix) + '</div>';
   }
   
-  var scenario = 'Tu vas à la boulangerie et tu achètes ' + nbArticles + ' articles :';
+  var scenario = 'Tu vas à ' + boutique.nom + ' et tu achètes ' + nbArticles + ' articles :';
   
   return {
-    emoji: '🛒',
+    emoji: boutique.emoji,
     scenario: scenario,
     detail: detail,
     question: 'Quel est le TOTAL à payer ?',
