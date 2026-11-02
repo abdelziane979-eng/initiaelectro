@@ -249,16 +249,56 @@ function formatPrix(prix) {
 // GÉNÉRATION DES QUESTIONS
 // ============================================================
 
-var OBJETS_FACILE = [
-  { emoji: '🍎', nom: 'une pomme', prix: function(){ return rand(1, 3); } },
-  { emoji: '🥖', nom: 'une baguette', prix: function(){ return rand(1, 2); } },
-  { emoji: '🍪', nom: 'un cookie', prix: function(){ return rand(1, 3); } },
-  { emoji: '🧃', nom: 'un jus', prix: function(){ return rand(2, 4); } },
-  { emoji: '📓', nom: 'un cahier', prix: function(){ return rand(2, 5); } },
-  { emoji: '✏️', nom: 'un crayon', prix: function(){ return rand(1, 2); } },
-  { emoji: '🍫', nom: 'une tablette de chocolat', prix: function(){ return rand(2, 4); } },
-  { emoji: '🥛', nom: 'une brique de lait', prix: function(){ return rand(1, 3); } }
-];
+var BOUTIQUES = {
+  boulangerie: {
+    nom: 'la boulangerie',
+    emoji: '🥖',
+    articles: [
+      { emoji: '🥖', nom: 'une baguette', prix: function(){ return rand(1, 2); } },
+      { emoji: '🥐', nom: 'un croissant', prix: function(){ return rand(1, 2); } },
+      { emoji: '🍫', nom: 'un pain au chocolat', prix: function(){ return rand(1, 2); } },
+      { emoji: '🥧', nom: 'une tartelette', prix: function(){ return rand(2, 3); } },
+      { emoji: '🍞', nom: 'un pain de mie', prix: function(){ return rand(2, 4); } },
+      { emoji: '🥨', nom: 'un bretzel', prix: function(){ return rand(1, 2); } }
+    ]
+  },
+  epicerie: {
+    nom: 'l\'épicerie',
+    emoji: '🛒',
+    articles: [
+      { emoji: '🍎', nom: 'une pomme', prix: function(){ return rand(1, 2); } },
+      { emoji: '🍌', nom: 'une banane', prix: function(){ return rand(1, 2); } },
+      { emoji: '🥛', nom: 'une brique de lait', prix: function(){ return rand(1, 3); } },
+      { emoji: '🧀', nom: 'un morceau de fromage', prix: function(){ return rand(2, 4); } },
+      { emoji: '🍫', nom: 'une tablette de chocolat', prix: function(){ return rand(1, 3); } },
+      { emoji: '🧃', nom: 'une brique de jus', prix: function(){ return rand(1, 3); } }
+    ]
+  },
+  papeterie: {
+    nom: 'la papeterie',
+    emoji: '✏️',
+    articles: [
+      { emoji: '✏️', nom: 'un crayon', prix: function(){ return rand(1, 2); } },
+      { emoji: '📓', nom: 'un cahier', prix: function(){ return rand(1, 3); } },
+      { emoji: '🖊️', nom: 'un stylo', prix: function(){ return rand(1, 2); } },
+      { emoji: '📏', nom: 'une règle', prix: function(){ return rand(1, 2); } },
+      { emoji: '🧽', nom: 'une gomme', prix: function(){ return rand(1, 2); } },
+      { emoji: '🖍️', nom: 'un feutre', prix: function(){ return rand(1, 2); } }
+    ]
+  },
+  primeur: {
+    nom: 'le primeur',
+    emoji: '🍎',
+    articles: [
+      { emoji: '🍎', nom: 'une pomme', prix: function(){ return rand(1, 2); } },
+      { emoji: '🍐', nom: 'une poire', prix: function(){ return rand(1, 2); } },
+      { emoji: '🍅', nom: 'une tomate', prix: function(){ return rand(1, 2); } },
+      { emoji: '🥕', nom: 'une carotte', prix: function(){ return rand(1, 2); } },
+      { emoji: '🥔', nom: 'une pomme de terre', prix: function(){ return rand(1, 1); } },
+      { emoji: '🍇', nom: 'une grappe de raisin', prix: function(){ return rand(2, 3); } }
+    ]
+  }
+};
 
 var OBJETS_MOYEN = [
   { emoji: '🎮', nom: 'un jeu vidéo', prix: function(){ return rand(15, 45); } },
