@@ -9,19 +9,15 @@
   body { font-family: 'Comic Sans MS', Arial, sans-serif; 
          background: linear-gradient(135deg, #fee2e2, #fecaca); 
          color: #1a1f2e; text-align: center; padding: 20px; min-height: 100vh; }
-  
   header { background: linear-gradient(135deg, #f87171, #dc2626); color: white; 
            padding: 20px; border-radius: 20px; max-width: 700px; margin: 0 auto 20px;
            box-shadow: 0 8px 0 #991b1b; }
   header h1 { font-size: 2em; margin-bottom: 5px; }
   header p { font-size: 1em; }
-  
   .carte { background: white; border-radius: 20px; padding: 25px; 
            box-shadow: 0 8px 0 #cbd5e1; border: 4px solid #f87171;
            max-width: 700px; margin: 0 auto 20px; }
-  
   h2 { color: #991b1b; margin-bottom: 20px; }
-  
   .btn { display: block; width: 100%; padding: 20px; margin: 10px 0;
          font-size: 1.2em; font-weight: bold; border: none; border-radius: 12px;
          cursor: pointer; font-family: inherit; transition: 0.1s; }
@@ -38,29 +34,24 @@
   .btn-prop:hover { transform: translateY(-2px); box-shadow: 0 7px 0 #1e40af; }
   .btn-prop.correct { background: #22c55e; box-shadow: 0 5px 0 #15803d; }
   .btn-prop.incorrect { background: #ef4444; box-shadow: 0 5px 0 #991b1b; }
-  .btn-prop:disabled { cursor: not-allowed; }
-  
+  .btn-prop:disabled { cursor: not-allowed; opacity: 0.8; }
   .phrase { background: #fee2e2; border-radius: 15px; padding: 30px 20px;
             margin: 20px 0; font-size: 1.5em; font-weight: bold;
             border: 3px dashed #f87171; line-height: 1.6; }
   .trou { display: inline-block; min-width: 60px; padding: 3px 15px;
           background: white; border-bottom: 3px solid #dc2626;
           border-radius: 6px; margin: 0 5px; color: #dc2626; }
-  
   .message { padding: 15px; border-radius: 10px; font-size: 1em; font-weight: bold;
              min-height: 60px; margin: 15px 0; display: flex; 
              align-items: center; justify-content: center; }
   .message.info { background: #dbeafe; color: #1e40af; }
   .message.succes { background: #dcfce7; color: #166534; }
   .message.erreur { background: #fee2e2; color: #991b1b; }
-  
   .compteur { display: flex; justify-content: space-between; font-weight: bold;
               color: #475569; margin-bottom: 15px; }
-  
   .retour { display: inline-block; margin-top: 15px; padding: 10px 20px;
             background: #64748b; color: white; text-decoration: none;
             border-radius: 10px; font-weight: bold; }
-  
   .cache { display: none; }
 </style>
 </head>
@@ -71,7 +62,6 @@
   <p>Attention aux mots qui se ressemblent !</p>
 </header>
 
-<!-- ÉCRAN D'ACCUEIL -->
 <div id="ecran-accueil" class="carte">
   <h2>Choisis ton niveau :</h2>
   <button class="btn btn-vert" onclick="demarrer('facile')">🟢 Facile (a/à, et/est)</button>
@@ -80,7 +70,6 @@
   <a href="index.html" class="retour">← Retour aux jeux</a>
 </div>
 
-<!-- ÉCRAN DE JEU -->
 <div id="ecran-jeu" class="carte cache">
   <div class="compteur">
     <span id="niveau-aff"></span>
@@ -92,7 +81,6 @@
   <a href="#" class="retour" onclick="retourAccueil(); return false;">🏠 Changer de niveau</a>
 </div>
 
-<!-- ÉCRAN FIN -->
 <div id="ecran-fin" class="carte cache">
   <h2 id="titre-fin">🏆 Bravo !</h2>
   <p id="score-fin" style="font-size:1.3em; margin:20px 0;"></p>
@@ -101,7 +89,6 @@
 </div>
 
 <script>
-// ========== DONNÉES ==========
 var PHRASES = {
   facile: [
     { a: 'Il ', b: ' un chat.', bonne: 'a', mauvaise: 'à', expl: '"a" est le verbe avoir.' },
@@ -145,11 +132,10 @@ var questions = [];
 var index = 0;
 var bonnes = 0;
 var NB = 10;
+var questionActuelle = null;
 
-// ========== FONCTIONS ==========
 function demarrer(niveau) {
   var pool = PHRASES[niveau].slice();
-  // Mélanger et prendre 10
   for (var i = pool.length - 1; i > 0; i--) {
     var j = Math.floor(Math.random() * (i + 1));
     var t = pool[i]; pool[i] = pool[j]; pool[j] = t;
@@ -175,25 +161,35 @@ function afficher() {
   }
   
   var q = questions[index];
+  questionActuelle = q;
+  
   document.getElementById('question-aff').textContent = 'Question ' + (index + 1) + '/' + NB;
   document.getElementById('phrase').innerHTML = q.a + '<span class="trou">?</span>' + q.b;
   
-  // Créer les boutons
   var boutons = [q.bonne, q.mauvaise];
   if (Math.random() < 0.5) { boutons = [q.mauvaise, q.bonne]; }
   
   var html = '';
   for (var i = 0; i < boutons.length; i++) {
-    html += '<button class="btn-prop" onclick="repondre(this, \'' + boutons[i] + '\', \'' + q.bonne + '\', \'' + q.expl + '\')">' + boutons[i] + '</button>';
+    html += '<button class="btn-prop" data-choix="' + boutons[i] + '">' + boutons[i] + '</button>';
   }
   document.getElementById('boutons-props').innerHTML = html;
+  
+  var tousBoutons = document.querySelectorAll('.btn-prop');
+  for (var k = 0; k < tousBoutons.length; k++) {
+    tousBoutons[k].addEventListener('click', function() {
+      var choix = this.getAttribute('data-choix');
+      repondre(this, choix);
+    });
+  }
   
   var msg = document.getElementById('message');
   msg.className = 'message info';
   msg.textContent = '👆 Clique sur le bon mot !';
 }
 
-function repondre(bouton, choix, bonne, expl) {
+function repondre(bouton, choix) {
+  var q = questionActuelle;
   var tous = document.querySelectorAll('.btn-prop');
   for (var i = 0; i < tous.length; i++) {
     tous[i].disabled = true;
@@ -201,18 +197,17 @@ function repondre(bouton, choix, bonne, expl) {
   
   var msg = document.getElementById('message');
   
-  if (choix === bonne) {
+  if (choix === q.bonne) {
     bonnes++;
     bouton.classList.add('correct');
     msg.className = 'message succes';
-    msg.textContent = '✅ Bravo ! ' + expl;
+    msg.textContent = '✅ Bravo ! ' + q.expl;
   } else {
     bouton.classList.add('incorrect');
     msg.className = 'message erreur';
-    msg.textContent = '❌ Presque ! C\'était "' + bonne + '". ' + expl;
-    // Marquer le bon
+    msg.textContent = '❌ Presque ! C\'était "' + q.bonne + '". ' + q.expl;
     for (var j = 0; j < tous.length; j++) {
-      if (tous[j].textContent === bonne) {
+      if (tous[j].getAttribute('data-choix') === q.bonne) {
         tous[j].classList.add('correct');
       }
     }
