@@ -92,5 +92,14 @@
     <a href="guide-prof.html" style="color: #64748b; text-decoration: none; font-size: 0.9em;">👨‍🏫 Mode Enseignant (Guide Pédagogique)</a>
   </div>
 </div>
+ <script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw-francais.js').then(function(reg) {
+      console.log('✅ Service Worker enregistré');
+    }).catch(function(err) {
+      console.log('⚠️ Erreur Service Worker:', err);
+    });
+  }
+</script>
 </body>
 </html>
