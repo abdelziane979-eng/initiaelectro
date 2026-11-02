@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Guide Pédagogique - InitiaMaths</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='112' fill='%233b82f6'/><text x='50%' y='55%' font-size='300' text-anchor='middle' dominant-baseline='middle'>🧮</text></svg>">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f9ff; color: #1a1f2e; line-height: 1.6; }
+  
+  header { background: linear-gradient(135deg, #3b82f6, #1d4ed8); color: white; padding: 40px 20px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+  header h1 { font-size: 2.2em; margin-bottom: 10px; }
+  header p { font-size: 1.1em; opacity: 0.95; }
+  
+  .conteneur { max-width: 900px; margin: 0 auto; padding: 40px 20px; }
+  
+  .intro-box { background: white; padding: 24px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 30px; border-left: 6px solid #3b82f6; }
+  .intro-box h2 { color: #1d4ed8; margin-bottom: 12px; font-size: 1.4em; }
+  .intro-box ul { margin-left: 20px; margin-top: 10px; }
+  .intro-box li { margin-bottom: 5px; color: #334155; }
+  
+  .jeu-carte { background: white; border-radius: 12px; padding: 24px; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); border-top: 4px solid; }
+  .jeu-carte h3 { font-size: 1.3em; margin-bottom: 12px; display: flex; align-items: center; gap: 10px; }
+  .jeu-carte .emoji { font-size: 1.5em; }
+  
+  .jeu-carte p { margin-bottom: 10px; color: #334155; }
+  .jeu-carte strong { color: #0f172a; }
+  
+  .a-dire { background: #f0f9ff; border-left: 3px solid #0ea5e9; padding: 12px 16px; border-radius: 4px; margin-top: 12px; margin-bottom: 12px; font-style: italic; }
+  .a-dire strong { color: #0369a1; }
+  
+  .question { background: #fdf4ff; border-left: 3px solid #d946ef; padding: 12px 16px; border-radius: 4px; margin-top: 12px; }
+  .question strong { color: #86198f; }
+  
+  .c1 { border-top-color: #f87171; } .c1 h3 { color: #b91c1c; }
+  .c2 { border-top-color: #60a5fa; } .c2 h3 { color: #1d4ed8; }
+  .c3 { border-top-color: #34d399; } .c3 h3 { color: #047857; }
+  .c4 { border-top-color: #a855f7; } .c4 h3 { color: #6b21a8; }
+  .c5 { border-top-color: #f59e0b; } .c5 h3 { color: #b45309; }
+  .c6 { border-top-color: #ec4899; } .c6 h3 { color: #9d174d; }
+  .c7 { border-top-color: #06b6d4; } .c7 h3 { color: #0e7490; }
+  .c8 { border-top-color: #10b981; } .c8 h3 { color: #047857; }
+
+  .btn-retour { display: inline-block; margin-top: 20px; padding: 10px 20px; background: #64748b; color: white; text-decoration: none; border-radius: 8px; font-weight: bold; }
+  
+  @media print {
+    body { background: white; }
+    header { box-shadow: none; background: #3b82f6; -webkit-print-color-adjust: exact; }
+    .jeu-carte, .intro-box { box-shadow: none; border: 1px solid #ccc; page-break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🧮 Guide Pédagogique : InitiaMaths</h1>
+  <p>Manuel à l'usage des professeurs (Cycle 2 & 3 / 7-11 ans)</p>
+</header>
+
+<div class="conteneur">
+  
+  <div class="intro-box">
+    <h2>🎯 Objectifs de l'application</h2>
+    <p><strong>InitiaMaths</strong> est une application éducative conçue pour consolider les fondamentaux mathématiques du primaire et du début du collège. Elle propose 8 jeux progressifs couvrant le calcul, la géométrie, la logique et la résolution de problèmes.</p>
+    <p style="margin-top: 10px;">Chaque jeu propose <strong>3 niveaux de difficulté</strong> pour s'adapter au rythme de chaque enfant. Toutes les activités sont autocorrectives : l'enfant peut jouer en autonomie, à la maison comme en classe.</p>
+    <p style="margin-top: 10px;"><strong>Points forts pédagogiques :</strong></p>
+    <ul>
+      <li>Feedback immédiat (vert/rouge) avec la bonne réponse affichée.</li>
+      <li>Système d'étoiles pour valoriser la progression.</li>
+      <li>Calcul mental, reconnaissance visuelle, raisonnement logique.</li>
+      <li>Application fonctionnelle hors-ligne (PWA).</li>
+    </ul>
+    <p style="margin-top: 10px; font-size: 0.95em; color: #64748b;">
+      🌐 <strong>Accès en ligne :</strong> https://abdelziane979-eng.github.io/initiaelectro/initiamaths/index.html
+    </p>
+  </div>
+
+  <!-- JEU 1 -->
+  <div class="jeu-carte c1">
+    <h3><span class="emoji">🧮</span> Jeu 1 : Les Tables de Multiplication</h3>
+    <p><strong>Concept :</strong> L'enfant choisit une table (de 1 à 10) ou "toutes les tables", puis répond à 10 questions de multiplication. Il peut utiliser le clavier ou le pavé numérique.</p>
+    <p><strong>Ce que ça enseigne :</strong> La mémorisation des tables, la rapidité de calcul, l'utilisation de la multiplication comme addition répétée.</p>
+    <div class="a-dire">
+      <strong>💬 À dire aux élèves :</strong> "Connaître ses tables par cœur, c'est comme avoir une boîte à outils magique. Plus tu les connais, plus tu résous vite les problèmes."
+    </div>
+    <div class="question">
+      <strong>❓ Question à poser :</strong> "Pourquoi 7 × 8 = 56 et pas 7 + 8 ?" (La multiplication c'est 7 fois le nombre 8, pas juste 7 + 8).
+    </div>
+  </div>
+
+  <!-- JEU 2 -->
+  <div class="jeu-carte c2">
+    <h3><span class="emoji">➕</span> Jeu 2 : Les Additions et Soustractions</h3>
+    <p><strong>Concept :</strong> 10 questions mélangeant additions et soustractions, à 3 niveaux de difficulté (jusqu'à 10, 50 ou 100).</p>
+    <p><strong>Ce que ça enseigne :</strong> Le calcul mental, la compréhension de la soustraction comme "retirer", et la manipulation des grands nombres.</p>
+    <div class="a-dire">
+      <strong>💬 À dire aux élèves :</strong> "Additions et soustractions sont comme deux frères : l'un ajoute, l'autre enlève. Regarde bien le signe pour savoir ce qu'il faut faire !"
+    </div>
+    <div class="question">
+      <strong>❓ Question à poser :</strong> "Quelle est la différence entre 15 + 4 et 15 − 4 ?" (L'un ajoute 4, l'autre le retire).
+    </div>
+  </div>
+
+  <!-- JEU 3 -->
+  <div class="jeu-carte c3">
+    <h3><span class="emoji">🍕</span> Jeu 3 : Les Fractions en Pizzas</h3>
+    <p><strong>Concept :</strong> Une pizza est découpée en parts. Certaines sont coloriées. L'enfant doit identifier la fraction correspondante (ex: 3/8).</p>
+    <p><strong>Ce que ça enseigne :</strong> La notion de fraction (numérateur/dénominateur), la représentation visuelle des partages égaux.</p>
+    <div class="a-dire">
+      <strong>💬 À dire aux élèves :</strong> "Une fraction, c'est un partage. Le nombre du bas te dit en combien de parts égales on a coupé la pizza, le nombre du haut te dit combien on en mange."
+    </div>
+    <div class="question">
+      <strong>❓ Question à poser :</strong> "Que représente 1/2 ? Est-ce plus ou moins qu'1/4 ?" (1/2 est plus grand, car on partage en 2 parts au lieu de 4).
+    </div>
+  </div>
+
+  <!-- JEU 4 -->
+  <div class="jeu-carte c4">
+    <h3><span class="emoji">📐</span> Jeu 4 : La Géométrie Magique</h3>
+    <p><strong>Concept :</strong> 3 niveaux progressifs : reconnaître les formes, calculer le périmètre d'un carré/rectangle, calculer son aire.</p>
+    <p><strong>Ce que ça enseigne :</strong> Le vocabulaire géométrique (carré, rectangle, triangle, cercle, losange, hexagone), le périmètre (tour de la forme) et l'aire (surface intérieure).</p>
+    <div class="a-dire">
+      <strong>💬 À dire aux élèves :</strong> "Le périmètre, c'est la clôture autour du jardin. L'aire, c'est la pelouse à l'intérieur. On les calcule différemment !"
+    </div>
+    <div class="question">
+      <strong>❓ Question à poser :</strong> "Pour un carré de 3 cm de côté, quel est son périmètre ? Son aire ?" (Périmètre = 12 cm, aire = 9 cm²).
+    </div>
+  </div>
+
+  <!-- JEU 5 -->
+  <div class="jeu-carte c5">
+    <h3><span class="emoji">⚖️</span> Jeu 5 : Plus Grand ou Plus Petit</h3>
+    <p><strong>Concept :</strong> Deux cartes sont présentées, l'enfant doit cliquer sur celle qui est la plus grande (ou la plus petite, selon la consigne).</p>
+    <p><strong>Ce que ça enseigne :</strong> La comparaison de nombres, l'utilisation des signes < et >, le calcul mental pour les expressions.</p>
+    <div class="a-dire">
+      <strong>💬 À dire aux élèves :</strong> "Compare comme un détective : regarde d'abord les dizaines, puis les unités. Si c'est égal, c'est le signe de l'égalité."
+    </div>
+    <div class="question">
+      <strong>❓ Question à poser :</strong> "Quel signe mettrais-tu entre 47 et 52 ?" (47 < 52 car 47 est plus petit).
+    </div>
+  </div>
+
+  <!-- JEU 6 -->
+  <div class="jeu-carte c6">
+    <h3><span class="emoji">🎯</span> Jeu 6 : Les Petits Problèmes</h3>
+    <p><strong>Concept :</strong> L'enfant lit un petit problème de la vie quotidienne (courses, école, animaux) et choisit la bonne réponse parmi 4.</p>
+    <p><strong>Ce que ça enseigne :</strong> La modélisation mathématique, la lecture active, la stratégie de résolution (identifier les données utiles, la question posée).</p>
+    <div class="a-dire">
+      <strong>💬 À dire aux élèves :</strong> "Pour résoudre un problème, on lit deux fois : la première fois pour comprendre l'histoire, la seconde pour repérer les nombres et ce qu'on nous demande."
+    </div>
+    <div class="question">
+      <strong>❓ Piste d'activité :</strong> Demandez à l'élève de reformuler le problème avec ses propres mots, puis de dessiner un petit schéma de la situation.
+    </div>
+  </div>
+
+  <!-- JEU 7 -->
+  <div class="jeu-carte c7">
+    <h3><span class="emoji">🔢</span> Jeu 7 : Les Suites Logiques</h3>
+    <p><strong>Concept :</strong> Une suite de nombres est affichée, le dernier est remplacé par un "?". L'enfant doit deviner la logique (+1, +3, ×2...) et trouver le nombre suivant.</p>
+    <p><strong>Ce que ça enseigne :</strong> La reconnaissance de motifs, la pensée algorithmique, la capacité à formuler et tester des hypothèses.</p>
+    <div class="a-dire">
+      <strong>💬 À dire aux élèves :</strong> "Cherche l'écart entre chaque nombre. Si tu ajoutes toujours la même chose, c'est une suite additive. Si tu multiplies, c'est une suite multiplicative."
+    </div>
+    <div class="question">
+      <strong>❓ Question à poser :</strong> "Dans la suite 2, 4, 6, 8, que se passe-t-il à chaque fois ?" (On ajoute 2 à chaque fois).
+    </div>
+  </div>
+
+  <!-- JEU 8 -->
+  <div class="jeu-carte c8">
+    <h3><span class="emoji">💰</span> Jeu 8 : La Monnaie et les Achats</h3>
+    <p><strong>Concept :</strong> 3 niveaux : calculer un total (boulangerie/épicerie/papeterie/primeur), rendre la monnaie, gérer plusieurs articles avec remise.</p>
+    <p><strong>Ce que ça enseigne :</strong> La manipulation des euros, l'addition de prix, la soustraction pour rendre la monnaie, l'application d'un pourcentage de remise.</p>
+    <div class="a-dire">
+      <strong>💬 À dire aux élèves :</strong> "Quand tu payes, on te rend la monnaie. C'est ce qui reste entre ce que tu donnes et ce que tu dois. Compte comme au marché !"
+    </div>
+    <div class="question">
+      <strong>❓ Piste d'activité :</strong> Proposez un petit jeu de rôle : "Le client et le marchand". Un élève achète, l'autre rend la monnaie. Utilisez de vraies pièces ou des billets factices.
+    </div>
+  </div>
+
+  <div style="text-align: center;">
+    <a href="index.html" class="btn-retour">← Retour à l'application InitiaMaths</a>
+  </div>
+
+</div>
+
+</body>
+</html>
