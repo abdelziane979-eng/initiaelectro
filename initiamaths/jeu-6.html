@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Les Petits Problèmes - InitiaMaths</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='112' fill='%23ec4899'/><text x='50%' y='55%' font-size='300' text-anchor='middle' dominant-baseline='middle'>🎯</text></svg>">
+<link rel="manifest" href="manifest-maths.json">
+<meta name="theme-color" content="#3b82f6">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="InitiaMaths">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Comic Sans MS', 'Segoe UI', Arial, sans-serif; 
+         background: linear-gradient(135deg, #fce7f3, #fbcfe8); 
+         color: #1a1f2e; text-align: center; min-height: 100vh;
+         padding: 20px; }
+  
+  header { background: linear-gradient(135deg, #ec4899, #db2777); color: white; 
+           padding: 20px; border-radius: 20px; max-width: 900px; margin: 0 auto 20px;
+           box-shadow: 0 8px 0 #9d174d; }
+  header h1 { font-size: 2em; text-shadow: 2px 2px 0 #9d174d; margin-bottom: 5px; }
+  header p { font-size: 1.1em; opacity: 0.95; }
+  
+  .conteneur { max-width: 900px; margin: 0 auto; }
+  
+  .carte { background: white; border-radius: 24px; padding: 30px; 
+           box-shadow: 0 8px 0 #cbd5e1; border: 4px solid #ec4899;
+           margin-bottom: 20px; }
+  
+  #ecran-accueil { display: block; }
+  #ecran-jeu { display: none; }
+  #ecran-fin { display: none; }
+  
+  .titre-choix { font-size: 1.5em; color: #9d174d; margin-bottom: 20px; }
+  
+  .grille-niveaux { display: flex; flex-direction: column; gap: 15px; margin-bottom: 20px; }
+  .btn-niveau { padding: 25px 20px; font-size: 1.3em; font-weight: bold;
+                color: white; border: none; border-radius: 16px; cursor: pointer;
+                transition: all 0.1s; font-family: inherit; text-align: left;
+                display: flex; align-items: center; gap: 20px; }
+  .btn-niveau:hover { transform: translateY(-2px); }
+  .btn-niveau:active { transform: translateY(4px); }
+  .btn-niveau .icone { font-size: 2.5em; }
+  .btn-niveau .desc { display: block; font-size: 0.7em; opacity: 0.9; margin-top: 5px; font-weight: normal; }
+  
+  .btn-niveau.facile { background: linear-gradient(135deg, #22c55e, #16a34a); box-shadow: 0 6px 0 #15803d; }
+  .btn-niveau.facile:hover { box-shadow: 0 8px 0 #15803d; }
+  .btn-niveau.moyen { background: linear-gradient(135deg, #f59e0b, #d97706); box-shadow: 0 6px 0 #b45309; }
+  .btn-niveau.moyen:hover { box-shadow: 0 8px 0 #b45309; }
+  .btn-niveau.difficile { background: linear-gradient(135deg, #ef4444, #dc2626); box-shadow: 0 6px 0 #991b1b; }
+  .btn-niveau.difficile:hover { box-shadow: 0 8px 0 #991b1b; }
+  
+  .barre-progression { width: 100%; height: 20px; background: #e2e8f0; 
+                       border-radius: 10px; overflow: hidden; margin-bottom: 20px;
+                       border: 2px solid #cbd5e1; }
+  .barre-progression-remplissage { height: 100%; background: linear-gradient(90deg, #22c55e, #16a34a);
+                                   width: 0%; transition: width 0.4s; border-radius: 8px; }
+  
+  .info-partie { display: flex; justify-content: space-between; margin-bottom: 20px;
+                 font-size: 1em; font-weight: bold; color: #475569; }
+  
+  .probleme-zone { background: #fce7f3; border-radius: 20px; padding: 25px;
+                   border: 4px dashed #ec4899; margin-bottom: 25px;
+                   text-align: left; }
+  .probleme-emoji { font-size: 2.5em; text-align: center; margin-bottom: 10px; }
+  .probleme-texte { font-size: 1.3em; color: #1a1f2e; line-height: 1.5;
+                    font-weight: bold; }
+  
+  .propositions-zone { display: flex; flex-direction: column; gap: 12px;
+                       max-width: 500px; margin: 0 auto 20px; }
+  .btn-prop { padding: 18px 24px; font-size: 1.3em; font-weight: bold;
+              background: linear-gradient(135deg, #60a5fa, #3b82f6); color: white;
+              border: none; border-radius: 16px; cursor: pointer;
+              box-shadow: 0 5px 0 #1e40af; transition: all 0.1s;
+              font-family: inherit; text-align: left; display: flex;
+              align-items: center; gap: 15px; }
+  .btn-prop:hover { transform: translateY(-2px); box-shadow: 0 7px 0 #1e40af; }
+  .btn-prop:active { transform: translateY(3px); box-shadow: 0 2px 0 #1e40af; }
+  .btn-prop .lettre { background: rgba(255,255,255,0.3); width: 35px; height: 35px;
+                      border-radius: 50%; display: flex; align-items: center;
+                      justify-content: center; font-size: 1em; }
+  .btn-prop.correct { background: linear-gradient(135deg, #22c55e, #16a34a); box-shadow: 0 5px 0 #15803d; }
+  .btn-prop.incorrect { background: linear-gradient(135deg, #ef4444, #dc2626); box-shadow: 0 5px 0 #991b1b; }
+  .btn-prop:disabled { cursor: not-allowed; }
+  
+  .message-zone { padding: 20px; border-radius: 12px; font-size: 1.2em; font-weight: bold;
+                  min-height: 70px; display: flex; align-items: center; justify-content: center;
+                  text-align: center; margin-bottom: 20px; transition: all 0.3s; }
+  .message-zone.succes { background: #dcfce7; color: #166534; }
+  .message-zone.erreur { background: #fee2e2; color: #991b1b; }
+  .message-zone.info { background: #dbeafe; color: #1e40af; }
+  
+  .score-etoiles { display: flex; justify-content: center; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+  .etoile { font-size: 1.8em; opacity: 0.3; transition: all 0.3s; }
+  .etoile.obtenue { opacity: 1; transform: scale(1.2); }
+  
+  .titre-fin { font-size: 2.5em; color: #9d174d; margin-bottom: 20px; }
+  .score-final { font-size: 1.5em; margin-bottom: 20px; }
+  .score-final strong { font-size: 2em; color: #16a34a; }
+  .btn-rejouer { padding: 20px 40px; font-size: 1.5em; font-weight: bold;
+                 background: linear-gradient(135deg, #f59e0b, #d97706); color: white;
+                 border: none; border-radius: 16px; cursor: pointer;
+                 box-shadow: 0 6px 0 #b45309; transition: all 0.1s;
+                 font-family: inherit; margin: 10px; }
+  .btn-rejouer:hover { transform: translateY(-2px); box-shadow: 0 8px 0 #b45309; }
+  .btn-rejouer:active { transform: translateY(4px); box-shadow: 0 2px 0 #b45309; }
+  
+  .retour { display: inline-block; margin-top: 20px; padding: 12px 24px;
+            background: #64748b; color: white; text-decoration: none;
+            border-radius: 12px; font-weight: bold; box-shadow: 0 4px 0 #475569; }
+  .retour:hover { background: #475569; }
+  
+  @keyframes secouer { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-15px)} 75%{transform:translateX(15px)} }
+  .confetti { position: fixed; width: 12px; height: 12px; z-index: 9999;
+              pointer-events: none; border-radius: 2px; }
+  
+  @media (max-width: 700px) {
+    .probleme-texte { font-size: 1.1em; }
+    .btn-prop { font-size: 1.1em; padding: 14px 18px; }
+    header h1 { font-size: 1.5em; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🎯 Les Petits Problèmes</h1>
+  <p>Résous des problèmes de la vie quotidienne !</p>
+</header>
+
+<div class="conteneur">
+  <!-- ÉCRAN D'ACCUEIL -->
+  <div id="ecran-accueil">
+    <div class="carte">
+      <h2 class="titre-choix">Choisis ton niveau de difficulté :</h2>
+      <div class="grille-niveaux">
+        <button class="btn-niveau facile" onclick="demarrerPartie('facile')">
+          <span class="icone">🟢</span>
+          <div><strong>Facile</strong><span class="desc">Additions et soustractions simples</span></div>
+        </button>
+        <button class="btn-niveau moyen" onclick="demarrerPartie('moyen')">
+          <span class="icone">🟡</span>
+          <div><strong>Moyen</strong><span class="desc">Nombres plus grands, 2 étapes</span></div>
+        </button>
+        <button class="btn-niveau difficile" onclick="demarrerPartie('difficile')">
+          <span class="icone">🔴</span>
+          <div><strong>Difficile</strong><span class="desc">Multiplications et divisions</span></div>
+        </button>
+      </div>
+    </div>
+    <a href="index.html" class="retour">← Retour aux jeux</a>
+  </div>
+  
+  <!-- ÉCRAN DE JEU -->
+  <div id="ecran-jeu">
+    <div class="carte">
+      <div class="info-partie">
+        <span id="info-niveau">🟢 Facile</span>
+        <span id="info-question">Question 1/10</span>
+      </div>
+      <div class="barre-progression">
+        <div class="barre-progression-remplissage" id="barre-remplissage"></div>
+      </div>
+      
+      <div class="score-etoiles" id="score-etoiles"></div>
+      
+      <div class="probleme-zone">
+        <div class="probleme-emoji" id="probleme-emoji">🍎</div>
+        <div class="probleme-texte" id="probleme-texte">Problème...</div>
+      </div>
+      
+      <div class="propositions-zone" id="propositions-zone"></div>
+      
+      <div class="message-zone info" id="message">👆 Choisis la bonne réponse !</div>
+    </div>
+    <a href="#" class="retour" onclick="recommencer(); return false;">🏠 Changer de niveau</a>
+  </div>
+  
+  <!-- ÉCRAN DE FIN -->
+  <div id="ecran-fin">
+    <div class="carte">
+      <div class="titre-fin" id="titre-fin">🏆 Bravo !</div>
+      <div class="score-final" id="score-final">Tu as <strong>10/10</strong> bonnes réponses !</div>
+      <div class="score-etoiles" id="score-final-etoiles"></div>
+      <button class="btn-rejouer" onclick="recommencer()">🔄 Rejouer</button>
+    </div>
+    <a href="index.html" class="retour">← Retour aux jeux</a>
+  </div>
+</div>
+
+<script>
+var niveauChoisi = 'facile';
+var questions = [];
+var indexQuestion = 0;
+var bonnesReponses = 0;
+var NB_QUESTIONS = 10;
+var audioCtx = null;
+
+function initAudio() {
+  if (!audioCtx) {
+    try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e) {}
+  }
+}
+
+function jouerSon(frequence, duree, type) {
+  initAudio();
+  if (!audioCtx) return;
+  try {
+    var osc = audioCtx.createOscillator();
+    var gain = audioCtx.createGain();
+    osc.type = type || 'sine';
+    osc.frequency.value = frequence;
+    gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duree);
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.start();
+    osc.stop(audioCtx.currentTime + duree);
+  } catch(e) {}
+}
+
+function jouerSucces() {
+  jouerSon(523, 0.1, 'sine');
+  setTimeout(function(){ jouerSon(659, 0.1, 'sine'); }, 100);
+  setTimeout(function(){ jouerSon(784, 0.2, 'sine'); }, 200);
+}
+
+function jouerEchec() {
+  jouerSon(300, 0.15, 'square');
+  setTimeout(function(){ jouerSon(200, 0.25, 'square'); }, 150);
+}
+
+// ============================================================
+// BASE DE PROBLÈMES
+// ============================================================
+var PROBLEMES_FACILES = [
+  { emoji: '🍎', texte: 'Léa a {a} pommes. Sa maman lui en donne {b} de plus. Combien de pommes a-t-elle maintenant ?',
+    a: function(){ return rand(3, 10); }, b: function(){ return rand(2, 8); },
+    reponse: function(a, b){ return a + b; }, unite: 'pommes', operateur: '+' },
+  { emoji: '🍪', texte: 'Tom a {a} cookies. Il en mange {b}. Combien de cookies lui reste-t-il ?',
+    a: function(){ return rand(5, 15); }, b: function(){ return rand(1, 4); },
+    reponse: function(a, b){ return a - b; }, unite: 'cookies', operateur: '-' },
+  { emoji: '🐦', texte: 'Il y a {a} oiseaux sur une branche. {b} oiseaux s\'envolent. Combien d\'oiseaux restent sur la branche ?',
+    a: function(){ return rand(6, 15); }, b: function(){ return rand(2, 5); },
+    reponse: function(a, b){ return a - b; }, unite: 'oiseaux', operateur: '-' },
+  { emoji: '🎈', texte: 'Lucas a {a} ballons rouges et {b} ballons bleus. Combien de ballons a-t-il en tout ?',
+    a: function(){ return rand(3, 10); }, b: function(){ return rand(3, 10); },
+    reponse: function(a, b){ return a + b; }, unite: 'ballons', operateur: '+' },
+  { emoji: '🍬', texte: 'Emma a {a} bonbons. Elle en donne {b} à son frère. Combien de bonbons lui reste-t-il ?',
+    a: function(){ return rand(8, 20); }, b: function(){ return rand(2, 6); },
+    reponse: function(a, b){ return a - b; }, unite: 'bonbons', operateur: '-' },
+  { emoji: '⭐', texte: 'Dans la classe, il y a {a} filles et {b} garçons. Combien d\'élèves y a-t-il en tout ?',
+    a: function(){ return rand(8, 15); }, b: function(){ return rand(8, 15); },
+    reponse: function(a, b){ return a + b; }, unite: 'élèves', operateur: '+' },
+  { emoji: '🚗', texte: 'Il y a {a} voitures dans le parking. {b} voitures partent. Combien de voitures restent ?',
+    a: function(){ return rand(10, 25); }, b: function(){ return rand(3, 8); },
+    reponse: function(a, b){ return a - b; }, unite: 'voitures', operateur: '-' },
+  { emoji: '🐟', texte: 'Le pêcheur a attrapé {a} poissons le matin et {b} poissons l\'après-midi. Combien de poissons a-t-il attrapés en tout ?',
+    a: function(){ return rand(4, 12); }, b: function(){ return rand(3, 10); },
+    reponse: function(a, b){ return a + b; }, unite: 'poissons', operateur: '+' }
+];
+
+var PROBLEMES_MOYENS = [
+  { emoji: '💰', texte: 'Marc a {a} euros. Il achète un livre à {b} euros. Combien lui reste-t-il d\'argent ?',
+    a: function(){ return rand(20, 50); }, b: function(){ return rand(5, 18); },
+    reponse: function(a, b){ return a - b; }, unite: 'euros', operateur: '-' },
+  { emoji: '🏫', texte: 'Une école a {a} élèves. {b} nouveaux élèves arrivent. Combien y a-t-il d\'élèves maintenant ?',
+    a: function(){ return rand(50, 150); }, b: function(){ return rand(10, 30); },
+    reponse: function(a, b){ return a + b; }, unite: 'élèves', operateur: '+' },
+  { emoji: '📚', texte: 'La bibliothèque avait {a} livres. Elle en reçoit {b} nouveaux. Combien de livres y a-t-il maintenant ?',
+    a: function(){ return rand(100, 300); }, b: function(){ return rand(20, 80); },
+    reponse: function(a, b){ return a + b; }, unite: 'livres', operateur: '+' },
+  { emoji: '🍕', texte: 'Une pizzeria a préparé {a} pizzas. Elle en a vendu {b}. Combien de pizzas restent ?',
+    a: function(){ return rand(40, 100); }, b: function(){ return rand(15, 35); },
+    reponse: function(a, b){ return a - b; }, unite: 'pizzas', operateur: '-' },
+  { emoji: '🏃', texte: 'Julie court {a} mètres le lundi et {b} mètres le mardi. Combien de mètres a-t-elle couru en tout ?',
+    a: function(){ return rand(200, 800); }, b: function(){ return rand(150, 600); },
+    reponse: function(a, b){ return a + b; }, unite: 'mètres', operateur: '+' },
+  { emoji: '🎒', texte: 'Un magasin a {a} cartables. Il en vend {b} dans la journée. Combien de cartables reste-t-il ?',
+    a: function(){ return rand(30, 80); }, b: function(){ return rand(10, 25); },
+    reponse: function(a, b){ return a - b; }, unite: 'cartables', operateur: '-' },
+  { emoji: '🌸', texte: 'Dans le jardin, il y a {a} tulipes et {b} roses. Combien de fleurs y a-t-il en tout ?',
+    a: function(){ return rand(15, 40); }, b: function(){ return rand(12, 35); },
+    reponse: function(a, b){ return a + b; }, unite: 'fleurs', operateur: '+' },
+  { emoji: '🥛', texte: 'La ferme a produit {a} litres de lait le matin. Elle en vend {b} litres. Combien de litres reste-t-il ?',
+    a: function(){ return rand(60, 120); }, b: function(){ return rand(20, 50); },
+    reponse: function(a, b){ return a - b; }, unite: 'litres', operateur: '-' }
+];
+
+var PROBLEMES_DIFFICILES = [
+  { emoji: '🍪', texte: 'Il y a {b} boîtes de {a} cookies chacune. Combien de cookies y a-t-il en tout ?',
+    a: function(){ return rand(3, 9); }, b: function(){ return rand(2, 6); },
+    reponse: function(a, b){ return a * b; }, unite: 'cookies', operateur: '×' },
+  { emoji: '🎂', texte: 'Un gâteau est coupé en {b} parts égales. {a} enfants en mangent chacun {a} parts... Non ! Plus simple : {b} amis partagent {a} bonbons équitablement. Combien chacun reçoit-il ?',
+    a: function(){ return rand(4, 12) * 4; }, b: function(){ return 4; },
+    reponse: function(a, b){ return Math.floor(a / b); }, unite: 'bonbons', operateur: '÷' },
+  { emoji: '🚌', texte: 'Il y a {b} bus avec {a} enfants dans chaque bus. Combien d\'enfants y a-t-il en tout ?',
+    a: function(){ return rand(20, 45); }, b: function(){ return rand(3, 6); },
+    reponse: function(a, b){ return a * b; }, unite: 'enfants', operateur: '×' },
+  { emoji: '🍫', texte: 'Léa a {a} carrés de chocolat. Elle les partage équitablement entre {b} amis. Combien chaque ami reçoit-il ?',
+    a: function(){ return rand(2, 10) * 3; }, b: function(){ return 3; },
+    reponse: function(a, b){ return Math.floor(a / b); }, unite: 'carrés', operateur: '÷' },
+  { emoji: '🎫', texte: 'Un cinéma a {b} salles de {a} places. Combien de places y a-t-il en tout ?',
+    a: function(){ return rand(40, 90); }, b: function(){ return rand(3, 6); },
+    reponse: function(a, b){ return a * b; }, unite: 'places', operateur: '×' },
+  { emoji: '📦', texte: 'Un camion transporte {a} colis répartis dans {b} cartons. Combien de colis y a-t-il dans chaque carton ?',
+    a: function(){ return rand(5, 15) * 5; }, b: function(){ return 5; },
+    reponse: function(a, b){ return Math.floor(a / b); }, unite: 'colis', operateur: '÷' },
+  { emoji: '🌳', texte: 'Il y a {b} rangées de {a} arbres. Combien d\'arbres y a-t-il en tout ?',
+    a: function(){ return rand(8, 15); }, b: function(){ return rand(4, 8); },
+    reponse: function(a, b){ return a * b; }, unite: 'arbres', operateur: '×' },
+  { emoji: '🍬', texte: 'Un paquet contient {a} bonbons. On les répartit dans {b} sachets. Combien de bonbons dans chaque sachet ?',
+    a: function(){ return rand(4, 10) * 4; }, b: function(){ return 4; },
+    reponse: function(a, b){ return Math.floor(a / b); }, unite: 'bonbons', operateur: '÷' }
+];
+
+function rand(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+// ============================================================
+// GÉNÉRATION DES QUESTIONS
+// ============================================================
+function genererQuestion(niveau) {
+  var base;
+  if (niveau === 'facile') base = PROBLEMES_FACILES[Math.floor(Math.random() * PROBLEMES_FACILES.length)];
+  else if (niveau === 'moyen') base = PROBLEMES_MOYENS[Math.floor(Math.random() * PROBLEMES_MOYENS.length)];
+  else base = PROBLEMES_DIFFICILES[Math.floor(Math.random() * PROBLEMES_DIFFICILES.length)];
+  
+  var a = base.a();
+  var b = base.b();
+  
+  // Ajuster pour éviter les cas impossibles
+  if (base.operateur === '÷' && a % b !== 0) {
+    a = Math.ceil(a / b) * b;
+  }
+  
+  var texte = base.texte.replace(/{a}/g, a).replace(/{b}/g, b);
+  var bonneReponse = base.reponse(a, b);
+  
+  var propositions = genererPropositions(bonneReponse, base.operateur);
+  
+  return {
+    emoji: base.emoji,
+    texte: texte,
+    bonneReponse: bonneReponse,
+    unite: base.unite,
+    propositions: propositions,
+    operateur: base.operateur,
+    a: a,
+    b: b
+  };
+}
+
+function genererPropositions(bonne, operateur) {
+  var propositions = [bonne];
+  var tentatives = 0;
+  
+  while (propositions.length < 4 && tentatives < 200) {
+    tentatives++;
+    var val;
+    var offset = Math.floor(Math.random() * 5) + 1;
+    
+    if (Math.random() < 0.5) val = bonne + offset;
+    else val = bonne - offset;
+    
+    if (val < 0) val = bonne + offset;
+    if (val === bonne) continue;
+    if (propositions.indexOf(val) !== -1) continue;
+    
+    propositions.push(val);
+  }
+  
+  while (propositions.length < 4) {
+    propositions.push(bonne + propositions.length);
+  }
+  
+  return melanger(propositions);
+}
+
+function melanger(arr) {
+  var a = arr.slice();
+  for (var i = a.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    var tmp = a[i]; a[i] = a[j]; a[j] = tmp;
+  }
+  return a;
+}
+
+// ============================================================
+// DÉMARRAGE
+// ============================================================
+function demarrerPartie(niveau) {
+  niveauChoisi = niveau;
+  questions = [];
+  indexQuestion = 0;
+  bonnesReponses = 0;
+  
+  for (var i = 0; i < NB_QUESTIONS; i++) {
+    questions.push(genererQuestion(niveau));
+  }
+  
+  document.getElementById('ecran-accueil').style.display = 'none';
+  document.getElementById('ecran-jeu').style.display = 'block';
+  document.getElementById('ecran-fin').style.display = 'none';
+  
+  var nomsNiveaux = { facile: '🟢 Facile', moyen: '🟡 Moyen', difficile: '🔴 Difficile' };
+  document.getElementById('info-niveau').textContent = nomsNiveaux[niveau];
+  
+  afficherQuestion();
+}
+
+function afficherQuestion() {
+  if (indexQuestion >= NB_QUESTIONS) {
+    finDePartie();
+    return;
+  }
+  
+  var q = questions[indexQuestion];
+  
+  document.getElementById('info-question').textContent = 'Question ' + (indexQuestion + 1) + '/' + NB_QUESTIONS;
+  var pourcentage = (indexQuestion / NB_QUESTIONS) * 100;
+  document.getElementById('barre-remplissage').style.width = pourcentage + '%';
+  
+  document.getElementById('probleme-emoji').textContent = q.emoji;
+  document.getElementById('probleme-texte').textContent = q.texte;
+  
+  mettreAJourEtoiles();
+  
+  var zone = document.getElementById('propositions-zone');
+  var lettres = ['A', 'B', 'C', 'D'];
+  var html = '';
+  for (var i = 0; i < q.propositions.length; i++) {
+    var p = q.propositions[i];
+    var estBonne = (p === q.bonneReponse);
+    html += '<button class="btn-prop" data-bonne="' + estBonne + '" onclick="repondre(this, ' + estBonne + ', ' + q.bonneReponse + ', \'' + q.unite + '\')">';
+    html += '<span class="lettre">' + lettres[i] + '</span>';
+    html += '<span>' + p + ' ' + q.unite + '</span>';
+    html += '</button>';
+  }
+  zone.innerHTML = html;
+  
+  var msg = document.getElementById('message');
+  msg.className = 'message-zone info';
+  msg.textContent = '👆 Choisis la bonne réponse !';
+}
+
+function mettreAJourEtoiles() {
+  var zone = document.getElementById('score-etoiles');
+  var html = '';
+  for (var i = 0; i < NB_QUESTIONS; i++) {
+    html += '<div class="etoile' + (i < bonnesReponses ? ' obtenue' : '') + '">⭐</div>';
+  }
+  zone.innerHTML = html;
+}
+
+// ============================================================
+// RÉPONSE
+// ============================================================
+function repondre(bouton, estBonne, bonneReponse, unite) {
+  var boutons = document.querySelectorAll('.btn-prop');
+  for (var i = 0; i < boutons.length; i++) {
+    boutons[i].disabled = true;
+    if (boutons[i].getAttribute('data-bonne') === 'true') {
+      boutons[i].classList.add('correct');
+    }
+  }
+  
+  var msg = document.getElementById('message');
+  
+  if (estBonne) {
+    bonnesReponses++;
+    bouton.classList.add('correct');
+    jouerSucces();
+    lancerConfetti();
+    msg.className = 'message-zone succes';
+    msg.textContent = '🎉 BRAVO ! La réponse est ' + bonneReponse + ' ' + unite;
+    mettreAJourEtoiles();
+  } else {
+    bouton.classList.add('incorrect');
+    jouerEchec();
+    msg.className = 'message-zone erreur';
+    msg.textContent = '❌ Presque ! La bonne réponse était ' + bonneReponse + ' ' + unite;
+    var carte = document.querySelector('#ecran-jeu .carte');
+    carte.style.animation = 'secouer 0.3s';
+    setTimeout(function(){ carte.style.animation = ''; }, 300);
+  }
+  
+  indexQuestion++;
+  setTimeout(afficherQuestion, 2200);
+}
+
+// ============================================================
+// FIN
+// ============================================================
+function finDePartie() {
+  document.getElementById('ecran-jeu').style.display = 'none';
+  document.getElementById('ecran-fin').style.display = 'block';
+  
+  var titre = document.getElementById('titre-fin');
+  var score = document.getElementById('score-final');
+  
+  if (bonnesReponses === NB_QUESTIONS) {
+    titre.textContent = '🏆 PARFAIT !';
+    score.innerHTML = 'Incroyable ! Tu as <strong>' + bonnesReponses + '/' + NB_QUESTIONS + '</strong> bonnes réponses !';
+    for (var i = 0; i < 3; i++) setTimeout(lancerConfetti, i * 400);
+  } else if (bonnesReponses >= 7) {
+    titre.textContent = '🎉 TRÈS BIEN !';
+    score.innerHTML = 'Tu as <strong>' + bonnesReponses + '/' + NB_QUESTIONS + '</strong> bonnes réponses !';
+    lancerConfetti();
+  } else if (bonnesReponses >= 5) {
+    titre.textContent = '👍 PAS MAL !';
+    score.innerHTML = 'Tu as <strong>' + bonnesReponses + '/' + NB_QUESTIONS + '</strong> bonnes réponses. Continue !';
+  } else {
+    titre.textContent = '💪 COURAGE !';
+    score.innerHTML = 'Tu as <strong>' + bonnesReponses + '/' + NB_QUESTIONS + '</strong> bonnes réponses. Réessaie !';
+  }
+  
+  var etoiles = document.getElementById('score-final-etoiles');
+  var html = '';
+  for (var j = 0; j < NB_QUESTIONS; j++) {
+    html += '<div class="etoile' + (j < bonnesReponses ? ' obtenue' : '') + '">⭐</div>';
+  }
+  etoiles.innerHTML = html;
+  
+  jouerSon(523, 0.15, 'sine');
+  setTimeout(function(){ jouerSon(659, 0.15, 'sine'); }, 150);
+  setTimeout(function(){ jouerSon(784, 0.15, 'sine'); }, 300);
+  setTimeout(function(){ jouerSon(1047, 0.4, 'sine'); }, 450);
+}
+
+function recommencer() {
+  document.getElementById('ecran-accueil').style.display = 'block';
+  document.getElementById('ecran-jeu').style.display = 'none';
+  document.getElementById('ecran-fin').style.display = 'none';
+}
+
+function lancerConfetti() {
+  var couleurs = ['#fbbf24', '#22c55e', '#ef4444', '#3b82f6', '#a855f7', '#ec4899', '#06b6d4'];
+  for (var i = 0; i < 50; i++) {
+    (function(idx) {
+      setTimeout(function() {
+        var c = document.createElement('div');
+        c.className = 'confetti';
+        c.style.left = Math.random() * 100 + '%';
+        c.style.top = '-20px';
+        c.style.background = couleurs[Math.floor(Math.random() * couleurs.length)];
+        c.style.transform = 'rotate(' + Math.random() * 360 + 'deg)';
+        document.body.appendChild(c);
+        var startY = -20;
+        var endY = window.innerHeight + 20;
+        var duration = 1800 + Math.random() * 1200;
+        var rotation = (Math.random() > 0.5 ? 1 : -1) * (360 + Math.random() * 720);
+        var startTime = null;
+        function animer(timestamp) {
+          if (!startTime) startTime = timestamp;
+          var progress = (timestamp - startTime) / duration;
+          if (progress < 1) {
+            var y = startY + (endY - startY) * progress;
+            c.style.top = y + 'px';
+            c.style.transform = 'rotate(' + (rotation * progress) + 'deg)';
+            requestAnimationFrame(animer);
+          } else {
+            if (c.parentNode) c.parentNode.removeChild(c);
+          }
+        }
+        requestAnimationFrame(animer);
+      }, idx * 25);
+    })(i);
+  }
+}
+
+document.addEventListener('click', function() { initAudio(); }, { once: true });
+
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw-maths.js').then(function(reg) {
+    console.log('✅ SW enregistré');
+  }).catch(function(err) {
+    console.log('⚠️ Erreur SW:', err);
+  });
+}
+</script>
+
+</body>
+</html>
