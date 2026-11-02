@@ -1,4 +1,4 @@
-var CACHE_NAME = 'initiamaths-v6';
+var CACHE_NAME = 'initiamaths-v7';
 var urlsToCache = [
   './',
   './index.html',
@@ -9,10 +9,10 @@ var urlsToCache = [
   './jeu-5.html',
   './jeu-6.html',
   './jeu-7.html',
+  './jeu-8.html',
   './icone.svg',
   './manifest-maths.json'
 ];
-
 self.addEventListener('install', function(event) {
   event.waitUntil(
     caches.open(CACHE_NAME).then(function(cache) {
