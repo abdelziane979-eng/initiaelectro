@@ -1,0 +1,24 @@
+{
+  "name": "InitiaFrançais",
+  "short_name": "InitiaFrançais",
+  "description": "Découvre le français en t'amusant !",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#dc2626",
+  "theme_color": "#dc2626",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "icone.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "icone.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ]
+}
