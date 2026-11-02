@@ -2,247 +2,175 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Les Mots Pièges - InitiaFrançais</title>
+<title>Les Mots Pièges</title>
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: 'Comic Sans MS', Arial, sans-serif; 
-         background: linear-gradient(135deg, #fee2e2, #fecaca); 
-         color: #1a1f2e; text-align: center; padding: 20px; min-height: 100vh; }
-  header { background: linear-gradient(135deg, #f87171, #dc2626); color: white; 
-           padding: 20px; border-radius: 20px; max-width: 700px; margin: 0 auto 20px;
-           box-shadow: 0 8px 0 #991b1b; }
-  header h1 { font-size: 2em; margin-bottom: 5px; }
-  header p { font-size: 1em; }
-  .carte { background: white; border-radius: 20px; padding: 25px; 
-           box-shadow: 0 8px 0 #cbd5e1; border: 4px solid #f87171;
-           max-width: 700px; margin: 0 auto 20px; }
-  h2 { color: #991b1b; margin-bottom: 20px; }
-  .btn { display: block; width: 100%; padding: 20px; margin: 10px 0;
-         font-size: 1.2em; font-weight: bold; border: none; border-radius: 12px;
-         cursor: pointer; font-family: inherit; transition: 0.1s; }
-  .btn-vert { background: #22c55e; color: white; box-shadow: 0 4px 0 #15803d; }
-  .btn-vert:hover { transform: translateY(-2px); box-shadow: 0 6px 0 #15803d; }
-  .btn-jaune { background: #f59e0b; color: white; box-shadow: 0 4px 0 #b45309; }
-  .btn-jaune:hover { transform: translateY(-2px); box-shadow: 0 6px 0 #b45309; }
-  .btn-rouge { background: #ef4444; color: white; box-shadow: 0 4px 0 #991b1b; }
-  .btn-rouge:hover { transform: translateY(-2px); box-shadow: 0 6px 0 #991b1b; }
-  .btn-prop { display: inline-block; width: 45%; padding: 25px 15px; margin: 8px 1%;
-              font-size: 2em; font-weight: bold; border: none; border-radius: 12px;
-              cursor: pointer; font-family: inherit; background: #3b82f6; color: white;
-              box-shadow: 0 5px 0 #1e40af; transition: 0.1s; }
-  .btn-prop:hover { transform: translateY(-2px); box-shadow: 0 7px 0 #1e40af; }
-  .btn-prop.correct { background: #22c55e; box-shadow: 0 5px 0 #15803d; }
-  .btn-prop.incorrect { background: #ef4444; box-shadow: 0 5px 0 #991b1b; }
-  .btn-prop:disabled { cursor: not-allowed; opacity: 0.8; }
-  .phrase { background: #fee2e2; border-radius: 15px; padding: 30px 20px;
-            margin: 20px 0; font-size: 1.5em; font-weight: bold;
-            border: 3px dashed #f87171; line-height: 1.6; }
-  .trou { display: inline-block; min-width: 60px; padding: 3px 15px;
-          background: white; border-bottom: 3px solid #dc2626;
-          border-radius: 6px; margin: 0 5px; color: #dc2626; }
-  .message { padding: 15px; border-radius: 10px; font-size: 1em; font-weight: bold;
-             min-height: 60px; margin: 15px 0; display: flex; 
-             align-items: center; justify-content: center; }
-  .message.info { background: #dbeafe; color: #1e40af; }
-  .message.succes { background: #dcfce7; color: #166534; }
-  .message.erreur { background: #fee2e2; color: #991b1b; }
-  .compteur { display: flex; justify-content: space-between; font-weight: bold;
-              color: #475569; margin-bottom: 15px; }
-  .retour { display: inline-block; margin-top: 15px; padding: 10px 20px;
-            background: #64748b; color: white; text-decoration: none;
-            border-radius: 10px; font-weight: bold; }
+  body { font-family: Arial, sans-serif; text-align: center; padding: 20px; background: #fee2e2; margin: 0; }
+  .carte { background: white; padding: 20px; border-radius: 15px; max-width: 600px; margin: 20px auto; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+  h1 { color: #991b1b; }
+  .btn { padding: 15px 30px; font-size: 1.2em; margin: 10px; cursor: pointer; border: none; border-radius: 10px; color: white; font-weight: bold; font-family: inherit; }
+  .btn:hover { opacity: 0.9; }
+  .vert { background: #22c55e; }
+  .jaune { background: #f59e0b; }
+  .rouge { background: #ef4444; }
+  .prop { background: #3b82f6; padding: 20px 40px; font-size: 1.5em; margin: 10px; cursor: pointer; border: none; border-radius: 10px; color: white; font-weight: bold; font-family: inherit; min-width: 100px; }
+  .prop:hover { opacity: 0.9; }
+  .prop:disabled { cursor: not-allowed; }
+  .phrase { font-size: 1.5em; font-weight: bold; margin: 20px 0; padding: 20px; background: #fef3c7; border-radius: 10px; }
+  .msg { padding: 15px; border-radius: 10px; margin: 15px 0; font-weight: bold; min-height: 50px; }
+  .info { background: #dbeafe; color: #1e40af; }
+  .ok { background: #dcfce7; color: #166534; }
+  .ko { background: #fee2e2; color: #991b1b; }
   .cache { display: none; }
+  .trou { color: red; border-bottom: 2px solid red; padding: 0 10px; }
 </style>
 </head>
 <body>
 
-<header>
+<div id="ecran1" class="carte">
   <h1>🪤 Les Mots Pièges</h1>
-  <p>Attention aux mots qui se ressemblent !</p>
-</header>
-
-<div id="ecran-accueil" class="carte">
-  <h2>Choisis ton niveau :</h2>
-  <button class="btn btn-vert" onclick="demarrer('facile')">🟢 Facile (a/à, et/est)</button>
-  <button class="btn btn-jaune" onclick="demarrer('moyen')">🟡 Moyen (ou/où, son/sont)</button>
-  <button class="btn btn-rouge" onclick="demarrer('difficile')">🔴 Difficile (on/ont + mélange)</button>
-  <a href="index.html" class="retour">← Retour aux jeux</a>
+  <p>Choisis ton niveau :</p>
+  <button class="btn vert" onclick="demarrer(0)">🟢 Facile</button>
+  <button class="btn jaune" onclick="demarrer(1)">🟡 Moyen</button>
+  <button class="btn rouge" onclick="demarrer(2)">🔴 Difficile</button>
 </div>
 
-<div id="ecran-jeu" class="carte cache">
-  <div class="compteur">
-    <span id="niveau-aff"></span>
-    <span id="question-aff">Question 1/10</span>
-  </div>
+<div id="ecran2" class="carte cache">
+  <p><span id="num">1</span> / 10</p>
   <div class="phrase" id="phrase"></div>
-  <div id="boutons-props"></div>
-  <div class="message info" id="message">Clique sur le bon mot !</div>
-  <a href="#" class="retour" onclick="retourAccueil(); return false;">🏠 Changer de niveau</a>
+  <button class="prop" id="btnA" onclick="cliqueA()">A</button>
+  <button class="prop" id="btnB" onclick="cliqueB()">B</button>
+  <div class="msg info" id="msg">Clique sur le bon mot !</div>
+  <a href="index.html" style="display:inline-block;margin-top:15px;color:#64748b;">← Retour</a>
 </div>
 
-<div id="ecran-fin" class="carte cache">
-  <h2 id="titre-fin">🏆 Bravo !</h2>
-  <p id="score-fin" style="font-size:1.3em; margin:20px 0;"></p>
-  <button class="btn btn-jaune" onclick="retourAccueil()">🔄 Rejouer</button>
-  <a href="index.html" class="retour">← Retour aux jeux</a>
+<div id="ecran3" class="carte cache">
+  <h2 id="titre3">Bravo !</h2>
+  <p id="score" style="font-size:1.5em;"></p>
+  <button class="btn jaune" onclick="retour()">🔄 Rejouer</button>
 </div>
 
 <script>
-var PHRASES = {
-  facile: [
-    { a: 'Il ', b: ' un chat.', bonne: 'a', mauvaise: 'à', expl: '"a" est le verbe avoir.' },
-    { a: 'Je vais ', b: ' Paris.', bonne: 'à', mauvaise: 'a', expl: '"à" est une préposition.' },
-    { a: 'Elle ', b: ' fini.', bonne: 'a', mauvaise: 'à', expl: '"a" = verbe avoir.' },
-    { a: 'Il pense ', b: ' ses vacances.', bonne: 'à', mauvaise: 'a', expl: '"à" = préposition.' },
-    { a: 'Tom ', b: ' un vélo.', bonne: 'a', mauvaise: 'à', expl: '"a" = verbe avoir.' },
-    { a: 'Le chat ', b: ' le chien jouent.', bonne: 'et', mauvaise: 'est', expl: '"et" relie deux choses.' },
-    { a: 'Il ', b: ' content.', bonne: 'est', mauvaise: 'et', expl: '"est" = verbe être.' },
-    { a: 'Papa ', b: ' maman sont là.', bonne: 'et', mauvaise: 'est', expl: '"et" = addition.' },
-    { a: 'La fleur ', b: ' belle.', bonne: 'est', mauvaise: 'et', expl: '"est" = verbe être.' },
-    { a: "J'aime le pain ", b: ' le fromage.', bonne: 'et', mauvaise: 'est', expl: '"et" = addition.' }
+var niveaux = [
+  [
+    { avant: 'Il ', apres: ' un chat.', bonne: 'a', mauvaise: 'à', expl: 'a = verbe avoir' },
+    { avant: 'Je vais ', apres: ' Paris.', bonne: 'à', mauvaise: 'a', expl: 'à = préposition' },
+    { avant: 'Elle ', apres: ' fini.', bonne: 'a', mauvaise: 'à', expl: 'a = verbe avoir' },
+    { avant: 'Il pense ', apres: ' ses vacances.', bonne: 'à', mauvaise: 'a', expl: 'à = préposition' },
+    { avant: 'Le chat ', apres: ' le chien jouent.', bonne: 'et', mauvaise: 'est', expl: 'et = addition' },
+    { avant: 'Il ', apres: ' content.', bonne: 'est', mauvaise: 'et', expl: 'est = verbe être' },
+    { avant: 'Papa ', apres: ' maman sont là.', bonne: 'et', mauvaise: 'est', expl: 'et = addition' },
+    { avant: 'La fleur ', apres: ' belle.', bonne: 'est', mauvaise: 'et', expl: 'est = verbe être' },
+    { avant: "J'aime le pain ", apres: ' le fromage.', bonne: 'et', mauvaise: 'est', expl: 'et = addition' },
+    { avant: 'Tom ', apres: ' un vélo.', bonne: 'a', mauvaise: 'à', expl: 'a = verbe avoir' }
   ],
-  moyen: [
-    { a: 'Tu veux du thé ', b: ' du café ?', bonne: 'ou', mauvaise: 'où', expl: '"ou" = choix.' },
-    { a: 'Je sais ', b: ' il habite.', bonne: 'où', mauvaise: 'ou', expl: '"où" = lieu.' },
-    { a: 'Tu préfères le rouge ', b: ' le bleu ?', bonne: 'ou', mauvaise: 'où', expl: '"ou" = choix.' },
-    { a: "C'est la maison ", b: ' je suis né.', bonne: 'où', mauvaise: 'ou', expl: '"où" = lieu.' },
-    { a: 'Il a oublié ', b: ' cartable.', bonne: 'son', mauvaise: 'sont', expl: '"son" = déterminant.' },
-    { a: 'Ils ', b: ' partis.', bonne: 'sont', mauvaise: 'son', expl: '"sont" = verbe être.' },
-    { a: 'Elle range ', b: ' livre.', bonne: 'son', mauvaise: 'sont', expl: '"son" = déterminant.' },
-    { a: 'Les enfants ', b: ' contents.', bonne: 'sont', mauvaise: 'son', expl: '"sont" = verbe être.' },
-    { a: 'Il joue avec ', b: ' chien.', bonne: 'son', mauvaise: 'sont', expl: '"son" = déterminant.' },
-    { a: 'Mes amis ', b: ' arrivés.', bonne: 'sont', mauvaise: 'son', expl: '"sont" = verbe être.' }
+  [
+    { avant: 'Tu veux du thé ', apres: ' du café ?', bonne: 'ou', mauvaise: 'où', expl: 'ou = choix' },
+    { avant: 'Je sais ', apres: ' il habite.', bonne: 'où', mauvaise: 'ou', expl: 'où = lieu' },
+    { avant: 'Tu préfères le rouge ', apres: ' le bleu ?', bonne: 'ou', mauvaise: 'où', expl: 'ou = choix' },
+    { avant: "C'est la maison ", apres: ' je suis né.', bonne: 'où', mauvaise: 'ou', expl: 'où = lieu' },
+    { avant: 'Il a oublié ', apres: ' cartable.', bonne: 'son', mauvaise: 'sont', expl: 'son = déterminant' },
+    { avant: 'Ils ', apres: ' partis.', bonne: 'sont', mauvaise: 'son', expl: 'sont = verbe être' },
+    { avant: 'Elle range ', apres: ' livre.', bonne: 'son', mauvaise: 'sont', expl: 'son = déterminant' },
+    { avant: 'Les enfants ', apres: ' contents.', bonne: 'sont', mauvaise: 'son', expl: 'sont = verbe être' },
+    { avant: 'Il joue avec ', apres: ' chien.', bonne: 'son', mauvaise: 'sont', expl: 'son = déterminant' },
+    { avant: 'Mes amis ', apres: ' arrivés.', bonne: 'sont', mauvaise: 'son', expl: 'sont = verbe être' }
   ],
-  difficile: [
-    { a: 'Les enfants ', b: ' faim.', bonne: 'ont', mauvaise: 'on', expl: '"ont" = verbe avoir.' },
-    { a: '', b: ' va à la plage.', bonne: 'On', mauvaise: 'Ont', expl: '"on" = pronom sujet.' },
-    { a: 'Ils ', b: ' gagné.', bonne: 'ont', mauvaise: 'on', expl: '"ont" = verbe avoir.' },
-    { a: '', b: ' mange à midi.', bonne: 'On', mauvaise: 'Ont', expl: '"on" = pronom sujet.' },
-    { a: 'Elles ', b: ' acheté des fleurs.', bonne: 'ont', mauvaise: 'on', expl: '"ont" = verbe avoir.' },
-    { a: 'Le chat ', b: ' le chien dorment.', bonne: 'et', mauvaise: 'est', expl: '"et" relie deux sujets.' },
-    { a: 'Elle ', b: ' partie.', bonne: 'est', mauvaise: 'et', expl: '"est" = verbe être.' },
-    { a: 'Il est allé ', b: ' la mer.', bonne: 'à', mauvaise: 'a', expl: '"à" = préposition.' },
-    { a: 'Léa ', b: ' un nouveau sac.', bonne: 'a', mauvaise: 'à', expl: '"a" = verbe avoir.' },
-    { a: 'Ils ', b: ' tout compris.', bonne: 'ont', mauvaise: 'on', expl: '"ont" = verbe avoir.' }
+  [
+    { avant: 'Les enfants ', apres: ' faim.', bonne: 'ont', mauvaise: 'on', expl: 'ont = verbe avoir' },
+    { avant: '', apres: ' va à la plage.', bonne: 'On', mauvaise: 'Ont', expl: 'on = pronom' },
+    { avant: 'Ils ', apres: ' gagné.', bonne: 'ont', mauvaise: 'on', expl: 'ont = verbe avoir' },
+    { avant: '', apres: ' mange à midi.', bonne: 'On', mauvaise: 'Ont', expl: 'on = pronom' },
+    { avant: 'Elles ', apres: ' acheté des fleurs.', bonne: 'ont', mauvaise: 'on', expl: 'ont = verbe avoir' },
+    { avant: 'Le chat ', apres: ' le chien dorment.', bonne: 'et', mauvaise: 'est', expl: 'et = addition' },
+    { avant: 'Elle ', apres: ' partie.', bonne: 'est', mauvaise: 'et', expl: 'est = verbe être' },
+    { avant: 'Il est allé ', apres: ' la mer.', bonne: 'à', mauvaise: 'a', expl: 'à = préposition' },
+    { avant: 'Léa ', apres: ' un nouveau sac.', bonne: 'a', mauvaise: 'à', expl: 'a = verbe avoir' },
+    { avant: 'Ils ', apres: ' tout compris.', bonne: 'ont', mauvaise: 'on', expl: 'ont = verbe avoir' }
   ]
-};
+];
 
-var questions = [];
-var index = 0;
-var bonnes = 0;
-var NB = 10;
-var questionActuelle = null;
+var liste = [];
+var idx = 0;
+var score = 0;
+var phraseActuelle = null;
+var choixA = '';
+var choixB = '';
 
-function demarrer(niveau) {
-  var pool = PHRASES[niveau].slice();
-  for (var i = pool.length - 1; i > 0; i--) {
+function demarrer(numNiveau) {
+  liste = niveaux[numNiveau].slice();
+  // Mélanger
+  for (var i = liste.length - 1; i > 0; i--) {
     var j = Math.floor(Math.random() * (i + 1));
-    var t = pool[i]; pool[i] = pool[j]; pool[j] = t;
+    var t = liste[i]; liste[i] = liste[j]; liste[j] = t;
   }
-  questions = pool.slice(0, NB);
-  index = 0;
-  bonnes = 0;
-  
-  document.getElementById('ecran-accueil').style.display = 'none';
-  document.getElementById('ecran-jeu').style.display = 'block';
-  document.getElementById('ecran-fin').style.display = 'none';
-  
-  var noms = { facile: '🟢 Facile', moyen: '🟡 Moyen', difficile: '🔴 Difficile' };
-  document.getElementById('niveau-aff').textContent = noms[niveau];
-  
+  idx = 0;
+  score = 0;
+  document.getElementById('ecran1').style.display = 'none';
+  document.getElementById('ecran2').style.display = 'block';
+  document.getElementById('ecran3').style.display = 'none';
   afficher();
 }
 
 function afficher() {
-  if (index >= questions.length) {
-    fin();
+  if (idx >= liste.length) {
+    document.getElementById('ecran2').style.display = 'none';
+    document.getElementById('ecran3').style.display = 'block';
+    document.getElementById('score').textContent = score + ' / ' + liste.length + ' bonnes réponses';
+    if (score === liste.length) document.getElementById('titre3').textContent = '🏆 PARFAIT !';
+    else if (score >= 7) document.getElementById('titre3').textContent = '🎉 TRÈS BIEN !';
+    else if (score >= 5) document.getElementById('titre3').textContent = '👍 PAS MAL !';
+    else document.getElementById('titre3').textContent = '💪 COURAGE !';
     return;
   }
+  phraseActuelle = liste[idx];
+  document.getElementById('num').textContent = (idx + 1);
+  document.getElementById('phrase').innerHTML = phraseActuelle.avant + ' <span class="trou">?</span> ' + phraseActuelle.apres;
   
-  var q = questions[index];
-  questionActuelle = q;
-  
-  document.getElementById('question-aff').textContent = 'Question ' + (index + 1) + '/' + NB;
-  document.getElementById('phrase').innerHTML = q.a + '<span class="trou">?</span>' + q.b;
-  
-  var boutons = [q.bonne, q.mauvaise];
-  if (Math.random() < 0.5) { boutons = [q.mauvaise, q.bonne]; }
-  
-  var html = '';
-  for (var i = 0; i < boutons.length; i++) {
-    html += '<button class="btn-prop" data-choix="' + boutons[i] + '">' + boutons[i] + '</button>';
+  choixA = phraseActuelle.bonne;
+  choixB = phraseActuelle.mauvaise;
+  if (Math.random() < 0.5) {
+    choixA = phraseActuelle.mauvaise;
+    choixB = phraseActuelle.bonne;
   }
-  document.getElementById('boutons-props').innerHTML = html;
-  
-  var tousBoutons = document.querySelectorAll('.btn-prop');
-  for (var k = 0; k < tousBoutons.length; k++) {
-    tousBoutons[k].addEventListener('click', function() {
-      var choix = this.getAttribute('data-choix');
-      repondre(this, choix);
-    });
-  }
-  
-  var msg = document.getElementById('message');
-  msg.className = 'message info';
-  msg.textContent = '👆 Clique sur le bon mot !';
+  document.getElementById('btnA').textContent = choixA;
+  document.getElementById('btnB').textContent = choixB;
+  document.getElementById('btnA').disabled = false;
+  document.getElementById('btnB').disabled = false;
+  document.getElementById('btnA').style.background = '#3b82f6';
+  document.getElementById('btnB').style.background = '#3b82f6';
+  document.getElementById('msg').className = 'msg info';
+  document.getElementById('msg').textContent = '👆 Clique sur le bon mot !';
 }
 
-function repondre(bouton, choix) {
-  var q = questionActuelle;
-  var tous = document.querySelectorAll('.btn-prop');
-  for (var i = 0; i < tous.length; i++) {
-    tous[i].disabled = true;
-  }
+function cliqueA() { verifier(choixA, 'btnA'); }
+function cliqueB() { verifier(choixB, 'btnB'); }
+
+function verifier(choix, boutonId) {
+  document.getElementById('btnA').disabled = true;
+  document.getElementById('btnB').disabled = true;
   
-  var msg = document.getElementById('message');
-  
-  if (choix === q.bonne) {
-    bonnes++;
-    bouton.classList.add('correct');
-    msg.className = 'message succes';
-    msg.textContent = '✅ Bravo ! ' + q.expl;
+  var msg = document.getElementById('msg');
+  if (choix === phraseActuelle.bonne) {
+    score++;
+    document.getElementById(boutonId).style.background = '#22c55e';
+    msg.className = 'msg ok';
+    msg.textContent = '✅ Bravo ! ' + phraseActuelle.expl;
   } else {
-    bouton.classList.add('incorrect');
-    msg.className = 'message erreur';
-    msg.textContent = '❌ Presque ! C\'était "' + q.bonne + '". ' + q.expl;
-    for (var j = 0; j < tous.length; j++) {
-      if (tous[j].getAttribute('data-choix') === q.bonne) {
-        tous[j].classList.add('correct');
-      }
-    }
+    document.getElementById(boutonId).style.background = '#ef4444';
+    msg.className = 'msg ko';
+    msg.textContent = '❌ Presque ! C\'était "' + phraseActuelle.bonne + '". ' + phraseActuelle.expl;
+    if (choixA === phraseActuelle.bonne) document.getElementById('btnA').style.background = '#22c55e';
+    if (choixB === phraseActuelle.bonne) document.getElementById('btnB').style.background = '#22c55e';
   }
   
-  index++;
-  setTimeout(afficher, 2500);
+  idx++;
+  setTimeout(afficher, 2200);
 }
 
-function fin() {
-  document.getElementById('ecran-jeu').style.display = 'none';
-  document.getElementById('ecran-fin').style.display = 'block';
-  
-  var titre = document.getElementById('titre-fin');
-  var score = document.getElementById('score-fin');
-  
-  if (bonnes === NB) {
-    titre.textContent = '🏆 PARFAIT !';
-    score.textContent = 'Tu as ' + bonnes + '/' + NB + ' bonnes réponses !';
-  } else if (bonnes >= 7) {
-    titre.textContent = '🎉 TRÈS BIEN !';
-    score.textContent = 'Tu as ' + bonnes + '/' + NB + ' bonnes réponses !';
-  } else if (bonnes >= 5) {
-    titre.textContent = '👍 PAS MAL !';
-    score.textContent = 'Tu as ' + bonnes + '/' + NB + ' bonnes réponses.';
-  } else {
-    titre.textContent = '💪 COURAGE !';
-    score.textContent = 'Tu as ' + bonnes + '/' + NB + ' bonnes réponses. Réessaie !';
-  }
-}
-
-function retourAccueil() {
-  document.getElementById('ecran-accueil').style.display = 'block';
-  document.getElementById('ecran-jeu').style.display = 'none';
-  document.getElementById('ecran-fin').style.display = 'none';
+function retour() {
+  document.getElementById('ecran1').style.display = 'block';
+  document.getElementById('ecran2').style.display = 'none';
+  document.getElementById('ecran3').style.display = 'none';
 }
 </script>
 
