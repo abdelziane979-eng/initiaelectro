@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Le Pluriel des Noms - InitiaFrançais</title>
+<style>
+  body { font-family: Arial, sans-serif; text-align: center; padding: 20px; background: #dbeafe; margin: 0; }
+  .carte { background: white; padding: 20px; border-radius: 15px; max-width: 600px; margin: 20px auto; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+  h1 { color: #1d4ed8; }
+  .btn { padding: 15px 30px; font-size: 1.2em; margin: 10px; cursor: pointer; border: none; border-radius: 10px; color: white; font-weight: bold; font-family: inherit; }
+  .btn:hover { opacity: 0.9; }
+  .vert { background: #22c55e; }
+  .jaune { background: #f59e0b; }
+  .rouge { background: #ef4444; }
+  .prop { background: #3b82f6; padding: 20px 40px; font-size: 1.5em; margin: 10px; cursor: pointer; border: none; border-radius: 10px; color: white; font-weight: bold; font-family: inherit; min-width: 150px; }
+  .prop:hover { opacity: 0.9; }
+  .prop:disabled { cursor: not-allowed; }
+  .phrase { font-size: 1.5em; font-weight: bold; margin: 20px 0; padding: 20px; background: #fef3c7; border-radius: 10px; }
+  .mot { color: #1d4ed8; font-size: 1.3em; }
+  .msg { padding: 15px; border-radius: 10px; margin: 15px 0; font-weight: bold; min-height: 50px; }
+  .info { background: #dbeafe; color: #1e40af; }
+  .ok { background: #dcfce7; color: #166534; }
+  .ko { background: #fee2e2; color: #991b1b; }
+  .cache { display: none; }
+</style>
+</head>
+<body>
+
+<div id="ecran1" class="carte">
+  <h1>📝 Le Pluriel des Noms</h1>
+  <p>Choisis ton niveau :</p>
+  <button class="btn vert" onclick="demarrer(0)">🟢 Facile (pluriel en -s)</button>
+  <button class="btn jaune" onclick="demarrer(1)">🟡 Moyen (pluriel en -x)</button>
+  <button class="btn rouge" onclick="demarrer(2)">🔴 Difficile (exceptions)</button>
+  <br><a href="index.html" style="display:inline-block;margin-top:15px;color:#64748b;">← Retour aux jeux</a>
+</div>
+
+<div id="ecran2" class="carte cache">
+  <p><span id="num">1</span> / 10</p>
+  <div class="phrase">
+    Singulier : <span class="mot" id="singulier">chat</span><br><br>
+    Quel est le pluriel ?
+  </div>
+  <button class="prop" id="btnA" onclick="cliqueA()">A</button>
+  <button class="prop" id="btnB" onclick="cliqueB()">B</button>
+  <div class="msg info" id="msg">Clique sur la bonne réponse !</div>
+  <a href="index.html" style="display:inline-block;margin-top:15px;color:#64748b;">← Retour</a>
+</div>
+
+<div id="ecran3" class="carte cache">
+  <h2 id="titre3">Bravo !</h2>
+  <p id="score" style="font-size:1.5em;"></p>
+  <button class="btn jaune" onclick="retour()">🔄 Rejouer</button>
+</div>
+
+<script>
+var niveaux = [
+  // NIVEAU FACILE : pluriel en -s (règle générale)
+  [
+    { sing: 'chat', bonne: 'chats', mauvaise: 'chats\'s', expl: 'On ajoute -s au pluriel : un chat → des chats.' },
+    { sing: 'chien', bonne: 'chiens', mauvaise: 'chien', expl: 'On ajoute -s : un chien → des chiens.' },
+    { sing: 'maison', bonne: 'maisons', mauvaise: 'maison', expl: 'On ajoute -s : une maison → des maisons.' },
+    { sing: 'livre', bonne: 'livres', mauvaise: 'livres\'s', expl: 'On ajoute -s : un livre → des livres.' },
+    { sing: 'fleur', bonne: 'fleurs', mauvaise: 'fleur', expl: 'On ajoute -s : une fleur → des fleurs.' },
+    { sing: 'table', bonne: 'tables', mauvaise: 'tables\'s', expl: 'On ajoute -s : une table → des tables.' },
+    { sing: 'garçon', bonne: 'garçons', mauvaise: 'garçon', expl: 'On ajoute -s : un garçon → des garçons.' },
+    { sing: 'fille', bonne: 'filles', mauvaise: 'filles\'s', expl: 'On ajoute -s : une fille → des filles.' },
+    { sing: 'arbre', bonne: 'arbres', mauvaise: 'arbre', expl: 'On ajoute -s : un arbre → des arbres.' },
+    { sing: 'voiture', bonne: 'voitures', mauvaise: 'voiture', expl: 'On ajoute -s : une voiture → des voitures.' }
+  ],
+  // NIVEAU MOYEN : pluriel en -x (noms en -eau, -au, -eu)
+  [
+    { sing: 'château', bonne: 'châteaux', mauvaise: 'châteaus', expl: 'Les noms en -eau prennent un -x : un château → des châteaux.' },
+    { sing: 'bateau', bonne: 'bateaux', mauvaise: 'bateaus', expl: 'Les noms en -eau prennent un -x : un bateau → des bateaux.' },
+    { sing: 'oiseau', bonne: 'oiseaux', mauvaise: 'oiseaus', expl: 'Les noms en -eau prennent un -x : un oiseau → des oiseaux.' },
+    { sing: 'gâteau', bonne: 'gâteaux', mauvaise: 'gâteaus', expl: 'Les noms en -eau prennent un -x : un gâteau → des gâteaux.' },
+    { sing: 'manteau', bonne: 'manteaux', mauvaise: 'manteaus', expl: 'Les noms en -eau prennent un -x : un manteau → des manteaux.' },
+    { sing: 'cheval', bonne: 'chevaux', mauvaise: 'chevals', expl: 'Les noms en -al font -aux : un cheval → des chevaux.' },
+    { sing: 'journal', bonne: 'journaux', mauvaise: 'journals', expl: 'Les noms en -al font -aux : un journal → des journaux.' },
+    { sing: 'travail', bonne: 'travaux', mauvaise: 'travailles', expl: 'Les noms en -ail font -aux : un travail → des travaux.' },
+    { sing: 'bijou', bonne: 'bijoux', mauvaise: 'bijous', expl: 'Bijou, caillou, chou, genou, hibou, joujou, pou prennent un -x.' },
+    { sing: 'genou', bonne: 'genoux', mauvaise: 'genous', expl: 'Genou fait partie des 7 exceptions en -ou qui prennent un -x.' }
+  ],
+  // NIVEAU DIFFICILE : exceptions et noms en -s, -x, -z
+  [
+    { sing: 'nez', bonne: 'nez', mauvaise: 'nezs', expl: 'Les noms en -s, -x, -z ne changent pas au pluriel.' },
+    { sing: 'tapis', bonne: 'tapis', mauvaise: 'tapiss', expl: 'Les noms en -s ne changent pas : un tapis → des tapis.' },
+    { sing: 'prix', bonne: 'prix', mauvaise: 'prixs', expl: 'Les noms en -x ne changent pas : un prix → des prix.' },
+    { sing: 'pou', bonne: 'poux', mauvaise: 'pous', expl: 'Pou fait partie des exceptions en -ou qui prennent un -x.' },
+    { sing: 'caillou', bonne: 'cailloux', mauvaise: 'caillous', expl: 'Caillou fait partie des exceptions en -ou qui prennent un -x.' },
+    { sing: 'chou', bonne: 'choux', mauvaise: 'chous', expl: 'Chou fait partie des exceptions en -ou qui prennent un -x.' },
+    { sing: 'pneu', bonne: 'pneus', mauvaise: 'pneux', expl: 'Pneu fait partie des exceptions : il prend un -s malgré le -eu.' },
+    { sing: 'bleu', bonne: 'bleus', mauvaise: 'bleux', expl: 'Bleu prend un -s (exception des noms en -eu).' },
+    { sing: 'cheval', bonne: 'chevaux', mauvaise: 'chevals', expl: 'Cheval → chevaux (noms en -al font -aux).' },
+    { sing: 'bal', bonne: 'bals', mauvaise: 'baux', expl: 'Bal est une exception : il prend un -s (pas -aux).' }
+  ]
+];
+
+var liste = [];
+var idx = 0;
+var score = 0;
+var questionActuelle = null;
+var choixA = '';
+var choixB = '';
+
+function demarrer(numNiveau) {
+  liste = niveaux[numNiveau].slice();
+  for (var i = liste.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    var t = liste[i]; liste[i] = liste[j]; liste[j] = t;
+  }
+  idx = 0;
+  score = 0;
+  document.getElementById('ecran1').style.display = 'none';
+  document.getElementById('ecran2').style.display = 'block';
+  document.getElementById('ecran3').style.display = 'none';
+  afficher();
+}
+
+function afficher() {
+  if (idx >= liste.length) {
+    document.getElementById('ecran2').style.display = 'none';
+    document.getElementById('ecran3').style.display = 'block';
+    document.getElementById('score').textContent = score + ' / ' + liste.length + ' bonnes réponses';
+    if (score === liste.length) document.getElementById('titre3').textContent = '🏆 PARFAIT !';
+    else if (score >= 7) document.getElementById('titre3').textContent = '🎉 TRÈS BIEN !';
+    else if (score >= 5) document.getElementById('titre3').textContent = '👍 PAS MAL !';
+    else document.getElementById('titre3').textContent = '💪 COURAGE !';
+    return;
+  }
+  questionActuelle = liste[idx];
+  document.getElementById('num').textContent = (idx + 1);
+  document.getElementById('singulier').textContent = questionActuelle.sing;
+  
+  choixA = questionActuelle.bonne;
+  choixB = questionActuelle.mauvaise;
+  if (Math.random() < 0.5) {
+    choixA = questionActuelle.mauvaise;
+    choixB = questionActuelle.bonne;
+  }
+  document.getElementById('btnA').textContent = choixA;
+  document.getElementById('btnB').textContent = choixB;
+  document.getElementById('btnA').disabled = false;
+  document.getElementById('btnB').disabled = false;
+  document.getElementById('btnA').style.background = '#3b82f6';
+  document.getElementById('btnB').style.background = '#3b82f6';
+  document.getElementById('msg').className = 'msg info';
+  document.getElementById('msg').textContent = '👆 Clique sur le bon pluriel !';
+}
+
+function cliqueA() { verifier(choixA, 'btnA'); }
+function cliqueB() { verifier(choixB, 'btnB'); }
+
+function verifier(choix, boutonId) {
+  document.getElementById('btnA').disabled = true;
+  document.getElementById('btnB').disabled = true;
+  
+  var msg = document.getElementById('msg');
+  if (choix === questionActuelle.bonne) {
+    score++;
+    document.getElementById(boutonId).style.background = '#22c55e';
+    msg.className = 'msg ok';
+    msg.textContent = '✅ Bravo ! ' + questionActuelle.expl;
+  } else {
+    document.getElementById(boutonId).style.background = '#ef4444';
+    msg.className = 'msg ko';
+    msg.textContent = '❌ Presque ! Le pluriel est "' + questionActuelle.bonne + '". ' + questionActuelle.expl;
+    if (choixA === questionActuelle.bonne) document.getElementById('btnA').style.background = '#22c55e';
+    if (choixB === questionActuelle.bonne) document.getElementById('btnB').style.background = '#22c55e';
+  }
+  
+  idx++;
+  setTimeout(afficher, 2500);
+}
+
+function retour() {
+  document.getElementById('ecran1').style.display = 'block';
+  document.getElementById('ecran2').style.display = 'none';
+  document.getElementById('ecran3').style.display = 'none';
+}
+</script>
+
+</body>
+</html>
