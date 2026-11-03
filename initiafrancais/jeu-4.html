@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>L'Orthographe Magique - InitiaFrançais</title>
+<style>
+  body { font-family: Arial, sans-serif; text-align: center; padding: 20px; background: #f3e8ff; margin: 0; }
+  .carte { background: white; padding: 20px; border-radius: 15px; max-width: 600px; margin: 20px auto; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+  h1 { color: #6b21a8; }
+  .btn { padding: 15px 30px; font-size: 1.2em; margin: 10px; cursor: pointer; border: none; border-radius: 10px; color: white; font-weight: bold; font-family: inherit; }
+  .btn:hover { opacity: 0.9; }
+  .vert { background: #22c55e; }
+  .jaune { background: #f59e0b; }
+  .rouge { background: #ef4444; }
+  .prop { background: #3b82f6; padding: 20px 40px; font-size: 1.6em; margin: 10px; cursor: pointer; border: none; border-radius: 10px; color: white; font-weight: bold; font-family: inherit; min-width: 180px; }
+  .prop:hover { opacity: 0.9; }
+  .prop:disabled { cursor: not-allowed; }
+  .phrase { font-size: 1.4em; font-weight: bold; margin: 20px 0; padding: 20px; background: #fef3c7; border-radius: 10px; }
+  .mot { color: #6b21a8; font-size: 1.5em; letter-spacing: 2px; }
+  .indice { font-size: 0.85em; color: #64748b; font-style: italic; margin-top: 8px; }
+  .msg { padding: 15px; border-radius: 10px; margin: 15px 0; font-weight: bold; min-height: 50px; }
+  .info { background: #dbeafe; color: #1e40af; }
+  .ok { background: #dcfce7; color: #166534; }
+  .ko { background: #fee2e2; color: #991b1b; }
+  .cache { display: none; }
+</style>
+</head>
+<body>
+
+<div id="ecran1" class="carte">
+  <h1>✏️ L'Orthographe Magique</h1>
+  <p>Choisis ton niveau :</p>
+  <button class="btn vert" onclick="demarrer(0)">🟢 Facile (mots courants)</button>
+  <button class="btn jaune" onclick="demarrer(1)">🟡 Moyen (sons ambigus)</button>
+  <button class="btn rouge" onclick="demarrer(2)">🔴 Difficile (pièges)</button>
+  <br><a href="index.html" style="display:inline-block;margin-top:15px;color:#64748b;">← Retour aux jeux</a>
+</div>
+
+<div id="ecran2" class="carte cache">
+  <p><span id="num">1</span> / 10</p>
+  <div class="phrase">
+    Quel est le bon mot ?<br><br>
+    <span class="mot" id="definition">Animal qui miaule</span>
+    <div class="indice" id="indice">Indice : commence par C, 4 lettres</div>
+  </div>
+  <button class="prop" id="btnA" onclick="cliqueA()">A</button>
+  <button class="prop" id="btnB" onclick="cliqueB()">B</button>
+  <div class="msg info" id="msg">Clique sur la bonne orthographe !</div>
+  <a href="index.html" style="display:inline-block;margin-top:15px;color:#64748b;">← Retour</a>
+</div>
+
+<div id="ecran3" class="carte cache">
+  <h2 id="titre3">Bravo !</h2>
+  <p id="score" style="font-size:1.5em;"></p>
+  <button class="btn jaune" onclick="retour()">🔄 Rejouer</button>
+</div>
+
+<script>
+var niveaux = [
+  // NIVEAU FACILE : mots courants, erreurs typiques
+  [
+    { def: 'Animal qui miaule', indice: 'Commence par C, 4 lettres', bonne: 'chat', mauvaise: 'cha', expl: 'chat (avec un t muet à la fin).' },
+    { def: 'Meuble pour dormir', indice: 'Commence par L, 3 lettres', bonne: 'lit', mauvaise: 'lis', expl: 'lit (le meuble), ne pas confondre avec "lis" (verbe lire).' },
+    { def: 'Boisson blanche des vaches', indice: 'Commence par L, 4 lettres', bonne: 'lait', mauvaise: 'lè', expl: 'lait (avec un t muet).' },
+    { def: 'Petit félin domestique', indice: '5 lettres, C...T', bonne: 'chats', mauvaise: 'chat', expl: 'chats au pluriel (plusieurs félins).' },
+    { def: 'Objet pour écrire', indice: 'Commence par C, 5 lettres', bonne: 'crayon', mauvaise: 'creyon', expl: 'crayon (pas "creyon").' },
+    { def: 'Petit de la poule', indice: 'Commence par P, 6 lettres', bonne: 'poussin', mauvaise: 'pousin', expl: 'poussin (avec deux s).' },
+    { def: 'Le repas du matin', indice: 'Commence par P, 12 lettres', bonne: 'petit-déjeuner', mauvaise: 'petit déjeuner', expl: 'petit-déjeuner (avec un trait d\'union).' },
+    { def: 'Instrument pour écrire au tableau', indice: 'Commence par C, 6 lettres', bonne: 'craie', mauvaise: 'crais', expl: 'craie (pas "crais").' },
+    { def: 'Oiseau qui vole la nuit', indice: '5 lettres, H...U', bonne: 'hibou', mauvaise: 'ibou', expl: 'hibou (avec un h).' },
+    { def: 'Couleur du ciel', indice: '4 lettres, B...U', bonne: 'bleu', mauvaise: 'bleut', expl: 'bleu (sans t).' }
+  ],
+  // NIVEAU MOYEN : sons ambigus (s/ss, c/ç, g/ge, é/er/ez)
+  [
+    { def: 'Sentir bon (verbe)', indice: 'Commence par S, 7 lettres', bonne: 'sentir', mauvaise: 'centir', expl: 'sentir (avec un s, pas un c).' },
+    { def: 'Le repas de midi', indice: 'Commence par D, 6 lettres', bonne: 'déjeuner', mauvaise: 'déjeuné', expl: 'déjeuner (nom, terminaison en -er).' },
+    { def: 'J\'ai mangé un gâteau (passé)', indice: 'Terminaison en -é', bonne: 'mangé', mauvaise: 'manger', expl: 'mangé (participe passé avec -é après avoir).' },
+    { def: 'Aller manger (infinitif)', indice: 'Terminaison en -er', bonne: 'manger', mauvaise: 'mangé', expl: 'manger (infinitif en -er, on peut dire "aller manger").' },
+    { def: 'Oiseau de mer noir', indice: 'Commence par M, 5 lettres', bonne: 'mouette', mauvaise: 'mouete', expl: 'mouette (deux t).' },
+    { def: 'Petit caillou', indice: 'Commence par C, 5 lettres', bonne: 'caillou', mauvaise: 'cailloux', expl: 'caillou (singulier, sans x).' },
+    { def: 'Plusieurs cailloux', indice: 'Pluriel', bonne: 'cailloux', mauvaise: 'caillous', expl: 'cailloux (avec un x, c\'est un des 7 exceptions en -ou).' },
+    { def: 'Le fruit du pommier', indice: 'Commence par P, 5 lettres', bonne: 'pomme', mauvaise: 'pome', expl: 'pomme (avec deux m).' },
+    { def: 'Faire du vélo (passé)', indice: 'Terminaison -é', bonne: 'roulé', mauvaise: 'rouler', expl: 'roulé (participe passé avec -é après avoir).' },
+    { def: 'Parler à voix haute (infinitif)', indice: 'Terminaison -er', bonne: 'parler', mauvaise: 'parlé', expl: 'parler (infinitif en -er).' }
+  ],
+  // NIVEAU DIFFICILE : pièges d'orthographe
+  [
+    { def: 'Un moment (pas "tamp")', indice: '4 lettres', bonne: 'temps', mauvaise: 'tamp', expl: 'temps (avec ps, le p ne se prononce pas).' },
+    { def: 'Le devant (préposition)', indice: '4 lettres', bonne: 'dans', mauvaise: 'dan', expl: 'dans (avec un s).' },
+    { def: 'Faire semblant de dormir', indice: 'Commence par S, 6 lettres', bonne: 'semblant', mauvaise: 'samblant', expl: 'semblant (pas "samblant").' },
+    { def: 'Le repos (action de dormir)', indice: '5 lettres, S...S', bonne: 'sommeil', mauvaise: 'someil', expl: 'sommeil (deux m).' },
+    { def: 'Outil pour couper', indice: '5 lettres, C...U', bonne: 'couteau', mauvaise: 'couteaux', expl: 'couteau (singulier, sans x).' },
+    { def: 'Plusieurs outils pour couper', indice: 'Pluriel', bonne: 'couteaux', mauvaise: 'couteaus', expl: 'couteaux (pluriel en -x).' },
+    { def: 'Ce qui arrive à un événement', indice: '9 lettres, E...T', bonne: 'événement', mauvaise: 'évennement', expl: 'événement (pas "évennement", un seul n mais deux é).' },
+    { def: 'Le contraire de "jamais"', indice: '8 lettres, T...S', bonne: 'toujours', mauvaise: 'toujour', expl: 'toujours (avec un s à la fin).' },
+    { def: 'Le contraire de "toujours"', indice: '6 lettres, J...S', bonne: 'jamais', mauvaise: 'jamai', expl: 'jamais (avec un s à la fin).' },
+    { def: 'Le verbe "être" au présent (nous)', indice: '5 lettres, S...M', bonne: 'sommes', mauvaise: 'somme', expl: 'sommes (nous sommes, verbe être).' }
+  ]
+];
+
+var liste = [];
+var idx = 0;
+var score = 0;
+var questionActuelle = null;
+var choixA = '';
+var choixB = '';
+
+function demarrer(numNiveau) {
+  liste = niveaux[numNiveau].slice();
+  for (var i = liste.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    var t = liste[i]; liste[i] = liste[j]; liste[j] = t;
+  }
+  idx = 0;
+  score = 0;
+  document.getElementById('ecran1').style.display = 'none';
+  document.getElementById('ecran2').style.display = 'block';
+  document.getElementById('ecran3').style.display = 'none';
+  afficher();
+}
+
+function afficher() {
+  if (idx >= liste.length) {
+    document.getElementById('ecran2').style.display = 'none';
+    document.getElementById('ecran3').style.display = 'block';
+    document.getElementById('score').textContent = score + ' / ' + liste.length + ' bonnes réponses';
+    if (score === liste.length) document.getElementById('titre3').textContent = '🏆 PARFAIT !';
+    else if (score >= 7) document.getElementById('titre3').textContent = '🎉 TRÈS BIEN !';
+    else if (score >= 5) document.getElementById('titre3').textContent = '👍 PAS MAL !';
+    else document.getElementById('titre3').textContent = '💪 COURAGE !';
+    return;
+  }
+  questionActuelle = liste[idx];
+  document.getElementById('num').textContent = (idx + 1);
+  document.getElementById('definition').textContent = questionActuelle.def;
+  document.getElementById('indice').textContent = questionActuelle.indice;
+  
+  choixA = questionActuelle.bonne;
+  choixB = questionActuelle.mauvaise;
+  if (Math.random() < 0.5) {
+    choixA = questionActuelle.mauvaise;
+    choixB = questionActuelle.bonne;
+  }
+  document.getElementById('btnA').textContent = choixA;
+  document.getElementById('btnB').textContent = choixB;
+  document.getElementById('btnA').disabled = false;
+  document.getElementById('btnB').disabled = false;
+  document.getElementById('btnA').style.background = '#3b82f6';
+  document.getElementById('btnB').style.background = '#3b82f6';
+  document.getElementById('msg').className = 'msg info';
+  document.getElementById('msg').textContent = '👆 Clique sur la bonne orthographe !';
+}
+
+function cliqueA() { verifier(choixA, 'btnA'); }
+function cliqueB() { verifier(choixB, 'btnB'); }
+
+function verifier(choix, boutonId) {
+  document.getElementById('btnA').disabled = true;
+  document.getElementById('btnB').disabled = true;
+  
+  var msg = document.getElementById('msg');
+  if (choix === questionActuelle.bonne) {
+    score++;
+    document.getElementById(boutonId).style.background = '#22c55e';
+    msg.className = 'msg ok';
+    msg.textContent = '✅ Bravo ! ' + questionActuelle.expl;
+  } else {
+    document.getElementById(boutonId).style.background = '#ef4444';
+    msg.className = 'msg ko';
+    msg.textContent = '❌ Presque ! La bonne réponse est "' + questionActuelle.bonne + '". ' + questionActuelle.expl;
+    if (choixA === questionActuelle.bonne) document.getElementById('btnA').style.background = '#22c55e';
+    if (choixB === questionActuelle.bonne) document.getElementById('btnB').style.background = '#22c55e';
+  }
+  
+  idx++;
+  setTimeout(afficher, 2500);
+}
+
+function retour() {
+  document.getElementById('ecran1').style.display = 'block';
+  document.getElementById('ecran2').style.display = 'none';
+  document.getElementById('ecran3').style.display = 'none';
+}
+</script>
+
+</body>
+</html>
