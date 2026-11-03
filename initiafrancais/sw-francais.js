@@ -1,12 +1,13 @@
-var CACHE_NAME = 'initiafrancais-v6';
+var CACHE_NAME = 'initiafrancais-v8';
 var urlsToCache = [
   './',
   './index.html',
   './jeu-1.html',
+  './jeu-2.html',
+  './jeu-3.html',
   './icone.svg',
   './manifest-francais.json'
 ];
-
 self.addEventListener('install', function(event) {
   event.waitUntil(
     caches.open(CACHE_NAME).then(function(cache) {
