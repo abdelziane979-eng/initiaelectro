@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Les Contraires et Synonymes - InitiaFrançais</title>
+<style>
+  body { font-family: Arial, sans-serif; text-align: center; padding: 20px; background: #fef3c7; margin: 0; }
+  .carte { background: white; padding: 20px; border-radius: 15px; max-width: 600px; margin: 20px auto; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+  h1 { color: #b45309; }
+  .btn { padding: 15px 30px; font-size: 1.2em; margin: 10px; cursor: pointer; border: none; border-radius: 10px; color: white; font-weight: bold; font-family: inherit; }
+  .btn:hover { opacity: 0.9; }
+  .vert { background: #22c55e; }
+  .jaune { background: #f59e0b; }
+  .rouge { background: #ef4444; }
+  .prop { background: #3b82f6; padding: 20px 40px; font-size: 1.6em; margin: 10px; cursor: pointer; border: none; border-radius: 10px; color: white; font-weight: bold; font-family: inherit; min-width: 180px; }
+  .prop:hover { opacity: 0.9; }
+  .prop:disabled { cursor: not-allowed; }
+  .phrase { font-size: 1.4em; font-weight: bold; margin: 20px 0; padding: 20px; background: #fef3c7; border-radius: 10px; }
+  .mot { color: #b45309; font-size: 1.8em; letter-spacing: 1px; }
+  .consigne { font-size: 1em; color: #78350f; margin-bottom: 10px; font-weight: normal; }
+  .msg { padding: 15px; border-radius: 10px; margin: 15px 0; font-weight: bold; min-height: 50px; }
+  .info { background: #dbeafe; color: #1e40af; }
+  .ok { background: #dcfce7; color: #166534; }
+  .ko { background: #fee2e2; color: #991b1b; }
+  .cache { display: none; }
+</style>
+</head>
+<body>
+
+<div id="ecran1" class="carte">
+  <h1>🔄 Les Contraires et Synonymes</h1>
+  <p>Choisis ton niveau :</p>
+  <button class="btn vert" onclick="demarrer(0)">🟢 Facile (contraires)</button>
+  <button class="btn jaune" onclick="demarrer(1)">🟡 Moyen (synonymes)</button>
+  <button class="btn rouge" onclick="demarrer(2)">🔴 Difficile (mélange)</button>
+  <br><a href="index.html" style="display:inline-block;margin-top:15px;color:#64748b;">← Retour aux jeux</a>
+</div>
+
+<div id="ecran2" class="carte cache">
+  <p><span id="num">1</span> / 10</p>
+  <div class="phrase">
+    <div class="consigne" id="consigne">Trouve le CONTRAIRE de :</div>
+    <span class="mot" id="mot">grand</span>
+  </div>
+  <button class="prop" id="btnA" onclick="cliqueA()">A</button>
+  <button class="prop" id="btnB" onclick="cliqueB()">B</button>
+  <div class="msg info" id="msg">Clique sur la bonne réponse !</div>
+  <a href="index.html" style="display:inline-block;margin-top:15px;color:#64748b;">← Retour</a>
+</div>
+
+<div id="ecran3" class="carte cache">
+  <h2 id="titre3">Bravo !</h2>
+  <p id="score" style="font-size:1.5em;"></p>
+  <button class="btn jaune" onclick="retour()">🔄 Rejouer</button>
+</div>
+
+<script>
+var niveaux = [
+  // NIVEAU FACILE : contraires simples
+  [
+    { consigne: 'Trouve le CONTRAIRE de :', mot: 'grand', bonne: 'petit', mauvaise: 'gros', expl: 'Le contraire de grand est petit.' },
+    { consigne: 'Trouve le CONTRAIRE de :', mot: 'chaud', bonne: 'froid', mauvaise: 'tiède', expl: 'Le contraire de chaud est froid.' },
+    { consigne: 'Trouve le CONTRAIRE de :', mot: 'jour', bonne: 'nuit', mauvaise: 'matin', expl: 'Le contraire de jour est nuit.' },
+    { consigne: 'Trouve le CONTRAIRE de :', mot: 'ouvert', bonne: 'fermé', mauvaise: 'bouché', expl: 'Le contraire d\'ouvert est fermé.' },
+    { consigne: 'Trouve le CONTRAIRE de :', mot: 'rapide', bonne: 'lent', mauvaise: 'mou', expl: 'Le contraire de rapide est lent.' },
+    { consigne: 'Trouve le CONTRAIRE de :', mot: 'heureux', bonne: 'triste', mauvaise: 'fâché', expl: 'Le contraire d\'heureux est triste.' },
+    { consigne: 'Trouve le CONTRAIRE de :', mot: 'monter', bonne: 'descendre', mauvaise: 'tomber', expl: 'Le contraire de monter est descendre.' },
+    { consigne: 'Trouve le CONTRAIRE de :', mot: 'plein', bonne: 'vide', mauvaise: 'creux', expl: 'Le contraire de plein est vide.' },
+    { consigne: 'Trouve le CONTRAIRE de :', mot: 'avant', bonne: 'après', mauvaise: 'pendant', expl: 'Le contraire d\'avant est après.' },
+    { consigne: 'Trouve le CONTRAIRE de :', mot: 'propre', bonne: 'sale', mauvaise: 'usé', expl: 'Le contraire de propre est sale.' }
+  ],
+  // NIVEAU MOYEN : synonymes simples
+  [
+    { consigne: 'Trouve le SYNONYME de :', mot: 'joli', bonne: 'beau', mauvaise: 'laid', expl: 'Joli et beau veulent dire la même chose.' },
+    { consigne: 'Trouve le SYNONYME de :', mot: 'content', bonne: 'heureux', mauvaise: 'triste', expl: 'Content et heureux sont synonymes.' },
+    { consigne: 'Trouve le SYNONYME de :', mot: 'maison', bonne: 'demeure', mauvaise: 'jardin', expl: 'Maison et demeure sont synonymes.' },
+    { consigne: 'Trouve le SYNONYME de :', mot: 'voiture', bonne: 'auto', mauvaise: 'vélo', expl: 'Voiture et auto sont synonymes.' },
+    { consigne: 'Trouve le SYNONYME de :', mot: 'manger', bonne: 'dévorer', mauvaise: 'boire', expl: 'Manger et dévorer (manger vite) sont proches.' },
+    { consigne: 'Trouve le SYNONYME de :', mot: 'parler', bonne: 'discuter', mauvaise: 'crier', expl: 'Parler et discuter sont synonymes.' },
+    { consigne: 'Trouve le SYNONYME de :', mot: 'courageux', bonne: 'brave', mauvaise: 'peureux', expl: 'Courageux et brave sont synonymes.' },
+    { consigne: 'Trouve le SYNONYME de :', mot: 'fatigué', bonne: 'épuisé', mauvaise: 'énervé', expl: 'Fatigué et épuisé sont synonymes.' },
+    { consigne: 'Trouve le SYNONYME de :', mot: 'méchant', bonne: 'cruel', mauvaise: 'gentil', expl: 'Méchant et cruel sont proches.' },
+    { consigne: 'Trouve le SYNONYME de :', mot: 'drôle', bonne: 'marrant', mauvaise: 'sérieux', expl: 'Drôle et marrant sont synonymes.' }
+  ],
+  // NIVEAU DIFFICILE : mélange contraires/synonymes
+  [
+    { consigne: 'Trouve le CONTRAIRE de :', mot: 'généreux', bonne: 'égoïste', mauvaise: 'gentil', expl: 'Le contraire de généreux est égoïste.' },
+    { consigne: 'Trouve le SYNONYME de :', mot: 'effrayant', bonne: 'terrifiant', mauvaise: 'ennuyeux', expl: 'Effrayant et terrifiant sont synonymes.' },
+    { consigne: 'Trouve le CONTRAIRE de :', mot: 'victoire', bonne: 'défaite', mauvaise: 'match', expl: 'Le contraire de victoire est défaite.' },
+    { consigne: 'Trouve le SYNONYME de :', mot: 'rapidement', bonne: 'vite', mauvaise: 'lentement', expl: 'Rapidement et vite sont synonymes.' },
+    { consigne: 'Trouve le CONTRAIRE de :', mot: 'silencieux', bonne: 'bruyant', mauvaise: 'calme', expl: 'Le contraire de silencieux est bruyant.' },
+    { consigne: 'Trouve le SYNONYME de :', mot: 'magnifique', bonne: 'splendide', mauvaise: 'horrible', expl: 'Magnifique et splendide sont synonymes.' },
+    { consigne: 'Trouve le CONTRAIRE de :', mot: 'ancien', bonne: 'moderne', mauvaise: 'vieux', expl: 'Le contraire d\'ancien est moderne.' },
+    { consigne: 'Trouve le SYNONYME de :', mot: 'attraper', bonne: 'saisir', mauvaise: 'lâcher', expl: 'Attraper et saisir sont synonymes.' },
+    { consigne: 'Trouve le CONTRAIRE de :', mot: 'sage', bonne: 'fou', mauvaise: 'calme', expl: 'Le contraire de sage est fou.' },
+    { consigne: 'Trouve le SYNONYME de :', mot: 'observer', bonne: 'regarder', mauvaise: 'ignorer', expl: 'Observer et regarder sont synonymes.' }
+  ]
+];
+
+var liste = [];
+var idx = 0;
+var score = 0;
+var questionActuelle = null;
+var choixA = '';
+var choixB = '';
+
+function demarrer(numNiveau) {
+  liste = niveaux[numNiveau].slice();
+  for (var i = liste.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    var t = liste[i]; liste[i] = liste[j]; liste[j] = t;
+  }
+  idx = 0;
+  score = 0;
+  document.getElementById('ecran1').style.display = 'none';
+  document.getElementById('ecran2').style.display = 'block';
+  document.getElementById('ecran3').style.display = 'none';
+  afficher();
+}
+
+function afficher() {
+  if (idx >= liste.length) {
+    document.getElementById('ecran2').style.display = 'none';
+    document.getElementById('ecran3').style.display = 'block';
+    document.getElementById('score').textContent = score + ' / ' + liste.length + ' bonnes réponses';
+    if (score === liste.length) document.getElementById('titre3').textContent = '🏆 PARFAIT !';
+    else if (score >= 7) document.getElementById('titre3').textContent = '🎉 TRÈS BIEN !';
+    else if (score >= 5) document.getElementById('titre3').textContent = '👍 PAS MAL !';
+    else document.getElementById('titre3').textContent = '💪 COURAGE !';
+    return;
+  }
+  questionActuelle = liste[idx];
+  document.getElementById('num').textContent = (idx + 1);
+  document.getElementById('consigne').textContent = questionActuelle.consigne;
+  document.getElementById('mot').textContent = questionActuelle.mot;
+  
+  choixA = questionActuelle.bonne;
+  choixB = questionActuelle.mauvaise;
+  if (Math.random() < 0.5) {
+    choixA = questionActuelle.mauvaise;
+    choixB = questionActuelle.bonne;
+  }
+  document.getElementById('btnA').textContent = choixA;
+  document.getElementById('btnB').textContent = choixB;
+  document.getElementById('btnA').disabled = false;
+  document.getElementById('btnB').disabled = false;
+  document.getElementById('btnA').style.background = '#3b82f6';
+  document.getElementById('btnB').style.background = '#3b82f6';
+  document.getElementById('msg').className = 'msg info';
+  document.getElementById('msg').textContent = '👆 Clique sur la bonne réponse !';
+}
+
+function cliqueA() { verifier(choixA, 'btnA'); }
+function cliqueB() { verifier(choixB, 'btnB'); }
+
+function verifier(choix, boutonId) {
+  document.getElementById('btnA').disabled = true;
+  document.getElementById('btnB').disabled = true;
+  
+  var msg = document.getElementById('msg');
+  if (choix === questionActuelle.bonne) {
+    score++;
+    document.getElementById(boutonId).style.background = '#22c55e';
+    msg.className = 'msg ok';
+    msg.textContent = '✅ Bravo ! ' + questionActuelle.expl;
+  } else {
+    document.getElementById(boutonId).style.background = '#ef4444';
+    msg.className = 'msg ko';
+    msg.textContent = '❌ Presque ! C\'était "' + questionActuelle.bonne + '". ' + questionActuelle.expl;
+    if (choixA === questionActuelle.bonne) document.getElementById('btnA').style.background = '#22c55e';
+    if (choixB === questionActuelle.bonne) document.getElementById('btnB').style.background = '#22c55e';
+  }
+  
+  idx++;
+  setTimeout(afficher, 2500);
+}
+
+function retour() {
+  document.getElementById('ecran1').style.display = 'block';
+  document.getElementById('ecran2').style.display = 'none';
+  document.getElementById('ecran3').style.display = 'none';
+}
+</script>
+
+</body>
+</html>
