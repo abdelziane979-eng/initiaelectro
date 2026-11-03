@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>La Petite Compréhension - InitiaFrançais</title>
+<style>
+  body { font-family: Arial, sans-serif; text-align: center; padding: 20px; background: #d1fae5; margin: 0; }
+  .carte { background: white; padding: 20px; border-radius: 15px; max-width: 650px; margin: 20px auto; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+  h1 { color: #047857; }
+  .btn { padding: 15px 30px; font-size: 1.2em; margin: 10px; cursor: pointer; border: none; border-radius: 10px; color: white; font-weight: bold; font-family: inherit; }
+  .btn:hover { opacity: 0.9; }
+  .vert { background: #22c55e; }
+  .jaune { background: #f59e0b; }
+  .rouge { background: #ef4444; }
+  .prop { background: #3b82f6; padding: 18px 30px; font-size: 1.2em; margin: 10px; cursor: pointer; border: none; border-radius: 10px; color: white; font-weight: bold; font-family: inherit; min-width: 200px; }
+  .prop:hover { opacity: 0.9; }
+  .prop:disabled { cursor: not-allowed; }
+  .texte-zone { font-size: 1.1em; margin: 20px 0; padding: 20px; background: #fef3c7; border-radius: 10px; text-align: left; line-height: 1.6; border-left: 5px solid #f59e0b; }
+  .question-zone { font-size: 1.2em; font-weight: bold; margin: 20px 0; padding: 15px; background: #dcfce7; border-radius: 10px; }
+  .msg { padding: 15px; border-radius: 10px; margin: 15px 0; font-weight: bold; min-height: 50px; }
+  .info { background: #dbeafe; color: #1e40af; }
+  .ok { background: #dcfce7; color: #166534; }
+  .ko { background: #fee2e2; color: #991b1b; }
+  .cache { display: none; }
+</style>
+</head>
+<body>
+
+<div id="ecran1" class="carte">
+  <h1>📖 La Petite Compréhension</h1>
+  <p>Choisis ton niveau :</p>
+  <button class="btn vert" onclick="demarrer(0)">🟢 Facile (texte court)</button>
+  <button class="btn jaune" onclick="demarrer(1)">🟡 Moyen (texte plus long)</button>
+  <button class="btn rouge" onclick="demarrer(2)">🔴 Difficile (déduction)</button>
+  <br><a href="index.html" style="display:inline-block;margin-top:15px;color:#64748b;">← Retour aux jeux</a>
+</div>
+
+<div id="ecran2" class="carte cache">
+  <p><span id="num">1</span> / 10</p>
+  <div class="texte-zone" id="texte">Texte...</div>
+  <div class="question-zone" id="question">Question...</div>
+  <button class="prop" id="btnA" onclick="cliqueA()">A</button>
+  <button class="prop" id="btnB" onclick="cliqueB()">B</button>
+  <div class="msg info" id="msg">Lis le texte puis réponds à la question.</div>
+  <a href="index.html" style="display:inline-block;margin-top:15px;color:#64748b;">← Retour</a>
+</div>
+
+<div id="ecran3" class="carte cache">
+  <h2 id="titre3">Bravo !</h2>
+  <p id="score" style="font-size:1.5em;"></p>
+  <button class="btn jaune" onclick="retour()">🔄 Rejouer</button>
+</div>
+
+<script>
+var niveaux = [
+  // NIVEAU FACILE : textes courts, réponse directe dans le texte
+  [
+    { texte: 'Léa a un chat qui s\'appelle Minou. Minou est blanc avec des taches noires. Il aime dormir sur le canapé.',
+      question: 'Comment s\'appelle le chat de Léa ?', bonne: 'Minou', mauvaise: 'Léa', expl: 'Le texte dit : "un chat qui s\'appelle Minou".' },
+    { texte: 'Tom va à l\'école tous les matins. Il prend le bus avec son ami Paul. Ils arrivent à 8h30.',
+      question: 'Comment Tom va-t-il à l\'école ?', bonne: 'En bus', mauvaise: 'À pied', expl: 'Le texte dit : "Il prend le bus".' },
+    { texte: 'Il fait beau aujourd\'hui. Le soleil brille et les oiseaux chantent. Marie décide d\'aller au parc.',
+      question: 'Où va Marie ?', bonne: 'Au parc', mauvaise: 'À la plage', expl: 'Le texte dit : "Marie décide d\'aller au parc".' },
+    { texte: 'Papa prépare un gâteau au chocolat. Il faut de la farine, des œufs et du sucre. Le gâteau sent très bon.',
+      question: 'Quel gâteau prépare Papa ?', bonne: 'Au chocolat', mauvaise: 'Aux fraises', expl: 'Le texte dit : "un gâteau au chocolat".' },
+    { texte: 'Le chien de Julie s\'appelle Rex. Rex est un grand chien marron. Il adore jouer avec une balle.',
+      question: 'Quel est le nom du chien ?', bonne: 'Rex', mauvaise: 'Julie', expl: 'Le texte dit : "Le chien de Julie s\'appelle Rex".' },
+    { texte: 'C\'est l\'anniversaire de Lucas. Il a 8 ans. Sa maman a préparé un gâteau avec 8 bougies.',
+      question: 'Quel âge a Lucas ?', bonne: '8 ans', mauvaise: '7 ans', expl: 'Le texte dit : "Il a 8 ans".' },
+    { texte: 'Dans le jardin, il y a des tomates et des carottes. Mamie arrose les légumes tous les soirs.',
+      question: 'Qu\'est-ce que Mamie arrose ?', bonne: 'Les légumes', mauvaise: 'Les fleurs', expl: 'Le texte dit : "Mamie arrose les légumes".' },
+    { texte: 'La maîtresse demande aux enfants de dessiner un animal. Paul dessine un éléphant. Emma dessine un papillon.',
+      question: 'Qu\'a dessiné Paul ?', bonne: 'Un éléphant', mauvaise: 'Un papillon', expl: 'Le texte dit : "Paul dessine un éléphant".' },
+    { texte: 'Il pleut dehors. Zoé prend son parapluie rouge. Elle met aussi ses bottes.',
+      question: 'Quelle est la couleur du parapluie de Zoé ?', bonne: 'Rouge', mauvaise: 'Bleu', expl: 'Le texte dit : "son parapluie rouge".' },
+    { texte: 'Le train part à 10 heures. Mme Martin arrive à la gare à 9h45. Elle a le temps d\'acheter un café.',
+      question: 'À quelle heure part le train ?', bonne: '10 heures', mauvaise: '9h45', expl: 'Le texte dit : "Le train part à 10 heures".' }
+  ],
+  // NIVEAU MOYEN : textes plus longs, réponse à déduire du texte
+  [
+    { texte: 'Ce matin, Lucas a oublié son cartable à la maison. Arrivé à l\'école, il s\'est rendu compte qu\'il n\'avait pas ses cahiers. Il a appelé sa maman pour qu\'elle lui apporte. Heureusement, elle est arrivée avant la récréation.',
+      question: 'Qu\'a oublié Lucas ?', bonne: 'Son cartable', mauvaise: 'Son goûter', expl: 'Le texte dit : "Lucas a oublié son cartable".' },
+    { texte: 'Chaque été, la famille Dupont part à la mer. Ils louent une petite maison près de la plage. Les enfants adorent faire des châteaux de sable. Le soir, ils mangent des glaces sur la promenade.',
+      question: 'Où va la famille Dupont chaque été ?', bonne: 'À la mer', mauvaise: 'À la montagne', expl: 'Le texte dit : "la famille Dupont part à la mer".' },
+    { texte: 'Le petit chat gris s\'est perdu dans le jardin. Il miaule très fort pour appeler sa maîtresse. Quand elle l\'entend, elle accourt pour le rassurer. Le chat, content, se blottit dans ses bras.',
+      question: 'Pourquoi le chat miaule-t-il ?', bonne: 'Pour appeler sa maîtresse', mauvaise: 'Parce qu\'il a faim', expl: 'Le texte dit : "Il miaule pour appeler sa maîtresse".' },
+    { texte: 'Dans la forêt, un écureuil cherche des noisettes. Il en ramasse beaucoup pour l\'hiver. Il les cache dans un arbre creux. Quand il fera froid, il aura de quoi manger.',
+      question: 'Pourquoi l\'écureuil ramasse-t-il des noisettes ?', bonne: 'Pour l\'hiver', mauvaise: 'Pour les offrir', expl: 'Le texte dit : "pour l\'hiver".' },
+    { texte: 'Le pâtissier prépare des croissants dès 4 heures du matin. Il pétrit la pâte, la laisse reposer, puis la met au four. À 7 heures, la boulangerie ouvre et les clients se régalent.',
+      question: 'À quelle heure ouvre la boulangerie ?', bonne: '7 heures', mauvaise: '4 heures', expl: 'Le texte dit : "À 7 heures, la boulangerie ouvre".' },
+    { texte: 'Julie adore les livres. Chaque samedi, elle va à la bibliothèque avec sa sœur. Elles empruntent 3 livres chacune. Elles les rapportent une semaine plus tard.',
+      question: 'Combien de livres Julie emprunte-t-elle ?', bonne: '3 livres', mauvaise: '1 livre', expl: 'Le texte dit : "elles empruntent 3 livres chacune".' },
+    { texte: 'Le vétérinaire examine le chien. Il écoute son cœur, regarde ses oreilles et ses dents. Le chien a un peu de fièvre. Le vétérinaire lui donne un médicament.',
+      question: 'Qu\'est-ce que le chien a ?', bonne: 'Un peu de fièvre', mauvaise: 'Mal aux pattes', expl: 'Le texte dit : "Le chien a un peu de fièvre".' },
+    { texte: 'La chenille mange beaucoup de feuilles. Pendant plusieurs semaines, elle grossit. Puis elle s\'enferme dans un cocon. Après quelques jours, elle devient un beau papillon.',
+      question: 'Que devient la chenille ?', bonne: 'Un papillon', mauvaise: 'Une abeille', expl: 'Le texte dit : "elle devient un beau papillon".' },
+    { texte: 'Le musée ouvre à 9h et ferme à 18h. Les enfants de moins de 6 ans ne paient pas l\'entrée. Paul, qui a 5 ans, entre gratuitement.',
+      question: 'Pourquoi Paul entre-t-il gratuitement ?', bonne: 'Il a moins de 6 ans', mauvaise: 'Il est avec ses parents', expl: 'Le texte dit : "les enfants de moins de 6 ans ne paient pas".' },
+    { texte: 'Pour faire un bon gâteau, il faut suivre la recette. D\'abord mélanger la farine et les œufs, puis ajouter le sucre. Enfin, mettre au four pendant 30 minutes.',
+      question: 'Quelle est la première étape de la recette ?', bonne: 'Mélanger la farine et les œufs', mauvaise: 'Mettre au four', expl: 'Le texte dit : "D\'abord mélanger la farine et les œufs".' }
+  ],
+  // NIVEAU DIFFICILE : déduction, inférence
+  [
+    { texte: 'Le ciel devient sombre. Les nuages sont gris. Les oiseaux se cachent dans les arbres. Soudain, une goutte d\'eau tombe sur le nez de Pierre.',
+      question: 'Que va-t-il se passer selon toi ?', bonne: 'Il va pleuvoir', mauvaise: 'Il va neiger', expl: 'Le ciel sombre, les nuages gris et la goutte d\'eau annoncent la pluie.' },
+    { texte: 'Emma a les joues rouges. Elle tremble et se sent très fatiguée. Sa maman lui dit de se reposer et de prendre sa température.',
+      question: 'Que pourrait avoir Emma ?', bonne: 'De la fièvre', mauvaise: 'Un simple rhume', expl: 'Les joues rouges, les tremblements et la fatigue sont des signes de fièvre.' },
+    { texte: 'La voiture de M. Durand est couverte de sel. Les routes sont blanches. Les enfants lancent des boules entre eux. Tout le monde porte des bonnets et des gants.',
+      question: 'Quelle est la saison ?', bonne: 'L\'hiver', mauvaise: 'L\'été', expl: 'Le sel, la neige, les boules et les vêtements chauds indiquent l\'hiver.' },
+    { texte: 'Léa a les mains pleines de farine. Il y a des œufs sur la table. Une délicieuse odeur de chocolat sort du four. Sa sœur arrive en courant.',
+      question: 'Que fait Léa ?', bonne: 'Un gâteau au chocolat', mauvaise: 'La lessive', expl: 'La farine, les œufs et l\'odeur de chocolat indiquent qu\'elle fait un gâteau.' },
+    { texte: 'Le chien de Paul se cache sous la table. Il tremble et a la queue entre les pattes. Un éclair illumine le ciel, puis un grondement retentit.',
+      question: 'Pourquoi le chien a-t-il peur ?', bonne: 'L\'orage', mauvaise: 'Un bruit fort', expl: 'L\'éclair et le grondement sont les signes d\'un orage.' },
+    { texte: 'Tous les matins, M. Dupont sort sa valise, son chapeau et ses lunettes. Il embrasse sa femme et se dirige vers la gare. Le soir, il rentre fatigué.',
+      question: 'Où va M. Dupont chaque matin ?', bonne: 'Au travail', mauvaise: 'En vacances', expl: 'Il prend la gare chaque matin et rentre fatigué le soir : c\'est son travail.' },
+    { texte: 'Les feuilles des arbres deviennent jaunes et rouges. Elles tombent par terre. Les jours raccourcissent et il fait plus frais. Les enfants ramassent des marrons.',
+      question: 'En quelle saison sommes-nous ?', bonne: 'L\'automne', mauvaise: 'Le printemps', expl: 'Les feuilles jaunes, les marrons et la baisse des températures indiquent l\'automne.' },
+    { texte: 'La maîtresse a la voix qui tremble. Elle tousse beaucoup et se mouche souvent. Elle annonce aux élèves qu\'elle ne sera pas là demain.',
+      question: 'Que va faire la maîtresse demain ?', bonne: 'Elle va se reposer', mauvaise: 'Elle va à la piscine', expl: 'Les symptômes (toux, voix tremblante) indiquent qu\'elle est malade et doit se reposer.' },
+    { texte: 'Dans la rue, tout le monde regarde en l\'air. Une fumée noire s\'échappe d\'une fenêtre. Les sirènes des pompiers se font entendre au loin.',
+      question: 'Que s\'est-il passé ?', bonne: 'Un incendie', mauvaise: 'Un accident de voiture', expl: 'La fumée noire et les sirènes des pompiers indiquent un incendie.' },
+    { texte: 'Les vagues sont hautes. Le vent souffle fort. Les bateaux restent au port. Sur la plage, les drapeaux sont rouges.',
+      question: 'Que signifie le drapeau rouge sur la plage ?', bonne: 'La baignade est interdite', mauvaise: 'Il y a des méduses', expl: 'Les vagues, le vent et le drapeau rouge indiquent que la baignade est dangereuse.' }
+  ]
+];
+
+var liste = [];
+var idx = 0;
+var score = 0;
+var questionActuelle = null;
+var choixA = '';
+var choixB = '';
+
+function demarrer(numNiveau) {
+  liste = niveaux[numNiveau].slice();
+  for (var i = liste.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    var t = liste[i]; liste[i] = liste[j]; liste[j] = t;
+  }
+  idx = 0;
+  score = 0;
+  document.getElementById('ecran1').style.display = 'none';
+  document.getElementById('ecran2').style.display = 'block';
+  document.getElementById('ecran3').style.display = 'none';
+  afficher();
+}
+
+function afficher() {
+  if (idx >= liste.length) {
+    document.getElementById('ecran2').style.display = 'none';
+    document.getElementById('ecran3').style.display = 'block';
+    document.getElementById('score').textContent = score + ' / ' + liste.length + ' bonnes réponses';
+    if (score === liste.length) document.getElementById('titre3').textContent = '🏆 PARFAIT !';
+    else if (score >= 7) document.getElementById('titre3').textContent = '🎉 TRÈS BIEN !';
+    else if (score >= 5) document.getElementById('titre3').textContent = '👍 PAS MAL !';
+    else document.getElementById('titre3').textContent = '💪 COURAGE !';
+    return;
+  }
+  questionActuelle = liste[idx];
+  document.getElementById('num').textContent = (idx + 1);
+  document.getElementById('texte').textContent = questionActuelle.texte;
+  document.getElementById('question').textContent = questionActuelle.question;
+  
+  choixA = questionActuelle.bonne;
+  choixB = questionActuelle.mauvaise;
+  if (Math.random() < 0.5) {
+    choixA = questionActuelle.mauvaise;
+    choixB = questionActuelle.bonne;
+  }
+  document.getElementById('btnA').textContent = choixA;
+  document.getElementById('btnB').textContent = choixB;
+  document.getElementById('btnA').disabled = false;
+  document.getElementById('btnB').disabled = false;
+  document.getElementById('btnA').style.background = '#3b82f6';
+  document.getElementById('btnB').style.background = '#3b82f6';
+  document.getElementById('msg').className = 'msg info';
+  document.getElementById('msg').textContent = '👆 Lis le texte puis réponds à la question !';
+}
+
+function cliqueA() { verifier(choixA, 'btnA'); }
+function cliqueB() { verifier(choixB, 'btnB'); }
+
+function verifier(choix, boutonId) {
+  document.getElementById('btnA').disabled = true;
+  document.getElementById('btnB').disabled = true;
+  
+  var msg = document.getElementById('msg');
+  if (choix === questionActuelle.bonne) {
+    score++;
+    document.getElementById(boutonId).style.background = '#22c55e';
+    msg.className = 'msg ok';
+    msg.textContent = '✅ Bravo ! ' + questionActuelle.expl;
+  } else {
+    document.getElementById(boutonId).style.background = '#ef4444';
+    msg.className = 'msg ko';
+    msg.textContent = '❌ Presque ! C\'était "' + questionActuelle.bonne + '". ' + questionActuelle.expl;
+    if (choixA === questionActuelle.bonne) document.getElementById('btnA').style.background = '#22c55e';
+    if (choixB === questionActuelle.bonne) document.getElementById('btnB').style.background = '#22c55e';
+  }
+  
+  idx++;
+  setTimeout(afficher, 3000);
+}
+
+function retour() {
+  document.getElementById('ecran1').style.display = 'block';
+  document.getElementById('ecran2').style.display = 'none';
+  document.getElementById('ecran3').style.display = 'none';
+}
+</script>
+
+</body>
+</html>
