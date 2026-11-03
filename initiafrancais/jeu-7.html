@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>La Ponctuation - InitiaFrançais</title>
+<style>
+  body { font-family: Arial, sans-serif; text-align: center; padding: 20px; background: #cffafe; margin: 0; }
+  .carte { background: white; padding: 20px; border-radius: 15px; max-width: 600px; margin: 20px auto; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+  h1 { color: #0e7490; }
+  .btn { padding: 15px 30px; font-size: 1.2em; margin: 10px; cursor: pointer; border: none; border-radius: 10px; color: white; font-weight: bold; font-family: inherit; }
+  .btn:hover { opacity: 0.9; }
+  .vert { background: #22c55e; }
+  .jaune { background: #f59e0b; }
+  .rouge { background: #ef4444; }
+  .prop { background: #3b82f6; padding: 20px 40px; font-size: 1.6em; margin: 10px; cursor: pointer; border: none; border-radius: 10px; color: white; font-weight: bold; font-family: inherit; min-width: 180px; }
+  .prop:hover { opacity: 0.9; }
+  .prop:disabled { cursor: not-allowed; }
+  .phrase { font-size: 1.3em; font-weight: bold; margin: 20px 0; padding: 20px; background: #fef3c7; border-radius: 10px; line-height: 1.8; }
+  .mot { color: #0e7490; font-size: 1.4em; letter-spacing: 1px; }
+  .consigne { font-size: 1em; color: #155e75; margin-bottom: 10px; font-weight: normal; }
+  .signe { color: #dc2626; font-size: 1.5em; font-weight: bold; }
+  .msg { padding: 15px; border-radius: 10px; margin: 15px 0; font-weight: bold; min-height: 50px; }
+  .info { background: #dbeafe; color: #1e40af; }
+  .ok { background: #dcfce7; color: #166534; }
+  .ko { background: #fee2e2; color: #991b1b; }
+  .cache { display: none; }
+</style>
+</head>
+<body>
+
+<div id="ecran1" class="carte">
+  <h1>❗ La Ponctuation</h1>
+  <p>Choisis ton niveau :</p>
+  <button class="btn vert" onclick="demarrer(0)">🟢 Facile (. ? !)</button>
+  <button class="btn jaune" onclick="demarrer(1)">🟡 Moyen (, ; :)</button>
+  <button class="btn rouge" onclick="demarrer(2)">🔴 Difficile (guillemets, tirets)</button>
+  <br><a href="index.html" style="display:inline-block;margin-top:15px;color:#64748b;">← Retour aux jeux</a>
+</div>
+
+<div id="ecran2" class="carte cache">
+  <p><span id="num">1</span> / 10</p>
+  <div class="phrase">
+    <div class="consigne" id="consigne">Choisis le bon signe de ponctuation à la fin :</div>
+    <span id="phrase-texte">Il fait beau aujourd'hui</span><span class="signe">___</span>
+  </div>
+  <button class="prop" id="btnA" onclick="cliqueA()">A</button>
+  <button class="prop" id="btnB" onclick="cliqueB()">B</button>
+  <div class="msg info" id="msg">Clique sur la bonne réponse !</div>
+  <a href="index.html" style="display:inline-block;margin-top:15px;color:#64748b;">← Retour</a>
+</div>
+
+<div id="ecran3" class="carte cache">
+  <h2 id="titre3">Bravo !</h2>
+  <p id="score" style="font-size:1.5em;"></p>
+  <button class="btn jaune" onclick="retour()">🔄 Rejouer</button>
+</div>
+
+<script>
+var niveaux = [
+  // NIVEAU FACILE : . ? !
+  [
+    { consigne: 'Choisis le bon signe à la fin :', phrase: 'Il fait beau aujourd\'hui', bonne: '.', mauvaise: '?', expl: 'C\'est une phrase déclarative, on met un point.' },
+    { consigne: 'Choisis le bon signe à la fin :', phrase: 'Comment t\'appelles-tu', bonne: '?', mauvaise: '.', expl: 'C\'est une question, on met un point d\'interrogation.' },
+    { consigne: 'Choisis le bon signe à la fin :', phrase: 'Attention, il y a une voiture', bonne: '!', mauvaise: '.', expl: 'C\'est une exclamation, on met un point d\'exclamation.' },
+    { consigne: 'Choisis le bon signe à la fin :', phrase: 'Le chat mange sa pâtée', bonne: '.', mauvaise: '!', expl: 'C\'est une phrase déclarative, on met un point.' },
+    { consigne: 'Choisis le bon signe à la fin :', phrase: 'Où est la sortie', bonne: '?', mauvaise: '.', expl: 'C\'est une question, on met un point d\'interrogation.' },
+    { consigne: 'Choisis le bon signe à la fin :', phrase: 'Quel beau spectacle', bonne: '!', mauvaise: '?', expl: 'C\'est une exclamation, on met un point d\'exclamation.' },
+    { consigne: 'Choisis le bon signe à la fin :', phrase: 'J\'aime le chocolat', bonne: '.', mauvaise: '?', expl: 'C\'est une phrase déclarative, on met un point.' },
+    { consigne: 'Choisis le bon signe à la fin :', phrase: 'Peux-tu m\'aider', bonne: '?', mauvaise: '.', expl: 'C\'est une question, on met un point d\'interrogation.' },
+    { consigne: 'Choisis le bon signe à la fin :', phrase: 'Vive les vacances', bonne: '!', mauvaise: '.', expl: 'C\'est une exclamation de joie.' },
+    { consigne: 'Choisis le bon signe à la fin :', phrase: 'La lune brille cette nuit', bonne: '.', mauvaise: '!', expl: 'C\'est une phrase déclarative, on met un point.' }
+  ],
+  // NIVEAU MOYEN : , ; :
+  [
+    { consigne: 'Choisis le bon signe (virgule ou point-virgule) :', phrase: 'J\'aime les pommes', bonne: ',', mauvaise: ';', expl: 'On utilise la virgule pour séparer une énumération.' },
+    { consigne: 'Choisis le bon signe (virgule ou point-virgule) :', phrase: 'Je suis fatigué', bonne: ',', mauvaise: ';', expl: 'On utilise la virgule pour introduire une explication simple.' },
+    { consigne: 'Choisis le bon signe (deux-points ou virgule) :', phrase: 'Il y a trois fruits', bonne: ':', mauvaise: ',', expl: 'On utilise les deux-points pour introduire une énumération.' },
+    { consigne: 'Choisis le bon signe (deux-points ou virgule) :', phrase: 'Elle m\'a dit', bonne: ':', mauvaise: ',', expl: 'On utilise les deux-points pour introduire des paroles.' },
+    { consigne: 'Choisis le bon signe (virgule ou point-virgule) :', phrase: 'Il fait chaud', bonne: ',', mauvaise: ';', expl: 'On utilise la virgule.' },
+    { consigne: 'Choisis le bon signe (deux-points ou virgule) :', phrase: 'Voici ma liste', bonne: ':', mauvaise: ',', expl: 'Les deux-points introduisent une liste.' },
+    { consigne: 'Choisis le bon signe (virgule ou point-virgule) :', phrase: 'Paul joue au foot', bonne: ',', mauvaise: ';', expl: 'On utilise la virgule après un groupe.' },
+    { consigne: 'Choisis le bon signe (deux-points ou virgule) :', phrase: 'Je vous présente', bonne: ':', mauvaise: ',', expl: 'Les deux-points pour introduire une présentation.' },
+    { consigne: 'Choisis le bon signe (virgule ou point-virgule) :', phrase: 'Dans le jardin', bonne: ',', mauvaise: ';', expl: 'On utilise la virgule après un complément de lieu.' },
+    { consigne: 'Choisis le bon signe (deux-points ou virgule) :', phrase: 'Attention', bonne: ':', mauvaise: ',', expl: 'Les deux-points pour introduire une mise en garde.' }
+  ],
+  // NIVEAU DIFFICILE : guillemets, tirets
+  [
+    { consigne: 'Choisis le bon signe pour les paroles :', phrase: 'Il dit', bonne: '«', mauvaise: '(', expl: 'On utilise les guillemets pour rapporter des paroles.' },
+    { consigne: 'Choisis le bon signe pour les paroles :', phrase: 'Bonjour', bonne: '»', mauvaise: ')', expl: 'On ferme les guillemets après les paroles.' },
+    { consigne: 'Choisis le bon signe (tiret) :', phrase: 'Il ouvrit la porte', bonne: '—', mauvaise: ',', expl: 'On utilise le tiret pour introduire un dialogue.' },
+    { consigne: 'Choisis le bon signe (guillemets) :', phrase: 'Elle chuchota', bonne: '«', mauvaise: '—', expl: 'On utilise les guillemets pour rapporter des paroles.' },
+    { consigne: 'Choisis le bon signe (tiret) :', phrase: 'Le vent soufflait', bonne: '—', mauvaise: ':', expl: 'On utilise le tiret pour introduire une réplique.' },
+    { consigne: 'Choisis le bon signe (guillemets) :', phrase: 'Il cria', bonne: '«', mauvaise: ':', expl: 'On utilise les guillemets pour rapporter des paroles.' },
+    { consigne: 'Choisis le bon signe (tiret) :', phrase: 'Bonjour, dit-elle', bonne: '—', mauvaise: '.', expl: 'On utilise le tiret pour introduire un dialogue.' },
+    { consigne: 'Choisis le bon signe (guillemets) :', phrase: 'Le professeur dit', bonne: '«', mauvaise: '(', expl: 'On utilise les guillemets pour rapporter des paroles.' },
+    { consigne: 'Choisis le bon signe (tiret) :', phrase: 'Elle répondit', bonne: '—', mauvaise: ';', expl: 'On utilise le tiret pour introduire une réponse.' },
+    { consigne: 'Choisis le bon signe (guillemets) :', phrase: 'Il murmura', bonne: '«', mauvaise: '[', expl: 'On utilise les guillemets pour rapporter des paroles.' }
+  ]
+];
+
+var liste = [];
+var idx = 0;
+var score = 0;
+var questionActuelle = null;
+var choixA = '';
+var choixB = '';
+
+function demarrer(numNiveau) {
+  liste = niveaux[numNiveau].slice();
+  for (var i = liste.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    var t = liste[i]; liste[i] = liste[j]; liste[j] = t;
+  }
+  idx = 0;
+  score = 0;
+  document.getElementById('ecran1').style.display = 'none';
+  document.getElementById('ecran2').style.display = 'block';
+  document.getElementById('ecran3').style.display = 'none';
+  afficher();
+}
+
+function afficher() {
+  if (idx >= liste.length) {
+    document.getElementById('ecran2').style.display = 'none';
+    document.getElementById('ecran3').style.display = 'block';
+    document.getElementById('score').textContent = score + ' / ' + liste.length + ' bonnes réponses';
+    if (score === liste.length) document.getElementById('titre3').textContent = '🏆 PARFAIT !';
+    else if (score >= 7) document.getElementById('titre3').textContent = '🎉 TRÈS BIEN !';
+    else if (score >= 5) document.getElementById('titre3').textContent = '👍 PAS MAL !';
+    else document.getElementById('titre3').textContent = '💪 COURAGE !';
+    return;
+  }
+  questionActuelle = liste[idx];
+  document.getElementById('num').textContent = (idx + 1);
+  document.getElementById('consigne').textContent = questionActuelle.consigne;
+  document.getElementById('phrase-texte').textContent = questionActuelle.phrase;
+  
+  choixA = questionActuelle.bonne;
+  choixB = questionActuelle.mauvaise;
+  if (Math.random() < 0.5) {
+    choixA = questionActuelle.mauvaise;
+    choixB = questionActuelle.bonne;
+  }
+  document.getElementById('btnA').textContent = choixA;
+  document.getElementById('btnB').textContent = choixB;
+  document.getElementById('btnA').disabled = false;
+  document.getElementById('btnB').disabled = false;
+  document.getElementById('btnA').style.background = '#3b82f6';
+  document.getElementById('btnB').style.background = '#3b82f6';
+  document.getElementById('msg').className = 'msg info';
+  document.getElementById('msg').textContent = '👆 Clique sur le bon signe de ponctuation !';
+}
+
+function cliqueA() { verifier(choixA, 'btnA'); }
+function cliqueB() { verifier(choixB, 'btnB'); }
+
+function verifier(choix, boutonId) {
+  document.getElementById('btnA').disabled = true;
+  document.getElementById('btnB').disabled = true;
+  
+  var msg = document.getElementById('msg');
+  if (choix === questionActuelle.bonne) {
+    score++;
+    document.getElementById(boutonId).style.background = '#22c55e';
+    msg.className = 'msg ok';
+    msg.textContent = '✅ Bravo ! ' + questionActuelle.expl;
+  } else {
+    document.getElementById(boutonId).style.background = '#ef4444';
+    msg.className = 'msg ko';
+    msg.textContent = '❌ Presque ! C\'était "' + questionActuelle.bonne + '". ' + questionActuelle.expl;
+    if (choixA === questionActuelle.bonne) document.getElementById('btnA').style.background = '#22c55e';
+    if (choixB === questionActuelle.bonne) document.getElementById('btnB').style.background = '#22c55e';
+  }
+  
+  idx++;
+  setTimeout(afficher, 2500);
+}
+
+function retour() {
+  document.getElementById('ecran1').style.display = 'block';
+  document.getElementById('ecran2').style.display = 'none';
+  document.getElementById('ecran3').style.display = 'none';
+}
+</script>
+
+</body>
+</html>
