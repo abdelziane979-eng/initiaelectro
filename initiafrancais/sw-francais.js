@@ -1,4 +1,4 @@
-var CACHE_NAME = 'initiafrancais-v13';
+var CACHE_NAME = 'initiafrancais-v14';
 var urlsToCache = [
   './',
   './index.html',
@@ -10,6 +10,7 @@ var urlsToCache = [
   './jeu-6.html',
   './jeu-7.html',
   './jeu-8.html',
+  './guide-prof.html',
   './icone.svg',
   './manifest-francais.json'
 ];
