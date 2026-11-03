@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Guide Pédagogique - InitiaFrançais</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='112' fill='%23dc2626'/><text x='50%' y='55%' font-size='300' text-anchor='middle' dominant-baseline='middle'>📚</text></svg>">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: #fef2f2; color: #1a1f2e; line-height: 1.6; }
+  
+  header { background: linear-gradient(135deg, #dc2626, #991b1b); color: white; padding: 40px 20px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+  header h1 { font-size: 2.2em; margin-bottom: 10px; }
+  header p { font-size: 1.1em; opacity: 0.95; }
+  
+  .conteneur { max-width: 900px; margin: 0 auto; padding: 40px 20px; }
+  
+  .intro-box { background: white; padding: 24px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 30px; border-left: 6px solid #dc2626; }
+  .intro-box h2 { color: #991b1b; margin-bottom: 12px; font-size: 1.4em; }
+  .intro-box ul { margin-left: 20px; margin-top: 10px; }
+  .intro-box li { margin-bottom: 5px; color: #334155; }
+  
+  .jeu-carte { background: white; border-radius: 12px; padding: 24px; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); border-top: 4px solid; }
+  .jeu-carte h3 { font-size: 1.3em; margin-bottom: 12px; display: flex; align-items: center; gap: 10px; }
+  .jeu-carte .emoji { font-size: 1.5em; }
+  
+  .jeu-carte p { margin-bottom: 10px; color: #334155; }
+  .jeu-carte strong { color: #0f172a; }
+  
+  .a-dire { background: #fef2f2; border-left: 3px solid #f87171; padding: 12px 16px; border-radius: 4px; margin-top: 12px; margin-bottom: 12px; font-style: italic; }
+  .a-dire strong { color: #991b1b; }
+  
+  .question { background: #fdf4ff; border-left: 3px solid #d946ef; padding: 12px 16px; border-radius: 4px; margin-top: 12px; }
+  .question strong { color: #86198f; }
+  
+  .c1 { border-top-color: #f87171; } .c1 h3 { color: #b91c1c; }
+  .c2 { border-top-color: #60a5fa; } .c2 h3 { color: #1d4ed8; }
+  .c3 { border-top-color: #34d399; } .c3 h3 { color: #047857; }
+  .c4 { border-top-color: #a855f7; } .c4 h3 { color: #6b21a8; }
+  .c5 { border-top-color: #f59e0b; } .c5 h3 { color: #b45309; }
+  .c6 { border-top-color: #ec4899; } .c6 h3 { color: #9d174d; }
+  .c7 { border-top-color: #06b6d4; } .c7 h3 { color: #0e7490; }
+  .c8 { border-top-color: #10b981; } .c8 h3 { color: #047857; }
+
+  .btn-retour { display: inline-block; margin-top: 20px; padding: 10px 20px; background: #64748b; color: white; text-decoration: none; border-radius: 8px; font-weight: bold; }
+  
+  @media print {
+    body { background: white; }
+    header { box-shadow: none; background: #dc2626; -webkit-print-color-adjust: exact; }
+    .jeu-carte, .intro-box { box-shadow: none; border: 1px solid #ccc; page-break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>📚 Guide Pédagogique : InitiaFrançais</h1>
+  <p>Manuel à l'usage des professeurs (Cycle 2 & 3 / 7-11 ans)</p>
+</header>
+
+<div class="conteneur">
+  
+  <div class="intro-box">
+    <h2>🎯 Objectifs de l'application</h2>
+    <p><strong>InitiaFrançais</strong> est une application éducative conçue pour consolider les fondamentaux du français au primaire et au début du collège. Elle propose 8 jeux progressifs couvrant l'orthographe, la grammaire, la conjugaison, le vocabulaire et la compréhension.</p>
+    <p style="margin-top: 10px;">Chaque jeu propose <strong>3 niveaux de difficulté</strong> pour s'adapter au rythme de chaque enfant. Toutes les activités sont autocorrectives : l'enfant peut jouer en autonomie, à la maison comme en classe.</p>
+    <p style="margin-top: 10px;"><strong>Points forts pédagogiques :</strong></p>
+    <ul>
+      <li>Feedback immédiat avec explication grammaticale après chaque réponse.</li>
+      <li>Répétition des règles fondamentales (orthographe, grammaire, conjugaison).</li>
+      <li>Progression douce et adaptée à l'âge.</li>
+      <li>Application fonctionnelle hors-ligne (PWA).</li>
+    </ul>
+    <p style="margin-top: 10px; font-size: 0.95em; color: #64748b;">
+      🌐 <strong>Accès en ligne :</strong> https://abdelziane979-eng.github.io/initiaelectro/initiafrancais/index.html
+    </p>
+  </div>
+
+  <!-- JEU 1 -->
+  <div class="jeu-carte c1">
+    <h3><span class="emoji">🪤</span> Jeu 1 : Les Mots Pièges</h3>
+    <p><strong>Concept :</strong> L'enfant choisit le bon homophone grammatical dans une phrase à trou (a/à, et/est, ou/où, son/sont, on/ont).</p>
+    <p><strong>Ce que ça enseigne :</strong> La distinction des homophones grammaticaux, la réflexion sur le sens et la fonction des mots dans la phrase.</p>
+    <div class="a-dire">
+      <strong>💬 À dire aux élèves :</strong> "Certains mots se prononcent pareil mais ne veulent pas dire la même chose. Pour choisir, essaie de remplacer par un autre mot : si tu peux dire 'avait', c'est 'a'. Si tu peux dire 'était', c'est 'est'."
+    </div>
+    <div class="question">
+      <strong>❓ Question à poser :</strong> "Comment savoir si on écrit 'a' ou 'à' ?" (On peut remplacer par 'avait' → c'est 'a', sinon c'est 'à').
+    </div>
+  </div>
+
+  <!-- JEU 2 -->
+  <div class="jeu-carte c2">
+    <h3><span class="emoji">📝</span> Jeu 2 : Le Pluriel des Noms</h3>
+    <p><strong>Concept :</strong> L'enfant transforme un nom singulier en pluriel en choisissant la bonne terminaison.</p>
+    <p><strong>Ce que ça enseigne :</strong> La règle générale du -s, les pluriels en -x (châteaux, chevaux), les 7 exceptions en -ou, et les noms invariables.</p>
+    <div class="a-dire">
+      <strong>💬 À dire aux élèves :</strong> "En général, on ajoute un -s au pluriel. Mais il y a des exceptions : les noms en -eau, -au et certains en -ou prennent un -x. Et les noms en -s, -x, -z ne changent pas."
+    </div>
+    <div class="question">
+      <strong>❓ Question à poser :</strong> "Pourquoi dit-on 'des châteaux' et pas 'des châteaus' ?" (Les noms en -eau prennent un -x au pluriel).
+    </div>
+  </div>
+
+  <!-- JEU 3 -->
+  <div class="jeu-carte c3">
+    <h3><span class="emoji">🎯</span> Jeu 3 : Les Conjugaisons (Présent)</h3>
+    <p><strong>Concept :</strong> L'enfant conjugue un verbe au présent de l'indicatif en choisissant la bonne terminaison.</p>
+    <p><strong>Ce que ça enseigne :</strong> Les terminaisons du présent (-ER, -IR), les verbes être et avoir, les verbes irréguliers (aller, faire, pouvoir, vouloir...).</p>
+    <div class="a-dire">
+      <strong>💬 À dire aux élèves :</strong> "Le présent, c'est ce qui se passe maintenant. Chaque personne a sa terminaison. Apprends-les par cœur, c'est la base du français !"
+    </div>
+    <div class="question">
+      <strong>❓ Question à poser :</strong> "Quelles sont les terminaisons du présent pour les verbes en -ER ?" (-e, -es, -e, -ons, -ez, -ent).
+    </div>
+  </div>
+
+  <!-- JEU 4 -->
+  <div class="jeu-carte c4">
+    <h3><span class="emoji">✏️</span> Jeu 4 : L'Orthographe Magique</h3>
+    <p><strong>Concept :</strong> L'enfant doit choisir la bonne orthographe d'un mot à partir de sa définition et d'un indice.</p>
+    <p><strong>Ce que ça enseigne :</strong> L'orthographe des mots courants, les terminaisons ambiguës (-é / -er / -ez), les doubles consonnes, les lettres muettes.</p>
+    <div class="a-dire">
+      <strong>💬 À dire aux élèves :</strong> "Pour choisir entre -é et -er, essaie de remplacer par un verbe du 3e groupe (comme 'vendre'). Si tu dis 'vendu', c'est -é. Si tu dis 'vendre', c'est -er."
+    </div>
+    <div class="question">
+      <strong>❓ Piste d'activité :</strong> Proposez des dictées courtes de mots du quotidien. Insistez sur les lettres muettes (chat, lait) et les doubles consonnes (pomme, terre).
+    </div>
+  </div>
+
+  <!-- JEU 5 -->
+  <div class="jeu-carte c5">
+    <h3><span class="emoji">🔄</span> Jeu 5 : Les Contraires et Synonymes</h3>
+    <p><strong>Concept :</strong> L'enfant trouve le contraire (antonyme) ou le synonyme d'un mot.</p>
+    <p><strong>Ce que ça enseigne :</strong> L'enrichissement du vocabulaire, la compréhension des nuances de sens, les relations entre les mots.</p>
+    <div class="a-dire">
+      <strong>💬 À dire aux élèves :</strong> "Deux mots sont synonymes s'ils veulent dire la même chose (joli / beau). Deux mots sont contraires s'ils veulent dire l'inverse (grand / petit)."
+    </div>
+    <div class="question">
+      <strong>❓ Piste d'activité :</strong> Proposez aux élèves de trouver 3 synonymes et 3 contraires pour un mot donné. Faites un jeu de rapidité en classe.
+    </div>
+  </div>
+
+  <!-- JEU 6 -->
+  <div class="jeu-carte c6">
+    <h3><span class="emoji">⚥</span> Jeu 6 : Masculin ou Féminin</h3>
+    <p><strong>Concept :</strong> L'enfant détermine si un nom est masculin ou féminin, puis maîtrise les accords adjectif-nom.</p>
+    <p><strong>Ce que ça enseigne :</strong> Le genre des noms (un/une, le/la), les règles d'accord de l'adjectif (petit/petite, grand/grande, heureux/heureuse).</p>
+    <div class="a-dire">
+      <strong>💬 À dire aux élèves :</strong> "Chaque nom a un genre : masculin ou féminin. C'est pour cela qu'on dit 'un chat' mais 'une fleur'. L'adjectif doit s'accorder avec le nom : 'un petit chat', 'une petite fleur'."
+    </div>
+    <div class="question">
+      <strong>❓ Question à poser :</strong> "Comment savoir si un nom est masculin ou féminin ?" (On regarde l'article qui l'accompagne : un/le = masculin, une/la = féminin).
+    </div>
+  </div>
+
+  <!-- JEU 7 -->
+  <div class="jeu-carte c7">
+    <h3><span class="emoji">❗</span> Jeu 7 : La Ponctuation</h3>
+    <p><strong>Concept :</strong> L'enfant choisit le bon signe de ponctuation à placer dans une phrase.</p>
+    <p><strong>Ce que ça enseigne :</strong> Les points (. ? !), les virgules et points-virgules, les deux-points, les guillemets et les tirets du dialogue.</p>
+    <div class="a-dire">
+      <strong>💬 À dire aux élèves :</strong> "La ponctuation, c'est comme les panneaux de signalisation de la phrase. Elle te dit quand t'arrêter (point), quand poser une question (?), quand t'exclamer (!), ou quand introduire une liste (:)."
+    </div>
+    <div class="question">
+      <strong>❓ Question à poser :</strong> "Quelle est la différence entre un point et un point d'interrogation ?" (Le point termine une phrase déclarative, le point d'interrogation termine une question).
+    </div>
+  </div>
+
+  <!-- JEU 8 -->
+  <div class="jeu-carte c8">
+    <h3><span class="emoji">📖</span> Jeu 8 : La Petite Compréhension</h3>
+    <p><strong>Concept :</strong> L'enfant lit un petit texte, puis répond à une question en choisissant la bonne réponse.</p>
+    <p><strong>Ce que ça enseigne :</strong> La lecture active, la compréhension littérale (cycle 2), puis l'inférence et la déduction (cycle 3).</p>
+    <div class="a-dire">
+      <strong>💬 À dire aux élèves :</strong> "Pour bien comprendre un texte, lis-le deux fois. La première fois pour comprendre l'histoire, la deuxième pour repérer les détails qui répondent à la question."
+    </div>
+    <div class="question">
+      <strong>❓ Piste d'activité :</strong> Demandez à l'élève de raconter l'histoire avec ses propres mots après avoir répondu. Ou proposez-lui d'inventer la suite du texte.
+    </div>
+  </div>
+
+  <div style="text-align: center;">
+    <a href="index.html" class="btn-retour">← Retour à l'application InitiaFrançais</a>
+  </div>
+
+</div>
+
+</body>
+</html>
