@@ -998,6 +998,45 @@ var DEFIS = {
       { typeA: 'bouton', patteA: 1, typeB: 'buzzer', patteB: 0 },
       { typeA: 'buzzer', patteA: 1, typeB: 'pile', patteB: 1 }
     ]
+  },  /* ===== 🚁 DRONE ===== */
+  droneDecollage: {
+    id: 'droneDecollage', nom: '🚁 Décollage du Drone', icone: '🚁',
+    categorie: 'vehicules',
+    desc: 'Prépare le drone pour le décollage : alimente le cerveau (MCU) et actionne l\'interrupteur d\'armement pour allumer la LED de statut.',
+    composants_requis: ['pile', 'microcontroleur', 'interrupteur', 'led', 'resistance'],
+    cablages_requis: [
+      { typeA: 'pile', patteA: 0, typeB: 'microcontroleur', patteB: 0 },
+      { typeA: 'microcontroleur', patteA: 1, typeB: 'pile', patteB: 1 },
+      { typeA: 'pile', patteA: 0, typeB: 'interrupteur', patteB: 0 },
+      { typeA: 'interrupteur', patteA: 1, typeB: 'microcontroleur', patteB: 4 },
+      { typeA: 'microcontroleur', patteA: 5, typeB: 'resistance', patteB: 0 },
+      { typeA: 'resistance', patteA: 1, typeB: 'led', patteB: 0 },
+      { typeA: 'led', patteA: 1, typeB: 'pile', patteB: 1 }
+    ]
+  },
+  droneDetresse: {
+    id: 'droneDetresse', nom: '🚨 Signal de Détresse', icone: '🚨',
+    categorie: 'securite',
+    desc: 'Le drone a perdu le signal ! Câble le buzzer pour qu\'il puisse donner l\'alerte sonore.',
+    composants_requis: ['pile', 'microcontroleur', 'buzzer'],
+    cablages_requis: [
+      { typeA: 'pile', patteA: 0, typeB: 'microcontroleur', patteB: 0 },
+      { typeA: 'microcontroleur', patteA: 1, typeB: 'pile', patteB: 1 },
+      { typeA: 'microcontroleur', patteA: 10, typeB: 'buzzer', patteB: 0 },
+      { typeA: 'buzzer', patteA: 1, typeB: 'pile', patteB: 1 }
+    ]
+  },
+  droneMoteur: {
+    id: 'droneMoteur', nom: '⚙️ Moteur Principal', icone: '⚙️',
+    categorie: 'vehicules',
+    desc: 'Le drone doit tourner ! Connecte le premier moteur au microcontrôleur.',
+    composants_requis: ['pile', 'microcontroleur', 'bouton', 'moteurDc'],
+    cablages_requis: [
+      { typeA: 'pile', patteA: 0, typeB: 'microcontroleur', patteB: 0 },
+      { typeA: 'microcontroleur', patteA: 1, typeB: 'pile', patteB: 1 },
+      { typeA: 'microcontroleur', patteA: 6, typeB: 'moteurDc', patteB: 0 },
+      { typeA: 'moteurDc', patteA: 1, typeB: 'pile', patteB: 1 }
+    ]
   }
 };
 var defiActif = null;
