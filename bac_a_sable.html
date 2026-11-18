@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>EspaceElectronic - TEST</title>
+<title>EspaceElectronic</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0' stop-color='%236b21a8'/><stop offset='1' stop-color='%23a855f7'/></linearGradient></defs><rect width='512' height='512' rx='112' fill='url(%23g)'/><circle cx='220' cy='256' r='60' fill='%23ff3333' stroke='%23fff' stroke-width='12'/><circle cx='200' cy='236' r='14' fill='rgba(255,255,255,0.85)'/><rect x='300' y='238' width='140' height='36' rx='18' fill='%23D4A76A' stroke='%23fff' stroke-width='8'/><rect x='320' y='238' width='14' height='36' fill='%23FFD700'/><rect x='356' y='238' width='14' height='36' fill='%238B00FF'/><rect x='392' y='238' width='14' height='36' fill='%238B4513'/><line x1='280' y1='256' x2='300' y2='256' stroke='%23fff' stroke-width='10' stroke-linecap='round'/></svg>">
 <link rel="manifest" href="manifest-bac.json">
 <meta name="theme-color" content="#6b21a8">
@@ -490,6 +490,9 @@
    CATALOGUE DES COMPOSANTS (Base locale)
    ========================================================= */
 var CATALOGUE = {
+  microcontroleur: { id:'microcontroleur', nom:'Microcontrôleur (FC)', icone:'🧠', couleur:'#0f172a', largeur:120, hauteur:120,
+    pattes:[{x:-10,y:15},{x:-10,y:35},{x:-10,y:55},{x:-10,y:75},{x:-10,y:95},{x:-10,y:115},{x:130,y:15},{x:130,y:35},{x:130,y:55},{x:130,y:75},{x:130,y:95},{x:130,y:115}],
+    valeurs:null, niveau:'maitrise', categorie:'circuit-integre' },
   pile: { id:'pile', nom:'Pile 9V', icone:'🔋', couleur:'#333', largeur:100, hauteur:60,
     pattes:[{x:10,y:55},{x:90,y:55}], valeurs:null },
   resistance: { id:'resistance', nom:'Résistance', icone:'🎨', couleur:'#D4A76A', largeur:100, hauteur:30,
@@ -693,6 +696,38 @@ var BLOCS = {
         ajouterFilBloc(led3.id, 1, pile.id, 1); ajouterFilBloc(led4.id, 1, pile.id, 1);
       }
     }
+  },
+  droneFC: { id:'droneFC', nom:'🚁 Carte Contrôle Vol Drone', icone:'🚁', desc:'MCU + capteurs + 4 moteurs + buzzer',
+    fn: function(cx, cy, avecCablage) {
+      var pile = creerComposantBloc('pile', cx - 420, cy + 100, null);
+      var mcu = creerComposantBloc('microcontroleur', cx - 150, cy - 60, null);
+      var ldr = creerComposantBloc('ldr', cx - 420, cy - 100, null);
+      var arm = creerComposantBloc('interrupteur', cx - 420, cy + 30, null);
+      var btn = creerComposantBloc('bouton', cx - 420, cy - 30, null);
+      var led = creerComposantBloc('led', cx + 80, cy - 180, 'vert');
+      var res = creerComposantBloc('resistance', cx + 80, cy - 130, '470');
+      var tMoteur = CATALOGUE.moteurDc ? 'moteurDc' : 'led';
+      var vMoteur = tMoteur === 'led' ? 'rouge' : null;
+      var m1 = creerComposantBloc(tMoteur, cx + 100, cy - 60, vMoteur);
+      var m2 = creerComposantBloc(tMoteur, cx + 300, cy - 60, vMoteur);
+      var m3 = creerComposantBloc(tMoteur, cx + 100, cy + 110, vMoteur);
+      var m4 = creerComposantBloc(tMoteur, cx + 300, cy + 110, vMoteur);
+      var buzz = creerComposantBloc('buzzer', cx + 80, cy + 20, null);
+      
+      if (avecCablage) {
+        ajouterFilBloc(pile.id, 0, mcu.id, 0); ajouterFilBloc(mcu.id, 1, pile.id, 1);
+        ajouterFilBloc(ldr.id, 0, pile.id, 0); ajouterFilBloc(ldr.id, 1, mcu.id, 2);
+        ajouterFilBloc(arm.id, 0, pile.id, 0); ajouterFilBloc(arm.id, 1, mcu.id, 4);
+        ajouterFilBloc(btn.id, 0, pile.id, 0); ajouterFilBloc(btn.id, 1, mcu.id, 3);
+        ajouterFilBloc(mcu.id, 5, res.id, 0); ajouterFilBloc(res.id, 1, led.id, 0);
+        ajouterFilBloc(led.id, 1, pile.id, 1);
+        ajouterFilBloc(mcu.id, 6, m1.id, 0); ajouterFilBloc(m1.id, 1, pile.id, 1);
+        ajouterFilBloc(mcu.id, 7, m2.id, 0); ajouterFilBloc(m2.id, 1, pile.id, 1);
+        ajouterFilBloc(mcu.id, 8, m3.id, 0); ajouterFilBloc(m3.id, 1, pile.id, 1);
+        ajouterFilBloc(mcu.id, 9, m4.id, 0); ajouterFilBloc(m4.id, 1, pile.id, 1);
+        ajouterFilBloc(mcu.id, 10, buzz.id, 0); ajouterFilBloc(buzz.id, 1, pile.id, 1);
+      }
+    }
   }
 };
  
@@ -768,7 +803,8 @@ var DEFIS = {
       { typeA: 'transistor', patteA: 0, typeB: 'pile', patteB: 1 }
     ]
   },
-    /* ===== 🔬 CAPTEURS ===== */
+  
+  /* ===== 🔬 CAPTEURS ===== */
   thermometre: {
     id: 'thermometre', nom: '🌡️ Thermomètre', icone: '🌡️',
     categorie: 'capteurs',
@@ -1024,7 +1060,8 @@ var CABLAGES_BLOCS = {
   detecteurNuit: ['Pile.+ → LDR (patte gauche)', 'LDR (patte droite) → Résistance 10kΩ → Pile.-', 'LDR (patte droite) → Transistor base', 'Pile.+ → LED (anode)', 'LED (cathode) → Transistor collecteur', 'Transistor émetteur → Pile.-'],
   bipContinu: ['Pile.+ → Résistance → Buzzer (patte gauche)', 'Buzzer (patte droite) → Pile.-'],
   chenillard4: ['Pile.+ → R1 → LED1', 'Pile.+ → R2 → LED2', 'Pile.+ → R3 → LED3', 'Pile.+ → R4 → LED4', 'LED1-4 (cathodes) → Interrupteur', 'Interrupteur → Pile.-'],
-  compteurCD4017: ['Pile.+ → NE555 (patte 8)', 'NE555 (patte 5) → Pile.-', 'R1 entre NE555 patte 8 et patte 7', 'R2 entre NE555 patte 7 et patte 6', 'Condensateur entre NE555 patte 6 et patte 1', 'NE555 patte 3 → CD4017 entrée horloge', 'Pile.+ → CD4017 VCC', 'CD4017 GND → Pile.-', 'CD4017 sorties → Résistances → LED', 'LED cathodes → Pile.-']
+  compteurCD4017: ['Pile.+ → NE555 (patte 8)', 'NE555 (patte 5) → Pile.-', 'R1 entre NE555 patte 8 et patte 7', 'R2 entre NE555 patte 7 et patte 6', 'Condensateur entre NE555 patte 6 et patte 1', 'NE555 patte 3 → CD4017 entrée horloge', 'Pile.+ → CD4017 VCC', 'CD4017 GND → Pile.-', 'CD4017 sorties → Résistances → LED', 'LED cathodes → Pile.-'],
+  droneFC: ['🔋 Alimentation : Pile.+ → MCU pin 0, MCU pin 1 → Pile.-', '📡 IMU : LDR → Pile.+ et MCU pin 2', '🔘 Calibration : Bouton → MCU pin 3 + Pile.-', '🛡️ Armement : Interrupteur → MCU pin 4 + Pile.-', '💡 Statut : MCU pin 5 → Résistance → LED verte → Pile.-', '⚙️ Moteurs : MCU pins 6-9 → M1, M2, M3, M4', '🔊 Buzzer : MCU pin 10 → Buzzer → Pile.-']
 };
 
 /* =========================================================
@@ -1090,7 +1127,7 @@ var dragVuePretPourDeplacement = false;
 
 var compoClignotantId = null;
 var compoClignotantTimer = null;
-
+ 
 /* =========================================================
    FONCTIONS DE LOGIQUE DES DEFIS
    ========================================================= */
@@ -1099,8 +1136,7 @@ function afficherDefis() {
   if (!div) return;
   
   var html = '';
-  
-    var categories = {
+  var categories = {
     'initiation': { nom: '💡 Initiation', ordre: 1 },
     'maison': { nom: '🏠 Maison', ordre: 2 },
     'ecologie': { nom: '🌱 Écologie', ordre: 3 },
@@ -2039,6 +2075,7 @@ function coordonneesSouris(event) {
 
 function creerComposantBloc(type, cx, cy, valeur) {
   var c = CATALOGUE[type];
+  if (!c) return null;
   var comp = {
     id: prochainId++, type: type,
     x: cx - c.largeur/2, y: cy - c.hauteur/2,
@@ -2364,7 +2401,7 @@ function mesurerComposant(comp) {
     if (multimetreMode === 'resistance') resultat = { valeur: 'OL', unite: 'Ω', info: '🔵 Condo ne se mesure pas en continu' };
     else if (multimetreMode === 'tension') resultat = { valeur: '0.00', unite: 'V', info: '⚡ Condo déchargé' };
     else resultat = { valeur: 'NON', unite: 'Pas de continuité', info: '🔔 Condo ne conduit pas en continu' };
-  } else if (typeMesure === 'ne555' || typeMesure === 'cd4017') {
+  } else if (typeMesure === 'ne555' || typeMesure === 'cd4017' || typeMesure === 'ci') {
     if (multimetreMode === 'tension') resultat = { valeur: '4.50', unite: 'V', info: '⚡ Tension interne (simulation)' };
     else resultat = { valeur: '----', unite: 'Composant actif', info: '🔬 Mesure complexe' };
   } else if (typeMesure === 'ldr') {
@@ -2462,122 +2499,6 @@ function formaterResistance(val) {
   if (val >= 1000000) return (val / 1000000).toFixed(2) + ' M';
   if (val >= 1000) return (val / 1000).toFixed(2) + ' k';
   return val.toFixed(0) + ' ';
-}
-
-function basculerTutoriels() {
-  var panneau = document.getElementById('tuto-panneau');
-  if (panneau.classList.contains('actif')) {
-    panneau.classList.remove('actif');
-    document.getElementById('btn-tutoriels').classList.remove('actif');
-  } else {
-    panneau.classList.add('actif');
-    document.getElementById('btn-tutoriels').classList.add('actif');
-  }
-}
-
-function demarrerTutoriel(id) {
-  var tuto = TUTORIELS[id];
-  if (!tuto) return;
-  tutoActif = tuto; tutoEtape = 0;
-  document.getElementById('tuto-nom').textContent = tuto.icone + ' ' + tuto.nom;
-  document.getElementById('tuto-desc').textContent = tuto.desc;
-  afficherEtapesTuto();
-  document.getElementById('tuto-panneau').classList.add('actif');
-  document.getElementById('btn-tutoriels').classList.add('actif');
-  document.getElementById('btn-tuto-suivant').disabled = false;
-  document.getElementById('statut-mode').textContent = '📖 Tuto : ' + tuto.nom;
-  document.getElementById('statut-mode').classList.add('tuto');
-  afficherTutoriels();
-  mettreMessage('📖 Tutoriel "' + tuto.nom + '" démarré. Suivez les étapes !', 'info');
-  majEtapeTutoCourante();
-}
-
-function afficherEtapesTuto() {
-  if (!tutoActif) return;
-  var div = document.getElementById('tuto-etapes');
-  var html = '';
-  for (var i = 0; i < tutoActif.etapes.length; i++) {
-    var e = tutoActif.etapes[i];
-    var cls = 'tuto-etape';
-    if (i < tutoEtape) cls += ' faite';
-    if (i === tutoEtape) cls += ' active';
-    html += '<div class="' + cls + '"><strong>' + (i+1) + '. ' + e.titre + '</strong>';
-    if (i === tutoEtape) html += '<div class="desc">' + e.description + '</div>';
-    html += '</div>';
-  }
-  div.innerHTML = html;
-}
-
-function majEtapeTutoCourante() {
-  if (!tutoActif) return;
-  if (tutoEtape >= tutoActif.etapes.length) {
-    document.getElementById('btn-tuto-suivant').disabled = true;
-    document.getElementById('tuto-nom').textContent = '🎉 Tutoriel terminé !';
-    document.getElementById('tuto-desc').textContent = 'Bravo !';
-    return;
-  }
-  var e = tutoActif.etapes[tutoEtape];
-  mettreMessage('📖 Étape ' + (tutoEtape+1) + '/' + tutoActif.etapes.length + ' : ' + e.titre + ' — ' + e.description, 'info');
-}
-
-function verifierActionTuto(action) {
-  if (!action) return true;
-  if (action.type === 'composant') return composants.some(function(c) { return c.type === action.id; });
-  if (action.type === 'fil') {
-    return fils.some(function(f) {
-      var cA = trouverComposant(f.compA); var cB = trouverComposant(f.compB);
-      if (!cA || !cB) return false;
-      return (cA.type === action.de.type && cB.type === action.vers.type) || (cA.type === action.vers.type && cB.type === action.de.type);
-    });
-  }
-  if (action.type === 'bloc') return composants.length >= 4;
-  return true;
-}
-
-function obtenirMessageManquant(action) {
-  if (action.type === 'composant') {
-    var c = CATALOGUE[action.id];
-    return 'Place d\'abord ' + (c ? c.nom : 'le composant') + ' sur le canvas !';
-  }
-  if (action.type === 'fil') return 'Câble d\'abord les composants entre eux !';
-  if (action.type === 'bloc') return 'Utilise le bloc correspondant dans la palette !';
-  return 'Termine d\'abord l\'étape en cours.';
-}
-
-function etapeTutoSuivante() {
-  if (!tutoActif) return;
-  if (tutoEtape >= tutoActif.etapes.length) return;
-  var etape = tutoActif.etapes[tutoEtape];
-  if (etape.action && !verifierActionTuto(etape.action)) {
-    mettreMessage('⏸️ ' + obtenirMessageManquant(etape.action), 'avertissement');
-    return;
-  }
-  tutoEtape++;
-  afficherEtapesTuto();
-  if (tutoEtape >= tutoActif.etapes.length) {
-    document.getElementById('btn-tuto-suivant').disabled = true;
-    document.getElementById('tuto-nom').textContent = '🎉 Tutoriel terminé !';
-    document.getElementById('tuto-desc').textContent = 'Bravo !';
-    mettreMessage('🎉 Tutoriel terminé ! Bravo !', 'succes');
-    return;
-  }
-  majEtapeTutoCourante();
-}
-
-function quitterTutoriel() {
-  if (tutoActif && tutoEtape < tutoActif.etapes.length && tutoEtape > 0) {
-    if (!confirm('⚠️ Voulez-vous vraiment quitter ce tutoriel ?\nToute la progression sera perdue.')) return;
-  }
-  tutoActif = null; tutoEtape = -1;
-  document.getElementById('tuto-panneau').classList.remove('actif');
-  document.getElementById('btn-tutoriels').classList.remove('actif');
-  document.getElementById('statut-mode').
-   
-  document.getElementById('statut-mode').textContent = '🖱️ Mode : Placer';
-  document.getElementById('tuto-nom').textContent = 'Aucun tutoriel sélectionné';
-  document.getElementById('tuto-desc').textContent = 'Choisissez un tutoriel dans la palette à gauche.';
-  afficherTutoriels();
-  mettreMessage('📖 Tutoriel quitté.', 'info');
 }
 
 function clicDroitCanvas(event) {
@@ -2908,7 +2829,6 @@ function exporterPDF() {
   html += '<div class="footer">Créé avec Alerte Electro - Bac à sable</div>';
   html += '<div class="no-print" style="margin-top:20px;"><button onclick="window.print()" style="padding:12px 24px;font-size:16px;background:#6b21a8;color:white;border:none;border-radius:8px;cursor:pointer;">🖨️ Imprimer / Enregistrer en PDF</button></div>';
   html += '<script>setTimeout(function(){ window.print(); }, 500);<\/script>';
-  <script src="drone-block.js"></script>
   html += '</body></html>';
   var w = window.open('', '_blank');
   w.document.write(html);
@@ -3426,71 +3346,6 @@ window.onload = function() {
     navigator.serviceWorker.register('sw.js').then(function(reg) { console.log('✅ Service Worker enregistré'); }).catch(function(err) { console.log('⚠️ Erreur Service Worker:', err); });
   }
 };
- /* ========== AJOUT DRONE FC ========== */
-setTimeout(function() {
-  try {
-    if (typeof CATALOGUE !== 'undefined' && !CATALOGUE.microcontroleur) {
-      CATALOGUE.microcontroleur = {
-        id: 'microcontroleur', nom: 'Microcontrôleur (FC)', icone: '🧠',
-        couleur: '#0f172a', largeur: 120, hauteur: 120,
-        pattes: [
-          {x:-10,y:15},{x:-10,y:35},{x:-10,y:55},{x:-10,y:75},{x:-10,y:95},{x:-10,y:115},
-          {x:130,y:15},{x:130,y:35},{x:130,y:55},{x:130,y:75},{x:130,y:95},{x:130,y:115}
-        ],
-        valeurs: null
-      };
-    }
-    
-    function choix(types, defaut) {
-      for (var i = 0; i < types.length; i++) { if (CATALOGUE[types[i]]) return types[i]; }
-      return defaut;
-    }
-    var tMoteur = choix(['moteurDc','moteur','servomoteur'], 'led');
-    var tCapteur = choix(['ldr','capteurIr'], 'resistance');
-    var tMCU = choix(['microcontroleur','ne555'], 'led');
-    var tBuzzer = choix(['buzzer','hautParleur'], 'led');
-    var tBouton = choix(['bouton','boutonPoussoir'], 'interrupteur');
-    
-    if (typeof BLOCS !== 'undefined' && !BLOCS.droneFC) {
-      BLOCS.droneFC = {
-        id: 'droneFC', nom: '🚁 Carte Contrôle Vol Drone', icone: '🚁',
-        desc: 'MCU + capteurs + 4 moteurs + buzzer',
-        fn: function(cx, cy, avecCablage) {
-          var pile = creerComposantBloc('pile', cx - 420, cy + 100, null);
-          var mcu = creerComposantBloc(tMCU, cx - 150, cy - 60, null);
-          var ldr = creerComposantBloc(tCapteur, cx - 420, cy - 100, null);
-          var arm = creerComposantBloc('interrupteur', cx - 420, cy + 30, null);
-          var btn = creerComposantBloc(tBouton, cx - 420, cy - 30, null);
-          var led = creerComposantBloc('led', cx + 80, cy - 180, 'vert');
-          var res = creerComposantBloc('resistance', cx + 80, cy - 130, '470');
-          var m1 = creerComposantBloc(tMoteur, cx + 100, cy - 60, null);
-          var m2 = creerComposantBloc(tMoteur, cx + 300, cy - 60, null);
-          var m3 = creerComposantBloc(tMoteur, cx + 100, cy + 110, null);
-          var m4 = creerComposantBloc(tMoteur, cx + 300, cy + 110, null);
-          var buzz = creerComposantBloc(tBuzzer, cx + 80, cy + 20, null);
-          
-          if (avecCablage) {
-            ajouterFilBloc(pile.id, 0, mcu.id, 0); ajouterFilBloc(mcu.id, 1, pile.id, 1);
-            ajouterFilBloc(ldr.id, 0, pile.id, 0); ajouterFilBloc(ldr.id, 1, mcu.id, 2);
-            ajouterFilBloc(arm.id, 0, pile.id, 0); ajouterFilBloc(arm.id, 1, mcu.id, 4);
-            ajouterFilBloc(btn.id, 0, pile.id, 0); ajouterFilBloc(btn.id, 1, mcu.id, 3);
-            ajouterFilBloc(mcu.id, 5, res.id, 0); ajouterFilBloc(res.id, 1, led.id, 0);
-            ajouterFilBloc(led.id, 1, pile.id, 1);
-            ajouterFilBloc(mcu.id, 6, m1.id, 0); ajouterFilBloc(m1.id, 1, pile.id, 1);
-            ajouterFilBloc(mcu.id, 7, m2.id, 0); ajouterFilBloc(m2.id, 1, pile.id, 1);
-            ajouterFilBloc(mcu.id, 8, m3.id, 0); ajouterFilBloc(m3.id, 1, pile.id, 1);
-            ajouterFilBloc(mcu.id, 9, m4.id, 0); ajouterFilBloc(m4.id, 1, pile.id, 1);
-            ajouterFilBloc(mcu.id, 10, buzz.id, 0); ajouterFilBloc(buzz.id, 1, pile.id, 1);
-          }
-        }
-      };
-    }
-    if (typeof afficherBlocs === 'function') afficherBlocs();
-    console.log('✅ Bloc Drone FC chargé avec succès');
-  } catch(e) {
-    console.error('❌ Erreur Drone FC:', e.message);
-  }
-}, 1000);
 </script>
 
 </body>
