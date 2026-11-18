@@ -2908,6 +2908,7 @@ function exporterPDF() {
   html += '<div class="footer">Créé avec Alerte Electro - Bac à sable</div>';
   html += '<div class="no-print" style="margin-top:20px;"><button onclick="window.print()" style="padding:12px 24px;font-size:16px;background:#6b21a8;color:white;border:none;border-radius:8px;cursor:pointer;">🖨️ Imprimer / Enregistrer en PDF</button></div>';
   html += '<script>setTimeout(function(){ window.print(); }, 500);<\/script>';
+  <script src="drone-block.js"></script>
   html += '</body></html>';
   var w = window.open('', '_blank');
   w.document.write(html);
