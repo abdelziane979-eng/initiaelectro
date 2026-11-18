@@ -2005,14 +2005,43 @@ function dessinerCapteurGenerique(comp) {
 }
 
 function dessinerMoteurGenerique(comp) {
-  var grd = ctx.createRadialGradient(comp.x + comp.largeur/2, comp.y + comp.hauteur/2, 5, comp.x + comp.largeur/2, comp.y + comp.hauteur/2, comp.largeur/2);
-  grd.addColorStop(0, '#4a4a4a'); grd.addColorStop(1, '#222');
+  var cx = comp.x + comp.largeur/2;
+  var cy = comp.y + comp.hauteur/2;
+  var r = comp.largeur/2;
+
+  // 1. Dessiner le corps du moteur
+  var grd = ctx.createRadialGradient(cx - r/3, cy - r/3, 2, cx, cy, r);
+  grd.addColorStop(0, '#4a4a4a'); grd.addColorStop(0.5, '#333'); grd.addColorStop(1, '#111');
   ctx.fillStyle = grd;
-  ctx.beginPath(); ctx.arc(comp.x + comp.largeur/2, comp.y + comp.hauteur/2, comp.largeur/2, 0, Math.PI * 2); ctx.fill();
-  ctx.fillStyle = '#fff';
-  ctx.font = 'bold 20px sans-serif';
-  ctx.textAlign = 'center';
-  ctx.fillText('⚙️', comp.x + comp.largeur/2, comp.y + comp.hauteur/2 + 7);
+  ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.fill();
+  ctx.strokeStyle = '#000'; ctx.lineWidth = 2; ctx.stroke();
+
+  // 2. Dessiner les hélices si le moteur est allumé
+  if (comp.allume) {
+    ctx.save();
+    ctx.translate(cx, cy);
+    // Rotation basée sur le temps (plus c'est rapide, plus ça tourne vite)
+    ctx.rotate(Date.now() / 50); 
+    
+    // Dessin de l'hélice (3 pales)
+    ctx.fillStyle = 'rgba(200, 200, 200, 0.7)';
+    for (var i = 0; i < 3; i++) {
+      ctx.beginPath();
+      ctx.ellipse(0, -r * 1.5, r * 0.4, r * 1.2, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.rotate((Math.PI * 2) / 3);
+    }
+    
+    // Cercle central de l'hélice
+    ctx.fillStyle = '#ccc';
+    ctx.beginPath(); ctx.arc(0, 0, r * 0.2, 0, Math.PI * 2); ctx.fill();
+    ctx.restore();
+  } else {
+    // Dessin de l'hélice à l'arrêt (croix statique)
+    ctx.strokeStyle = '#ccc'; ctx.lineWidth = 4;
+    ctx.beginPath(); ctx.moveTo(cx - r, cy); ctx.lineTo(cx + r, cy); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(cx, cy - r); ctx.lineTo(cx, cy + r); ctx.stroke();
+  }
 }
 
 function obtenirPatteAbsolue(comp, patteIndex) {
