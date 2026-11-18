@@ -435,7 +435,7 @@
       <div class="multimetre-selecteur">
         <button onclick="setModeMultimetre('resistance')" id="btn-multi-resistance" class="actif">🔵 Résistance</button>
         <button onclick="setModeMultimetre('tension')" id="btn-multi-tension">⚡ Tension</button>
-        <button onclick="setModeMultimetre('continuite')" id="btn-multi-continuite">🔔 Continuité</button>
+        <button onclick="setModeMultimetre('continuité')" id="btn-multi-continuite">🔔 Continuité</button>
       </div>
       <div class="multimetre-aide" id="multi-aide">
         <strong>Mode Résistance</strong> : cliquez sur un composant pour mesurer sa résistance, OU sur 2 pattes pour mesurer entre elles.
@@ -964,6 +964,47 @@ var DEFIS = {
     ]
   },
   
+  /* ===== 🚁 DRONE ===== */
+  droneDecollage: {
+    id: 'droneDecollage', nom: '🚁 Décollage du Drone', icone: '🚁',
+    categorie: 'vehicules',
+    desc: 'Prépare le drone pour le décollage : alimente le cerveau (MCU) et actionne l\'interrupteur d\'armement pour allumer la LED de statut.',
+    composants_requis: ['pile', 'microcontroleur', 'interrupteur', 'led', 'resistance'],
+    cablages_requis: [
+      { typeA: 'pile', patteA: 0, typeB: 'microcontroleur', patteB: 0 },
+      { typeA: 'microcontroleur', patteA: 1, typeB: 'pile', patteB: 1 },
+      { typeA: 'pile', patteA: 0, typeB: 'interrupteur', patteB: 0 },
+      { typeA: 'interrupteur', patteA: 1, typeB: 'microcontroleur', patteB: 4 },
+      { typeA: 'microcontroleur', patteA: 5, typeB: 'resistance', patteB: 0 },
+      { typeA: 'resistance', patteA: 1, typeB: 'led', patteB: 0 },
+      { typeA: 'led', patteA: 1, typeB: 'pile', patteB: 1 }
+    ]
+  },
+  droneDetresse: {
+    id: 'droneDetresse', nom: '🚨 Signal de Détresse', icone: '🚨',
+    categorie: 'securite',
+    desc: 'Le drone a perdu le signal ! Câble le buzzer pour qu\'il puisse donner l\'alerte sonore.',
+    composants_requis: ['pile', 'microcontroleur', 'buzzer'],
+    cablages_requis: [
+      { typeA: 'pile', patteA: 0, typeB: 'microcontroleur', patteB: 0 },
+      { typeA: 'microcontroleur', patteA: 1, typeB: 'pile', patteB: 1 },
+      { typeA: 'microcontroleur', patteA: 10, typeB: 'buzzer', patteB: 0 },
+      { typeA: 'buzzer', patteA: 1, typeB: 'pile', patteB: 1 }
+    ]
+  },
+  droneMoteur: {
+    id: 'droneMoteur', nom: '⚙️ Moteur Principal', icone: '⚙️',
+    categorie: 'vehicules',
+    desc: 'Le drone doit tourner ! Connecte le premier moteur au microcontrôleur.',
+    composants_requis: ['pile', 'microcontroleur', 'led'],
+    cablages_requis: [
+      { typeA: 'pile', patteA: 0, typeB: 'microcontroleur', patteB: 0 },
+      { typeA: 'microcontroleur', patteA: 1, typeB: 'pile', patteB: 1 },
+      { typeA: 'microcontroleur', patteA: 6, typeB: 'led', patteB: 0 },
+      { typeA: 'led', patteA: 1, typeB: 'pile', patteB: 1 }
+    ]
+  },
+  
   /* ===== 💡 INITIATION ===== */
   ledSimple: {
     id: 'ledSimple', nom: '💡 LED simple', icone: '💡',
@@ -988,7 +1029,18 @@ var DEFIS = {
       { typeA: 'led', patteA: 1, typeB: 'pile', patteB: 1 }
     ]
   },
-  
+  boutonSonnette: {
+    id: 'boutonSonnette', nom: '🔔 Bouton sonnette', icone: '🔔',
+    categorie: 'initiation',
+    desc: 'Appuie sur le bouton pour faire sonner le buzzer.',
+    composants_requis: ['pile', 'bouton', 'buzzer'],
+    cablages_requis: [
+      { typeA: 'pile', patteA: 0, typeB: 'bouton', patteB: 0 },
+      { typeA: 'bouton', patteA: 1, typeB: 'buzzer', patteB: 0 },
+      { typeA: 'buzzer', patteA: 1, typeB: 'pile', patteB: 1 }
+    ]
+  }
+};
 var defiActif = null;
 
 /* =========================================================
@@ -2663,7 +2715,7 @@ function calculerEtatLED() {
     var typeMesure = mapperTypeDessin(comp.type);
     if (typeMesure === 'pile') continue;
     if (typeMesure === 'ne555' || typeMesure === 'cd4017' || typeMesure === 'condensateur' || typeMesure === 'transistor') continue;
-    if (typeMesure === 'led') addEdge(comp.id + ':0', comp.id + ':1');
+    if (typeMesure === 'led' || typeMesure === 'moteur') addEdge(comp.id + ':0', comp.id + ':1');
     else if (typeMesure === 'resistance' || typeMesure === 'ldr' || typeMesure === 'buzzer') addEdge(comp.id + ':0', comp.id + ':1');
     else if (typeMesure === 'interrupteur' && comp.ferme) addEdge(comp.id + ':0', comp.id + ':1');
     else if (typeMesure === 'bouton' && comp.appuye) addEdge(comp.id + ':0', comp.id + ':1');
@@ -2688,7 +2740,7 @@ function calculerEtatLED() {
     resultat.etat = "court-circuit"; return resultat;
   }
 
-  var leds = composants.filter(function(c) { return mapperTypeDessin(c.type) === 'led'; });
+  var leds = composants.filter(function(c) { return mapperTypeDessin(c.type) === 'led' || mapperTypeDessin(c.type) === 'moteur'; });
   for (var l = 0; l < leds.length; l++) {
     var led = leds[l];
     var cPlusP0 = chercherChemin(pattePlus, led.id + ':0', adj);
@@ -2733,8 +2785,8 @@ function tester() {
   if (r.etat === "pas-de-pile") mettreMessage('❌ Aucune pile dans le circuit.', 'erreur');
   else if (r.etat === "court-circuit") mettreMessage('⚠️ Court-circuit détecté !', 'erreur');
   else if (r.etat === "pas-de-composant-visuel") mettreMessage('⚠️ Aucune LED ni buzzer dans le circuit.', 'avertissement');
-  else if (r.ledsAllumees > 0 && r.buzzersActifs > 0) mettreMessage('✅ Circuit fermé ! ' + r.ledsAllumees + ' LED + ' + r.buzzersActifs + ' buzzer(s) !', 'succes');
-  else if (r.ledsAllumees > 0) mettreMessage('✅ Circuit fermé ! ' + r.ledsAllumees + ' LED allumée(s).', 'succes');
+  else if (r.ledsAllumees > 0 && r.buzzersActifs > 0) mettreMessage('✅ Circuit fermé ! ' + r.ledsAllumees + ' LED/Moteur + ' + r.buzzersActifs + ' buzzer(s) !', 'succes');
+  else if (r.ledsAllumees > 0) mettreMessage('✅ Circuit fermé ! ' + r.ledsAllumees + ' LED/Moteur allumé(s).', 'succes');
   else if (r.buzzersActifs > 0) mettreMessage('🔊 Circuit fermé ! ' + r.buzzersActifs + ' buzzer(s) !', 'succes');
   else mettreMessage('🔌 Circuit ouvert ou incomplet.', 'avertissement');
   demarrerAnimationChenillard();
@@ -3355,6 +3407,7 @@ window.onload = function() {
     ledPulsePhase += 0.08; buzzerOndePhase = (buzzerOndePhase + 0.02) % 1;
     var besoinRedraw = false;
     if (!animChenillardActif) { var aLEDAllumee = composants.some(function(c) { return mapperTypeDessin(c.type) === 'led' && c.allume; }); if (aLEDAllumee) besoinRedraw = true; }
+    if (composants.some(function(c) { return mapperTypeDessin(c.type) === 'moteur' && c.allume; })) besoinRedraw = true;
     if (multimetreActif && (pointeRouge || pointeNoire)) besoinRedraw = true;
     if (buzzerActif) besoinRedraw = true;
     if (besoinRedraw) dessiner();
