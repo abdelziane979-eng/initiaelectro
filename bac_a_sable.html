@@ -2537,6 +2537,14 @@ function calculerMesureEntreDeuxPattes() {
     var comp = composants[m];
     var typeMesure2 = mapperTypeDessin(comp.type);
     if (typeMesure2 === 'pile' || typeMesure2 === 'ne555' || typeMesure2 === 'cd4017' || typeMesure2 === 'condensateur' || typeMesure2 === 'transistor') continue;
+            if (comp.type === 'microcontroleur') {
+           addEdge(comp.id + ':4', comp.id + ':5');
+           addEdge(comp.id + ':4', comp.id + ':6');
+           addEdge(comp.id + ':4', comp.id + ':7');
+           addEdge(comp.id + ':4', comp.id + ':8');
+           addEdge(comp.id + ':4', comp.id + ':9');
+           addEdge(comp.id + ':4', comp.id + ':10');
+         }
     if (typeMesure2 === 'interrupteur' && !comp.ferme) continue;
     if (typeMesure2 === 'bouton' && !comp.appuye) continue;
     if (CATALOGUE[comp.type] && CATALOGUE[comp.type].pattes.length >= 2) addEdge(comp.id + ':0', comp.id + ':1');
@@ -2718,6 +2726,14 @@ function calculerEtatLED() {
     var typeMesure = mapperTypeDessin(comp.type);
     if (typeMesure === 'pile') continue;
     if (typeMesure === 'ne555' || typeMesure === 'cd4017' || typeMesure === 'condensateur' || typeMesure === 'transistor') continue;
+            if (comp.type === 'microcontroleur') {
+           addEdge(comp.id + ':4', comp.id + ':5');
+           addEdge(comp.id + ':4', comp.id + ':6');
+           addEdge(comp.id + ':4', comp.id + ':7');
+           addEdge(comp.id + ':4', comp.id + ':8');
+           addEdge(comp.id + ':4', comp.id + ':9');
+           addEdge(comp.id + ':4', comp.id + ':10');
+         }
     if (typeMesure === 'led' || typeMesure === 'moteur') addEdge(comp.id + ':0', comp.id + ':1');
     else if (typeMesure === 'resistance' || typeMesure === 'ldr' || typeMesure === 'buzzer') addEdge(comp.id + ':0', comp.id + ':1');
     else if (typeMesure === 'interrupteur' && comp.ferme) addEdge(comp.id + ':0', comp.id + ':1');
