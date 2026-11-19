@@ -2068,10 +2068,10 @@ function dessinerMoteurGenerique(comp) {
 
   // 2. Hélice
   if (comp.allume) {
-    // Hélice qui tourne (Orange fluo pour être bien visible)
+    // Hélice qui tourne (Orange fluo) - Utilisation de angleHelice pour une rotation fluide
     ctx.save();
     ctx.translate(cx, cy);
-    ctx.rotate(Date.now() / 20); // Tourne vite
+    ctx.rotate(angleHelice);
     
     ctx.fillStyle = '#f97316'; // Orange vif
     for (var i = 0; i < 3; i++) {
@@ -3429,6 +3429,7 @@ window.onload = function() {
   document.addEventListener('keydown', gererClavier);
   setInterval(function() {
     ledPulsePhase += 0.08; buzzerOndePhase = (buzzerOndePhase + 0.02) % 1;
+    angleHelice += 0.2;
     var besoinRedraw = false;
     if (!animChenillardActif) { var aLEDAllumee = composants.some(function(c) { return mapperTypeDessin(c.type) === 'led' && c.allume; }); if (aLEDAllumee) besoinRedraw = true; }
     if (composants.some(function(c) { return mapperTypeDessin(c.type) === 'moteur' && c.allume; })) besoinRedraw = true;
