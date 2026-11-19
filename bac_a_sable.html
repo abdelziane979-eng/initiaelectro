@@ -435,7 +435,7 @@
       <div class="multimetre-selecteur">
         <button onclick="setModeMultimetre('resistance')" id="btn-multi-resistance" class="actif">🔵 Résistance</button>
         <button onclick="setModeMultimetre('tension')" id="btn-multi-tension">⚡ Tension</button>
-        <button onclick="setModeMultimetre('continuité')" id="btn-multi-continuite">🔔 Continuité</button>
+        <button onclick="setModeMultimetre('continuite')" id="btn-multi-continuite">🔔 Continuité</button>
       </div>
       <div class="multimetre-aide" id="multi-aide">
         <strong>Mode Résistance</strong> : cliquez sur un composant pour mesurer sa résistance, OU sur 2 pattes pour mesurer entre elles.
@@ -493,6 +493,8 @@ var CATALOGUE = {
   microcontroleur: { id:'microcontroleur', nom:'Microcontrôleur (FC)', icone:'🧠', couleur:'#0f172a', largeur:120, hauteur:120,
     pattes:[{x:-10,y:15},{x:-10,y:35},{x:-10,y:55},{x:-10,y:75},{x:-10,y:95},{x:-10,y:115},{x:130,y:15},{x:130,y:35},{x:130,y:55},{x:130,y:75},{x:130,y:95},{x:130,y:115}],
     valeurs:null, niveau:'maitrise', categorie:'circuit-integre' },
+  moteurDc: { id:'moteurDc', nom:'Moteur DC', icone:'⚙️', couleur:'#555', largeur:60, hauteur:60,
+    pattes:[{x:10,y:60},{x:50,y:60}], valeurs:null },
   pile: { id:'pile', nom:'Pile 9V', icone:'🔋', couleur:'#333', largeur:100, hauteur:60,
     pattes:[{x:10,y:55},{x:90,y:55}], valeurs:null },
   resistance: { id:'resistance', nom:'Résistance', icone:'🎨', couleur:'#D4A76A', largeur:100, hauteur:30,
@@ -706,12 +708,10 @@ var BLOCS = {
       var btn = creerComposantBloc('bouton', cx - 420, cy - 30, null);
       var led = creerComposantBloc('led', cx + 80, cy - 180, 'vert');
       var res = creerComposantBloc('resistance', cx + 80, cy - 130, '470');
-      var tMoteur = CATALOGUE.moteurDc ? 'moteurDc' : 'led';
-      var vMoteur = tMoteur === 'led' ? 'rouge' : null;
-      var m1 = creerComposantBloc(tMoteur, cx + 100, cy - 60, vMoteur);
-      var m2 = creerComposantBloc(tMoteur, cx + 300, cy - 60, vMoteur);
-      var m3 = creerComposantBloc(tMoteur, cx + 100, cy + 110, vMoteur);
-      var m4 = creerComposantBloc(tMoteur, cx + 300, cy + 110, vMoteur);
+      var m1 = creerComposantBloc('moteurDc', cx + 100, cy - 60, null);
+      var m2 = creerComposantBloc('moteurDc', cx + 300, cy - 60, null);
+      var m3 = creerComposantBloc('moteurDc', cx + 100, cy + 110, null);
+      var m4 = creerComposantBloc('moteurDc', cx + 300, cy + 110, null);
       var buzz = creerComposantBloc('buzzer', cx + 80, cy + 20, null);
       
       if (avecCablage) {
@@ -732,7 +732,7 @@ var BLOCS = {
 };
  
 /* =========================================================
-   DEFIS D'INGENIERIE (MODE INNOVANT)
+   DEFIS D'INGENIERIE
    ========================================================= */
 var DEFIS = {
   /* ===== 🏠 MAISON ===== */
@@ -924,7 +924,7 @@ var DEFIS = {
     ]
   },
   
-  /* ===== 🚗 VÉHICULES ===== */
+  /* ===== 🚗 VÉHICULES & DRONE ===== */
   feuTricolore: {
     id: 'feuTricolore', nom: '🚦 Feu tricolore', icone: '🚦',
     categorie: 'vehicules',
@@ -963,8 +963,6 @@ var DEFIS = {
       { typeA: 'moteurDc', patteA: 1, typeB: 'pile', patteB: 1 }
     ]
   },
-  
-  /* ===== 🚁 DRONE ===== */
   droneDecollage: {
     id: 'droneDecollage', nom: '🚁 Décollage du Drone', icone: '🚁',
     categorie: 'vehicules',
@@ -1182,7 +1180,7 @@ function afficherDefis() {
     'maison': { nom: '🏠 Maison', ordre: 2 },
     'ecologie': { nom: '🌱 Écologie', ordre: 3 },
     'jeux': { nom: '🎮 Jeux & Sons', ordre: 4 },
-    'vehicules': { nom: '🚗 Véhicules', ordre: 5 },
+    'vehicules': { nom: '🚗 Véhicules & Drone', ordre: 5 },
     'capteurs': { nom: '🔬 Capteurs', ordre: 6 },
     'securite': { nom: '🔒 Sécurité', ordre: 7 },
     'autres': { nom: '📦 Autres', ordre: 99 }
@@ -2061,14 +2059,14 @@ function dessinerMoteurGenerique(comp) {
   var cy = comp.y + comp.hauteur/2;
   var r = comp.largeur/2;
 
-  // 1. Dessiner le corps du moteur (Gris foncé)
+  // 1. Corps du moteur (Gris foncé)
   var grd = ctx.createRadialGradient(cx - r/3, cy - r/3, 2, cx, cy, r);
   grd.addColorStop(0, '#666'); grd.addColorStop(0.5, '#444'); grd.addColorStop(1, '#222');
   ctx.fillStyle = grd;
   ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.fill();
   ctx.strokeStyle = '#000'; ctx.lineWidth = 2; ctx.stroke();
 
-  // 2. Dessiner l'hélice
+  // 2. Hélice
   if (comp.allume) {
     // Hélice qui tourne (Orange fluo pour être bien visible)
     ctx.save();
@@ -2279,6 +2277,7 @@ function clicCanvas(event) {
     }
   }
 }
+
 function supprimerComposant(id) {
   composants = composants.filter(function(c) { return c.id !== id; });
   fils = fils.filter(function(f) { return f.compA !== id && f.compB !== id; });
@@ -2533,21 +2532,24 @@ function calculerMesureEntreDeuxPattes() {
     var f = fils[k];
     addEdge(f.compA + ':' + f.patteA, f.compB + ':' + f.patteB);
   }
-  for (var m = 0; m < composants.length; m++) {
-    var comp = composants[m];
-    var typeMesure2 = mapperTypeDessin(comp.type);
+  for (var m2 = 0; m2 < composants.length; m2++) {
+    var comp2 = composants[m2];
+    var typeMesure2 = mapperTypeDessin(comp2.type);
     if (typeMesure2 === 'pile' || typeMesure2 === 'ne555' || typeMesure2 === 'cd4017' || typeMesure2 === 'condensateur' || typeMesure2 === 'transistor') continue;
-            if (comp.type === 'microcontroleur') {
-           addEdge(comp.id + ':4', comp.id + ':5');
-           addEdge(comp.id + ':4', comp.id + ':6');
-           addEdge(comp.id + ':4', comp.id + ':7');
-           addEdge(comp.id + ':4', comp.id + ':8');
-           addEdge(comp.id + ':4', comp.id + ':9');
-           addEdge(comp.id + ':4', comp.id + ':10');
-         }
-    if (typeMesure2 === 'interrupteur' && !comp.ferme) continue;
-    if (typeMesure2 === 'bouton' && !comp.appuye) continue;
-    if (CATALOGUE[comp.type] && CATALOGUE[comp.type].pattes.length >= 2) addEdge(comp.id + ':0', comp.id + ':1');
+    
+    // CORRECTION : Le courant passe dans le MCU (avec comp2)
+    if (comp2.type === 'microcontroleur') {
+      addEdge(comp2.id + ':4', comp2.id + ':5');
+      addEdge(comp2.id + ':4', comp2.id + ':6');
+      addEdge(comp2.id + ':4', comp2.id + ':7');
+      addEdge(comp2.id + ':4', comp2.id + ':8');
+      addEdge(comp2.id + ':4', comp2.id + ':9');
+      addEdge(comp2.id + ':4', comp2.id + ':10');
+    }
+
+    if (typeMesure2 === 'interrupteur' && !comp2.ferme) continue;
+    if (typeMesure2 === 'bouton' && !comp2.appuye) continue;
+    if (CATALOGUE[comp2.type] && CATALOGUE[comp2.type].pattes.length >= 2) addEdge(comp2.id + ':0', comp2.id + ':1');
   }
   var depart = pointeRouge.compId + ':' + pointeRouge.patteIndex;
   var arrivee = pointeNoire.compId + ':' + pointeNoire.patteIndex;
@@ -2726,14 +2728,17 @@ function calculerEtatLED() {
     var typeMesure = mapperTypeDessin(comp.type);
     if (typeMesure === 'pile') continue;
     if (typeMesure === 'ne555' || typeMesure === 'cd4017' || typeMesure === 'condensateur' || typeMesure === 'transistor') continue;
-            if (comp.type === 'microcontroleur') {
-           addEdge(comp.id + ':4', comp.id + ':5');
-           addEdge(comp.id + ':4', comp.id + ':6');
-           addEdge(comp.id + ':4', comp.id + ':7');
-           addEdge(comp.id + ':4', comp.id + ':8');
-           addEdge(comp.id + ':4', comp.id + ':9');
-           addEdge(comp.id + ':4', comp.id + ':10');
-         }
+    
+    // CORRECTION : Le courant passe dans le MCU (avec comp)
+    if (comp.type === 'microcontroleur') {
+      addEdge(comp.id + ':4', comp.id + ':5');
+      addEdge(comp.id + ':4', comp.id + ':6');
+      addEdge(comp.id + ':4', comp.id + ':7');
+      addEdge(comp.id + ':4', comp.id + ':8');
+      addEdge(comp.id + ':4', comp.id + ':9');
+      addEdge(comp.id + ':4', comp.id + ':10');
+    }
+
     if (typeMesure === 'led' || typeMesure === 'moteur') addEdge(comp.id + ':0', comp.id + ':1');
     else if (typeMesure === 'resistance' || typeMesure === 'ldr' || typeMesure === 'buzzer') addEdge(comp.id + ':0', comp.id + ':1');
     else if (typeMesure === 'interrupteur' && comp.ferme) addEdge(comp.id + ':0', comp.id + ':1');
@@ -3436,189 +3441,6 @@ window.onload = function() {
     navigator.serviceWorker.register('sw.js').then(function(reg) { console.log('✅ Service Worker enregistré'); }).catch(function(err) { console.log('⚠️ Erreur Service Worker:', err); });
   }
 };
- /* ========== CORRECTION LOGIQUE DRONE ET MULTIMETRE ========== */
-setTimeout(function() {
-  if (typeof window.calculerEtatLED === 'function') {
-    window.calculerEtatLED = function() {
-      for (var i = 0; i < composants.length; i++) {
-        composants[i].allume = false;
-        if (composants[i].type === 'buzzer') composants[i].sonne = false;
-      }
-      var resultat = { etat: "ok", ledsAllumees: 0, buzzersActifs: 0 };
-      var piles = composants.filter(function(c) { return mapperTypeDessin(c.type) === 'pile'; });
-      if (piles.length === 0) { resultat.etat = "pas-de-pile"; return resultat; }
-      var pile = piles[0];
-      var pattePlus = pile.id + ':0';
-      var patteMoins = pile.id + ':1';
-
-      var adj = {};
-      function addEdge(a, b) {
-        if (!adj[a]) adj[a] = []; if (!adj[b]) adj[b] = [];
-        adj[a].push(b); adj[b].push(a);
-      }
-      for (var k = 0; k < fils.length; k++) {
-        var f = fils[k];
-        addEdge(f.compA + ':' + f.patteA, f.compB + ':' + f.patteB);
-      }
-      for (var m = 0; m < composants.length; m++) {
-        var comp = composants[m];
-        var typeMesure = mapperTypeDessin(comp.type);
-        if (typeMesure === 'pile') continue;
-        if (typeMesure === 'ne555' || typeMesure === 'cd4017' || typeMesure === 'condensateur' || typeMesure === 'transistor') continue;
-        
-        // CORRECTION ICI : Le courant passe de la patte 4 (armement) aux pattes 6-10 (sorties)
-        if (comp.type === 'microcontroleur') {
-          addEdge(comp.id + ':4', comp.id + ':5');
-          addEdge(comp.id + ':4', comp.id + ':6');
-          addEdge(comp.id + ':4', comp.id + ':7');
-          addEdge(comp.id + ':4', comp.id + ':8');
-          addEdge(comp.id + ':4', comp.id + ':9');
-          addEdge(comp.id + ':4', comp.id + ':10');
-        }
-
-        if (typeMesure === 'led' || typeMesure === 'moteur') addEdge(comp.id + ':0', comp.id + ':1');
-        else if (typeMesure === 'resistance' || typeMesure === 'ldr' || typeMesure === 'buzzer') addEdge(comp.id + ':0', comp.id + ':1');
-        else if (typeMesure === 'interrupteur' && comp.ferme) addEdge(comp.id + ':0', comp.id + ':1');
-        else if (typeMesure === 'bouton' && comp.appuye) addEdge(comp.id + ':0', comp.id + ':1');
-      }
-
-      var adjDirect = {};
-      function addEdgeD(a, b) {
-        if (!adjDirect[a]) adjDirect[a] = []; if (!adjDirect[b]) adjDirect[b] = [];
-        adjDirect[a].push(b); adjDirect[b].push(a);
-      }
-      for (var k2 = 0; k2 < fils.length; k2++) {
-        var f2 = fils[k2];
-        addEdgeD(f2.compA + ':' + f2.patteA, f2.compB + ':' + f2.patteB);
-      }
-      for (var m2 = 0; m2 < composants.length; m2++) {
-        var comp2 = composants[m2];
-        var typeMesure2 = mapperTypeDessin(comp2.type);
-        if (typeMesure2 === 'interrupteur' && comp2.ferme) addEdgeD(comp2.id + ':0', comp2.id + ':1');
-        if (typeMesure2 === 'bouton' && comp2.appuye) addEdgeD(comp2.id + ':0', comp2.id + ':1');
-      }
-      if (chercherChemin(pattePlus, patteMoins, adjDirect)) {
-        resultat.etat = "court-circuit"; return resultat;
-      }
-
-      var leds = composants.filter(function(c) { return mapperTypeDessin(c.type) === 'led' || mapperTypeDessin(c.type) === 'moteur'; });
-      for (var l = 0; l < leds.length; l++) {
-        var led = leds[l];
-        var cPlusP0 = chercherChemin(pattePlus, led.id + ':0', adj);
-        var cPlusP1 = chercherChemin(pattePlus, led.id + ':1', adj);
-        var cMoinsP0 = chercherChemin(patteMoins, led.id + ':0', adj);
-        var cMoinsP1 = chercherChemin(patteMoins, led.id + ':1', adj);
-        if ((cPlusP0 && cMoinsP1) || (cPlusP1 && cMoinsP0)) {
-          led.allume = true; resultat.ledsAllumees++;
-        }
-      }
-
-      var buzzers = composants.filter(function(c) { return c.type === 'buzzer'; });
-      for (var b = 0; b < buzzers.length; b++) {
-        var bz = buzzers[b];
-        var bPlusP0 = chercherChemin(pattePlus, bz.id + ':0', adj);
-        var bPlusP1 = chercherChemin(pattePlus, bz.id + ':1', adj);
-        var bMoinsP0 = chercherChemin(patteMoins, bz.id + ':0', adj);
-        var bMoinsP1 = chercherChemin(patteMoins, bz.id + ':1', adj);
-        if ((bPlusP0 && bMoinsP1) || (bPlusP1 && bMoinsP0)) {
-          bz.sonne = true; resultat.buzzersActifs++;
-        }
-      }
-      if (leds.length === 0 && buzzers.length === 0) resultat.etat = "pas-de-composant-visuel";
-      return resultat;
-    };
-  }
-
-  if (typeof window.calculerMesureEntreDeuxPattes === 'function') {
-    window.calculerMesureEntreDeuxPattes = function() {
-      if (!pointeRouge || !pointeNoire) return;
-      var comp1 = trouverComposant(pointeRouge.compId);
-      if (!comp1) return;
-      
-      var adj = {};
-      function addEdge(a, b) {
-        if (!adj[a]) adj[a] = []; if (!adj[b]) adj[b] = [];
-        adj[a].push(b); adj[b].push(a);
-      }
-      for (var k = 0; k < fils.length; k++) {
-        var f = fils[k];
-        addEdge(f.compA + ':' + f.patteA, f.compB + ':' + f.patteB);
-      }
-      for (var m = 0; m < composants.length; m++) {
-        var comp = composants[m];
-        var typeMesure2 = mapperTypeDessin(comp.type);
-        if (typeMesure2 === 'pile' || typeMesure2 === 'ne555' || typeMesure2 === 'cd4017' || typeMesure2 === 'condensateur' || typeMesure2 === 'transistor') continue;
-        
-        // CORRECTION ICI : Le courant passe dans le MCU pour le multimètre
-        if (comp.type === 'microcontroleur') {
-          addEdge(comp.id + ':4', comp.id + ':5');
-          addEdge(comp.id + ':4', comp.id + ':6');
-          addEdge(comp.id + ':4', comp.id + ':7');
-          addEdge(comp.id + ':4', comp.id + ':8');
-          addEdge(comp.id + ':4', comp.id + ':9');
-          addEdge(comp.id + ':4', comp.id + ':10');
-        }
-
-        if (typeMesure2 === 'interrupteur' && !comp.ferme) continue;
-        if (typeMesure2 === 'bouton' && !comp.appuye) continue;
-        if (CATALOGUE[comp.type] && CATALOGUE[comp.type].pattes.length >= 2) addEdge(comp.id + ':0', comp.id + ':1');
-      }
-      
-      var depart = pointeRouge.compId + ':' + pointeRouge.patteIndex;
-      var arrivee = pointeNoire.compId + ':' + pointeNoire.patteIndex;
-      var connecte = chercherChemin(depart, arrivee, adj);
-
-      if (multimetreMode === 'continuite') {
-        if (connecte) { mettreAJourAffichageMulti('OUI', '🔔 BIP BIP !', '🔔 Les 2 pattes sont reliées'); mettreMessage('🔔 Continuité détectée !', 'succes'); }
-        else { mettreAJourAffichageMulti('NON', 'Pas de continuité', '🔔 Circuit ouvert'); mettreMessage('🔔 Pas de continuité.', 'avertissement'); }
-      } else if (multimetreMode === 'resistance') {
-        if (connecte) { mettreAJourAffichageMulti('0.00', 'Ω', '🔵 Résistance (fermé)'); }
-        else mettreAJourAffichageMulti('OL', 'Ω', '🔵 Circuit ouvert');
-      } else if (multimetreMode === 'tension') {
-        mettreAJourAffichageMulti('0.00', 'V', connecte ? '⚡ Aucune source' : '⚡ Circuit ouvert');
-      }
-      pointeRouge = null; pointeNoire = null; majPointes();
-      dessiner();
-    };
-  }
-
-  if (typeof window.dessinerMoteurGenerique === 'function') {
-    window.dessinerMoteurGenerique = function(comp) {
-      var cx = comp.x + comp.largeur/2;
-      var cy = comp.y + comp.hauteur/2;
-      var r = comp.largeur/2;
-
-      var grd = ctx.createRadialGradient(cx - r/3, cy - r/3, 2, cx, cy, r);
-      grd.addColorStop(0, '#666'); grd.addColorStop(0.5, '#444'); grd.addColorStop(1, '#222');
-      ctx.fillStyle = grd;
-      ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.fill();
-      ctx.strokeStyle = '#000'; ctx.lineWidth = 2; ctx.stroke();
-
-      if (comp.allume) {
-        ctx.save();
-        ctx.translate(cx, cy);
-        ctx.rotate(Date.now() / 20);
-        ctx.fillStyle = '#f97316';
-        for (var i = 0; i < 3; i++) {
-          ctx.beginPath();
-          ctx.ellipse(0, -r * 1.5, r * 0.35, r * 1.4, 0, 0, Math.PI * 2);
-          ctx.fill();
-          ctx.rotate((Math.PI * 2) / 3);
-        }
-        ctx.fillStyle = '#fff';
-        ctx.beginPath(); ctx.arc(0, 0, r * 0.25, 0, Math.PI * 2); ctx.fill();
-        ctx.restore();
-      } else {
-        ctx.strokeStyle = '#f97316'; ctx.lineWidth = 6;
-        ctx.beginPath(); ctx.moveTo(cx - r * 1.2, cy); ctx.lineTo(cx + r * 1.2, cy); ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(cx, cy - r * 1.2); ctx.lineTo(cx, cy + r * 1.2); ctx.stroke();
-        ctx.fillStyle = '#fff';
-        ctx.beginPath(); ctx.arc(cx, cy, r * 0.25, 0, Math.PI * 2); ctx.fill();
-      }
-    };
-  }
-  console.log('✅ Corrections Drone (Moteurs & Multimètre) appliquées !');
-}, 1000);
 </script>
 
 </body>
