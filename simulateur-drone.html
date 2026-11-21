@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Simulateur Drone - Atelier de Câblage</title>
+<title>Simulateur Drone - Atelier & Vol</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: 'Segoe UI', Arial, sans-serif; background: #0f172a; color: #e2e8f0; height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
@@ -16,7 +16,8 @@
 
   .conteneur { display: flex; flex: 1; overflow: hidden; }
   
-  .palette { width: 250px; background: #1e293b; padding: 15px; display: flex; flex-direction: column; gap: 10px; overflow-y: auto; border-right: 2px solid #334155; }
+  .palette { width: 250px; background: #1e293b; padding: 15px; display: flex; flex-direction: column; gap: 10px; overflow-y: auto; border-right: 2px solid #334155; transition: 0.3s; }
+  .palette.hidden { display: none; }
   .palette h2 { font-size: 1.1em; color: #60a5fa; margin-bottom: 10px; border-bottom: 2px solid #334155; padding-bottom: 5px; }
   .item-palette { background: #334155; padding: 10px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: 0.2s; border: 2px solid transparent; }
   .item-palette:hover { background: #475569; border-color: #60a5fa; }
@@ -24,13 +25,16 @@
   .item-palette .emoji { font-size: 1.5em; }
 
   .zone-jeu { flex: 1; background: #0b1120; position: relative; overflow: hidden; background-image: radial-gradient(#1e293b 1px, transparent 1px); background-size: 20px 20px; }
+  .zone-jeu.mode-vol { background-image: none; background: #0f172a; } /* Fond différent en vol */
   canvas { display: block; cursor: crosshair; }
   canvas.mode-cablage { cursor: cell; }
 
-  .panneau-droit { width: 300px; background: #1e293b; padding: 15px; display: flex; flex-direction: column; border-left: 2px solid #334155; }
+  .panneau-droit { width: 300px; background: #1e293b; padding: 15px; display: flex; flex-direction: column; border-left: 2px solid #334155; transition: 0.3s; }
+  .panneau-droit.hidden { display: none; }
   .instruction { background: #0f172a; padding: 15px; border-radius: 8px; font-size: 0.9em; line-height: 1.5; border-left: 4px solid #3b82f6; margin-bottom: 15px; }
   .instruction ul { margin-left: 20px; margin-top: 10px; }
   .instruction li { margin-bottom: 5px; }
+  
   .btn-action { border: none; padding: 12px; border-radius: 8px; font-size: 1em; font-weight: bold; cursor: pointer; transition: 0.1s; margin-bottom: 10px; width: 100%; }
   .btn-verifier { background: linear-gradient(135deg, #10b981, #059669); color: white; box-shadow: 0 4px 0 #047857; }
   .btn-verifier:hover { transform: translateY(-2px); box-shadow: 0 6px 0 #047857; }
@@ -41,23 +45,37 @@
   .btn-effacer { background: linear-gradient(135deg, #ef4444, #dc2626); color: white; box-shadow: 0 4px 0 #991b1b; }
   .btn-effacer:hover { transform: translateY(-2px); box-shadow: 0 6px 0 #991b1b; }
   .btn-effacer:active { transform: translateY(2px); box-shadow: 0 2px 0 #991b1b; }
+  .btn-vol { background: linear-gradient(135deg, #8b5cf6, #6d28d9); color: white; box-shadow: 0 4px 0 #4c1d95; display: none; margin-top: 15px; }
+  .btn-vol:hover { transform: translateY(-2px); box-shadow: 0 6px 0 #4c1d95; }
+  .btn-vol:active { transform: translateY(2px); box-shadow: 0 2px 0 #4c1d95; }
+  
   .message { margin-top: 15px; padding: 15px; border-radius: 8px; font-weight: bold; display: none; text-align: left; line-height: 1.4; }
   .message.succes { display: block; background: #dcfce7; color: #166534; border: 2px solid #22c55e; }
   .message.erreur { display: block; background: #fee2e2; color: #991b1b; border: 2px solid #ef4444; }
+
+  /* HUD de Vol */
+  .hud { position: absolute; top: 20px; left: 20px; background: rgba(15, 23, 42, 0.8); padding: 15px; border-radius: 12px; border: 2px solid #334155; color: #e2e8f0; font-family: monospace; font-size: 1.2em; display: none; z-index: 5; }
+  .hud.active { display: block; }
+  .hud .valeur { color: #10b981; font-weight: bold; }
+  .hud .alerte { color: #ef4444; animation: clignote 0.5s infinite alternate; }
+  @keyframes clignote { from { opacity: 1; } to { opacity: 0.5; } }
+  
+  .commandes-vol { position: absolute; bottom: 20px; left: 20px; background: rgba(15, 23, 42, 0.8); padding: 10px 15px; border-radius: 8px; color: #94a3b8; font-size: 0.9em; display: none; z-index: 5; }
+  .commandes-vol.active { display: block; }
 </style>
 </head>
 <body>
 
 <header>
   <div>
-    <h1>🚁 Atelier de Câblage Drone</h1>
-    <p>Place les composants et relie-les correctement</p>
+    <h1 id="titre-principal">🚁 Atelier de Câblage Drone</h1>
+    <p id="sous-titre">Place les composants et relie-les correctement</p>
   </div>
-  <a href="index.html" class="btn-retour">← Retour à l'accueil</a>
+  <a href="index.html" class="btn-retour" id="btn-retour">← Retour</a>
 </header>
 
 <div class="conteneur">
-  <div class="palette">
+  <div class="palette" id="palette">
     <h2>🛠️ Cartes Électroniques</h2>
     <div class="item-palette" onclick="choisirComposant('batterie')">
       <span class="emoji">🔋</span> <div><strong>Batterie</strong><br><small>LiPo 3S (11.1V)</small></div>
@@ -78,10 +96,20 @@
 
   <div class="zone-jeu" id="zone-jeu">
     <canvas id="canvas-drone"></canvas>
+    
+    <!-- HUD et commandes pour le mode Vol -->
+    <div class="hud" id="hud">
+      <div>🔋 Batterie : <span class="valeur" id="hud-batterie">100%</span></div>
+      <div>📡 Altitude : <span class="valeur" id="hud-altitude">0 m</span></div>
+      <div>💨 Vent : <span class="valeur" id="hud-vent">0 km/h</span></div>
+    </div>
+    <div class="commandes-vol" id="commandes-vol">
+      <strong>Commandes :</strong> Z = Gaz (Monter) | S = Descendre | Q/D = Tourner (Lacet) | ↑/↓ = Avancer/Reculer
+    </div>
   </div>
 
-  <div class="panneau-droit">
-    <div class="instruction">
+  <div class="panneau-droit" id="panneau-droit">
+    <div class="instruction" id="instruction">
       <strong>📋 Objectif :</strong><br>
       Connecte la batterie au PDB, puis alimente les ESC. Enfin, relie les signaux des ESC au Contrôleur de Vol (FC).
       <ul>
@@ -95,12 +123,16 @@
     <button class="btn-action btn-multimetre" id="btn-multi" onclick="basculerMultimetre()">🔬 Test de Continuité</button>
     <button class="btn-action btn-verifier" onclick="verifierCablage()">✅ Vérifier le Câblage</button>
     <button class="btn-action btn-effacer" onclick="toutEffacer()">🗑️ Tout effacer</button>
+    <button class="btn-action btn-vol" id="btn-vol" onclick="demarrerVol()">🚀 DÉCOLLER !</button>
     
     <div class="message" id="message"></div>
   </div>
 </div>
 
 <script>
+// ==========================================
+// VARIABLES GLOBALES (ATELIER)
+// ==========================================
 const canvas = document.getElementById('canvas-drone');
 const ctx = canvas.getContext('2d');
 const zoneJeu = document.getElementById('zone-jeu');
@@ -118,12 +150,23 @@ let composantSelectionne = null;
 let patteEnAttente = null;
 let composantEnDrag = null;
 let dragOffsetX = 0, dragOffsetY = 0;
-
 let patteSurvolee = null;
-
 let modeMultimetre = false;
 let pointeA = null;
 let pointeB = null;
+
+// ==========================================
+// VARIABLES GLOBALES (VOL)
+// ==========================================
+let modeActuel = 'atelier'; // 'atelier' ou 'vol'
+let dronePos = { x: 0, y: 0 };
+let droneVel = { x: 0, y: 0 };
+let droneAngle = 0;
+let altitude = 0;
+let batterie = 100;
+let vent = { x: 0, y: 0, force: 0 };
+let keys = {};
+let animationId = null;
 
 const CATALOGUE = {
   batterie: { 
@@ -161,6 +204,9 @@ const CATALOGUE = {
   }
 };
 
+// ==========================================
+// FONCTIONS DE L'ATELIER
+// ==========================================
 function choisirComposant(type) {
   if (modeMultimetre) basculerMultimetre();
   composantSelectionne = type;
@@ -172,7 +218,7 @@ canvas.addEventListener('click', clicCanvas);
 canvas.addEventListener('mousedown', sourisDown);
 canvas.addEventListener('mousemove', survolSouris);
 canvas.addEventListener('mouseup', sourisUp);
-canvas.addEventListener('contextmenu', clicDroitCanvas); // Clic droit
+canvas.addEventListener('contextmenu', clicDroitCanvas);
 
 function coordonneesSouris(event) {
   const rect = canvas.getBoundingClientRect();
@@ -215,7 +261,6 @@ function trouverPatteSousSouris(x, y) {
   return null;
 }
 
-// Distance d'un point à un segment de droite
 function distancePointSegment(px, py, x1, y1, x2, y2) {
   const dx = x2 - x1;
   const dy = y2 - y1;
@@ -226,7 +271,6 @@ function distancePointSegment(px, py, x1, y1, x2, y2) {
   return Math.sqrt((px - (x1 + t*dx))**2 + (py - (y1 + t*dy))**2);
 }
 
-// Trouver le fil sous la souris
 function trouverFilSousSouris(x, y) {
   for (let i = fils.length - 1; i >= 0; i--) {
     const f = fils[i];
@@ -236,7 +280,6 @@ function trouverFilSousSouris(x, y) {
       const pA = obtenirPatteAbsolue(compA, f.patteA);
       const pB = obtenirPatteAbsolue(compB, f.patteB);
       
-      // Approximation de la courbe par des segments de ligne droite pour le clic
       const steps = 10;
       let minDistance = Infinity;
       let prevX = pA.x, prevY = pA.y;
@@ -244,16 +287,12 @@ function trouverFilSousSouris(x, y) {
       for (let s = 1; s <= steps; s++) {
         const t = s / steps;
         const mt = 1 - t;
-        // Formule de la courbe de Bézier
         const bx = mt*mt*mt*pA.x + 3*mt*mt*t*pA.x + 3*mt*t*t*pB.x + t*t*t*pB.x;
         const by = mt*mt*mt*pA.y + 3*mt*mt*t*((pA.y+pB.y)/2) + 3*mt*t*t*((pA.y+pB.y)/2) + t*t*t*pB.y;
-        
         const d = distancePointSegment(x, y, prevX, prevY, bx, by);
         if (d < minDistance) minDistance = d;
-        
         prevX = bx; prevY = by;
       }
-      
       if (minDistance < 10) return f;
     }
   }
@@ -261,11 +300,10 @@ function trouverFilSousSouris(x, y) {
 }
 
 function clicDroitCanvas(event) {
-  event.preventDefault(); // Empêche le menu contextuel du navigateur
+  event.preventDefault();
+  if (modeActuel !== 'atelier') return;
   
   const pos = coordonneesSouris(event);
-  
-  // 1. Tester si on clique sur un fil
   const fil = trouverFilSousSouris(pos.x, pos.y);
   if (fil) {
     fils = fils.filter(f => f !== fil);
@@ -273,10 +311,8 @@ function clicDroitCanvas(event) {
     return;
   }
   
-  // 2. Tester si on clique sur un composant
   const comp = trouverComposantSousSouris(pos.x, pos.y);
   if (comp) {
-    // Supprimer le composant et tous ses fils connectés
     composants = composants.filter(c => c.id !== comp.id);
     fils = fils.filter(f => f.compA !== comp.id && f.compB !== comp.id);
     dessiner();
@@ -335,6 +371,7 @@ function testerContinuite(idA, idB) {
 }
 
 function clicCanvas(event) {
+  if (modeActuel !== 'atelier') return;
   const pos = coordonneesSouris(event);
   
   if (modeMultimetre) {
@@ -411,8 +448,8 @@ function clicCanvas(event) {
 }
 
 function sourisDown(event) {
-  if (patteEnAttente || modeMultimetre) return;
-  if (event.button === 2) return; // Ne pas drag si clic droit
+  if (modeActuel !== 'atelier' || patteEnAttente || modeMultimetre) return;
+  if (event.button === 2) return;
   
   const pos = coordonneesSouris(event);
   const comp = trouverComposantSousSouris(pos.x, pos.y);
@@ -424,6 +461,7 @@ function sourisDown(event) {
 }
 
 function survolSouris(event) {
+  if (modeActuel !== 'atelier') return;
   if (composantEnDrag) {
     const pos = coordonneesSouris(event);
     composantEnDrag.x = pos.x - dragOffsetX;
@@ -453,6 +491,7 @@ function survolSouris(event) {
 }
 
 function sourisUp(event) {
+  if (modeActuel !== 'atelier') return;
   if (composantEnDrag) {
     composantEnDrag = null;
     dessiner();
@@ -460,6 +499,7 @@ function sourisUp(event) {
 }
 
 function dessiner() {
+  if (modeActuel !== 'atelier') return;
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   
   fils.forEach(fil => {
@@ -643,6 +683,7 @@ function verifierCablage() {
   } else {
     afficherMessage("🎉 FÉLICITATIONS !<br>Le câblage est parfait. Le drone est prêt pour la checklist de vol ! 🚁", "succes");
     lancerConfettis();
+    document.getElementById('btn-vol').style.display = 'block';
   }
 }
 
@@ -654,6 +695,7 @@ function toutEffacer() {
     patteEnAttente = null;
     pointeA = null; pointeB = null;
     document.getElementById('message').style.display = 'none';
+    document.getElementById('btn-vol').style.display = 'none';
     dessiner();
   }
 }
@@ -682,12 +724,222 @@ function lancerConfettis() {
   }
 }
 
+// ==========================================
+// FONCTIONS DU MODE VOL
+// ==========================================
+function demarrerVol() {
+  modeActuel = 'vol';
+  
+  // Cacher l'atelier, montrer le vol
+  document.getElementById('palette').classList.add('hidden');
+  document.getElementById('panneau-droit').classList.add('hidden');
+  document.getElementById('titre-principal').innerHTML = '🚁 Simulateur de Vol';
+  document.getElementById('sous-titre').innerHTML = 'Pilote le drone avec le clavier';
+  document.getElementById('btn-retour').href = 'simulateur-drone.html'; // Recharge l'atelier
+  document.getElementById('hud').classList.add('active');
+  document.getElementById('commandes-vol').classList.add('active');
+  
+  // Redimensionner le canvas pour prendre tout l'écran
+  zoneJeu.classList.add('mode-vol');
+  canvas.width = zoneJeu.clientWidth;
+  canvas.height = zoneJeu.clientHeight;
+  
+  // Initialiser la physique
+  dronePos = { x: 0, y: 0 };
+  droneVel = { x: 0, y: 0 };
+  droneAngle = 0;
+  altitude = 0;
+  batterie = 100;
+  vent = { x: 0, y: 0, force: 0 };
+  
+  // Écouter le clavier
+  document.addEventListener('keydown', (e) => keys[e.key.toLowerCase()] = true);
+  document.addEventListener('keyup', (e) => keys[e.key.toLowerCase()] = false);
+  
+  // Lancer la boucle de jeu
+  boucleDeVol();
+}
+
+function boucleDeVol() {
+  if (modeActuel !== 'vol') return;
+  
+  mettreAJourPhysique();
+  dessinerVol();
+  
+  animationId = requestAnimationFrame(boucleDeVol);
+}
+
+function mettreAJourPhysique() {
+  // 1. Batterie
+  if (batterie > 0) {
+    batterie -= 0.01;
+    if (batterie < 0) batterie = 0;
+  }
+  
+  // 2. Vent (change aléatoirement)
+  if (Math.random() < 0.02) {
+    vent.x = (Math.random() - 0.5) * 2;
+    vent.y = (Math.random() - 0.5) * 2;
+    vent.force = Math.random() * 10;
+  }
+  
+  // 3. Gaz / Altitude
+  let gaz = 0;
+  if (keys['z'] || keys['arrowup']) gaz = 1;
+  if (keys['s'] || keys['arrowdown']) gaz = -1;
+  
+  altitude += gaz * 2;
+  if (altitude < 0) altitude = 0;
+  if (altitude > 100) altitude = 100;
+  
+  // Si pas de batterie, chute
+  if (batterie <= 0) {
+    altitude -= 5;
+    if (altitude < 0) altitude = 0;
+  }
+  
+  // 4. Direction (Lacet)
+  if (keys['q'] || keys['arrowleft']) droneAngle -= 0.05;
+  if (keys['d'] || keys['arrowright']) droneAngle += 0.05;
+  
+  // 5. Mouvement (Avancer/Reculer)
+  let vitesseAvance = 0;
+  if (keys['w'] || keys['arrowup']) vitesseAvance = 3;
+  if (keys['s'] || keys['arrowdown']) vitesseAvance = -3; // Conflict avec gaz, on simplifie : flèches = direction
+  
+  // Simplification : On utilise ZQSD
+  // Z = Monter (Gaz), S = Descendre, Q = Tourner Gauche, D = Tourner Droite, W = Avancer, C = Reculer
+  if (keys['w']) {
+    droneVel.x += Math.sin(droneAngle) * 0.2;
+    droneVel.y -= Math.cos(droneAngle) * 0.2;
+  }
+  
+  // 6. Application du vent et de l'inertie
+  droneVel.x += vent.x * (vent.force / 100);
+  droneVel.y += vent.y * (vent.force / 100);
+  
+  droneVel.x *= 0.98; // Frottement
+  droneVel.y *= 0.98;
+  
+  dronePos.x += droneVel.x;
+  dronePos.y += droneVel.y;
+  
+  // Mettre à jour le HUD
+  document.getElementById('hud-batterie').textContent = Math.round(batterie) + '%';
+  document.getElementById('hud-batterie').className = batterie < 20 ? 'valeur alerte' : 'valeur';
+  
+  document.getElementById('hud-altitude').textContent = Math.round(altitude) + ' m';
+  document.getElementById('hud-vent').textContent = Math.round(vent.force) + ' km/h';
+}
+
+function dessinerVol() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  
+  // Dessiner le sol qui défile (Grille)
+  ctx.strokeStyle = '#1e293b';
+  ctx.lineWidth = 1;
+  const gridSize = 50;
+  const offsetX = dronePos.x % gridSize;
+  const offsetY = dronePos.y % gridSize;
+  
+  for (let x = -offsetX; x < canvas.width; x += gridSize) {
+    ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); ctx.stroke();
+  }
+  for (let y = -offsetY; y < canvas.height; y += gridSize) {
+    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke();
+  }
+  
+  // Dessiner des obstacles (Arbres) fictifs pour voir le mouvement
+  for (let i = 0; i < 10; i++) {
+    let treeX = (i * 300 - dronePos.x) % canvas.width;
+    let treeY = (i * 400 - dronePos.y) % canvas.height;
+    if (treeX < -50) treeX += canvas.width;
+    if (treeY < -50) treeY += canvas.height;
+    
+    ctx.fillStyle = '#14532d';
+    ctx.beginPath();
+    ctx.arc(treeX, treeY, 30, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  // Dessiner le drone au centre
+  const cx = canvas.width / 2;
+  const cy = canvas.height / 2;
+  const scale = 1 + (altitude / 100); // Plus il est haut, plus il paraît grand
+  
+  ctx.save();
+  ctx.translate(cx, cy);
+  ctx.rotate(droneAngle);
+  ctx.scale(scale, scale);
+  
+  // Corps du drone (Châssis en X)
+  ctx.strokeStyle = '#475569';
+  ctx.lineWidth = 8;
+  ctx.lineCap = 'round';
+  ctx.beginPath();
+  ctx.moveTo(-40, -40); ctx.lineTo(40, 40);
+  ctx.moveTo(-40, 40); ctx.lineTo(40, -40);
+  ctx.stroke();
+  
+  // Carte centrale (FC)
+  ctx.fillStyle = '#10b981';
+  ctx.fillRect(-15, -15, 30, 30);
+  
+  // Hélices (qui tournent si batterie > 0)
+  const angleHelice = Date.now() / (batterie > 0 ? 20 : 500);
+  
+  const positionsMoteurs = [
+    { x: -40, y: -40 }, { x: 40, y: -40 },
+    { x: -40, y: 40 }, { x: 40, y: 40 }
+  ];
+  
+  positionsMoteurs.forEach(pos => {
+    ctx.save();
+    ctx.translate(pos.x, pos.y);
+    ctx.rotate(angleHelice);
+    
+    // Hélice
+    ctx.fillStyle = 'rgba(200, 200, 200, 0.6)';
+    ctx.beginPath();
+    ctx.ellipse(0, 0, 10, 35, 0, 0, Math.PI * 2);
+    ctx.fill();
+    
+    // Moyeu
+    ctx.fillStyle = '#fff';
+    ctx.beginPath();
+    ctx.arc(0, 0, 8, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  });
+  
+  // Indicateur d'avant
+  ctx.fillStyle = '#ef4444';
+  ctx.beginPath();
+  ctx.moveTo(0, -20);
+  ctx.lineTo(-5, -10);
+  ctx.lineTo(5, -10);
+  ctx.fill();
+  
+  ctx.restore();
+  
+  // Message de crash
+  if (batterie <= 0 && altitude <= 0) {
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+    ctx.fillRect(0, canvas.height/2 - 50, canvas.width, 100);
+    ctx.fillStyle = '#ef4444';
+    ctx.font = 'bold 40px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText("💥 CRASH ! Batterie vide.", canvas.width/2, canvas.height/2 + 15);
+  }
+}
+
 window.addEventListener('resize', () => {
   largeurCanvas = zoneJeu.clientWidth;
   hauteurCanvas = zoneJeu.clientHeight;
   canvas.width = largeurCanvas;
   canvas.height = hauteurCanvas;
-  dessiner();
+  if (modeActuel === 'atelier') dessiner();
+  else if (modeActuel === 'vol') dessinerVol();
 });
 
 window.onload = () => {
