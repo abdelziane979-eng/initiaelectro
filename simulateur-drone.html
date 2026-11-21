@@ -607,83 +607,98 @@ function dessiner() {
 }
 
 function verifierCablage() {
-  if (modeMultimetre) basculerMultimetre();
-  const msgBox = document.getElementById('message');
-  msgBox.className = 'message';
-  msgBox.style.display = 'none';
+  try {
+    if (modeMultimetre) basculerMultimetre();
+    const msgBox = document.getElementById('message');
+    msgBox.className = 'message';
+    msgBox.style.display = 'none';
 
-  const nbBatteries = composants.filter(c => c.type === 'batterie').length;
-  const nbPDB = composants.filter(c => c.type === 'pdb').length;
-  const nbFC = composants.filter(c => c.type === 'fc').length;
-  const nbESC = composants.filter(c => c.type === 'esc').length;
-  const nbMoteurs = composants.filter(c => c.type === 'moteur').length;
+    const nbBatteries = composants.filter(c => c.type === 'batterie').length;
+    const nbPDB = composants.filter(c => c.type === 'pdb').length;
+    const nbFC = composants.filter(c => c.type === 'fc').length;
+    const nbESC = composants.filter(c => c.type === 'esc').length;
+    const nbMoteurs = composants.filter(c => c.type === 'moteur').length;
 
-  if (nbBatteries < 1 || nbPDB < 1 || nbFC < 1 || nbESC < 4 || nbMoteurs < 4) {
-    afficherMessage("❌ Il manque des composants ! Place 1 Batterie, 1 PDB, 1 Contrôleur de Vol, 4 ESC et 4 Moteurs.", "erreur");
-    return;
-  }
+    if (nbBatteries < 1 || nbPDB < 1 || nbFC < 1 || nbESC < 4 || nbMoteurs < 4) {
+      afficherMessage("❌ Il manque des composants ! Place 1 Batterie, 1 PDB, 1 Contrôleur de Vol, 4 ESC et 4 Moteurs.", "erreur");
+      return;
+    }
 
-  let erreurs = [];
+    let erreurs = [];
 
-  function estConnecte(typeA, patteA, typeB, patteB) {
-    return fils.some(f => {
-      const cA = composants.find(c => c.id === f.compA);
-      const cB = composants.find(c => c.id === f.compB);
-      if (!cA || !cB) return false;
-      return (
-        (cA.type === typeA && f.patteA === patteA && cB.type === typeB && f.patteB === patteB) ||
-        (cB.type === typeA && f.patteB === patteA && cA.type === typeB && f.patteA === patteB)
-      );
-    });
-  }
-
-  if (!estConnecte('batterie', '+', 'pdb', 'bat+')) erreurs.push("La borne + de la Batterie n'est pas reliée au BAT+ du PDB.");
-  if (!estConnecte('batterie', '-', 'pdb', 'bat-')) erreurs.push("La borne - de la Batterie n'est pas reliée au BAT- du PDB.");
-
-  if (!estConnecte('pdb', '5v', 'fc', '5v')) erreurs.push("Le 5V BEC du PDB n'est pas relié au 5V du FC.");
-  if (!estConnecte('pdb', 'bat-', 'fc', 'gnd')) erreurs.push("La masse (GND) du FC n'est pas reliée au PDB.");
-
-  let m1OK = false, m2OK = false, m3OK = false, m4OK = false;
-  
-  composants.filter(c => c.type === 'esc').forEach(esc => {
-    const escAlimente = fils.some(f => {
-      const cA = composants.find(c => c.id === f.compA);
-      const cB = composants.find(c => c.id === f.compB);
-      return (cA.type === 'pdb' && f.patteA.startsWith('esc') && cB.id === esc.id && f.patteB === 'pwr+') ||
-             (cB.type === 'pdb' && f.patteB.startsWith('esc') && cA.id === esc.id && f.patteA === 'pwr+');
-    });
-    if (!escAlimente) erreurs.push("Un ESC n'est pas alimenté par le PDB (pwr+).");
-
-    const escMasse = fils.some(f => {
+    function estConnecte(typeA, patteA, typeB, patteB) {
+      return fils.some(f => {
         const cA = composants.find(c => c.id === f.compA);
         const cB = composants.find(c => c.id === f.compB);
-        return (cA.type === 'pdb' && f.patteA === 'bat-' && cB.id === esc.id && f.patteB === 'pwr-') ||
-               (cB.type === 'pdb' && f.patteB === 'bat-' && cA.id === esc.id && f.patteA === 'pwr-');
-    });
-    if (!escMasse) erreurs.push("Un ESC n'est pas relié à la masse du PDB (pwr-).");
-
-    if (estConnecte('fc', 'm1', 'esc', 'sig')) m1OK = true;
-    if (estConnecte('fc', 'm2', 'esc', 'sig')) m2OK = true;
-    if (estConnecte('fc', 'm3', 'esc', 'sig')) m3OK = true;
-    if (estConnecte('fc', 'm4', 'esc', 'sig')) m4OK = true;
-
-    if (!estConnecte('esc', 'mot+', 'moteur', '+') || !estConnecte('esc', 'mot-', 'moteur', '-')) {
-      erreurs.push("Un ESC n'est pas correctement relié à son moteur (M+ et M-).");
+        if (!cA || !cB) return false;
+        return (
+          (cA.type === typeA && f.patteA === patteA && cB.type === typeB && f.patteB === patteB) ||
+          (cB.type === typeA && f.patteB === patteA && cA.type === typeB && f.patteA === patteB)
+        );
+      });
     }
-  });
 
-  if (!m1OK) erreurs.push("Le signal du Moteur 1 (FC) n'est pas relié à un ESC (SIG).");
-  if (!m2OK) erreurs.push("Le signal du Moteur 2 (FC) n'est pas relié à un ESC (SIG).");
-  if (!m3OK) erreurs.push("Le signal du Moteur 3 (FC) n'est pas relié à un ESC (SIG).");
-  if (!m4OK) erreurs.push("Le signal du Moteur 4 (FC) n'est pas relié à un ESC (SIG).");
+    if (!estConnecte('batterie', '+', 'pdb', 'bat+')) erreurs.push("La borne + de la Batterie n'est pas reliée au BAT+ du PDB.");
+    if (!estConnecte('batterie', '-', 'pdb', 'bat-')) erreurs.push("La borne - de la Batterie n'est pas reliée au BAT- du PDB.");
 
-  if (erreurs.length > 0) {
-    const erreursUniques = [...new Set(erreurs)];
-    afficherMessage("❌ Câblage incomplet :<br><br>• " + erreursUniques.join("<br>• "), "erreur");
-  } else {
-    afficherMessage("🎉 FÉLICITATIONS !<br>Le câblage est parfait. Le drone est prêt pour la checklist de vol ! 🚁", "succes");
-    lancerConfettis();
-    document.getElementById('btn-vol').style.display = 'block';
+    if (!estConnecte('pdb', '5v', 'fc', '5v')) erreurs.push("Le 5V BEC du PDB n'est pas relié au 5V du FC.");
+    if (!estConnecte('pdb', 'bat-', 'fc', 'gnd')) erreurs.push("La masse (GND) du FC n'est pas reliée au PDB.");
+
+    let m1OK = false, m2OK = false, m3OK = false, m4OK = false;
+    
+    composants.filter(c => c.type === 'esc').forEach(esc => {
+      
+      // Vérification de l'alimentation de l'ESC
+      const escAlimente = fils.some(f => {
+        const cA = composants.find(c => c.id === f.compA);
+        const cB = composants.find(c => c.id === f.compB);
+        if (!cA || !cB) return false; // PROTECTION ANTI-BUG
+        
+        return (cA.type === 'pdb' && f.patteA.startsWith('esc') && cB.id === esc.id && f.patteB === 'pwr+') ||
+               (cB.type === 'pdb' && f.patteB.startsWith('esc') && cA.id === esc.id && f.patteA === 'pwr+');
+      });
+      if (!escAlimente) erreurs.push("Un ESC n'est pas alimenté par le PDB (pwr+).");
+
+      // Vérification de la masse de l'ESC
+      const escMasse = fils.some(f => {
+          const cA = composants.find(c => c.id === f.compA);
+          const cB = composants.find(c => c.id === f.compB);
+          if (!cA || !cB) return false; // PROTECTION ANTI-BUG
+          
+          return (cA.type === 'pdb' && f.patteA === 'bat-' && cB.id === esc.id && f.patteB === 'pwr-') ||
+                 (cB.type === 'pdb' && f.patteB === 'bat-' && cA.id === esc.id && f.patteA === 'pwr-');
+      });
+      if (!escMasse) erreurs.push("Un ESC n'est pas relié à la masse du PDB (pwr-).");
+
+      // Vérification des signaux
+      if (estConnecte('fc', 'm1', 'esc', 'sig')) m1OK = true;
+      if (estConnecte('fc', 'm2', 'esc', 'sig')) m2OK = true;
+      if (estConnecte('fc', 'm3', 'esc', 'sig')) m3OK = true;
+      if (estConnecte('fc', 'm4', 'esc', 'sig')) m4OK = true;
+
+      // Vérification des moteurs
+      if (!estConnecte('esc', 'mot+', 'moteur', '+') || !estConnecte('esc', 'mot-', 'moteur', '-')) {
+        erreurs.push("Un ESC n'est pas correctement relié à son moteur (M+ et M-).");
+      }
+    });
+
+    if (!m1OK) erreurs.push("Le signal du Moteur 1 (FC) n'est pas relié à un ESC (SIG).");
+    if (!m2OK) erreurs.push("Le signal du Moteur 2 (FC) n'est pas relié à un ESC (SIG).");
+    if (!m3OK) erreurs.push("Le signal du Moteur 3 (FC) n'est pas relié à un ESC (SIG).");
+    if (!m4OK) erreurs.push("Le signal du Moteur 4 (FC) n'est pas relié à un ESC (SIG).");
+
+    if (erreurs.length > 0) {
+      const erreursUniques = [...new Set(erreurs)];
+      afficherMessage("❌ Câblage incomplet :<br><br>• " + erreursUniques.join("<br>• "), "erreur");
+    } else {
+      afficherMessage("🎉 FÉLICITATIONS !<br>Le câblage est parfait. Le drone est prêt pour la checklist de vol ! 🚁", "succes");
+      lancerConfettis();
+      document.getElementById('btn-vol').style.display = 'block';
+    }
+  } catch (e) {
+    // Si une erreur imprévue arrive, on l'affiche en rouge au lieu de planter silencieusement
+    afficherMessage("❌ Erreur du simulateur : " + e.message, "erreur");
+    console.error(e);
   }
 }
 
