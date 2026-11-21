@@ -38,6 +38,9 @@
   .btn-multimetre { background: linear-gradient(135deg, #0891b2, #06b6d4); color: white; box-shadow: 0 4px 0 #0e7490; }
   .btn-multimetre:hover { transform: translateY(-2px); box-shadow: 0 6px 0 #0e7490; }
   .btn-multimetre.actif { background: linear-gradient(135deg, #0e7490, #155e75); box-shadow: inset 0 2px 4px rgba(0,0,0,0.5); transform: translateY(2px); }
+  .btn-effacer { background: linear-gradient(135deg, #ef4444, #dc2626); color: white; box-shadow: 0 4px 0 #991b1b; }
+  .btn-effacer:hover { transform: translateY(-2px); box-shadow: 0 6px 0 #991b1b; }
+  .btn-effacer:active { transform: translateY(2px); box-shadow: 0 2px 0 #991b1b; }
   .message { margin-top: 15px; padding: 15px; border-radius: 8px; font-weight: bold; display: none; text-align: left; line-height: 1.4; }
   .message.succes { display: block; background: #dcfce7; color: #166534; border: 2px solid #22c55e; }
   .message.erreur { display: block; background: #fee2e2; color: #991b1b; border: 2px solid #ef4444; }
@@ -85,11 +88,13 @@
         <li>🔴 Rouge : + (Plus)</li>
         <li>⚫ Noir : - (Moins)</li>
         <li>🟡 Jaune : Signal</li>
+        <li>🗑️ <strong>Clic droit</strong> pour supprimer</li>
       </ul>
     </div>
     
     <button class="btn-action btn-multimetre" id="btn-multi" onclick="basculerMultimetre()">🔬 Test de Continuité</button>
     <button class="btn-action btn-verifier" onclick="verifierCablage()">✅ Vérifier le Câblage</button>
+    <button class="btn-action btn-effacer" onclick="toutEffacer()">🗑️ Tout effacer</button>
     
     <div class="message" id="message"></div>
   </div>
@@ -114,10 +119,8 @@ let patteEnAttente = null;
 let composantEnDrag = null;
 let dragOffsetX = 0, dragOffsetY = 0;
 
-// Gestion du survol
 let patteSurvolee = null;
 
-// État du multimètre
 let modeMultimetre = false;
 let pointeA = null;
 let pointeB = null;
@@ -169,6 +172,7 @@ canvas.addEventListener('click', clicCanvas);
 canvas.addEventListener('mousedown', sourisDown);
 canvas.addEventListener('mousemove', survolSouris);
 canvas.addEventListener('mouseup', sourisUp);
+canvas.addEventListener('contextmenu', clicDroitCanvas); // Clic droit
 
 function coordonneesSouris(event) {
   const rect = canvas.getBoundingClientRect();
@@ -205,11 +209,79 @@ function trouverPatteSousSouris(x, y) {
     for (let j = 0; j < comp.pattes.length; j++) {
       const p = obtenirPatteAbsolue(comp, comp.pattes[j].id);
       const dx = x - p.x, dy = y - p.y;
-      // Zone de clic augmentée (rayon 25)
       if (dx*dx + dy*dy <= 25*25) return { compId: comp.id, patte: comp.pattes[j] };
     }
   }
   return null;
+}
+
+// Distance d'un point à un segment de droite
+function distancePointSegment(px, py, x1, y1, x2, y2) {
+  const dx = x2 - x1;
+  const dy = y2 - y1;
+  const l2 = dx*dx + dy*dy;
+  if (l2 === 0) return Math.sqrt((px-x1)**2 + (py-y1)**2);
+  let t = ((px - x1) * dx + (py - y1) * dy) / l2;
+  t = Math.max(0, Math.min(1, t));
+  return Math.sqrt((px - (x1 + t*dx))**2 + (py - (y1 + t*dy))**2);
+}
+
+// Trouver le fil sous la souris
+function trouverFilSousSouris(x, y) {
+  for (let i = fils.length - 1; i >= 0; i--) {
+    const f = fils[i];
+    const compA = composants.find(c => c.id === f.compA);
+    const compB = composants.find(c => c.id === f.compB);
+    if (compA && compB) {
+      const pA = obtenirPatteAbsolue(compA, f.patteA);
+      const pB = obtenirPatteAbsolue(compB, f.patteB);
+      
+      // Approximation de la courbe par des segments de ligne droite pour le clic
+      const steps = 10;
+      let minDistance = Infinity;
+      let prevX = pA.x, prevY = pA.y;
+      
+      for (let s = 1; s <= steps; s++) {
+        const t = s / steps;
+        const mt = 1 - t;
+        // Formule de la courbe de Bézier
+        const bx = mt*mt*mt*pA.x + 3*mt*mt*t*pA.x + 3*mt*t*t*pB.x + t*t*t*pB.x;
+        const by = mt*mt*mt*pA.y + 3*mt*mt*t*((pA.y+pB.y)/2) + 3*mt*t*t*((pA.y+pB.y)/2) + t*t*t*pB.y;
+        
+        const d = distancePointSegment(x, y, prevX, prevY, bx, by);
+        if (d < minDistance) minDistance = d;
+        
+        prevX = bx; prevY = by;
+      }
+      
+      if (minDistance < 10) return f;
+    }
+  }
+  return null;
+}
+
+function clicDroitCanvas(event) {
+  event.preventDefault(); // Empêche le menu contextuel du navigateur
+  
+  const pos = coordonneesSouris(event);
+  
+  // 1. Tester si on clique sur un fil
+  const fil = trouverFilSousSouris(pos.x, pos.y);
+  if (fil) {
+    fils = fils.filter(f => f !== fil);
+    dessiner();
+    return;
+  }
+  
+  // 2. Tester si on clique sur un composant
+  const comp = trouverComposantSousSouris(pos.x, pos.y);
+  if (comp) {
+    // Supprimer le composant et tous ses fils connectés
+    composants = composants.filter(c => c.id !== comp.id);
+    fils = fils.filter(f => f.compA !== comp.id && f.compB !== comp.id);
+    dessiner();
+    return;
+  }
 }
 
 function basculerMultimetre() {
@@ -340,6 +412,8 @@ function clicCanvas(event) {
 
 function sourisDown(event) {
   if (patteEnAttente || modeMultimetre) return;
+  if (event.button === 2) return; // Ne pas drag si clic droit
+  
   const pos = coordonneesSouris(event);
   const comp = trouverComposantSousSouris(pos.x, pos.y);
   if (comp) {
@@ -358,7 +432,6 @@ function survolSouris(event) {
     return;
   }
   
-  // Gestion du survol des pattes
   const pos = coordonneesSouris(event);
   const nouvellePatte = trouverPatteSousSouris(pos.x, pos.y);
   
@@ -389,7 +462,6 @@ function sourisUp(event) {
 function dessiner() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   
-  // Dessiner les fils
   fils.forEach(fil => {
     const compA = composants.find(c => c.id === fil.compA);
     const compB = composants.find(c => c.id === fil.compB);
@@ -437,7 +509,6 @@ function dessiner() {
       const p = obtenirPatteAbsolue(comp, patte.id);
       const estSurvolee = patteSurvolee && patteSurvolee.compId === comp.id && patteSurvolee.patte.id === patte.id;
       
-      // Halo de survol
       if (estSurvolee) {
         ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
         ctx.beginPath();
@@ -445,18 +516,15 @@ function dessiner() {
         ctx.fill();
       }
 
-      // Le point de connexion (agrandi)
       ctx.fillStyle = patte.couleur;
       ctx.beginPath();
       ctx.arc(p.x, p.y, 9, 0, Math.PI * 2);
       ctx.fill();
       
-      // Bordure blanche pour faire ressortir
       ctx.strokeStyle = estSurvolee ? '#fff' : '#64748b';
       ctx.lineWidth = estSurvolee ? 3 : 2;
       ctx.stroke();
 
-      // Texte (sur fond noir pour être lisible)
       ctx.font = 'bold 11px Arial';
       const texte = patte.nom;
       const largeurTexte = ctx.measureText(texte).width;
@@ -464,11 +532,9 @@ function dessiner() {
       let offsetX = patte.x < 0 ? -largeurTexte/2 - 15 : (patte.x > comp.largeur ? largeurTexte/2 + 15 : 0);
       let offsetY = patte.y < 0 ? -15 : (patte.y > comp.hauteur ? 20 : 0);
 
-      // Fond noir du texte
       ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
       ctx.fillRect(p.x + offsetX - largeurTexte/2 - 2, p.y + offsetY - 11, largeurTexte + 4, 14);
       
-      // Texte blanc
       ctx.fillStyle = '#fff';
       ctx.textAlign = 'center';
       ctx.fillText(texte, p.x + offsetX, p.y + offsetY);
@@ -577,6 +643,18 @@ function verifierCablage() {
   } else {
     afficherMessage("🎉 FÉLICITATIONS !<br>Le câblage est parfait. Le drone est prêt pour la checklist de vol ! 🚁", "succes");
     lancerConfettis();
+  }
+}
+
+function toutEffacer() {
+  if (confirm("Voulez-vous vraiment tout effacer ?")) {
+    composants = [];
+    fils = [];
+    prochainId = 1;
+    patteEnAttente = null;
+    pointeA = null; pointeB = null;
+    document.getElementById('message').style.display = 'none';
+    dessiner();
   }
 }
 
