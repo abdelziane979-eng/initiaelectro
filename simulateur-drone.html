@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simulateur Drone - Atelier de Câblage</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: #0f172a; color: #e2e8f0; height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
+  
+  header { background: linear-gradient(135deg, #3b82f6, #1d4ed8); color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.3); z-index: 10; }
+  header h1 { font-size: 1.5em; }
+  header p { font-size: 0.9em; opacity: 0.9; }
+  .btn-retour { background: rgba(255,255,255,0.2); color: white; border: 2px solid rgba(255,255,255,0.4); padding: 8px 16px; border-radius: 8px; cursor: pointer; text-decoration: none; font-weight: bold; transition: 0.2s; }
+  .btn-retour:hover { background: rgba(255,255,255,0.35); }
+
+  .conteneur { display: flex; flex: 1; overflow: hidden; }
+  
+  .palette { width: 250px; background: #1e293b; padding: 15px; display: flex; flex-direction: column; gap: 10px; overflow-y: auto; border-right: 2px solid #334155; }
+  .palette h2 { font-size: 1.1em; color: #60a5fa; margin-bottom: 10px; border-bottom: 2px solid #334155; padding-bottom: 5px; }
+  .item-palette { background: #334155; padding: 10px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: 0.2s; border: 2px solid transparent; }
+  .item-palette:hover { background: #475569; border-color: #60a5fa; }
+  .item-palette.actif { background: #3b82f6; border-color: #93c5fd; }
+  .item-palette .emoji { font-size: 1.5em; }
+
+  .zone-jeu { flex: 1; background: #0b1120; position: relative; overflow: hidden; background-image: radial-gradient(#1e293b 1px, transparent 1px); background-size: 20px 20px; }
+  canvas { display: block; cursor: crosshair; }
+  canvas.mode-cablage { cursor: cell; }
+
+  .panneau-droit { width: 300px; background: #1e293b; padding: 15px; display: flex; flex-direction: column; border-left: 2px solid #334155; }
+  .instruction { background: #0f172a; padding: 15px; border-radius: 8px; font-size: 0.9em; line-height: 1.5; border-left: 4px solid #3b82f6; margin-bottom: 15px; }
+  .instruction ul { margin-left: 20px; margin-top: 10px; }
+  .instruction li { margin-bottom: 5px; }
+  .btn-verifier { background: linear-gradient(135deg, #10b981, #059669); color: white; border: none; padding: 15px; border-radius: 8px; font-size: 1.1em; font-weight: bold; cursor: pointer; box-shadow: 0 4px 0 #047857; transition: 0.1s; margin-top: auto; }
+  .btn-verifier:hover { transform: translateY(-2px); box-shadow: 0 6px 0 #047857; }
+  .btn-verifier:active { transform: translateY(2px); box-shadow: 0 2px 0 #047857; }
+  .message { margin-top: 15px; padding: 15px; border-radius: 8px; font-weight: bold; display: none; text-align: center; }
+  .message.succes { display: block; background: #dcfce7; color: #166534; border: 2px solid #22c55e; }
+  .message.erreur { display: block; background: #fee2e2; color: #991b1b; border: 2px solid #ef4444; }
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>🚁 Atelier de Câblage Drone</h1>
+    <p>Place les composants et relie-les correctement</p>
+  </div>
+  <a href="index.html" class="btn-retour">← Retour à l'accueil</a>
+</header>
+
+<div class="conteneur">
+  <div class="palette">
+    <h2>🛠️ Cartes Électroniques</h2>
+    <div class="item-palette" onclick="choisirComposant('batterie')">
+      <span class="emoji">🔋</span> <div><strong>Batterie</strong><br><small>LiPo 3S (11.1V)</small></div>
+    </div>
+    <div class="item-palette" onclick="choisirComposant('pdb')">
+      <span class="emoji">⚡</span> <div><strong>PDB</strong><br><small>Distribution & BEC</small></div>
+    </div>
+    <div class="item-palette" onclick="choisirComposant('fc')">
+      <span class="emoji">🧠</span> <div><strong>Contrôleur de Vol</strong><br><small>Flight Controller</small></div>
+    </div>
+    <div class="item-palette" onclick="choisirComposant('esc')">
+      <span class="emoji">⚙️</span> <div><strong>ESC</strong><br><small>Variateur de vitesse</small></div>
+    </div>
+    <div class="item-palette" onclick="choisirComposant('moteur')">
+      <span class="emoji">🌀</span> <div><strong>Moteur Brushless</strong><br><small>Avec hélice</small></div>
+    </div>
+  </div>
+
+  <div class="zone-jeu" id="zone-jeu">
+    <canvas id="canvas-drone"></canvas>
+  </div>
+
+  <div class="panneau-droit">
+    <div class="instruction">
+      <strong>📋 Objectif :</strong><br>
+      Connecte la batterie au PDB, puis alimente les ESC. Enfin, relie les signaux des ESC au Contrôleur de Vol (FC).
+      <ul>
+        <li>🔴 Rouge : + (Plus)</li>
+        <li>⚫ Noir : - (Moins)</li>
+        <li>🟡 Jaune : Signal</li>
+      </ul>
+    </div>
+    <button class="btn-verifier" onclick="verifierCablage()">✅ Vérifier le Câblage</button>
+    <div class="message" id="message"></div>
+  </div>
+</div>
+
+<script>
+const canvas = document.getElementById('canvas-drone');
+const ctx = canvas.getContext('2d');
+const zoneJeu = document.getElementById('zone-jeu');
+
+let largeurCanvas = zoneJeu.clientWidth;
+let hauteurCanvas = zoneJeu.clientHeight;
+canvas.width = largeurCanvas;
+canvas.height = hauteurCanvas;
+
+let composants = [];
+let fils = [];
+let prochainId = 1;
+
+let composantSelectionne = null;
+let patteEnAttente = null;
+let composantEnDrag = null;
+let dragOffsetX = 0, dragOffsetY = 0;
+
+// Définition des composants et de leurs pattes (pins)
+const CATALOGUE = {
+  batterie: { 
+    nom: 'Batterie', largeur: 80, hauteur: 50, couleur: '#475569',
+    pattes: [{ id:'+', nom:'+', x:20, y:50, couleur:'#ef4444' }, { id:'-', nom:'-', x:60, y:50, couleur:'#111' }] 
+  },
+  pdb: { 
+    nom: 'PDB', largeur: 140, hauteur: 80, couleur: '#1e293b',
+    pattes: [
+      { id:'bat+', nom:'BAT+', x:20, y:80, couleur:'#ef4444' }, { id:'bat-', nom:'BAT-', x:50, y:80, couleur:'#111' },
+      { id:'esc1', nom:'ESC1', x:110, y:20, couleur:'#ef4444' }, { id:'esc2', nom:'ESC2', x:130, y:20, couleur:'#ef4444' },
+      { id:'esc3', nom:'ESC3', x:110, y:60, couleur:'#ef4444' }, { id:'esc4', nom:'ESC4', x:130, y:60, couleur:'#ef4444' },
+      { id:'5v', nom:'5V BEC', x:70, y:80, couleur:'#f59e0b' }
+    ] 
+  },
+  fc: { 
+    nom: 'Contrôleur de Vol', largeur: 120, hauteur: 120, couleur: '#0f172a',
+    pattes: [
+      { id:'5v', nom:'5V', x:-10, y:20, couleur:'#f59e0b' }, { id:'gnd', nom:'GND', x:-10, y:50, couleur:'#111' },
+      { id:'m1', nom:'M1', x:130, y:20, couleur:'#eab308' }, { id:'m2', nom:'M2', x:130, y:40, couleur:'#eab308' },
+      { id:'m3', nom:'M3', x:130, y:60, couleur:'#eab308' }, { id:'m4', nom:'M4', x:130, y:80, couleur:'#eab308' }
+    ] 
+  },
+  esc: { 
+    nom: 'ESC', largeur: 60, hauteur: 80, couleur: '#1e293b',
+    pattes: [
+      { id:'pwr+', nom:'+', x:10, y:80, couleur:'#ef4444' }, { id:'pwr-', nom:'-', x:30, y:80, couleur:'#111' },
+      { id:'sig', nom:'SIG', x:-10, y:40, couleur:'#eab308' },
+      { id:'mot+', nom:'M+', x:10, y:-10, couleur:'#ef4444' }, { id:'mot-', nom:'M-', x:30, y:-10, couleur:'#111' }
+    ] 
+  },
+  moteur: { 
+    nom: 'Moteur', largeur: 50, hauteur: 50, couleur: '#334155',
+    pattes: [{ id:'+', nom:'+', x:15, y:60, couleur:'#ef4444' }, { id:'-', nom:'-', x:35, y:60, couleur:'#111' }] 
+  }
+};
+
+function choisirComposant(type) {
+  composantSelectionne = type;
+  document.querySelectorAll('.item-palette').forEach(el => el.classList.remove('actif'));
+  event.currentTarget.classList.add('actif');
+}
+
+// Ajout des événements souris
+canvas.addEventListener('click', clicCanvas);
+canvas.addEventListener('mousedown', sourisDown);
+canvas.addEventListener('mousemove', survolSouris);
+canvas.addEventListener('mouseup', sourisUp);
+
+function coordonneesSouris(event) {
+  const rect = canvas.getBoundingClientRect();
+  return { x: event.clientX - rect.left, y: event.clientY - rect.top };
+}
+
+function creerComposant(type, x, y) {
+  const def = CATALOGUE[type];
+  const comp = {
+    id: prochainId++, type: type,
+    x: x - def.largeur/2, y: y - def.hauteur/2,
+    largeur: def.largeur, hauteur: def.hauteur,
+    pattes: def.pattes
+  };
+  composants.push(comp);
+}
+
+function obtenirPatteAbsolue(comp, patteId) {
+  const patte = comp.pattes.find(p => p.id === patteId);
+  return { x: comp.x + patte.x, y: comp.y + patte.y };
+}
+
+function trouverComposantSousSouris(x, y) {
+  for (let i = composants.length - 1; i >= 0; i--) {
+    const c = composants[i];
+    if (x >= c.x && x <= c.x + c.largeur && y >= c.y && y <= c.y + c.hauteur) return c;
+  }
+  return null;
+}
+
+function trouverPatteSousSouris(x, y) {
+  for (let i = composants.length - 1; i >= 0; i--) {
+    const comp = composants[i];
+    for (let j = 0; j < comp.pattes.length; j++) {
+      const p = obtenirPatteAbsolue(comp, comp.pattes[j].id);
+      const dx = x - p.x, dy = y - p.y;
+      if (dx*dx + dy*dy <= 15*15) return { compId: comp.id, patte: comp.pattes[j] };
+    }
+  }
+  return null;
+}
+
+function clicCanvas(event) {
+  const pos = coordonneesSouris(event);
+  
+  if (composantSelectionne) {
+    creerComposant(composantSelectionne, pos.x, pos.y);
+    composantSelectionne = null;
+    document.querySelectorAll('.item-palette').forEach(el => el.classList.remove('actif'));
+    dessiner();
+    return;
+  }
+
+  const patte = trouverPatteSousSouris(pos.x, pos.y);
+  if (patte) {
+    if (!patteEnAttente) {
+      patteEnAttente = patte;
+      canvas.classList.add('mode-cablage');
+      dessiner();
+    } else {
+      if (patteEnAttente.compId === patte.compId && patteEnAttente.patte.id === patte.patte.id) {
+        patteEnAttente = null;
+        canvas.classList.remove('mode-cablage');
+        dessiner();
+        return;
+      }
+      fils.push({
+        compA: patteEnAttente.compId, patteA: patteEnAttente.patte.id,
+        compB: patte.compId, patteB: patte.patte.id,
+        couleur: patteEnAttente.patte.couleur
+      });
+      patteEnAttente = null;
+      canvas.classList.remove('mode-cablage');
+      dessiner();
+    }
+  } else {
+    if (patteEnAttente) {
+      patteEnAttente = null;
+      canvas.classList.remove('mode-cablage');
+      dessiner();
+    }
+  }
+}
+
+function sourisDown(event) {
+  if (patteEnAttente) return;
+  const pos = coordonneesSouris(event);
+  const comp = trouverComposantSousSouris(pos.x, pos.y);
+  if (comp) {
+    composantEnDrag = comp;
+    dragOffsetX = pos.x - comp.x;
+    dragOffsetY = pos.y - comp.y;
+  }
+}
+
+function survolSouris(event) {
+  if (composantEnDrag) {
+    const pos = coordonneesSouris(event);
+    composantEnDrag.x = pos.x - dragOffsetX;
+    composantEnDrag.y = pos.y - dragOffsetY;
+    dessiner();
+  }
+}
+
+function sourisUp(event) {
+  if (composantEnDrag) {
+    composantEnDrag = null;
+    dessiner();
+  }
+}
+
+function dessiner() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  
+  // Dessiner les fils
+  fils.forEach(fil => {
+    const compA = composants.find(c => c.id === fil.compA);
+    const compB = composants.find(c => c.id === fil.compB);
+    if (compA && compB) {
+      const pA = obtenirPatteAbsolue(compA, fil.patteA);
+      const pB = obtenirPatteAbsolue(compB, fil.patteB);
+      
+      ctx.beginPath();
+      ctx.moveTo(pA.x, pA.y);
+      // Courbe pour faire joli
+      ctx.bezierCurveTo(pA.x, (pA.y + pB.y) / 2, pB.x, (pA.y + pB.y) / 2, pB.x, pB.y);
+      ctx.strokeStyle = fil.couleur;
+      ctx.lineWidth = 4;
+      ctx.stroke();
+    }
+  });
+
+  // Dessiner les composants
+  composants.forEach(comp => {
+    // Boitier
+    ctx.fillStyle = CATALOGUE[comp.type].couleur;
+    ctx.strokeStyle = '#475569';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.roundRect(comp.x, comp.y, comp.largeur, comp.hauteur, 8);
+    ctx.fill();
+    ctx.stroke();
+
+    // Texte
+    ctx.fillStyle = '#e2e8f0';
+    ctx.font = 'bold 12px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText(CATALOGUE[comp.type].nom, comp.x + comp.largeur/2, comp.y + comp.hauteur/2 + 5);
+    
+    // Dessin spécifique pour certains composants (ex: hélice)
+    if (comp.type === 'moteur') {
+      ctx.strokeStyle = '#94a3b8';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.arc(comp.x + 25, comp.y + 15, 15, 0, Math.PI * 2);
+      ctx.stroke();
+    }
+
+    // Pattes (Pins)
+    comp.pattes.forEach(patte => {
+      const p = obtenirPatteAbsolue(comp, patte.id);
+      
+      ctx.fillStyle = patte.couleur;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, 6, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = '#fff';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+
+      // Texte de la patte
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = '10px Arial';
+      let offsetX = patte.x < 0 ? -15 : (patte.x > comp.largeur ? 15 : 0);
+      let offsetY = patte.y < 0 ? -10 : (patte.y > comp.hauteur ? 15 : 0);
+      ctx.fillText(patte.nom, p.x + offsetX, p.y + offsetY);
+    });
+  });
+
+  // Dessiner la patte en attente
+  if (patteEnAttente) {
+    const comp = composants.find(c => c.id === patteEnAttente.compId);
+    if (comp) {
+      const p = obtenirPatteAbsolue(comp, patteEnAttente.patte.id);
+      ctx.strokeStyle = '#fbbf24';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, 12, 0, Math.PI * 2);
+      ctx.stroke();
+    }
+  }
+}
+
+// Fonction vide pour l'instant, on la complétera dans la partie 2
+function verifierCablage() {
+  console.log("Vérification à venir...");
+}
+</script>
+
+</body>
+</html>
+// ==========================================
+// LOGIQUE DE VÉRIFICATION DU CÂBLAGE
+// ==========================================
+function verifierCablage() {
+  const msgBox = document.getElementById('message');
+  msgBox.className = 'message';
+  msgBox.style.display = 'none';
+
+  // 1. Vérifier si les composants minimum sont présents
+  const nbBatteries = composants.filter(c => c.type === 'batterie').length;
+  const nbPDB = composants.filter(c => c.type === 'pdb').length;
+  const nbFC = composants.filter(c => c.type === 'fc').length;
+  const nbESC = composants.filter(c => c.type === 'esc').length;
+  const nbMoteurs = composants.filter(c => c.type === 'moteur').length;
+
+  if (nbBatteries < 1 || nbPDB < 1 || nbFC < 1 || nbESC < 4 || nbMoteurs < 4) {
+    afficherMessage("❌ Il manque des composants ! Place 1 Batterie, 1 PDB, 1 Contrôleur de Vol, 4 ESC et 4 Moteurs.", "erreur");
+    return;
+  }
+
+  let erreurs = [];
+
+  // Fonction utilitaire pour vérifier si deux pattes sont reliées
+  function estConnecte(typeA, patteA, typeB, patteB) {
+    return fils.some(f => {
+      const cA = composants.find(c => c.id === f.compA);
+      const cB = composants.find(c => c.id === f.compB);
+      if (!cA || !cB) return false;
+      
+      // On vérifie dans les deux sens (A vers B ou B vers A)
+      return (
+        (cA.type === typeA && f.patteA === patteA && cB.type === typeB && f.patteB === patteB) ||
+        (cB.type === typeA && f.patteB === patteA && cA.type === typeB && f.patteA === patteB)
+      );
+    });
+  }
+
+  // 2. Vérifier l'alimentation principale (Batterie -> PDB)
+  if (!estConnecte('batterie', '+', 'pdb', 'bat+')) erreurs.push("La borne + de la Batterie n'est pas reliée au BAT+ du PDB.");
+  if (!estConnecte('batterie', '-', 'pdb', 'bat-')) erreurs.push("La borne - de la Batterie n'est pas reliée au BAT- du PDB.");
+
+  // 3. Vérifier l'alimentation du Contrôleur de Vol (PDB -> FC)
+  if (!estConnecte('pdb', '5v', 'fc', '5v')) erreurs.push("Le 5V BEC du PDB n'est pas relié au 5V du FC.");
+  if (!estConnecte('pdb', 'bat-', 'fc', 'gnd')) erreurs.push("La masse (GND) du FC n'est pas reliée au PDB.");
+
+  // 4. Vérifier les ESC (Alimentation et Signal)
+  // Pour simplifier, on vérifie qu'il y a au moins un câblage correct pour chaque patte du FC
+  let m1OK = false, m2OK = false, m3OK = false, m4OK = false;
+  
+  composants.filter(c => c.type === 'esc').forEach(esc => {
+    // Vérifier l'alimentation de l'ESC (PDB -> ESC)
+    const escAlimente = fils.some(f => {
+      const cA = composants.find(c => c.id === f.compA);
+      const cB = composants.find(c => c.id === f.compB);
+      return (cA.type === 'pdb' && cA.id === composants.find(comp => comp.type === 'pdb').id && f.patteA.startsWith('esc') && cB.id === esc.id && f.patteB === 'pwr+') ||
+             (cB.type === 'pdb' && cB.id === composants.find(comp => comp.type === 'pdb').id && f.patteB.startsWith('esc') && cA.id === esc.id && f.patteA === 'pwr+');
+    });
+    if (!escAlimente) erreurs.push("Un ESC n'est pas alimenté par le PDB (pwr+).");
+
+    // Vérifier la masse de l'ESC (PDB bat- -> ESC pwr-)
+    const escMasse = fils.some(f => {
+        const cA = composants.find(c => c.id === f.compA);
+        const cB = composants.find(c => c.id === f.compB);
+        return (cA.type === 'pdb' && f.patteA === 'bat-' && cB.id === esc.id && f.patteB === 'pwr-') ||
+               (cB.type === 'pdb' && f.patteB === 'bat-' && cA.id === esc.id && f.patteA === 'pwr-');
+    });
+    if (!escMasse) erreurs.push("Un ESC n'est pas relié à la masse du PDB (pwr-).");
+
+    // Vérifier le signal (FC -> ESC)
+    if (estConnecte('fc', 'm1', 'esc', 'sig')) m1OK = true;
+    if (estConnecte('fc', 'm2', 'esc', 'sig')) m2OK = true;
+    if (estConnecte('fc', 'm3', 'esc', 'sig')) m3OK = true;
+    if (estConnecte('fc', 'm4', 'esc', 'sig')) m4OK = true;
+
+    // Vérifier le moteur (ESC -> Moteur)
+    if (!estConnecte('esc', 'mot+', 'moteur', '+') || !estConnecte('esc', 'mot-', 'moteur', '-')) {
+      erreurs.push("Un ESC n'est pas correctement relié à son moteur (M+ et M-).");
+    }
+  });
+
+  if (!m1OK) erreurs.push("Le signal du Moteur 1 (FC) n'est pas relié à un ESC (SIG).");
+  if (!m2OK) erreurs.push("Le signal du Moteur 2 (FC) n'est pas relié à un ESC (SIG).");
+  if (!m3OK) erreurs.push("Le signal du Moteur 3 (FC) n'est pas relié à un ESC (SIG).");
+  if (!m4OK) erreurs.push("Le signal du Moteur 4 (FC) n'est pas relié à un ESC (SIG).");
+
+  // Affichage du résultat
+  if (erreurs.length > 0) {
+    // On enlève les doublons d'erreurs (si 4 ESC ne sont pas alimentés, on ne veut pas 4 fois la même ligne)
+    const erreursUniques = [...new Set(erreurs)];
+    afficherMessage("❌ Câblage incomplet :<br><br>• " + erreursUniques.join("<br>• "), "erreur");
+  } else {
+    afficherMessage("🎉 FÉLICITATIONS !<br>Le câblage est parfait. Le drone est prêt pour la checklist de vol ! 🚁", "succes");
+    lancerConfettis();
+  }
+}
+
+function afficherMessage(texte, type) {
+  const msgBox = document.getElementById('message');
+  msgBox.innerHTML = texte;
+  msgBox.className = 'message ' + type;
+  msgBox.style.display = 'block';
+}
+
+// ==========================================
+// ANIMATION CONFETTIS (Pour la réussite)
+// ==========================================
+function lancerConfettis() {
+  const couleurs = ['#fbbf24', '#22c55e', '#ef4444', '#3b82f6', '#a855f7'];
+  for (let i = 0; i < 50; i++) {
+    setTimeout(() => {
+      const c = document.createElement('div');
+      c.style.cssText = `position:fixed; width:10px; height:10px; left:${Math.random()*100}%; top:-20px; background:${couleurs[Math.floor(Math.random()*couleurs.length)]}; z-index:9999; border-radius:${Math.random()>0.5?'50%':'2px'}; transition: transform 2s linear, top 2s linear, opacity 2s; pointer-events:none;`;
+      document.body.appendChild(c);
+      
+      // Animation
+      requestAnimationFrame(() => {
+        c.style.top = '105vh';
+        c.style.transform = `rotate(${Math.random()*720}deg)`;
+        c.style.opacity = '0';
+      });
+      
+      // Nettoyage
+      setTimeout(() => c.remove(), 2500);
+    }, i * 30);
+  }
+}
+
+// ==========================================
+// INITIALISATION ET REDIMENSIONNEMENT
+// ==========================================
+window.addEventListener('resize', () => {
+  largeurCanvas = zoneJeu.clientWidth;
+  hauteurCanvas = zoneJeu.clientHeight;
+  canvas.width = largeurCanvas;
+  canvas.height = hauteurCanvas;
+  dessiner();
+});
+
+// Démarrer le dessin au chargement
+window.onload = () => {
+  // Ajout du support pour les anciens navigateurs
+  if (!CanvasRenderingContext2D.prototype.roundRect) {
+    CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
+      if (w < 2 * r) r = w / 2;
+      if (h < 2 * r) r = h / 2;
+      this.beginPath();
+      this.moveTo(x + r, y);
+      this.arcTo(x + w, y, x + w, y + h, r);
+      this.arcTo(x + w, y + h, x, y + h, r);
+      this.arcTo(x, y + h, x, y, r);
+      this.arcTo(x, y, x + w, y, r);
+      this.closePath();
+      return this;
+    };
+  }
+  dessiner();
+};
