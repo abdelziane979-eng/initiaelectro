@@ -34,7 +34,7 @@
   .btn-verifier { background: linear-gradient(135deg, #10b981, #059669); color: white; border: none; padding: 15px; border-radius: 8px; font-size: 1.1em; font-weight: bold; cursor: pointer; box-shadow: 0 4px 0 #047857; transition: 0.1s; margin-top: auto; }
   .btn-verifier:hover { transform: translateY(-2px); box-shadow: 0 6px 0 #047857; }
   .btn-verifier:active { transform: translateY(2px); box-shadow: 0 2px 0 #047857; }
-  .message { margin-top: 15px; padding: 15px; border-radius: 8px; font-weight: bold; display: none; text-align: center; }
+  .message { margin-top: 15px; padding: 15px; border-radius: 8px; font-weight: bold; display: none; text-align: left; line-height: 1.4; }
   .message.succes { display: block; background: #dcfce7; color: #166534; border: 2px solid #22c55e; }
   .message.erreur { display: block; background: #fee2e2; color: #991b1b; border: 2px solid #ef4444; }
 </style>
@@ -107,7 +107,6 @@ let patteEnAttente = null;
 let composantEnDrag = null;
 let dragOffsetX = 0, dragOffsetY = 0;
 
-// Définition des composants et de leurs pattes (pins)
 const CATALOGUE = {
   batterie: { 
     nom: 'Batterie', largeur: 80, hauteur: 50, couleur: '#475569',
@@ -150,7 +149,6 @@ function choisirComposant(type) {
   event.currentTarget.classList.add('actif');
 }
 
-// Ajout des événements souris
 canvas.addEventListener('click', clicCanvas);
 canvas.addEventListener('mousedown', sourisDown);
 canvas.addEventListener('mousemove', survolSouris);
@@ -269,7 +267,6 @@ function sourisUp(event) {
 function dessiner() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   
-  // Dessiner les fils
   fils.forEach(fil => {
     const compA = composants.find(c => c.id === fil.compA);
     const compB = composants.find(c => c.id === fil.compB);
@@ -279,7 +276,6 @@ function dessiner() {
       
       ctx.beginPath();
       ctx.moveTo(pA.x, pA.y);
-      // Courbe pour faire joli
       ctx.bezierCurveTo(pA.x, (pA.y + pB.y) / 2, pB.x, (pA.y + pB.y) / 2, pB.x, pB.y);
       ctx.strokeStyle = fil.couleur;
       ctx.lineWidth = 4;
@@ -287,24 +283,20 @@ function dessiner() {
     }
   });
 
-  // Dessiner les composants
   composants.forEach(comp => {
-    // Boitier
     ctx.fillStyle = CATALOGUE[comp.type].couleur;
     ctx.strokeStyle = '#475569';
     ctx.lineWidth = 2;
     ctx.beginPath();
-    ctx.roundRect(comp.x, comp.y, comp.largeur, comp.hauteur, 8);
+    if (ctx.roundRect) { ctx.roundRect(comp.x, comp.y, comp.largeur, comp.hauteur, 8); } else { ctx.rect(comp.x, comp.y, comp.largeur, comp.hauteur); }
     ctx.fill();
     ctx.stroke();
 
-    // Texte
     ctx.fillStyle = '#e2e8f0';
     ctx.font = 'bold 12px Arial';
     ctx.textAlign = 'center';
     ctx.fillText(CATALOGUE[comp.type].nom, comp.x + comp.largeur/2, comp.y + comp.hauteur/2 + 5);
     
-    // Dessin spécifique pour certains composants (ex: hélice)
     if (comp.type === 'moteur') {
       ctx.strokeStyle = '#94a3b8';
       ctx.lineWidth = 3;
@@ -313,7 +305,6 @@ function dessiner() {
       ctx.stroke();
     }
 
-    // Pattes (Pins)
     comp.pattes.forEach(patte => {
       const p = obtenirPatteAbsolue(comp, patte.id);
       
@@ -325,7 +316,6 @@ function dessiner() {
       ctx.lineWidth = 1;
       ctx.stroke();
 
-      // Texte de la patte
       ctx.fillStyle = '#94a3b8';
       ctx.font = '10px Arial';
       let offsetX = patte.x < 0 ? -15 : (patte.x > comp.largeur ? 15 : 0);
@@ -334,7 +324,6 @@ function dessiner() {
     });
   });
 
-  // Dessiner la patte en attente
   if (patteEnAttente) {
     const comp = composants.find(c => c.id === patteEnAttente.compId);
     if (comp) {
@@ -348,23 +337,11 @@ function dessiner() {
   }
 }
 
-// Fonction vide pour l'instant, on la complétera dans la partie 2
-function verifierCablage() {
-  console.log("Vérification à venir...");
-}
-</script>
-
-</body>
-</html>
-// ==========================================
-// LOGIQUE DE VÉRIFICATION DU CÂBLAGE
-// ==========================================
 function verifierCablage() {
   const msgBox = document.getElementById('message');
   msgBox.className = 'message';
   msgBox.style.display = 'none';
 
-  // 1. Vérifier si les composants minimum sont présents
   const nbBatteries = composants.filter(c => c.type === 'batterie').length;
   const nbPDB = composants.filter(c => c.type === 'pdb').length;
   const nbFC = composants.filter(c => c.type === 'fc').length;
@@ -378,14 +355,11 @@ function verifierCablage() {
 
   let erreurs = [];
 
-  // Fonction utilitaire pour vérifier si deux pattes sont reliées
   function estConnecte(typeA, patteA, typeB, patteB) {
     return fils.some(f => {
       const cA = composants.find(c => c.id === f.compA);
       const cB = composants.find(c => c.id === f.compB);
       if (!cA || !cB) return false;
-      
-      // On vérifie dans les deux sens (A vers B ou B vers A)
       return (
         (cA.type === typeA && f.patteA === patteA && cB.type === typeB && f.patteB === patteB) ||
         (cB.type === typeA && f.patteB === patteA && cA.type === typeB && f.patteA === patteB)
@@ -393,29 +367,23 @@ function verifierCablage() {
     });
   }
 
-  // 2. Vérifier l'alimentation principale (Batterie -> PDB)
   if (!estConnecte('batterie', '+', 'pdb', 'bat+')) erreurs.push("La borne + de la Batterie n'est pas reliée au BAT+ du PDB.");
   if (!estConnecte('batterie', '-', 'pdb', 'bat-')) erreurs.push("La borne - de la Batterie n'est pas reliée au BAT- du PDB.");
 
-  // 3. Vérifier l'alimentation du Contrôleur de Vol (PDB -> FC)
   if (!estConnecte('pdb', '5v', 'fc', '5v')) erreurs.push("Le 5V BEC du PDB n'est pas relié au 5V du FC.");
   if (!estConnecte('pdb', 'bat-', 'fc', 'gnd')) erreurs.push("La masse (GND) du FC n'est pas reliée au PDB.");
 
-  // 4. Vérifier les ESC (Alimentation et Signal)
-  // Pour simplifier, on vérifie qu'il y a au moins un câblage correct pour chaque patte du FC
   let m1OK = false, m2OK = false, m3OK = false, m4OK = false;
   
   composants.filter(c => c.type === 'esc').forEach(esc => {
-    // Vérifier l'alimentation de l'ESC (PDB -> ESC)
     const escAlimente = fils.some(f => {
       const cA = composants.find(c => c.id === f.compA);
       const cB = composants.find(c => c.id === f.compB);
-      return (cA.type === 'pdb' && cA.id === composants.find(comp => comp.type === 'pdb').id && f.patteA.startsWith('esc') && cB.id === esc.id && f.patteB === 'pwr+') ||
-             (cB.type === 'pdb' && cB.id === composants.find(comp => comp.type === 'pdb').id && f.patteB.startsWith('esc') && cA.id === esc.id && f.patteA === 'pwr+');
+      return (cA.type === 'pdb' && f.patteA.startsWith('esc') && cB.id === esc.id && f.patteB === 'pwr+') ||
+             (cB.type === 'pdb' && f.patteB.startsWith('esc') && cA.id === esc.id && f.patteA === 'pwr+');
     });
     if (!escAlimente) erreurs.push("Un ESC n'est pas alimenté par le PDB (pwr+).");
 
-    // Vérifier la masse de l'ESC (PDB bat- -> ESC pwr-)
     const escMasse = fils.some(f => {
         const cA = composants.find(c => c.id === f.compA);
         const cB = composants.find(c => c.id === f.compB);
@@ -424,13 +392,11 @@ function verifierCablage() {
     });
     if (!escMasse) erreurs.push("Un ESC n'est pas relié à la masse du PDB (pwr-).");
 
-    // Vérifier le signal (FC -> ESC)
     if (estConnecte('fc', 'm1', 'esc', 'sig')) m1OK = true;
     if (estConnecte('fc', 'm2', 'esc', 'sig')) m2OK = true;
     if (estConnecte('fc', 'm3', 'esc', 'sig')) m3OK = true;
     if (estConnecte('fc', 'm4', 'esc', 'sig')) m4OK = true;
 
-    // Vérifier le moteur (ESC -> Moteur)
     if (!estConnecte('esc', 'mot+', 'moteur', '+') || !estConnecte('esc', 'mot-', 'moteur', '-')) {
       erreurs.push("Un ESC n'est pas correctement relié à son moteur (M+ et M-).");
     }
@@ -441,9 +407,7 @@ function verifierCablage() {
   if (!m3OK) erreurs.push("Le signal du Moteur 3 (FC) n'est pas relié à un ESC (SIG).");
   if (!m4OK) erreurs.push("Le signal du Moteur 4 (FC) n'est pas relié à un ESC (SIG).");
 
-  // Affichage du résultat
   if (erreurs.length > 0) {
-    // On enlève les doublons d'erreurs (si 4 ESC ne sont pas alimentés, on ne veut pas 4 fois la même ligne)
     const erreursUniques = [...new Set(erreurs)];
     afficherMessage("❌ Câblage incomplet :<br><br>• " + erreursUniques.join("<br>• "), "erreur");
   } else {
@@ -459,9 +423,6 @@ function afficherMessage(texte, type) {
   msgBox.style.display = 'block';
 }
 
-// ==========================================
-// ANIMATION CONFETTIS (Pour la réussite)
-// ==========================================
 function lancerConfettis() {
   const couleurs = ['#fbbf24', '#22c55e', '#ef4444', '#3b82f6', '#a855f7'];
   for (let i = 0; i < 50; i++) {
@@ -469,23 +430,16 @@ function lancerConfettis() {
       const c = document.createElement('div');
       c.style.cssText = `position:fixed; width:10px; height:10px; left:${Math.random()*100}%; top:-20px; background:${couleurs[Math.floor(Math.random()*couleurs.length)]}; z-index:9999; border-radius:${Math.random()>0.5?'50%':'2px'}; transition: transform 2s linear, top 2s linear, opacity 2s; pointer-events:none;`;
       document.body.appendChild(c);
-      
-      // Animation
       requestAnimationFrame(() => {
         c.style.top = '105vh';
         c.style.transform = `rotate(${Math.random()*720}deg)`;
         c.style.opacity = '0';
       });
-      
-      // Nettoyage
       setTimeout(() => c.remove(), 2500);
     }, i * 30);
   }
 }
 
-// ==========================================
-// INITIALISATION ET REDIMENSIONNEMENT
-// ==========================================
 window.addEventListener('resize', () => {
   largeurCanvas = zoneJeu.clientWidth;
   hauteurCanvas = zoneJeu.clientHeight;
@@ -494,9 +448,7 @@ window.addEventListener('resize', () => {
   dessiner();
 });
 
-// Démarrer le dessin au chargement
 window.onload = () => {
-  // Ajout du support pour les anciens navigateurs
   if (!CanvasRenderingContext2D.prototype.roundRect) {
     CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
       if (w < 2 * r) r = w / 2;
@@ -513,3 +465,7 @@ window.onload = () => {
   }
   dessiner();
 };
+</script>
+
+</body>
+</html>
