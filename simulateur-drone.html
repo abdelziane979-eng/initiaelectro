@@ -3,65 +3,36 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Simulateur Drone - Atelier & Vol</title>
+<title>Simulateur Drone - Atelier de Câblage</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: 'Segoe UI', Arial, sans-serif; background: #0f172a; color: #e2e8f0; height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
-  
   header { background: linear-gradient(135deg, #3b82f6, #1d4ed8); color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.3); z-index: 10; }
   header h1 { font-size: 1.5em; }
-  header p { font-size: 0.9em; opacity: 0.9; }
-  .btn-retour { background: rgba(255,255,255,0.2); color: white; border: 2px solid rgba(255,255,255,0.4); padding: 8px 16px; border-radius: 8px; cursor: pointer; text-decoration: none; font-weight: bold; transition: 0.2s; }
-  .btn-retour:hover { background: rgba(255,255,255,0.35); }
-
+  .btn-retour { background: rgba(255,255,255,0.2); color: white; border: 2px solid rgba(255,255,255,0.4); padding: 8px 16px; border-radius: 8px; cursor: pointer; text-decoration: none; font-weight: bold; }
   .conteneur { display: flex; flex: 1; overflow: hidden; }
-  
-  .palette { width: 250px; background: #1e293b; padding: 15px; display: flex; flex-direction: column; gap: 10px; overflow-y: auto; border-right: 2px solid #334155; transition: 0.3s; }
-  .palette.hidden { display: none; }
+  .palette { width: 250px; background: #1e293b; padding: 15px; display: flex; flex-direction: column; gap: 10px; overflow-y: auto; border-right: 2px solid #334155; }
   .palette h2 { font-size: 1.1em; color: #60a5fa; margin-bottom: 10px; border-bottom: 2px solid #334155; padding-bottom: 5px; }
-  .item-palette { background: #334155; padding: 10px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: 0.2s; border: 2px solid transparent; }
+  .item-palette { background: #334155; padding: 10px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; gap: 10px; border: 2px solid transparent; }
   .item-palette:hover { background: #475569; border-color: #60a5fa; }
   .item-palette.actif { background: #3b82f6; border-color: #93c5fd; }
   .item-palette .emoji { font-size: 1.5em; }
-
   .zone-jeu { flex: 1; background: #0b1120; position: relative; overflow: hidden; background-image: radial-gradient(#1e293b 1px, transparent 1px); background-size: 20px 20px; }
-  .zone-jeu.mode-vol { background-image: none; background: #0f172a; } /* Fond différent en vol */
   canvas { display: block; cursor: crosshair; }
   canvas.mode-cablage { cursor: cell; }
-
-  .panneau-droit { width: 300px; background: #1e293b; padding: 15px; display: flex; flex-direction: column; border-left: 2px solid #334155; transition: 0.3s; }
-  .panneau-droit.hidden { display: none; }
+  .panneau-droit { width: 300px; background: #1e293b; padding: 15px; display: flex; flex-direction: column; border-left: 2px solid #334155; }
   .instruction { background: #0f172a; padding: 15px; border-radius: 8px; font-size: 0.9em; line-height: 1.5; border-left: 4px solid #3b82f6; margin-bottom: 15px; }
   .instruction ul { margin-left: 20px; margin-top: 10px; }
   .instruction li { margin-bottom: 5px; }
-  
-  .btn-action { border: none; padding: 12px; border-radius: 8px; font-size: 1em; font-weight: bold; cursor: pointer; transition: 0.1s; margin-bottom: 10px; width: 100%; }
+  .btn-action { border: none; padding: 12px; border-radius: 8px; font-size: 1em; font-weight: bold; cursor: pointer; margin-bottom: 10px; width: 100%; }
   .btn-verifier { background: linear-gradient(135deg, #10b981, #059669); color: white; box-shadow: 0 4px 0 #047857; }
-  .btn-verifier:hover { transform: translateY(-2px); box-shadow: 0 6px 0 #047857; }
-  .btn-verifier:active { transform: translateY(2px); box-shadow: 0 2px 0 #047857; }
   .btn-multimetre { background: linear-gradient(135deg, #0891b2, #06b6d4); color: white; box-shadow: 0 4px 0 #0e7490; }
-  .btn-multimetre:hover { transform: translateY(-2px); box-shadow: 0 6px 0 #0e7490; }
-  .btn-multimetre.actif { background: linear-gradient(135deg, #0e7490, #155e75); box-shadow: inset 0 2px 4px rgba(0,0,0,0.5); transform: translateY(2px); }
+  .btn-multimetre.actif { background: linear-gradient(135deg, #0e7490, #155e75); box-shadow: inset 0 2px 4px rgba(0,0,0,0.5); }
   .btn-effacer { background: linear-gradient(135deg, #ef4444, #dc2626); color: white; box-shadow: 0 4px 0 #991b1b; }
-  .btn-effacer:hover { transform: translateY(-2px); box-shadow: 0 6px 0 #991b1b; }
-  .btn-effacer:active { transform: translateY(2px); box-shadow: 0 2px 0 #991b1b; }
   .btn-vol { background: linear-gradient(135deg, #8b5cf6, #6d28d9); color: white; box-shadow: 0 4px 0 #4c1d95; display: none; margin-top: 15px; }
-  .btn-vol:hover { transform: translateY(-2px); box-shadow: 0 6px 0 #4c1d95; }
-  .btn-vol:active { transform: translateY(2px); box-shadow: 0 2px 0 #4c1d95; }
-  
   .message { margin-top: 15px; padding: 15px; border-radius: 8px; font-weight: bold; display: none; text-align: left; line-height: 1.4; }
   .message.succes { display: block; background: #dcfce7; color: #166534; border: 2px solid #22c55e; }
   .message.erreur { display: block; background: #fee2e2; color: #991b1b; border: 2px solid #ef4444; }
-
-  /* HUD de Vol */
-  .hud { position: absolute; top: 20px; left: 20px; background: rgba(15, 23, 42, 0.8); padding: 15px; border-radius: 12px; border: 2px solid #334155; color: #e2e8f0; font-family: monospace; font-size: 1.2em; display: none; z-index: 5; }
-  .hud.active { display: block; }
-  .hud .valeur { color: #10b981; font-weight: bold; }
-  .hud .alerte { color: #ef4444; animation: clignote 0.5s infinite alternate; }
-  @keyframes clignote { from { opacity: 1; } to { opacity: 0.5; } }
-  
-  .commandes-vol { position: absolute; bottom: 20px; left: 20px; background: rgba(15, 23, 42, 0.8); padding: 10px 15px; border-radius: 8px; color: #94a3b8; font-size: 0.9em; display: none; z-index: 5; }
-  .commandes-vol.active { display: block; }
 </style>
 </head>
 <body>
@@ -77,35 +48,15 @@
 <div class="conteneur">
   <div class="palette" id="palette">
     <h2>🛠️ Cartes Électroniques</h2>
-    <div class="item-palette" onclick="choisirComposant('batterie')">
-      <span class="emoji">🔋</span> <div><strong>Batterie</strong><br><small>LiPo 3S (11.1V)</small></div>
-    </div>
-    <div class="item-palette" onclick="choisirComposant('pdb')">
-      <span class="emoji">⚡</span> <div><strong>PDB</strong><br><small>Distribution & BEC</small></div>
-    </div>
-    <div class="item-palette" onclick="choisirComposant('fc')">
-      <span class="emoji">🧠</span> <div><strong>Contrôleur de Vol</strong><br><small>Flight Controller</small></div>
-    </div>
-    <div class="item-palette" onclick="choisirComposant('esc')">
-      <span class="emoji">⚙️</span> <div><strong>ESC</strong><br><small>Variateur de vitesse</small></div>
-    </div>
-    <div class="item-palette" onclick="choisirComposant('moteur')">
-      <span class="emoji">🌀</span> <div><strong>Moteur Brushless</strong><br><small>Avec hélice</small></div>
-    </div>
+    <div class="item-palette" onclick="choisirComposant('batterie')"><span class="emoji">🔋</span> <div><strong>Batterie</strong></div></div>
+    <div class="item-palette" onclick="choisirComposant('pdb')"><span class="emoji">⚡</span> <div><strong>PDB</strong></div></div>
+    <div class="item-palette" onclick="choisirComposant('fc')"><span class="emoji">🧠</span> <div><strong>Contrôleur de Vol</strong></div></div>
+    <div class="item-palette" onclick="choisirComposant('esc')"><span class="emoji">⚙️</span> <div><strong>ESC</strong></div></div>
+    <div class="item-palette" onclick="choisirComposant('moteur')"><span class="emoji">🌀</span> <div><strong>Moteur</strong></div></div>
   </div>
 
   <div class="zone-jeu" id="zone-jeu">
     <canvas id="canvas-drone"></canvas>
-    
-    <!-- HUD et commandes pour le mode Vol -->
-    <div class="hud" id="hud">
-      <div>🔋 Batterie : <span class="valeur" id="hud-batterie">100%</span></div>
-      <div>📡 Altitude : <span class="valeur" id="hud-altitude">0 m</span></div>
-      <div>💨 Vent : <span class="valeur" id="hud-vent">0 km/h</span></div>
-    </div>
-    <div class="commandes-vol" id="commandes-vol">
-      <strong>Commandes :</strong> Z = Gaz (Monter) | S = Descendre | Q/D = Tourner (Lacet) | ↑/↓ = Avancer/Reculer
-    </div>
   </div>
 
   <div class="panneau-droit" id="panneau-droit">
@@ -130,13 +81,10 @@
 </div>
 
 <script>
-// ==========================================
-// VARIABLES GLOBALES (ATELIER)
-// ==========================================
+// (Variables globales, etc.)
 const canvas = document.getElementById('canvas-drone');
 const ctx = canvas.getContext('2d');
 const zoneJeu = document.getElementById('zone-jeu');
-
 let largeurCanvas = zoneJeu.clientWidth;
 let hauteurCanvas = zoneJeu.clientHeight;
 canvas.width = largeurCanvas;
@@ -145,109 +93,45 @@ canvas.height = hauteurCanvas;
 let composants = [];
 let fils = [];
 let prochainId = 1;
-
 let composantSelectionne = null;
 let patteEnAttente = null;
 let composantEnDrag = null;
 let dragOffsetX = 0, dragOffsetY = 0;
 let patteSurvolee = null;
 let modeMultimetre = false;
-let pointeA = null;
-let pointeB = null;
-
-// ==========================================
-// VARIABLES GLOBALES (VOL)
-// ==========================================
-let modeActuel = 'atelier'; // 'atelier' ou 'vol'
-let dronePos = { x: 0, y: 0 };
-let droneVel = { x: 0, y: 0 };
-let droneAngle = 0;
-let altitude = 0;
-let batterie = 100;
-let vent = { x: 0, y: 0, force: 0 };
-let keys = {};
-let animationId = null;
+let pointeA = null, pointeB = null;
 
 const CATALOGUE = {
-  batterie: { 
-    nom: 'Batterie', largeur: 80, hauteur: 50, couleur: '#475569',
-    pattes: [{ id:'+', nom:'+', x:20, y:50, couleur:'#ef4444' }, { id:'-', nom:'-', x:60, y:50, couleur:'#111' }] 
-  },
-  pdb: { 
-    nom: 'PDB', largeur: 140, hauteur: 80, couleur: '#1e293b',
-    pattes: [
-      { id:'bat+', nom:'BAT+', x:20, y:80, couleur:'#ef4444' }, { id:'bat-', nom:'BAT-', x:50, y:80, couleur:'#111' },
-      { id:'esc1', nom:'ESC1', x:110, y:20, couleur:'#ef4444' }, { id:'esc2', nom:'ESC2', x:130, y:20, couleur:'#ef4444' },
-      { id:'esc3', nom:'ESC3', x:110, y:60, couleur:'#ef4444' }, { id:'esc4', nom:'ESC4', x:130, y:60, couleur:'#ef4444' },
-      { id:'5v', nom:'5V BEC', x:70, y:80, couleur:'#f59e0b' }
-    ] 
-  },
-  fc: { 
-    nom: 'Contrôleur de Vol', largeur: 120, hauteur: 120, couleur: '#0f172a',
-    pattes: [
-      { id:'5v', nom:'5V', x:-10, y:20, couleur:'#f59e0b' }, { id:'gnd', nom:'GND', x:-10, y:50, couleur:'#111' },
-      { id:'m1', nom:'M1', x:130, y:20, couleur:'#eab308' }, { id:'m2', nom:'M2', x:130, y:40, couleur:'#eab308' },
-      { id:'m3', nom:'M3', x:130, y:60, couleur:'#eab308' }, { id:'m4', nom:'M4', x:130, y:80, couleur:'#eab308' }
-    ] 
-  },
-  esc: { 
-    nom: 'ESC', largeur: 60, hauteur: 80, couleur: '#1e293b',
-    pattes: [
-      { id:'pwr+', nom:'+', x:10, y:80, couleur:'#ef4444' }, { id:'pwr-', nom:'-', x:30, y:80, couleur:'#111' },
-      { id:'sig', nom:'SIG', x:-10, y:40, couleur:'#eab308' },
-      { id:'mot+', nom:'M+', x:10, y:-10, couleur:'#ef4444' }, { id:'mot-', nom:'M-', x:30, y:-10, couleur:'#111' }
-    ] 
-  },
-  moteur: { 
-    nom: 'Moteur', largeur: 50, hauteur: 50, couleur: '#334155',
-    pattes: [{ id:'+', nom:'+', x:15, y:60, couleur:'#ef4444' }, { id:'-', nom:'-', x:35, y:60, couleur:'#111' }] 
-  }
+  batterie: { nom: 'Batterie', largeur: 80, hauteur: 50, couleur: '#475569', pattes: [{ id:'+', nom:'+', x:20, y:50, couleur:'#ef4444' }, { id:'-', nom:'-', x:60, y:50, couleur:'#111' }] },
+  pdb: { nom: 'PDB', largeur: 140, hauteur: 80, couleur: '#1e293b', pattes: [
+    { id:'bat+', nom:'BAT+', x:20, y:80, couleur:'#ef4444' }, { id:'bat-', nom:'BAT-', x:50, y:80, couleur:'#111' },
+    { id:'esc1', nom:'ESC1', x:110, y:20, couleur:'#ef4444' }, { id:'esc2', nom:'ESC2', x:130, y:20, couleur:'#ef4444' },
+    { id:'esc3', nom:'ESC3', x:110, y:60, couleur:'#ef4444' }, { id:'esc4', nom:'ESC4', x:130, y:60, couleur:'#ef4444' },
+    { id:'5v', nom:'5V BEC', x:70, y:80, couleur:'#f59e0b' }
+  ] },
+  fc: { nom: 'Contrôleur de Vol', largeur: 120, hauteur: 120, couleur: '#0f172a', pattes: [
+    { id:'5v', nom:'5V', x:-10, y:20, couleur:'#f59e0b' }, { id:'gnd', nom:'GND', x:-10, y:50, couleur:'#111' },
+    { id:'m1', nom:'M1', x:130, y:20, couleur:'#eab308' }, { id:'m2', nom:'M2', x:130, y:40, couleur:'#eab308' },
+    { id:'m3', nom:'M3', x:130, y:60, couleur:'#eab308' }, { id:'m4', nom:'M4', x:130, y:80, couleur:'#eab308' }
+  ] },
+  esc: { nom: 'ESC', largeur: 60, hauteur: 80, couleur: '#1e293b', pattes: [
+    { id:'pwr+', nom:'+', x:10, y:80, couleur:'#ef4444' }, { id:'pwr-', nom:'-', x:30, y:80, couleur:'#111' },
+    { id:'sig', nom:'SIG', x:-10, y:40, couleur:'#eab308' }, { id:'mot+', nom:'M+', x:10, y:-10, couleur:'#ef4444' }, { id:'mot-', nom:'M-', x:30, y:-10, couleur:'#111' }
+  ] },
+  moteur: { nom: 'Moteur', largeur: 50, hauteur: 50, couleur: '#334155', pattes: [{ id:'+', nom:'+', x:15, y:60, couleur:'#ef4444' }, { id:'-', nom:'-', x:35, y:60, couleur:'#111' }] }
 };
 
-// ==========================================
-// FONCTIONS DE L'ATELIER
-// ==========================================
-function choisirComposant(type) {
-  if (modeMultimetre) basculerMultimetre();
-  composantSelectionne = type;
-  document.querySelectorAll('.item-palette').forEach(el => el.classList.remove('actif'));
-  event.currentTarget.classList.add('actif');
-}
-
+function choisirComposant(type) { if (modeMultimetre) basculerMultimetre(); composantSelectionne = type; document.querySelectorAll('.item-palette').forEach(el => el.classList.remove('actif')); event.currentTarget.classList.add('actif'); }
 canvas.addEventListener('click', clicCanvas);
 canvas.addEventListener('mousedown', sourisDown);
 canvas.addEventListener('mousemove', survolSouris);
 canvas.addEventListener('mouseup', sourisUp);
 canvas.addEventListener('contextmenu', clicDroitCanvas);
 
-function coordonneesSouris(event) {
-  const rect = canvas.getBoundingClientRect();
-  return { x: event.clientX - rect.left, y: event.clientY - rect.top };
-}
-
-function creerComposant(type, x, y) {
-  const def = CATALOGUE[type];
-  const comp = {
-    id: prochainId++, type: type,
-    x: x - def.largeur/2, y: y - def.hauteur/2,
-    largeur: def.largeur, hauteur: def.hauteur,
-    pattes: def.pattes
-  };
-  composants.push(comp);
-}
-
-function obtenirPatteAbsolue(comp, patteId) {
-  const patte = comp.pattes.find(p => p.id === patteId);
-  return { x: comp.x + patte.x, y: comp.y + patte.y };
-}
-
-function trouverComposantSousSouris(x, y) {
-  for (let i = composants.length - 1; i >= 0; i--) {
-    const c = composants[i];
-    if (x >= c.x && x <= c.x + c.largeur && y >= c.y && y <= c.y + c.hauteur) return c;
-  }
-  return null;
-}
+function coordonneesSouris(event) { const rect = canvas.getBoundingClientRect(); return { x: event.clientX - rect.left, y: event.clientY - rect.top }; }
+function creerComposant(type, x, y) { const def = CATALOGUE[type]; const comp = { id: prochainId++, type: type, x: x - def.largeur/2, y: y - def.hauteur/2, largeur: def.largeur, hauteur: def.hauteur, pattes: def.pattes }; composants.push(comp); }
+function obtenirPatteAbsolue(comp, patteId) { const patte = comp.pattes.find(p => p.id === patteId); return { x: comp.x + patte.x, y: comp.y + patte.y }; }
+function trouverComposantSousSouris(x, y) { for (let i = composants.length - 1; i >= 0; i--) { const c = composants[i]; if (x >= c.x && x <= c.x + c.largeur && y >= c.y && y <= c.y + c.hauteur) return c; } return null; }
 
 function trouverPatteSousSouris(x, y) {
   for (let i = composants.length - 1; i >= 0; i--) {
@@ -261,32 +145,16 @@ function trouverPatteSousSouris(x, y) {
   return null;
 }
 
-function distancePointSegment(px, py, x1, y1, x2, y2) {
-  const dx = x2 - x1;
-  const dy = y2 - y1;
-  const l2 = dx*dx + dy*dy;
-  if (l2 === 0) return Math.sqrt((px-x1)**2 + (py-y1)**2);
-  let t = ((px - x1) * dx + (py - y1) * dy) / l2;
-  t = Math.max(0, Math.min(1, t));
-  return Math.sqrt((px - (x1 + t*dx))**2 + (py - (y1 + t*dy))**2);
-}
+function distancePointSegment(px, py, x1, y1, x2, y2) { const dx = x2 - x1; const dy = y2 - y1; const l2 = dx*dx + dy*dy; if (l2 === 0) return Math.sqrt((px-x1)**2 + (py-y1)**2); let t = ((px - x1) * dx + (py - y1) * dy) / l2; t = Math.max(0, Math.min(1, t)); return Math.sqrt((px - (x1 + t*dx))**2 + (py - (y1 + t*dy))**2); }
 
 function trouverFilSousSouris(x, y) {
   for (let i = fils.length - 1; i >= 0; i--) {
-    const f = fils[i];
-    const compA = composants.find(c => c.id === f.compA);
-    const compB = composants.find(c => c.id === f.compB);
+    const f = fils[i]; const compA = composants.find(c => c.id === f.compA); const compB = composants.find(c => c.id === f.compB);
     if (compA && compB) {
-      const pA = obtenirPatteAbsolue(compA, f.patteA);
-      const pB = obtenirPatteAbsolue(compB, f.patteB);
-      
-      const steps = 10;
-      let minDistance = Infinity;
-      let prevX = pA.x, prevY = pA.y;
-      
+      const pA = obtenirPatteAbsolue(compA, f.patteA); const pB = obtenirPatteAbsolue(compB, f.patteB);
+      const steps = 10; let minDistance = Infinity; let prevX = pA.x, prevY = pA.y;
       for (let s = 1; s <= steps; s++) {
-        const t = s / steps;
-        const mt = 1 - t;
+        const t = s / steps; const mt = 1 - t;
         const bx = mt*mt*mt*pA.x + 3*mt*mt*t*pA.x + 3*mt*t*t*pB.x + t*t*t*pB.x;
         const by = mt*mt*mt*pA.y + 3*mt*mt*t*((pA.y+pB.y)/2) + 3*mt*t*t*((pA.y+pB.y)/2) + t*t*t*pB.y;
         const d = distancePointSegment(x, y, prevX, prevY, bx, by);
@@ -301,427 +169,172 @@ function trouverFilSousSouris(x, y) {
 
 function clicDroitCanvas(event) {
   event.preventDefault();
-  if (modeActuel !== 'atelier') return;
-  
   const pos = coordonneesSouris(event);
   const fil = trouverFilSousSouris(pos.x, pos.y);
-  if (fil) {
-    fils = fils.filter(f => f !== fil);
-    dessiner();
-    return;
-  }
-  
+  if (fil) { fils = fils.filter(f => f !== fil); dessiner(); return; }
   const comp = trouverComposantSousSouris(pos.x, pos.y);
-  if (comp) {
-    composants = composants.filter(c => c.id !== comp.id);
-    fils = fils.filter(f => f.compA !== comp.id && f.compB !== comp.id);
-    dessiner();
-    return;
-  }
+  if (comp) { composants = composants.filter(c => c.id !== comp.id); fils = fils.filter(f => f.compA !== comp.id && f.compB !== comp.id); dessiner(); return; }
 }
 
 function basculerMultimetre() {
-  modeMultimetre = !modeMultimetre;
-  pointeA = null; pointeB = null;
-  
+  modeMultimetre = !modeMultimetre; pointeA = null; pointeB = null;
   const btn = document.getElementById('btn-multi');
   if (modeMultimetre) {
-    btn.classList.add('actif');
-    btn.innerHTML = '🔬 Multimètre : ON<br><small>Cliquez sur 2 pattes</small>';
-    patteEnAttente = null;
-    canvas.classList.remove('mode-cablage');
+    btn.classList.add('actif'); btn.innerHTML = '🔬 Multimètre : ON<br><small>Cliquez sur 2 pattes</small>'; patteEnAttente = null; canvas.classList.remove('mode-cablage');
     afficherMessage("🔬 Mode Multimètre activé.<br>Cliquez sur une patte, puis sur une autre pour tester la continuité.", "succes");
-    document.getElementById('message').className = 'message succes';
-    document.getElementById('message').style.background = '#e0f2fe';
-    document.getElementById('message').style.color = '#0369a1';
-    document.getElementById('message').style.borderColor = '#38bdf8';
-    document.getElementById('message').style.display = 'block';
+    document.getElementById('message').className = 'message succes'; document.getElementById('message').style.background = '#e0f2fe'; document.getElementById('message').style.color = '#0369a1'; document.getElementById('message').style.borderColor = '#38bdf8'; document.getElementById('message').style.display = 'block';
   } else {
-    btn.classList.remove('actif');
-    btn.innerHTML = '🔬 Test de Continuité';
-    document.getElementById('message').style.display = 'none';
+    btn.classList.remove('actif'); btn.innerHTML = '🔬 Test de Continuité'; document.getElementById('message').style.display = 'none';
   }
   dessiner();
 }
 
 function testerContinuite(idA, idB) {
   let adj = {};
-  fils.forEach(f => {
-    let noeudA = f.compA + ':' + f.patteA;
-    let noeudB = f.compB + ':' + f.patteB;
-    if (!adj[noeudA]) adj[noeudA] = [];
-    if (!adj[noeudB]) adj[noeudB] = [];
-    adj[noeudA].push(noeudB);
-    adj[noeudB].push(noeudA);
-  });
-
-  let visited = {};
-  let queue = [idA];
-  
-  while(queue.length > 0) {
-    let c = queue.shift();
-    if (c === idB) return true;
-    if (visited[c]) continue;
-    visited[c] = true;
-    if (adj[c]) {
-      adj[c].forEach(v => queue.push(v));
-    }
-  }
+  fils.forEach(f => { let noeudA = f.compA + ':' + f.patteA; let noeudB = f.compB + ':' + f.patteB; if (!adj[noeudA]) adj[noeudA] = []; if (!adj[noeudB]) adj[noeudB] = []; adj[noeudA].push(noeudB); adj[noeudB].push(noeudA); });
+  let visited = {}; let queue = [idA];
+  while(queue.length > 0) { let c = queue.shift(); if (c === idB) return true; if (visited[c]) continue; visited[c] = true; if (adj[c]) { adj[c].forEach(v => queue.push(v)); } }
   return false;
 }
 
 function clicCanvas(event) {
-  if (modeActuel !== 'atelier') return;
   const pos = coordonneesSouris(event);
   
   if (modeMultimetre) {
     const patte = trouverPatteSousSouris(pos.x, pos.y);
     if (patte) {
-      if (!pointeA) {
-        pointeA = patte;
-        afficherMessage("🔬 Pointe 1 connectée. Cliquez sur la deuxième patte.", "succes");
-        document.getElementById('message').style.background = '#e0f2fe';
-        document.getElementById('message').style.color = '#0369a1';
-        document.getElementById('message').style.borderColor = '#38bdf8';
-      } else if (!pointeB) {
+      if (!pointeA) { pointeA = patte; afficherMessage("🔬 Pointe 1 connectée. Cliquez sur la deuxième patte.", "succes"); document.getElementById('message').style.background = '#e0f2fe'; document.getElementById('message').style.color = '#0369a1'; document.getElementById('message').style.borderColor = '#38bdf8'; }
+      else if (!pointeB) {
         if (pointeA.compId === patte.compId && pointeA.patte.id === patte.patte.id) return;
-        pointeB = patte;
-        let idA = pointeA.compId + ':' + pointeA.patte.id;
-        let idB = pointeB.compId + ':' + pointeB.patte.id;
-        
-        if (testerContinuite(idA, idB)) {
-          afficherMessage("🔔 BIP BIP !<br>Le courant passe entre ces deux pattes.", "succes");
-          lancerConfettis();
-        } else {
-          afficherMessage("❌ Pas de continuité.<br>Le circuit est ouvert entre ces deux pattes.", "erreur");
-        }
+        pointeB = patte; let idA = pointeA.compId + ':' + pointeA.patte.id; let idB = pointeB.compId + ':' + pointeB.patte.id;
+        if (testerContinuite(idA, idB)) { afficherMessage("🔔 BIP BIP !<br>Le courant passe entre ces deux pattes.", "succes"); lancerConfettis(); } else { afficherMessage("❌ Pas de continuité.<br>Le circuit est ouvert entre ces deux pattes.", "erreur"); }
         pointeA = null; pointeB = null;
       }
-    } else {
-      pointeA = null; pointeB = null;
-      afficherMessage("🔬 Pointes réinitialisées. Cliquez sur 2 pattes.", "succes");
-      document.getElementById('message').style.background = '#e0f2fe';
-      document.getElementById('message').style.color = '#0369a1';
-      document.getElementById('message').style.borderColor = '#38bdf8';
-    }
-    dessiner();
-    return;
+    } else { pointeA = null; pointeB = null; afficherMessage("🔬 Pointes réinitialisées. Cliquez sur 2 pattes.", "succes"); document.getElementById('message').style.background = '#e0f2fe'; document.getElementById('message').style.color = '#0369a1'; document.getElementById('message').style.borderColor = '#38bdf8'; }
+    dessiner(); return;
   }
 
-  if (composantSelectionne) {
-    creerComposant(composantSelectionne, pos.x, pos.y);
-    composantSelectionne = null;
-    document.querySelectorAll('.item-palette').forEach(el => el.classList.remove('actif'));
-    dessiner();
-    return;
-  }
+  if (composantSelectionne) { creerComposant(composantSelectionne, pos.x, pos.y); composantSelectionne = null; document.querySelectorAll('.item-palette').forEach(el => el.classList.remove('actif')); dessiner(); return; }
 
   const patte = trouverPatteSousSouris(pos.x, pos.y);
   if (patte) {
-    if (!patteEnAttente) {
-      patteEnAttente = patte;
-      canvas.classList.add('mode-cablage');
-      dessiner();
-    } else {
-      if (patteEnAttente.compId === patte.compId && patteEnAttente.patte.id === patte.patte.id) {
-        patteEnAttente = null;
-        canvas.classList.remove('mode-cablage');
-        dessiner();
-        return;
-      }
-      fils.push({
-        compA: patteEnAttente.compId, patteA: patteEnAttente.patte.id,
-        compB: patte.compId, patteB: patte.patte.id,
-        couleur: patteEnAttente.patte.couleur
-      });
-      patteEnAttente = null;
-      canvas.classList.remove('mode-cablage');
-      dessiner();
+    if (!patteEnAttente) { patteEnAttente = patte; canvas.classList.add('mode-cablage'); dessiner(); }
+    else {
+      if (patteEnAttente.compId === patte.compId && patteEnAttente.patte.id === patte.patte.id) { patteEnAttente = null; canvas.classList.remove('mode-cablage'); dessiner(); return; }
+      fils.push({ compA: patteEnAttente.compId, patteA: patteEnAttente.patte.id, compB: patte.compId, patteB: patte.patte.id, couleur: patteEnAttente.patte.couleur });
+      patteEnAttente = null; canvas.classList.remove('mode-cablage'); dessiner();
     }
-  } else {
-    if (patteEnAttente) {
-      patteEnAttente = null;
-      canvas.classList.remove('mode-cablage');
-      dessiner();
-    }
-  }
+  } else { if (patteEnAttente) { patteEnAttente = null; canvas.classList.remove('mode-cablage'); dessiner(); } }
 }
 
-function sourisDown(event) {
-  if (modeActuel !== 'atelier' || patteEnAttente || modeMultimetre) return;
-  if (event.button === 2) return;
-  
-  const pos = coordonneesSouris(event);
-  const comp = trouverComposantSousSouris(pos.x, pos.y);
-  if (comp) {
-    composantEnDrag = comp;
-    dragOffsetX = pos.x - comp.x;
-    dragOffsetY = pos.y - comp.y;
-  }
-}
-
+function sourisDown(event) { if (patteEnAttente || modeMultimetre || event.button === 2) return; const pos = coordonneesSouris(event); const comp = trouverComposantSousSouris(pos.x, pos.y); if (comp) { composantEnDrag = comp; dragOffsetX = pos.x - comp.x; dragOffsetY = pos.y - comp.y; } }
 function survolSouris(event) {
-  if (modeActuel !== 'atelier') return;
-  if (composantEnDrag) {
-    const pos = coordonneesSouris(event);
-    composantEnDrag.x = pos.x - dragOffsetX;
-    composantEnDrag.y = pos.y - dragOffsetY;
-    dessiner();
-    return;
-  }
-  
-  const pos = coordonneesSouris(event);
-  const nouvellePatte = trouverPatteSousSouris(pos.x, pos.y);
-  
-  if (nouvellePatte && patteSurvolee) {
-    if (nouvellePatte.compId !== patteSurvolee.compId || nouvellePatte.patte.id !== patteSurvolee.patte.id) {
-      patteSurvolee = nouvellePatte;
-      canvas.style.cursor = 'pointer';
-      dessiner();
-    }
-  } else if (nouvellePatte && !patteSurvolee) {
-    patteSurvolee = nouvellePatte;
-    canvas.style.cursor = 'pointer';
-    dessiner();
-  } else if (!nouvellePatte && patteSurvolee) {
-    patteSurvolee = null;
-    canvas.style.cursor = modeMultimetre ? 'crosshair' : (composantSelectionne ? 'copy' : 'default');
-    dessiner();
-  }
+  if (composantEnDrag) { const pos = coordonneesSouris(event); composantEnDrag.x = pos.x - dragOffsetX; composantEnDrag.y = pos.y - dragOffsetY; dessiner(); return; }
+  const pos = coordonneesSouris(event); const nouvellePatte = trouverPatteSousSouris(pos.x, pos.y);
+  if (nouvellePatte && patteSurvolee) { if (nouvellePatte.compId !== patteSurvolee.compId || nouvellePatte.patte.id !== patteSurvolee.patte.id) { patteSurvolee = nouvellePatte; canvas.style.cursor = 'pointer'; dessiner(); } }
+  else if (nouvellePatte && !patteSurvolee) { patteSurvolee = nouvellePatte; canvas.style.cursor = 'pointer'; dessiner(); }
+  else if (!nouvellePatte && patteSurvolee) { patteSurvolee = null; canvas.style.cursor = modeMultimetre ? 'crosshair' : (composantSelectionne ? 'copy' : 'default'); dessiner(); }
 }
-
-function sourisUp(event) {
-  if (modeActuel !== 'atelier') return;
-  if (composantEnDrag) {
-    composantEnDrag = null;
-    dessiner();
-  }
-}
+function sourisUp(event) { if (composantEnDrag) { composantEnDrag = null; dessiner(); } }
 
 function dessiner() {
-  if (modeActuel !== 'atelier') return;
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-  
   fils.forEach(fil => {
-    const compA = composants.find(c => c.id === fil.compA);
-    const compB = composants.find(c => c.id === fil.compB);
+    const compA = composants.find(c => c.id === fil.compA); const compB = composants.find(c => c.id === fil.compB);
     if (compA && compB) {
-      const pA = obtenirPatteAbsolue(compA, fil.patteA);
-      const pB = obtenirPatteAbsolue(compB, fil.patteB);
-      
-      ctx.beginPath();
-      ctx.moveTo(pA.x, pA.y);
-      ctx.bezierCurveTo(pA.x, (pA.y + pB.y) / 2, pB.x, (pA.y + pB.y) / 2, pB.x, pB.y);
-      
-      ctx.strokeStyle = fil.couleur;
-      ctx.lineWidth = 5;
-      ctx.stroke();
-      
-      ctx.strokeStyle = 'rgba(255,255,255,0.3)';
-      ctx.lineWidth = 1;
-      ctx.stroke();
+      const pA = obtenirPatteAbsolue(compA, fil.patteA); const pB = obtenirPatteAbsolue(compB, fil.patteB);
+      ctx.beginPath(); ctx.moveTo(pA.x, pA.y); ctx.bezierCurveTo(pA.x, (pA.y + pB.y) / 2, pB.x, (pA.y + pB.y) / 2, pB.x, pB.y);
+      ctx.strokeStyle = fil.couleur; ctx.lineWidth = 5; ctx.stroke();
+      ctx.strokeStyle = 'rgba(255,255,255,0.3)'; ctx.lineWidth = 1; ctx.stroke();
     }
   });
-
   composants.forEach(comp => {
-    ctx.fillStyle = CATALOGUE[comp.type].couleur;
-    ctx.strokeStyle = '#475569';
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    if (ctx.roundRect) { ctx.roundRect(comp.x, comp.y, comp.largeur, comp.hauteur, 8); } else { ctx.rect(comp.x, comp.y, comp.largeur, comp.hauteur); }
-    ctx.fill();
-    ctx.stroke();
-
-    ctx.fillStyle = '#e2e8f0';
-    ctx.font = 'bold 12px Arial';
-    ctx.textAlign = 'center';
+    ctx.fillStyle = CATALOGUE[comp.type].couleur; ctx.strokeStyle = '#475569'; ctx.lineWidth = 2;
+    ctx.beginPath(); if (ctx.roundRect) { ctx.roundRect(comp.x, comp.y, comp.largeur, comp.hauteur, 8); } else { ctx.rect(comp.x, comp.y, comp.largeur, comp.hauteur); } ctx.fill(); ctx.stroke();
+    ctx.fillStyle = '#e2e8f0'; ctx.font = 'bold 12px Arial'; ctx.textAlign = 'center';
     ctx.fillText(CATALOGUE[comp.type].nom, comp.x + comp.largeur/2, comp.y + comp.hauteur/2 + 5);
-    
-    if (comp.type === 'moteur') {
-      ctx.strokeStyle = '#94a3b8';
-      ctx.lineWidth = 3;
-      ctx.beginPath();
-      ctx.arc(comp.x + 25, comp.y + 15, 15, 0, Math.PI * 2);
-      ctx.stroke();
-    }
-
+    if (comp.type === 'moteur') { ctx.strokeStyle = '#94a3b8'; ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(comp.x + 25, comp.y + 15, 15, 0, Math.PI * 2); ctx.stroke(); }
     comp.pattes.forEach(patte => {
-      const p = obtenirPatteAbsolue(comp, patte.id);
-      const estSurvolee = patteSurvolee && patteSurvolee.compId === comp.id && patteSurvolee.patte.id === patte.id;
-      
-      if (estSurvolee) {
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, 16, 0, Math.PI * 2);
-        ctx.fill();
-      }
-
-      ctx.fillStyle = patte.couleur;
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, 9, 0, Math.PI * 2);
-      ctx.fill();
-      
-      ctx.strokeStyle = estSurvolee ? '#fff' : '#64748b';
-      ctx.lineWidth = estSurvolee ? 3 : 2;
-      ctx.stroke();
-
-      ctx.font = 'bold 11px Arial';
-      const texte = patte.nom;
-      const largeurTexte = ctx.measureText(texte).width;
-      
+      const p = obtenirPatteAbsolue(comp, patte.id); const estSurvolee = patteSurvolee && patteSurvolee.compId === comp.id && patteSurvolee.patte.id === patte.id;
+      if (estSurvolee) { ctx.fillStyle = 'rgba(255, 255, 255, 0.2)'; ctx.beginPath(); ctx.arc(p.x, p.y, 16, 0, Math.PI * 2); ctx.fill(); }
+      ctx.fillStyle = patte.couleur; ctx.beginPath(); ctx.arc(p.x, p.y, 9, 0, Math.PI * 2); ctx.fill();
+      ctx.strokeStyle = estSurvolee ? '#fff' : '#64748b'; ctx.lineWidth = estSurvolee ? 3 : 2; ctx.stroke();
+      ctx.font = 'bold 11px Arial'; const texte = patte.nom; const largeurTexte = ctx.measureText(texte).width;
       let offsetX = patte.x < 0 ? -largeurTexte/2 - 15 : (patte.x > comp.largeur ? largeurTexte/2 + 15 : 0);
       let offsetY = patte.y < 0 ? -15 : (patte.y > comp.hauteur ? 20 : 0);
-
-      ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
-      ctx.fillRect(p.x + offsetX - largeurTexte/2 - 2, p.y + offsetY - 11, largeurTexte + 4, 14);
-      
-      ctx.fillStyle = '#fff';
-      ctx.textAlign = 'center';
-      ctx.fillText(texte, p.x + offsetX, p.y + offsetY);
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.7)'; ctx.fillRect(p.x + offsetX - largeurTexte/2 - 2, p.y + offsetY - 11, largeurTexte + 4, 14);
+      ctx.fillStyle = '#fff'; ctx.textAlign = 'center'; ctx.fillText(texte, p.x + offsetX, p.y + offsetY);
     });
   });
-
-  if (patteEnAttente && !modeMultimetre) {
-    const comp = composants.find(c => c.id === patteEnAttente.compId);
-    if (comp) {
-      const p = obtenirPatteAbsolue(comp, patteEnAttente.patte.id);
-      ctx.strokeStyle = '#fbbf24';
-      ctx.lineWidth = 3;
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, 15, 0, Math.PI * 2);
-      ctx.stroke();
-    }
-  }
-
-  if (modeMultimetre && pointeA) {
-    const comp = composants.find(c => c.id === pointeA.compId);
-    if (comp) {
-      const p = obtenirPatteAbsolue(comp, pointeA.patte.id);
-      ctx.strokeStyle = '#0ea5e9';
-      ctx.lineWidth = 4;
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, 15, 0, Math.PI * 2);
-      ctx.stroke();
-    }
-  }
+  if (patteEnAttente && !modeMultimetre) { const comp = composants.find(c => c.id === patteEnAttente.compId); if (comp) { const p = obtenirPatteAbsolue(comp, patteEnAttente.patte.id); ctx.strokeStyle = '#fbbf24'; ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(p.x, p.y, 15, 0, Math.PI * 2); ctx.stroke(); } }
+  if (modeMultimetre && pointeA) { const comp = composants.find(c => c.id === pointeA.compId); if (comp) { const p = obtenirPatteAbsolue(comp, pointeA.patte.id); ctx.strokeStyle = '#0ea5e9'; ctx.lineWidth = 4; ctx.beginPath(); ctx.arc(p.x, p.y, 15, 0, Math.PI * 2); ctx.stroke(); } }
 }
 
 function verifierCablage() {
   try {
     if (modeMultimetre) basculerMultimetre();
-    const msgBox = document.getElementById('message');
-    msgBox.className = 'message';
-    msgBox.style.display = 'none';
-
-    const nbBatteries = composants.filter(c => c.type === 'batterie').length;
-    const nbPDB = composants.filter(c => c.type === 'pdb').length;
-    const nbFC = composants.filter(c => c.type === 'fc').length;
-    const nbESC = composants.filter(c => c.type === 'esc').length;
-    const nbMoteurs = composants.filter(c => c.type === 'moteur').length;
-
-    if (nbBatteries < 1 || nbPDB < 1 || nbFC < 1 || nbESC < 4 || nbMoteurs < 4) {
-      afficherMessage("❌ Il manque des composants ! Place 1 Batterie, 1 PDB, 1 Contrôleur de Vol, 4 ESC et 4 Moteurs.", "erreur");
-      return;
-    }
-
+    const msgBox = document.getElementById('message'); msgBox.className = 'message'; msgBox.style.display = 'none';
+    const nbBatteries = composants.filter(c => c.type === 'batterie').length; const nbPDB = composants.filter(c => c.type === 'pdb').length; const nbFC = composants.filter(c => c.type === 'fc').length; const nbESC = composants.filter(c => c.type === 'esc').length; const nbMoteurs = composants.filter(c => c.type === 'moteur').length;
+    if (nbBatteries < 1 || nbPDB < 1 || nbFC < 1 || nbESC < 4 || nbMoteurs < 4) { afficherMessage("❌ Il manque des composants ! Place 1 Batterie, 1 PDB, 1 Contrôleur de Vol, 4 ESC et 4 Moteurs.", "erreur"); return; }
     let erreurs = [];
-
     function estConnecte(typeA, patteA, typeB, patteB) {
       return fils.some(f => {
-        const cA = composants.find(c => c.id === f.compA);
-        const cB = composants.find(c => c.id === f.compB);
+        const cA = composants.find(c => c.id === f.compA); const cB = composants.find(c => c.id === f.compB);
         if (!cA || !cB) return false;
-        return (
-          (cA.type === typeA && f.patteA === patteA && cB.type === typeB && f.patteB === patteB) ||
-          (cB.type === typeA && f.patteB === patteA && cA.type === typeB && f.patteA === patteB)
-        );
+        return ( (cA.type === typeA && f.patteA === patteA && cB.type === typeB && f.patteB === patteB) || (cB.type === typeA && f.patteB === patteA && cA.type === typeB && f.patteA === patteB) );
       });
     }
-
     if (!estConnecte('batterie', '+', 'pdb', 'bat+')) erreurs.push("La borne + de la Batterie n'est pas reliée au BAT+ du PDB.");
     if (!estConnecte('batterie', '-', 'pdb', 'bat-')) erreurs.push("La borne - de la Batterie n'est pas reliée au BAT- du PDB.");
-
     if (!estConnecte('pdb', '5v', 'fc', '5v')) erreurs.push("Le 5V BEC du PDB n'est pas relié au 5V du FC.");
     if (!estConnecte('pdb', 'bat-', 'fc', 'gnd')) erreurs.push("La masse (GND) du FC n'est pas reliée au PDB.");
-
-    let m1OK = false, m2OK = false, m3OK = false, m4OK = false;
     
+    let m1OK = false, m2OK = false, m3OK = false, m4OK = false;
     composants.filter(c => c.type === 'esc').forEach(esc => {
-      
-      // Vérification de l'alimentation de l'ESC
       const escAlimente = fils.some(f => {
-        const cA = composants.find(c => c.id === f.compA);
-        const cB = composants.find(c => c.id === f.compB);
-        if (!cA || !cB) return false; // PROTECTION ANTI-BUG
-        
-        return (cA.type === 'pdb' && f.patteA.startsWith('esc') && cB.id === esc.id && f.patteB === 'pwr+') ||
-               (cB.type === 'pdb' && f.patteB.startsWith('esc') && cA.id === esc.id && f.patteA === 'pwr+');
+        const cA = composants.find(c => c.id === f.compA); const cB = composants.find(c => c.id === f.compB);
+        if (!cA || !cB) return false;
+        return (cA.type === 'pdb' && f.patteA.startsWith('esc') && cB.id === esc.id && f.patteB === 'pwr+') || (cB.type === 'pdb' && f.patteB.startsWith('esc') && cA.id === esc.id && f.patteA === 'pwr+');
       });
       if (!escAlimente) erreurs.push("Un ESC n'est pas alimenté par le PDB (pwr+).");
-
-      // Vérification de la masse de l'ESC
+      
       const escMasse = fils.some(f => {
-          const cA = composants.find(c => c.id === f.compA);
-          const cB = composants.find(c => c.id === f.compB);
-          if (!cA || !cB) return false; // PROTECTION ANTI-BUG
-          
-          return (cA.type === 'pdb' && f.patteA === 'bat-' && cB.id === esc.id && f.patteB === 'pwr-') ||
-                 (cB.type === 'pdb' && f.patteB === 'bat-' && cA.id === esc.id && f.patteA === 'pwr-');
+          const cA = composants.find(c => c.id === f.compA); const cB = composants.find(c => c.id === f.compB);
+          if (!cA || !cB) return false;
+          return (cA.type === 'pdb' && f.patteA === 'bat-' && cB.id === esc.id && f.patteB === 'pwr-') || (cB.type === 'pdb' && f.patteB === 'bat-' && cA.id === esc.id && f.patteA === 'pwr-');
       });
       if (!escMasse) erreurs.push("Un ESC n'est pas relié à la masse du PDB (pwr-).");
-
-      // Vérification des signaux
+      
       if (estConnecte('fc', 'm1', 'esc', 'sig')) m1OK = true;
       if (estConnecte('fc', 'm2', 'esc', 'sig')) m2OK = true;
       if (estConnecte('fc', 'm3', 'esc', 'sig')) m3OK = true;
       if (estConnecte('fc', 'm4', 'esc', 'sig')) m4OK = true;
-
-      // Vérification des moteurs
-      if (!estConnecte('esc', 'mot+', 'moteur', '+') || !estConnecte('esc', 'mot-', 'moteur', '-')) {
-        erreurs.push("Un ESC n'est pas correctement relié à son moteur (M+ et M-).");
-      }
+      
+      if (!estConnecte('esc', 'mot+', 'moteur', '+') || !estConnecte('esc', 'mot-', 'moteur', '-')) { erreurs.push("Un ESC n'est pas correctement relié à son moteur (M+ et M-)."); }
     });
-
+    
     if (!m1OK) erreurs.push("Le signal du Moteur 1 (FC) n'est pas relié à un ESC (SIG).");
     if (!m2OK) erreurs.push("Le signal du Moteur 2 (FC) n'est pas relié à un ESC (SIG).");
     if (!m3OK) erreurs.push("Le signal du Moteur 3 (FC) n'est pas relié à un ESC (SIG).");
     if (!m4OK) erreurs.push("Le signal du Moteur 4 (FC) n'est pas relié à un ESC (SIG).");
-
+    
     if (erreurs.length > 0) {
       const erreursUniques = [...new Set(erreurs)];
       afficherMessage("❌ Câblage incomplet :<br><br>• " + erreursUniques.join("<br>• "), "erreur");
     } else {
       afficherMessage("🎉 FÉLICITATIONS !<br>Le câblage est parfait. Le drone est prêt pour la checklist de vol ! 🚁", "succes");
-      lancerConfettis();
-      document.getElementById('btn-vol').style.display = 'block';
+      lancerConfettis(); document.getElementById('btn-vol').style.display = 'block';
     }
-  } catch (e) {
-    // Si une erreur imprévue arrive, on l'affiche en rouge au lieu de planter silencieusement
-    afficherMessage("❌ Erreur du simulateur : " + e.message, "erreur");
-    console.error(e);
-  }
+  } catch (e) { afficherMessage("❌ Erreur du simulateur : " + e.message, "erreur"); console.error(e); }
 }
 
 function toutEffacer() {
   if (confirm("Voulez-vous vraiment tout effacer ?")) {
-    composants = [];
-    fils = [];
-    prochainId = 1;
-    patteEnAttente = null;
-    pointeA = null; pointeB = null;
-    document.getElementById('message').style.display = 'none';
-    document.getElementById('btn-vol').style.display = 'none';
-    dessiner();
+    composants = []; fils = []; prochainId = 1; patteEnAttente = null; pointeA = null; pointeB = null;
+    document.getElementById('message').style.display = 'none'; document.getElementById('btn-vol').style.display = 'none'; dessiner();
   }
 }
-
-function afficherMessage(texte, type) {
-  const msgBox = document.getElementById('message');
-  msgBox.innerHTML = texte;
-  msgBox.className = 'message ' + type;
-  msgBox.style.display = 'block';
-}
-
+function afficherMessage(texte, type) { const msgBox = document.getElementById('message'); msgBox.innerHTML = texte; msgBox.className = 'message ' + type; msgBox.style.display = 'block'; }
 function lancerConfettis() {
   const couleurs = ['#fbbf24', '#22c55e', '#ef4444', '#3b82f6', '#a855f7'];
   for (let i = 0; i < 50; i++) {
@@ -729,252 +342,13 @@ function lancerConfettis() {
       const c = document.createElement('div');
       c.style.cssText = `position:fixed; width:10px; height:10px; left:${Math.random()*100}%; top:-20px; background:${couleurs[Math.floor(Math.random()*couleurs.length)]}; z-index:9999; border-radius:${Math.random()>0.5?'50%':'2px'}; transition: transform 2s linear, top 2s linear, opacity 2s; pointer-events:none;`;
       document.body.appendChild(c);
-      requestAnimationFrame(() => {
-        c.style.top = '105vh';
-        c.style.transform = `rotate(${Math.random()*720}deg)`;
-        c.style.opacity = '0';
-      });
+      requestAnimationFrame(() => { c.style.top = '105vh'; c.style.transform = `rotate(${Math.random()*720}deg)`; c.style.opacity = '0'; });
       setTimeout(() => c.remove(), 2500);
     }, i * 30);
   }
 }
-
-// ==========================================
-// FONCTIONS DU MODE VOL
-// ==========================================
-function demarrerVol() {
-  modeActuel = 'vol';
-  
-  // Cacher l'atelier, montrer le vol
-  document.getElementById('palette').classList.add('hidden');
-  document.getElementById('panneau-droit').classList.add('hidden');
-  document.getElementById('titre-principal').innerHTML = '🚁 Simulateur de Vol';
-  document.getElementById('sous-titre').innerHTML = 'Pilote le drone avec le clavier';
-  document.getElementById('btn-retour').href = 'simulateur-drone.html'; // Recharge l'atelier
-  document.getElementById('hud').classList.add('active');
-  document.getElementById('commandes-vol').classList.add('active');
-  
-  // Redimensionner le canvas pour prendre tout l'écran
-  zoneJeu.classList.add('mode-vol');
-  canvas.width = zoneJeu.clientWidth;
-  canvas.height = zoneJeu.clientHeight;
-  
-  // Initialiser la physique
-  dronePos = { x: 0, y: 0 };
-  droneVel = { x: 0, y: 0 };
-  droneAngle = 0;
-  altitude = 0;
-  batterie = 100;
-  vent = { x: 0, y: 0, force: 0 };
-  
-  // Écouter le clavier
-  document.addEventListener('keydown', (e) => keys[e.key.toLowerCase()] = true);
-  document.addEventListener('keyup', (e) => keys[e.key.toLowerCase()] = false);
-  
-  // Lancer la boucle de jeu
-  boucleDeVol();
-}
-
-function boucleDeVol() {
-  if (modeActuel !== 'vol') return;
-  
-  mettreAJourPhysique();
-  dessinerVol();
-  
-  animationId = requestAnimationFrame(boucleDeVol);
-}
-
-function mettreAJourPhysique() {
-  // 1. Batterie
-  if (batterie > 0) {
-    batterie -= 0.01;
-    if (batterie < 0) batterie = 0;
-  }
-  
-  // 2. Vent (change aléatoirement)
-  if (Math.random() < 0.02) {
-    vent.x = (Math.random() - 0.5) * 2;
-    vent.y = (Math.random() - 0.5) * 2;
-    vent.force = Math.random() * 10;
-  }
-  
-  // 3. Gaz / Altitude
-  let gaz = 0;
-  if (keys['z'] || keys['arrowup']) gaz = 1;
-  if (keys['s'] || keys['arrowdown']) gaz = -1;
-  
-  altitude += gaz * 2;
-  if (altitude < 0) altitude = 0;
-  if (altitude > 100) altitude = 100;
-  
-  // Si pas de batterie, chute
-  if (batterie <= 0) {
-    altitude -= 5;
-    if (altitude < 0) altitude = 0;
-  }
-  
-  // 4. Direction (Lacet)
-  if (keys['q'] || keys['arrowleft']) droneAngle -= 0.05;
-  if (keys['d'] || keys['arrowright']) droneAngle += 0.05;
-  
-  // 5. Mouvement (Avancer/Reculer)
-  let vitesseAvance = 0;
-  if (keys['w'] || keys['arrowup']) vitesseAvance = 3;
-  if (keys['s'] || keys['arrowdown']) vitesseAvance = -3; // Conflict avec gaz, on simplifie : flèches = direction
-  
-  // Simplification : On utilise ZQSD
-  // Z = Monter (Gaz), S = Descendre, Q = Tourner Gauche, D = Tourner Droite, W = Avancer, C = Reculer
-  if (keys['w']) {
-    droneVel.x += Math.sin(droneAngle) * 0.2;
-    droneVel.y -= Math.cos(droneAngle) * 0.2;
-  }
-  
-  // 6. Application du vent et de l'inertie
-  droneVel.x += vent.x * (vent.force / 100);
-  droneVel.y += vent.y * (vent.force / 100);
-  
-  droneVel.x *= 0.98; // Frottement
-  droneVel.y *= 0.98;
-  
-  dronePos.x += droneVel.x;
-  dronePos.y += droneVel.y;
-  
-  // Mettre à jour le HUD
-  document.getElementById('hud-batterie').textContent = Math.round(batterie) + '%';
-  document.getElementById('hud-batterie').className = batterie < 20 ? 'valeur alerte' : 'valeur';
-  
-  document.getElementById('hud-altitude').textContent = Math.round(altitude) + ' m';
-  document.getElementById('hud-vent').textContent = Math.round(vent.force) + ' km/h';
-}
-
-function dessinerVol() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  
-  // Dessiner le sol qui défile (Grille)
-  ctx.strokeStyle = '#1e293b';
-  ctx.lineWidth = 1;
-  const gridSize = 50;
-  const offsetX = dronePos.x % gridSize;
-  const offsetY = dronePos.y % gridSize;
-  
-  for (let x = -offsetX; x < canvas.width; x += gridSize) {
-    ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); ctx.stroke();
-  }
-  for (let y = -offsetY; y < canvas.height; y += gridSize) {
-    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke();
-  }
-  
-  // Dessiner des obstacles (Arbres) fictifs pour voir le mouvement
-  for (let i = 0; i < 10; i++) {
-    let treeX = (i * 300 - dronePos.x) % canvas.width;
-    let treeY = (i * 400 - dronePos.y) % canvas.height;
-    if (treeX < -50) treeX += canvas.width;
-    if (treeY < -50) treeY += canvas.height;
-    
-    ctx.fillStyle = '#14532d';
-    ctx.beginPath();
-    ctx.arc(treeX, treeY, 30, 0, Math.PI * 2);
-    ctx.fill();
-  }
-
-  // Dessiner le drone au centre
-  const cx = canvas.width / 2;
-  const cy = canvas.height / 2;
-  const scale = 1 + (altitude / 100); // Plus il est haut, plus il paraît grand
-  
-  ctx.save();
-  ctx.translate(cx, cy);
-  ctx.rotate(droneAngle);
-  ctx.scale(scale, scale);
-  
-  // Corps du drone (Châssis en X)
-  ctx.strokeStyle = '#475569';
-  ctx.lineWidth = 8;
-  ctx.lineCap = 'round';
-  ctx.beginPath();
-  ctx.moveTo(-40, -40); ctx.lineTo(40, 40);
-  ctx.moveTo(-40, 40); ctx.lineTo(40, -40);
-  ctx.stroke();
-  
-  // Carte centrale (FC)
-  ctx.fillStyle = '#10b981';
-  ctx.fillRect(-15, -15, 30, 30);
-  
-  // Hélices (qui tournent si batterie > 0)
-  const angleHelice = Date.now() / (batterie > 0 ? 20 : 500);
-  
-  const positionsMoteurs = [
-    { x: -40, y: -40 }, { x: 40, y: -40 },
-    { x: -40, y: 40 }, { x: 40, y: 40 }
-  ];
-  
-  positionsMoteurs.forEach(pos => {
-    ctx.save();
-    ctx.translate(pos.x, pos.y);
-    ctx.rotate(angleHelice);
-    
-    // Hélice
-    ctx.fillStyle = 'rgba(200, 200, 200, 0.6)';
-    ctx.beginPath();
-    ctx.ellipse(0, 0, 10, 35, 0, 0, Math.PI * 2);
-    ctx.fill();
-    
-    // Moyeu
-    ctx.fillStyle = '#fff';
-    ctx.beginPath();
-    ctx.arc(0, 0, 8, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.restore();
-  });
-  
-  // Indicateur d'avant
-  ctx.fillStyle = '#ef4444';
-  ctx.beginPath();
-  ctx.moveTo(0, -20);
-  ctx.lineTo(-5, -10);
-  ctx.lineTo(5, -10);
-  ctx.fill();
-  
-  ctx.restore();
-  
-  // Message de crash
-  if (batterie <= 0 && altitude <= 0) {
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
-    ctx.fillRect(0, canvas.height/2 - 50, canvas.width, 100);
-    ctx.fillStyle = '#ef4444';
-    ctx.font = 'bold 40px Arial';
-    ctx.textAlign = 'center';
-    ctx.fillText("💥 CRASH ! Batterie vide.", canvas.width/2, canvas.height/2 + 15);
-  }
-}
-
-window.addEventListener('resize', () => {
-  largeurCanvas = zoneJeu.clientWidth;
-  hauteurCanvas = zoneJeu.clientHeight;
-  canvas.width = largeurCanvas;
-  canvas.height = hauteurCanvas;
-  if (modeActuel === 'atelier') dessiner();
-  else if (modeActuel === 'vol') dessinerVol();
-});
-
-window.onload = () => {
-  if (!CanvasRenderingContext2D.prototype.roundRect) {
-    CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
-      if (w < 2 * r) r = w / 2;
-      if (h < 2 * r) r = h / 2;
-      this.beginPath();
-      this.moveTo(x + r, y);
-      this.arcTo(x + w, y, x + w, y + h, r);
-      this.arcTo(x + w, y + h, x, y + h, r);
-      this.arcTo(x, y + h, x, y, r);
-      this.arcTo(x, y, x + w, y, r);
-      this.closePath();
-      return this;
-    };
-  }
-  dessiner();
-};
+window.addEventListener('resize', () => { largeurCanvas = zoneJeu.clientWidth; hauteurCanvas = zoneJeu.clientHeight; canvas.width = largeurCanvas; canvas.height = hauteurCanvas; dessiner(); });
+window.onload = () => { if (!CanvasRenderingContext2D.prototype.roundRect) { CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) { if (w < 2 * r) r = w / 2; if (h < 2 * r) r = h / 2; this.beginPath(); this.moveTo(x + r, y); this.arcTo(x + w, y, x + w, y + h, r); this.arcTo(x + w, y + h, x, y + h, r); this.arcTo(x, y + h, x, y, r); this.arcTo(x, y, x + w, y, r); this.closePath(); return this; }; } dessiner(); };
 </script>
-
 </body>
 </html>
