@@ -27,8 +27,7 @@
 
   .zone-pcb { flex: 1; background: #0a0a0a; position: relative; overflow: hidden; display: flex; justify-content: center; align-items: center; background-image: radial-gradient(#222 1px, transparent 1px); background-size: 20px 20px; }
   
-  /* On force la taille du canvas pour éviter les décalages */
-  canvas { cursor: crosshair; width: 800px; height: 600px; display: block; }
+  canvas { cursor: crosshair; display: block; background: rgba(255,0,0,0.05); } /* Léger fond rouge pour voir la zone cliquable */
 
   .panneau-droit { width: 300px; background: #1a1a1a; padding: 20px; display: flex; flex-direction: column; border-left: 1px solid #333; }
   .log-zone { flex: 1; background: #0a0a0a; padding: 10px; border: 1px solid #333; font-family: monospace; font-size: 0.85em; overflow-y: auto; color: #4ade80; border-radius: 4px; margin-bottom: 20px; }
@@ -124,6 +123,9 @@ window.onload = () => {
   canvas = document.getElementById('canvas-pcb');
   ctx = canvas.getContext('2d');
   
+  // On s'assure que le canvas est focusable et prêt à recevoir les événements
+  canvas.style.touchAction = 'none'; 
+
   setInterval(() => {
     if (composantSelectionne) {
       dessinerPCB();
@@ -156,48 +158,19 @@ function selectionnerComp(type) {
   dessinerPCB();
 }
 
-// Détection de la position EXACTE sans décalage
-function obtenirCoordonnees(e) {
-  const rect = canvas.getBoundingClientRect();
-  // On calcule la position par rapport au coin haut-gauche du canvas
-  return {
-    x: e.clientX - rect.left,
-    y: e.clientY - rect.top
-  };
-}
-
-canvas.addEventListener('mousemove', (e) => {
-  const pos = obtenirCoordonnees(e);
-  const realX = pos.x - OFFSET_X;
-  const realY = pos.y - OFFSET_Y;
-
-  let padTrouve = null;
-  for (let key in PADS) {
-    const pad = PADS[key];
-    if (realX >= pad.x - 30 && realX <= pad.x + pad.w + 30 &&
-        realY >= pad.y - 30 && realY <= pad.y + pad.h + 30) {
-      padTrouve = pad;
-      break;
-    }
-  }
-
-  if (padTrouve !== hoverPad) {
-    hoverPad = padTrouve;
-    canvas.style.cursor = hoverPad ? 'pointer' : 'crosshair';
-    dessinerPCB();
-  }
-});
-
-canvas.addEventListener('click', (e) => {
-  const pos = obtenirCoordonnees(e);
-  const realX = pos.x - OFFSET_X;
-  const realY = pos.y - OFFSET_Y;
+// Utilisation de pointerdown au lieu de click, c'est beaucoup plus fiable
+canvas.addEventListener('pointerdown', (e) => {
+  // Message de test IMMÉDIAT pour savoir si on capte le clic
+  logMessage("Événement clic détecté !", "info");
   
-  // Log pour comprendre où on clique
-  logMessage(`Clic à X:${Math.round(realX)} Y:${Math.round(realY)}`, "info");
+  const rect = canvas.getBoundingClientRect();
+  const realX = e.clientX - rect.left - OFFSET_X;
+  const realY = e.clientY - rect.top - OFFSET_Y;
+  
+  logMessage(`Coordonnées : X=${Math.round(realX)}, Y=${Math.round(realY)}`);
 
   if (!composantSelectionne) {
-    logMessage("Veuillez d'abord sélectionner un composant dans le menu de gauche.", "erreur");
+    logMessage("Veuillez d'abord sélectionner un composant à gauche.", "erreur");
     return;
   }
   
@@ -206,8 +179,9 @@ canvas.addEventListener('click', (e) => {
   let padTrouve = null;
   for (let key in PADS) {
     const pad = PADS[key];
-    if (realX >= pad.x - 30 && realX <= pad.x + pad.w + 30 &&
-        realY >= pad.y - 30 && realY <= pad.y + pad.h + 30) {
+    // On élargit la zone de clic à 40px autour de la pastille
+    if (realX >= pad.x - 40 && realX <= pad.x + pad.w + 40 &&
+        realY >= pad.y - 40 && realY <= pad.y + pad.h + 40) {
       padTrouve = pad;
       break;
     }
@@ -223,11 +197,10 @@ canvas.addEventListener('click', (e) => {
       
       composantSelectionne = null;
       hoverPad = null;
-      canvas.style.cursor = 'crosshair';
       
       verifierSiFini();
     } else {
-      logMessage("Erreur ! Vous avez cliqué sur la pastille " + padTrouve.nom + " qui est prévue pour un autre composant.", "erreur");
+      logMessage("Erreur : Vous avez cliqué sur la pastille " + padTrouve.nom + " qui est prévue pour un autre composant.", "erreur");
     }
   } else {
     logMessage("Vous avez cliqué à côté. Rapprochez-vous de la pastille dorée.", "erreur");
@@ -239,6 +212,28 @@ canvas.addEventListener('click', (e) => {
     lastClick = null;
     dessinerPCB();
   }, 500);
+});
+
+canvas.addEventListener('mousemove', (e) => {
+  const rect = canvas.getBoundingClientRect();
+  const realX = e.clientX - rect.left - OFFSET_X;
+  const realY = e.clientY - rect.top - OFFSET_Y;
+
+  let padTrouve = null;
+  for (let key in PADS) {
+    const pad = PADS[key];
+    if (realX >= pad.x - 40 && realX <= pad.x + pad.w + 40 &&
+        realY >= pad.y - 40 && realY <= pad.y + pad.h + 40) {
+      padTrouve = pad;
+      break;
+    }
+  }
+
+  if (padTrouve !== hoverPad) {
+    hoverPad = padTrouve;
+    canvas.style.cursor = hoverPad ? 'pointer' : 'crosshair';
+    dessinerPCB();
+  }
 });
 
 function verifierSiFini() {
@@ -349,7 +344,7 @@ function dessinerPCB() {
   if (lastClick) {
     ctx.fillStyle = '#ef4444';
     ctx.beginPath();
-    ctx.arc(lastClick.x, lastClick.y, 6, 0, Math.PI*2);
+    ctx.arc(lastClick.x, lastClick.y, 8, 0, Math.PI*2);
     ctx.fill();
     ctx.strokeStyle = '#fff';
     ctx.lineWidth = 2;
