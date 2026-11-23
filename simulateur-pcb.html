@@ -22,6 +22,7 @@
   .item-comp { background: #252525; padding: 12px; border-radius: 4px; cursor: pointer; display: flex; flex-direction: column; border: 1px solid #333; transition: 0.2s; }
   .item-comp:hover { border-color: #4ade80; background: #2a2a2a; }
   .item-comp.actif { border-color: #4ade80; background: #1e3a2a; box-shadow: 0 0 10px rgba(74, 222, 128, 0.2); }
+  .item-comp.soude { opacity: 0.5; cursor: not-allowed; border-color: #10b981; background: #064e3b; }
   .item-comp strong { color: #fff; font-size: 0.9em; }
   .item-comp small { color: #888; font-family: monospace; font-size: 0.75em; margin-top: 4px; }
 
@@ -29,12 +30,15 @@
   .zone-pcb { flex: 1; background: #0a0a0a; position: relative; overflow: hidden; display: flex; justify-content: center; align-items: center; background-image: radial-gradient(#222 1px, transparent 1px); background-size: 20px 20px; }
   canvas { cursor: crosshair; }
 
-  /* Panneau de droite (Infos et validation) */
+  /* Panneau de droite */
   .panneau-droit { width: 300px; background: #1a1a1a; padding: 20px; display: flex; flex-direction: column; border-left: 1px solid #333; }
   .log-zone { flex: 1; background: #0a0a0a; padding: 10px; border: 1px solid #333; font-family: monospace; font-size: 0.85em; overflow-y: auto; color: #4ade80; border-radius: 4px; margin-bottom: 20px; }
   .log-zone p { margin-bottom: 5px; }
   .log-erreur { color: #ef4444; }
   .log-info { color: #3b82f6; }
+  
+  .progression { font-family: monospace; font-size: 1.1em; color: #fff; margin-bottom: 15px; text-align: center; background: #252525; padding: 10px; border-radius: 4px; border: 1px solid #333; }
+  
   .btn-action { background: #4ade80; color: #000; border: none; padding: 15px; border-radius: 4px; font-size: 1em; font-weight: bold; cursor: pointer; font-family: monospace; transition: 0.2s; }
   .btn-action:hover { background: #22c55e; }
   .btn-action:disabled { background: #333; color: #666; cursor: not-allowed; }
@@ -56,23 +60,23 @@
     
     <div class="item-comp" id="comp-mcu" onclick="selectionnerComp('mcu')">
       <strong>Microcontrôleur STM32F405</strong>
-      <small>Ref: LQFP-64 (Cerveau)</small>
+      <small>Ref: LQFP-64 (U1)</small>
     </div>
     <div class="item-comp" id="comp-imu" onclick="selectionnerComp('imu')">
       <strong>Gyroscope MPU6000</strong>
-      <small>Ref: QFN-24 (Capteur)</small>
+      <small>Ref: QFN-24 (IC1)</small>
     </div>
     <div class="item-comp" id="comp-bec" onclick="selectionnerComp('bec')">
       <strong>Régulateur BEC 5V</strong>
-      <small>Ref: SOT-223 (Alim)</small>
+      <small>Ref: SOT-223 (U2)</small>
     </div>
     <div class="item-comp" id="comp-xt60" onclick="selectionnerComp('xt60')">
       <strong>Connecteur XT60</strong>
-      <small>Ref: THT (Batterie)</small>
+      <small>Ref: THT (P1)</small>
     </div>
     <div class="item-comp" id="comp-pads" onclick="selectionnerComp('pads')">
       <strong>Pads Moteurs (M1-M4)</strong>
-      <small>Ref: THT (Signaux ESC)</small>
+      <small>Ref: THT (M1, M2, M3, M4)</small>
     </div>
   </div>
 
@@ -82,6 +86,9 @@
 
   <div class="panneau-droit">
     <h2 style="color:#4ade80; font-family:monospace; margin-bottom:10px;">CONSOLE DE SOUDURE</h2>
+    
+    <div class="progression" id="progression">Composants soudés : 0 / 5</div>
+
     <div class="log-zone" id="log">
       <p class="log-info">Système prêt.</p>
       <p>1. Cliquez sur un composant à gauche.</p>
@@ -92,7 +99,6 @@
 </div>
 
 <script>
-// Configuration de la carte PCB
 const BOARD_W = 600;
 const BOARD_H = 450;
 const OFFSET_X = 100;
@@ -109,21 +115,22 @@ const PADS = {
   pads_m4: { x: 400, y: 250, w: 15, h: 15, type: 'pads', nom: 'M4' },
 };
 
-const COMPOSANTS_PLACES = {};
+// On initialise explicitement l'état des composants
+let composantsPlaces = { mcu: false, imu: false, bec: false, xt60: false, pads: false };
 let composantSelectionne = null;
 let canvas, ctx;
-let hoverPad = null; // Pour le survol de la souris
+let hoverPad = null;
 
 window.onload = () => {
   canvas = document.getElementById('canvas-pcb');
   ctx = canvas.getContext('2d');
   
-  // Animations de clignotement pour les pastilles cibles
+  // Animation pour faire clignoter les pastilles cibles
   setInterval(() => {
     if (composantSelectionne) {
       dessinerPCB();
     }
-  }, 500);
+  }, 400);
 
   dessinerPCB();
 };
@@ -138,33 +145,33 @@ function logMessage(msg, type = 'info') {
 }
 
 function selectionnerComp(type) {
-  if (COMPOSANTS_PLACES[type]) {
+  // Si déjà soudé, on ne fait rien
+  if (composantsPlaces[type]) {
     logMessage("Ce composant est déjà soudé !", "erreur");
     return;
   }
+  
   composantSelectionne = type;
+  
+  // Mise à jour visuelle de la palette
   document.querySelectorAll('.item-comp').forEach(el => el.classList.remove('actif'));
   document.getElementById('comp-' + type).classList.add('actif');
+  
   logMessage("Composant sélectionné : " + type.toUpperCase() + ". Cliquez sur sa pastille dorée.");
   dessinerPCB();
 }
 
-// Détection du survol
+// Survol de la souris pour changer le curseur
 canvas.addEventListener('mousemove', (e) => {
   const rect = canvas.getBoundingClientRect();
-  const clickX = e.clientX - rect.left;
-  const clickY = e.clientY - rect.top;
-
-  // On soustrait le décalage pour correspondre aux vraies coordonnées du PCB
-  const realX = clickX - OFFSET_X;
-  const realY = clickY - OFFSET_Y;
+  const realX = (e.clientX - rect.left) - OFFSET_X;
+  const realY = (e.clientY - rect.top) - OFFSET_Y;
 
   let padTrouve = null;
   for (let key in PADS) {
     const pad = PADS[key];
-    // Zone de détection de 40px autour du centre du pad
-    if (realX >= pad.x - 40 && realX <= pad.x + pad.w + 40 &&
-        realY >= pad.y - 40 && realY <= pad.y + pad.h + 40) {
+    if (realX >= pad.x - 30 && realX <= pad.x + pad.w + 30 &&
+        realY >= pad.y - 30 && realY <= pad.y + pad.h + 30) {
       padTrouve = pad;
       break;
     }
@@ -177,7 +184,7 @@ canvas.addEventListener('mousemove', (e) => {
   }
 });
 
-// Détection du clic
+// Clic sur le circuit
 canvas.addEventListener('click', (e) => {
   if (!composantSelectionne) {
     logMessage("Veuillez d'abord sélectionner un composant dans le menu de gauche.", "info");
@@ -185,19 +192,14 @@ canvas.addEventListener('click', (e) => {
   }
   
   const rect = canvas.getBoundingClientRect();
-  const clickX = e.clientX - rect.left;
-  const clickY = e.clientY - rect.top;
-
-  // CORRECTION DU BUG : On soustrait le décalage visuel
-  const realX = clickX - OFFSET_X;
-  const realY = clickY - OFFSET_Y;
+  const realX = (e.clientX - rect.left) - OFFSET_X;
+  const realY = (e.clientY - rect.top) - OFFSET_Y;
 
   let padTrouve = null;
-  
   for (let key in PADS) {
     const pad = PADS[key];
-    if (realX >= pad.x - 40 && realX <= pad.x + pad.w + 40 &&
-        realY >= pad.y - 40 && realY <= pad.y + pad.h + 40) {
+    if (realX >= pad.x - 30 && realX <= pad.x + pad.w + 30 &&
+        realY >= pad.y - 30 && realY <= pad.y + pad.h + 30) {
       padTrouve = pad;
       break;
     }
@@ -205,10 +207,16 @@ canvas.addEventListener('click', (e) => {
 
   if (padTrouve) {
     if (padTrouve.type === composantSelectionne) {
-      COMPOSANTS_PLACES[composantSelectionne] = true;
+      // Succès !
+      composantsPlaces[composantSelectionne] = true;
       logMessage("Soudure réussie : " + padTrouve.nom + " (" + composantSelectionne.toUpperCase() + ")", "succes");
+      
+      // Mise à jour de la palette (le composant devient grisé)
+      document.getElementById('comp-' + composantSelectionne).classList.remove('actif');
+      document.getElementById('comp-' + composantSelectionne).classList.add('soude');
+      
       composantSelectionne = null;
-      document.querySelectorAll('.item-comp').forEach(el => el.classList.remove('actif'));
+      
       verifierSiFini();
       dessinerPCB();
     } else {
@@ -220,10 +228,16 @@ canvas.addEventListener('click', (e) => {
 });
 
 function verifierSiFini() {
-  const totalAplacer = ['mcu', 'imu', 'bec', 'xt60', 'pads'];
-  const places = Object.keys(COMPOSANTS_PLACES);
+  let count = 0;
+  for (let key in composantsPlaces) {
+    if (composantsPlaces[key]) count++;
+  }
   
-  if (places.length === totalAplacer.length) {
+  // Mise à jour du compteur
+  document.getElementById('progression').textContent = "Composants soudés : " + count + " / 5";
+  
+  // Activation du bouton si tout est bon
+  if (count === 5) {
     document.getElementById('btn-verifier').disabled = false;
     logMessage("Tous les composants sont soudés. Lancez le test !", "info");
   }
@@ -235,7 +249,7 @@ function dessinerPCB() {
   ctx.save();
   ctx.translate(OFFSET_X, OFFSET_Y);
 
-  // 1. Fond de la carte (PCB)
+  // 1. Fond de la carte
   ctx.fillStyle = '#0d2b1a'; 
   ctx.strokeStyle = '#1a472a';
   ctx.lineWidth = 4;
@@ -262,26 +276,25 @@ function dessinerPCB() {
   ctx.beginPath(); ctx.arc(BOARD_W - 20, BOARD_H - 20, 6, 0, Math.PI*2); ctx.fill();
 
   // 4. Dessin des pastilles
-  const temps = Date.now();
-  const clignote = Math.sin(temps / 150) > 0; // Pour faire clignoter
+  const clignote = Math.sin(Date.now() / 150) > 0; 
 
   for (let key in PADS) {
     const pad = PADS[key];
-    const estSoude = COMPOSANTS_PLACES[pad.type];
+    const estSoude = composantsPlaces[pad.type];
     const estCible = composantSelectionne === pad.type;
 
-    // Effet de halo pour la cible
+    // Halo clignotant (uniquement sur la pastille cible)
     if (estCible && clignote) {
-      ctx.fillStyle = 'rgba(251, 191, 36, 0.4)';
+      ctx.fillStyle = 'rgba(251, 191, 36, 0.6)';
       ctx.beginPath();
-      ctx.arc(pad.x + pad.w/2, pad.y + pad.h/2, Math.max(pad.w, pad.h) + 15, 0, Math.PI*2);
+      ctx.arc(pad.x + pad.w/2, pad.y + pad.h/2, Math.max(pad.w, pad.h) + 20, 0, Math.PI*2);
       ctx.fill();
     }
 
-    // Dessin du pad
+    // Dessin de la pastille
     ctx.fillStyle = estSoude ? '#10b981' : '#c9a84c'; 
-    ctx.strokeStyle = hoverPad === pad ? '#fff' : 'rgba(0,0,0,0.5)';
-    ctx.lineWidth = hoverPad === pad ? 3 : 1;
+    ctx.strokeStyle = (hoverPad === pad && estCible) ? '#fff' : 'rgba(0,0,0,0.5)';
+    ctx.lineWidth = (hoverPad === pad && estCible) ? 4 : 1;
 
     if (pad.type === 'xt60') {
       ctx.fillRect(pad.x, pad.y, pad.w, pad.h);
@@ -295,24 +308,24 @@ function dessinerPCB() {
       ctx.strokeRect(pad.x, pad.y, pad.w, pad.h);
     }
 
-    // Référence
+    // Texte (U1, IC1...)
     ctx.fillStyle = '#aaa';
-    ctx.font = '10px monospace';
+    ctx.font = '12px monospace';
     ctx.textAlign = 'center';
     ctx.fillText(pad.nom, pad.x + pad.w/2, pad.y - 8);
 
-    // Composant soudé
+    // Dessin du composant s'il est soudé
     if (estSoude) {
       if (pad.type === 'mcu') {
         ctx.fillStyle = '#111';
         ctx.fillRect(pad.x + 5, pad.y + 5, pad.w - 10, pad.h - 10);
         ctx.fillStyle = '#4ade80';
-        ctx.fillText('STM32', pad.x + pad.w/2, pad.y + pad.h/2 + 3);
+        ctx.fillText('STM32', pad.x + pad.w/2, pad.y + pad.h/2 + 5);
       } else if (pad.type === 'imu') {
         ctx.fillStyle = '#111';
         ctx.fillRect(pad.x + 5, pad.y + 5, pad.w - 10, pad.h - 10);
         ctx.fillStyle = '#4ade80';
-        ctx.fillText('MPU', pad.x + pad.w/2, pad.y + pad.h/2 + 3);
+        ctx.fillText('MPU', pad.x + pad.w/2, pad.y + pad.h/2 + 5);
       } else if (pad.type === 'bec') {
         ctx.fillStyle = '#333';
         ctx.fillRect(pad.x, pad.y, pad.w, pad.h);
