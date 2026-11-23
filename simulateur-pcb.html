@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simulateur PCB - Flight Controller</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: #121212; color: #e0e0e0; height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
+  
+  header { background: #1e1e1e; color: #4ade80; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #333; }
+  header h1 { font-size: 1.3em; font-family: monospace; letter-spacing: 1px; }
+  header p { font-size: 0.85em; color: #888; }
+  .btn-retour { background: transparent; color: #888; border: 1px solid #555; padding: 8px 16px; border-radius: 4px; cursor: pointer; text-decoration: none; font-family: monospace; transition: 0.2s; }
+  .btn-retour:hover { border-color: #4ade80; color: #4ade80; }
+
+  .conteneur { display: flex; flex: 1; overflow: hidden; }
+  
+  /* Palette de composants */
+  .palette { width: 280px; background: #1a1a1a; padding: 15px; display: flex; flex-direction: column; gap: 8px; overflow-y: auto; border-right: 1px solid #333; }
+  .palette h2 { font-size: 1em; color: #aaa; font-family: monospace; margin-bottom: 10px; border-bottom: 1px solid #333; padding-bottom: 5px; }
+  .item-comp { background: #252525; padding: 12px; border-radius: 4px; cursor: pointer; display: flex; flex-direction: column; border: 1px solid #333; transition: 0.2s; }
+  .item-comp:hover { border-color: #4ade80; background: #2a2a2a; }
+  .item-comp.actif { border-color: #4ade80; background: #1e3a2a; box-shadow: 0 0 10px rgba(74, 222, 128, 0.2); }
+  .item-comp strong { color: #fff; font-size: 0.9em; }
+  .item-comp small { color: #888; font-family: monospace; font-size: 0.75em; margin-top: 4px; }
+
+  /* Zone de dessin PCB */
+  .zone-pcb { flex: 1; background: #0a0a0a; position: relative; overflow: hidden; display: flex; justify-content: center; align-items: center; background-image: radial-gradient(#222 1px, transparent 1px); background-size: 20px 20px; }
+  canvas { cursor: crosshair; }
+
+  /* Panneau de droite (Infos et validation) */
+  .panneau-droit { width: 300px; background: #1a1a1a; padding: 20px; display: flex; flex-direction: column; border-left: 1px solid #333; }
+  .log-zone { flex: 1; background: #0a0a0a; padding: 10px; border: 1px solid #333; font-family: monospace; font-size: 0.85em; overflow-y: auto; color: #4ade80; border-radius: 4px; margin-bottom: 20px; }
+  .log-zone p { margin-bottom: 5px; }
+  .log-erreur { color: #ef4444; }
+  .log-info { color: #3b82f6; }
+  .btn-action { background: #4ade80; color: #000; border: none; padding: 15px; border-radius: 4px; font-size: 1em; font-weight: bold; cursor: pointer; font-family: monospace; transition: 0.2s; }
+  .btn-action:hover { background: #22c55e; }
+  .btn-action:disabled { background: #333; color: #666; cursor: not-allowed; }
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>⚡ PCB Designer : Flight Controller</h1>
+    <p>Phase 1 : Soudure et assemblage de la carte de vol</p>
+  </div>
+  <a href="index.html" class="btn-retour">← Quitter</a>
+</header>
+
+<div class="conteneur">
+  <div class="palette">
+    <h2>📦 COMPOSANTS CMS & CONNECTEURS</h2>
+    
+    <div class="item-comp" id="comp-mcu" onclick="selectionnerComp('mcu')">
+      <strong>Microcontrôleur STM32F405</strong>
+      <small>Ref: LQFP-64 (Cerveau)</small>
+    </div>
+    <div class="item-comp" id="comp-imu" onclick="selectionnerComp('imu')">
+      <strong>Gyroscope MPU6000</strong>
+      <small>Ref: QFN-24 (Capteur)</small>
+    </div>
+    <div class="item-comp" id="comp-bec" onclick="selectionnerComp('bec')">
+      <strong>Régulateur BEC 5V</strong>
+      <small>Ref: SOT-223 (Alim)</small>
+    </div>
+    <div class="item-comp" id="comp-xt60" onclick="selectionnerComp('xt60')">
+      <strong>Connecteur XT60</strong>
+      <small>Ref: THT (Batterie)</small>
+    </div>
+    <div class="item-comp" id="comp-pads" onclick="selectionnerComp('pads')">
+      <strong>Pads Moteurs (M1-M4)</strong>
+      <small>Ref: THT (Signaux ESC)</small>
+    </div>
+  </div>
+
+  <div class="zone-pcb" id="zone-pcb">
+    <canvas id="canvas-pcb" width="800" height="600"></canvas>
+  </div>
+
+  <div class="panneau-droit">
+    <h2 style="color:#4ade80; font-family:monospace; margin-bottom:10px;">CONSOLE DE SOUDURE</h2>
+    <div class="log-zone" id="log">
+      <p class="log-info">Système prêt.</p>
+      <p>Sélectionnez un composant et cliquez sur son emplacement.</p>
+    </div>
+    <button class="btn-action" id="btn-verifier" onclick="verifierCarte()" disabled>⚡ TESTER LA CARTE</button>
+  </div>
+</div>
+
+<script>
+// Configuration de la carte PCB (coordonnées relatives au canvas)
+const BOARD_W = 600;
+const BOARD_H = 450;
+const OFFSET_X = 100;
+const OFFSET_Y = 75;
+
+const PADS = {
+  mcu: { x: 300, y: 200, w: 60, h: 60, type: 'mcu', nom: 'U1' },
+  imu: { x: 300, y: 100, w: 30, h: 30, type: 'imu', nom: 'IC1' },
+  bec: { x: 450, y: 300, w: 20, h: 30, type: 'bec', nom: 'U2' },
+  xt60: { x: 150, y: 350, w: 30, h: 40, type: 'xt60', nom: 'P1' },
+  pads_m1: { x: 200, y: 150, w: 15, h: 15, type: 'pads', nom: 'M1' },
+  pads_m2: { x: 400, y: 150, w: 15, h: 15, type: 'pads', nom: 'M2' },
+  pads_m3: { x: 200, y: 250, w: 15, h: 15, type: 'pads', nom: 'M3' },
+  pads_m4: { x: 400, y: 250, w: 15, h: 15, type: 'pads', nom: 'M4' },
+};
+
+const COMPOSANTS_PLACES = {};
+let composantSelectionne = null;
+let canvas, ctx;
+
+window.onload = () => {
+  canvas = document.getElementById('canvas-pcb');
+  ctx = canvas.getContext('2d');
+  dessinerPCB();
+};
+
+function logMessage(msg, type = 'info') {
+  const log = document.getElementById('log');
+  const p = document.createElement('p');
+  p.textContent = '> ' + msg;
+  p.className = type === 'erreur' ? 'log-erreur' : (type === 'succes' ? 'log-info' : '');
+  log.appendChild(p);
+  log.scrollTop = log.scrollHeight;
+}
+
+function selectionnerComp(type) {
+  if (COMPOSANTS_PLACES[type]) {
+    logMessage("Ce composant est déjà soudé !", "erreur");
+    return;
+  }
+  composantSelectionne = type;
+  document.querySelectorAll('.item-comp').forEach(el => el.classList.remove('actif'));
+  document.getElementById('comp-' + type).classList.add('actif');
+  logMessage("Composant sélectionné : " + type.toUpperCase());
+}
+
+canvas.addEventListener('click', (e) => {
+  if (!composantSelectionne) return;
+  
+  const rect = canvas.getBoundingClientRect();
+  const clickX = e.clientX - rect.left;
+  const clickY = e.clientY - rect.top;
+
+  let padTrouve = null;
+  
+  // On cherche si on a cliqué sur un pad
+  for (let key in PADS) {
+    const pad = PADS[key];
+    // Zone de clic autour du pad
+    if (clickX >= pad.x - 30 && clickX <= pad.x + pad.w + 30 &&
+        clickY >= pad.y - 30 && clickY <= pad.y + pad.h + 30) {
+      padTrouve = pad;
+      break;
+    }
+  }
+
+  if (padTrouve) {
+    if (padTrouve.type === composantSelectionne) {
+      // Succès de la soudure !
+      COMPOSANTS_PLACES[composantSelectionne] = true;
+      logMessage("Soudure réussie : " + padTrouve.nom + " (" + composantSelectionne.toUpperCase() + ")", "succes");
+      composantSelectionne = null;
+      document.querySelectorAll('.item-comp').forEach(el => el.classList.remove('actif'));
+      verifierSiFini();
+      dessinerPCB();
+    } else {
+      logMessage("Erreur de soudure ! Vous ne pouvez pas souder ce composant ici.", "erreur");
+    }
+  } else {
+    logMessage("Cliquez plus près d'une pastille (pad) de soudure.", "erreur");
+  }
+});
+
+function verifierSiFini() {
+  const totalAplacer = ['mcu', 'imu', 'bec', 'xt60', 'pads'];
+  const places = Object.keys(COMPOSANTS_PLACES);
+  
+  if (places.length === totalAplacer.length) {
+    document.getElementById('btn-verifier').disabled = false;
+    logMessage("Tous les composants sont soudés. Lancez le test !", "info");
+  }
+}
+
+function dessinerPCB() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  
+  ctx.save();
+  ctx.translate(OFFSET_X, OFFSET_Y);
+
+  // 1. Dessiner le contour de la carte (PCB)
+  ctx.fillStyle = '#0d2b1a'; // Vert très foncé (PCB)
+  ctx.strokeStyle = '#1a472a';
+  ctx.lineWidth = 4;
+  ctx.beginPath();
+  if (ctx.roundRect) ctx.roundRect(0, 0, BOARD_W, BOARD_H, 30);
+  else ctx.rect(0, 0, BOARD_W, BOARD_H);
+  ctx.fill();
+  ctx.stroke();
+
+  // 2. Dessiner quelques pistes de cuivre (pour le style)
+  ctx.strokeStyle = '#c9a84c'; // Cuivre
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(150, 350); ctx.lineTo(150, 250); ctx.lineTo(300, 200); // XT60 vers MCU
+  ctx.moveTo(300, 200); ctx.lineTo(400, 150); // MCU vers M2
+  ctx.moveTo(300, 200); ctx.lineTo(200, 250); // MCU vers M3
+  ctx.stroke();
+
+  // 3. Dessiner les trous de fixation
+  ctx.fillStyle = '#000';
+  ctx.beginPath(); ctx.arc(20, 20, 6, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.arc(BOARD_W - 20, 20, 6, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.arc(20, BOARD_H - 20, 6, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.arc(BOARD_W - 20, BOARD_H - 20, 6, 0, Math.PI*2); ctx.fill();
+
+  // 4. Dessiner les pads de soudure
+  for (let key in PADS) {
+    const pad = PADS[key];
+    const estSoude = COMPOSANTS_PLACES[pad.type];
+
+    // Pad en cuivre
+    ctx.fillStyle = estSoude ? '#10b981' : '#c9a84c'; // Vert si soudé, Or si vide
+    ctx.strokeStyle = '#fff';
+    ctx.lineWidth = 1;
+
+    if (pad.type === 'xt60') {
+      // XT60 a deux grosses pastilles
+      ctx.fillRect(pad.x, pad.y, pad.w, pad.h);
+      ctx.fillRect(pad.x + 40, pad.y, pad.w, pad.h);
+    } else if (pad.type === 'pads') {
+      // Pads moteurs (petits ronds)
+      ctx.beginPath(); ctx.arc(pad.x, pad.y, pad.w/2, 0, Math.PI*2); ctx.fill();
+    } else {
+      // Pads de circuits intégrés (rectangles)
+      ctx.fillRect(pad.x, pad.y, pad.w, pad.h);
+    }
+    ctx.stroke();
+
+    // Texte de la référence
+    ctx.fillStyle = '#aaa';
+    ctx.font = '10px monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText(pad.nom, pad.x + pad.w/2, pad.y - 5);
+
+    // Dessiner le composant s'il est soudé
+    if (estSoude) {
+      if (pad.type === 'mcu') {
+        ctx.fillStyle = '#111';
+        ctx.fillRect(pad.x + 5, pad.y + 5, pad.w - 10, pad.h - 10);
+        ctx.fillStyle = '#555';
+        ctx.fillText('STM32', pad.x + pad.w/2, pad.y + pad.h/2 + 3);
+      } else if (pad.type === 'imu') {
+        ctx.fillStyle = '#111';
+        ctx.fillRect(pad.x + 5, pad.y + 5, pad.w - 10, pad.h - 10);
+        ctx.fillStyle = '#555';
+        ctx.fillText('MPU', pad.x + pad.w/2, pad.y + pad.h/2 + 3);
+      } else if (pad.type === 'bec') {
+        ctx.fillStyle = '#333';
+        ctx.fillRect(pad.x, pad.y, pad.w, pad.h);
+      } else if (pad.type === 'xt60') {
+        ctx.fillStyle = '#f59e0b'; // Connecteur jaune
+        ctx.fillRect(pad.x - 5, pad.y - 5, pad.w + 10, pad.h + 10);
+        ctx.fillRect(pad.x + 35, pad.y - 5, pad.w + 10, pad.h + 10);
+      }
+    }
+  }
+
+  ctx.restore();
+}
+
+function verifierCarte() {
+  logMessage("⚡ Test de continuité et d'alimentation en cours...", "info");
+  document.getElementById('btn-verifier').disabled = true;
+  
+  setTimeout(() => {
+    logMessage("✅ Alimentation 5V : OK", "succes");
+    logMessage("✅ Gyroscope : OK", "succes");
+    logMessage("✅ Signaux Moteurs : OK", "succes");
+    logMessage("🎉 CARTE DE VOL PRÊTE À ÊTRE FIXÉE SUR LE CHÂSSIS !", "succes");
+  }, 1500);
+}
+</script>
+
+</body>
+</html>
