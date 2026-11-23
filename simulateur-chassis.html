@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simulateur Drone - Assemblage Châssis</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: #121212; color: #e0e0e0; height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
+  
+  header { background: #1e1e1e; color: #4ade80; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #333; }
+  header h1 { font-size: 1.3em; font-family: monospace; letter-spacing: 1px; }
+  header p { font-size: 0.85em; color: #888; }
+  .btn-retour { background: transparent; color: #888; border: 1px solid #555; padding: 8px 16px; border-radius: 4px; cursor: pointer; text-decoration: none; font-family: monospace; transition: 0.2s; }
+  .btn-retour:hover { border-color: #4ade80; color: #4ade80; }
+
+  .conteneur { display: flex; flex: 1; overflow: hidden; }
+  
+  /* Palette de composants */
+  .palette { width: 280px; background: #1a1a1a; padding: 15px; display: flex; flex-direction: column; gap: 8px; overflow-y: auto; border-right: 1px solid #333; }
+  .palette h2 { font-size: 1em; color: #aaa; font-family: monospace; margin-bottom: 10px; border-bottom: 1px solid #333; padding-bottom: 5px; }
+  .item-comp { background: #252525; padding: 12px; border-radius: 4px; cursor: pointer; display: flex; flex-direction: column; border: 1px solid #333; transition: 0.2s; }
+  .item-comp:hover { border-color: #4ade80; background: #2a2a2a; }
+  .item-comp.actif { border-color: #4ade80; background: #1e3a2a; box-shadow: 0 0 10px rgba(74, 222, 128, 0.2); }
+  .item-comp strong { color: #fff; font-size: 0.9em; }
+  .item-comp small { color: #888; font-family: monospace; font-size: 0.75em; margin-top: 4px; }
+
+  /* Zone de dessin */
+  .zone-pcb { flex: 1; background: #0a0a0a; position: relative; overflow: hidden; display: flex; justify-content: center; align-items: center; background-image: radial-gradient(#222 1px, transparent 1px); background-size: 20px 20px; }
+  canvas { cursor: crosshair; }
+
+  /* Panneau de droite */
+  .panneau-droit { width: 300px; background: #1a1a1a; padding: 20px; display: flex; flex-direction: column; border-left: 1px solid #333; }
+  .log-zone { flex: 1; background: #0a0a0a; padding: 10px; border: 1px solid #333; font-family: monospace; font-size: 0.85em; overflow-y: auto; color: #4ade80; border-radius: 4px; margin-bottom: 20px; }
+  .log-zone p { margin-bottom: 5px; }
+  .log-erreur { color: #ef4444; }
+  .log-info { color: #3b82f6; }
+  .btn-action { background: #4ade80; color: #000; border: none; padding: 15px; border-radius: 4px; font-size: 1em; font-weight: bold; cursor: pointer; font-family: monospace; transition: 0.2s; }
+  .btn-action:hover { background: #22c55e; }
+  .btn-action:disabled { background: #333; color: #666; cursor: not-allowed; }
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>🔧 Assemblage Châssis & Moteurs</h1>
+    <p>Phase 2 : Montage mécanique et vissage des hélices</p>
+  </div>
+  <a href="index.html" class="btn-retour">← Quitter</a>
+</header>
+
+<div class="conteneur">
+  <div class="palette">
+    <h2>⚙️ PIÈCES DÉTACHÉES</h2>
+    
+    <div class="item-comp" id="comp-moteur" onclick="selectionnerComp('moteur')">
+      <strong>Moteur Brushless 2207</strong>
+      <small>Ref: 1750KV (x4 à visser)</small>
+    </div>
+    
+    <div class="item-comp" id="comp-stack" onclick="selectionnerComp('stack')">
+      <strong>Stack ESC + FC</strong>
+      <small>Ref: T-Motor 45A + STM32</small>
+    </div>
+    
+    <div class="item-comp" id="comp-helice-cw" onclick="selectionnerComp('helice-cw')">
+      <strong>Hélice CW (Sens Horaire)</strong>
+      <small>Ref: Gemfan 51466 (x2)</small>
+    </div>
+    
+    <div class="item-comp" id="comp-helice-ccw" onclick="selectionnerComp('helice-ccw')">
+      <strong>Hélice CCW (Sens Anti-Horaire)</strong>
+      <small>Ref: Gemfan 51466 (x2)</small>
+    </div>
+  </div>
+
+  <div class="zone-pcb" id="zone-pcb">
+    <canvas id="canvas-chassis" width="800" height="600"></canvas>
+  </div>
+
+  <div class="panneau-droit">
+    <h2 style="color:#4ade80; font-family:monospace; margin-bottom:10px;">CONSOLE D'ASSEMBLAGE</h2>
+    <div class="log-zone" id="log">
+      <p class="log-info">Châssis en carbone chargé.</p>
+      <p>Veuillez visser les moteurs, le stack et les hélices.</p>
+    </div>
+    <button class="btn-action" id="btn-verifier" onclick="verifierDrone()" disabled>⚡ TESTER LE DRONE</button>
+  </div>
+</div>
+
+<script>
+// Configuration de la carte PCB
+const BOARD_W = 600;
+const BOARD_H = 600;
+const OFFSET_X = 100;
+const OFFSET_Y = 0;
+
+// Coordonnées des zones d'assemblage
+const ZONES = {
+  moteur1: { x: 150, y: 150, nom: 'Moteur 1 (Avant Gauche)', type: 'moteur' },
+  moteur2: { x: 450, y: 150, nom: 'Moteur 2 (Avant Droit)', type: 'moteur' },
+  moteur3: { x: 150, y: 450, nom: 'Moteur 3 (Arrière Gauche)', type: 'moteur' },
+  moteur4: { x: 450, y: 450, nom: 'Moteur 4 (Arrière Droit)', type: 'moteur' },
+  stack: { x: 300, y: 300, nom: 'Emplacement Stack ESC/FC', type: 'stack' },
+  
+  helice1: { x: 150, y: 150, nom: 'Hélice M1 (CW)', type: 'helice-cw' },
+  helice2: { x: 450, y: 150, nom: 'Hélice M2 (CCW)', type: 'helice-ccw' },
+  helice3: { x: 150, y: 450, nom: 'Hélice M3 (CCW)', type: 'helice-ccw' },
+  helice4: { x: 450, y: 450, nom: 'Hélice M4 (CW)', type: 'helice-cw' }
+};
+
+// État du montage
+let moteursPlaces = 0;
+let stackPlace = false;
+let helicesPlacees = 0;
+
+let composantSelectionne = null;
+let canvas, ctx;
+
+window.onload = () => {
+  canvas = document.getElementById('canvas-chassis');
+  ctx = canvas.getContext('2d');
+  dessinerChassis();
+};
+
+function logMessage(msg, type = 'info') {
+  const log = document.getElementById('log');
+  const p = document.createElement('p');
+  p.textContent = '> ' + msg;
+  p.className = type === 'erreur' ? 'log-erreur' : (type === 'succes' ? 'log-info' : '');
+  log.appendChild(p);
+  log.scrollTop = log.scrollHeight;
+}
+
+function selectionnerComp(type) {
+  if (type === 'moteur' && moteursPlaces >= 4) { logMessage("Les 4 moteurs sont déjà vissés !", "erreur"); return; }
+  if (type === 'stack' && stackPlace) { logMessage("Le stack est déjà fixé !", "erreur"); return; }
+  if (type.includes('helice') && helicesPlacees >= 4) { logMessage("Les 4 hélices sont déjà vissées !", "erreur"); return; }
+
+  composantSelectionne = type;
+  document.querySelectorAll('.item-comp').forEach(el => el.classList.remove('actif'));
+  document.getElementById('comp-' + type).classList.add('actif');
+  logMessage("Pièce sélectionnée : " + type.toUpperCase());
+}
+
+canvas.addEventListener('click', (e) => {
+  if (!composantSelectionne) return;
+  
+  const rect = canvas.getBoundingClientRect();
+  const clickX = e.clientX - rect.left;
+  const clickY = e.clientY - rect.top;
+
+  let zoneTrouvee = null;
+  
+  // On cherche si on a cliqué sur une zone d'assemblage
+  for (let key in ZONES) {
+    const zone = ZONES[key];
+    const dx = clickX - (zone.x + OFFSET_X);
+    const dy = clickY - (zone.y + OFFSET_Y);
+    
+    // Zone de clic de 50px de rayon
+    if (dx*dx + dy*dy < 50*50) {
+      zoneTrouvee = zone;
+      break;
+    }
+  }
+
+  if (zoneTrouvee) {
+    // Vérification de la logique d'assemblage
+    if (zoneTrouvee.type === composantSelectionne) {
+      
+      // Cas spécifique du stack
+      if (composantSelectionne === 'stack') {
+        stackPlace = true;
+        logMessage("Stack ESC + FC vissé au centre.", "succes");
+      } 
+      // Cas des moteurs
+      else if (composantSelectionne === 'moteur') {
+        // On vérifie si le moteur n'est pas déjà là (on regarde si on a déjà cliqué sur cette zone)
+        if (!zoneTrouvee.rempli) {
+          zoneTrouvee.rempli = true;
+          moteursPlaces++;
+          logMessage("Moteur vissé : " + zoneTrouvee.nom, "succes");
+        } else {
+          logMessage("Un moteur est déjà vissé ici !", "erreur");
+          return;
+        }
+      }
+      // Cas des hélices
+      else if (composantSelectionne.includes('helice')) {
+        if (!zoneTrouvee.rempli) {
+          zoneTrouvee.rempli = true;
+          helicesPlacees++;
+          logMessage("Hélice vissée : " + zoneTrouvee.nom, "succes");
+        } else {
+          logMessage("Une hélice est déjà vissée ici !", "erreur");
+          return;
+        }
+      }
+
+      // On désélectionne
+      composantSelectionne = null;
+      document.querySelectorAll('.item-comp').forEach(el => el.classList.remove('actif'));
+      verifierSiFini();
+      dessinerChassis();
+
+    } else {
+      logMessage("Erreur : Cette pièce ne correspond pas à cet emplacement.", "erreur");
+    }
+  } else {
+    logMessage("Cliquez au centre d'un des 4 bras ou au centre du châssis.", "erreur");
+  }
+});
+
+function verifierSiFini() {
+  if (moteursPlaces === 4 && stackPlace && helicesPlacees === 4) {
+    document.getElementById('btn-verifier').disabled = false;
+    logMessage("Assemblage terminé. Lancez le test de la structure !", "info");
+  }
+}
+
+function dessinerChassis() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  
+  ctx.save();
+  ctx.translate(OFFSET_X, OFFSET_Y);
+
+  // 1. Dessin du châssis en X (Carbone)
+  // Bras du châssis
+  ctx.lineCap = 'round';
+  ctx.lineWidth = 40;
+  ctx.strokeStyle = '#222'; // Carbone
+  
+  // Croix
+  ctx.beginPath();
+  ctx.moveTo(150, 150); ctx.lineTo(450, 450);
+  ctx.moveTo(450, 150); ctx.lineTo(150, 450);
+  ctx.stroke();
+
+  // Bordure des bras (reflet)
+  ctx.lineWidth = 38;
+  ctx.strokeStyle = '#333';
+  ctx.beginPath();
+  ctx.moveTo(150, 150); ctx.lineTo(450, 450);
+  ctx.moveTo(450, 150); ctx.lineTo(150, 450);
+  ctx.stroke();
+
+  // 2. Plaque centrale (Bottom plate)
+  ctx.fillStyle = '#1a1a1a';
+  ctx.strokeStyle = '#444';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  if (ctx.roundRect) ctx.roundRect(250, 250, 100, 100, 10);
+  else ctx.rect(250, 250, 100, 100);
+  ctx.fill(); ctx.stroke();
+
+  // 3. Dessin des zones cibles (guides pour l'élève)
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+  ctx.lineWidth = 2;
+  ctx.setLineDash([5, 5]);
+  
+  for (let key in ZONES) {
+    const zone = ZONES[key];
+    ctx.beginPath();
+    ctx.arc(zone.x, zone.y, 30, 0, Math.PI*2);
+    ctx.stroke();
+  }
+  ctx.setLineDash([]);
+
+  // 4. Dessin des composants placés
+  for (let key in ZONES) {
+    const zone = ZONES[key];
+    
+    // Si le stack est placé
+    if (zone.type === 'stack' && stackPlace) {
+      ctx.fillStyle = '#0d2b1a'; // PCB vert
+      ctx.strokeStyle = '#4ade80';
+      ctx.beginPath();
+      if (ctx.roundRect) ctx.roundRect(zone.x - 30, zone.y - 30, 60, 60, 5);
+      else ctx.rect(zone.x - 30, zone.y - 30, 60, 60);
+      ctx.fill(); ctx.stroke();
+      
+      // Petit composant dessus
+      ctx.fillStyle = '#111';
+      ctx.fillRect(zone.x - 10, zone.y - 10, 20, 20);
+    }
+
+    // Si un moteur est placé
+    if (zone.type === 'moteur' && zone.rempli) {
+      ctx.fillStyle = '#555'; // Métal
+      ctx.strokeStyle = '#888';
+      ctx.beginPath(); ctx.arc(zone.x, zone.y, 25, 0, Math.PI*2); ctx.fill(); ctx.stroke();
+      
+      // Bobine cuivre
+      ctx.fillStyle = '#b45309';
+      ctx.beginPath(); ctx.arc(zone.x, zone.y, 15, 0, Math.PI*2); ctx.fill();
+      
+      // Axe central
+      ctx.fillStyle = '#ccc';
+      ctx.beginPath(); ctx.arc(zone.x, zone.y, 5, 0, Math.PI*2); ctx.fill();
+    }
+
+    // Si une hélice est placée
+    if (zone.type.includes('helice') && zone.rempli) {
+      ctx.save();
+      ctx.translate(zone.x, zone.y);
+      
+      // Couleur différente selon CW ou CCW
+      ctx.fillStyle = zone.type === 'helice-cw' ? 'rgba(239, 68, 68, 0.7)' : 'rgba(59, 130, 246, 0.7)'; 
+      
+      ctx.beginPath();
+      ctx.ellipse(0, 0, 15, 45, 0, 0, Math.PI*2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.ellipse(0, 0, 45, 15, 0, 0, Math.PI*2);
+      ctx.fill();
+      
+      // Moyeu
+      ctx.fillStyle = '#000';
+      ctx.beginPath(); ctx.arc(0, 0, 8, 0, Math.PI*2); ctx.fill();
+      
+      ctx.restore();
+    }
+  }
+
+  ctx.restore();
+}
+
+function verifierDrone() {
+  logMessage("🔍 Test du centre de gravité et de l'équilibre...", "info");
+  document.getElementById('btn-verifier').disabled = true;
+  
+  setTimeout(() => {
+    logMessage("✅ Moteurs : Bien fixés aux bras", "succes");
+    logMessage("✅ Stack : Centré et vissé", "succes");
+    logMessage("✅ Hélices : Sens de rotation respecté (CW/CCW)", "succes");
+    logMessage("🚁 CHÂSSIS PRÊT POUR LA PHASE 3 (Radiocommande & Vol) !", "succes");
+  }, 1500);
+}
+</script>
+
+</body>
+</html>
