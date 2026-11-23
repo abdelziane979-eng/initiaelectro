@@ -16,7 +16,6 @@
 
   .conteneur { display: flex; flex: 1; overflow: hidden; }
   
-  /* Palette de composants */
   .palette { width: 280px; background: #1a1a1a; padding: 15px; display: flex; flex-direction: column; gap: 8px; overflow-y: auto; border-right: 1px solid #333; }
   .palette h2 { font-size: 1em; color: #aaa; font-family: monospace; margin-bottom: 10px; border-bottom: 1px solid #333; padding-bottom: 5px; }
   .item-comp { background: #252525; padding: 12px; border-radius: 4px; cursor: pointer; display: flex; flex-direction: column; border: 1px solid #333; transition: 0.2s; }
@@ -26,11 +25,11 @@
   .item-comp strong { color: #fff; font-size: 0.9em; }
   .item-comp small { color: #888; font-family: monospace; font-size: 0.75em; margin-top: 4px; }
 
-  /* Zone de dessin PCB */
   .zone-pcb { flex: 1; background: #0a0a0a; position: relative; overflow: hidden; display: flex; justify-content: center; align-items: center; background-image: radial-gradient(#222 1px, transparent 1px); background-size: 20px 20px; }
-  canvas { cursor: crosshair; width: 100%; height: 100%; object-fit: contain; }
+  
+  /* On force la taille du canvas pour éviter les décalages */
+  canvas { cursor: crosshair; width: 800px; height: 600px; display: block; }
 
-  /* Panneau de droite */
   .panneau-droit { width: 300px; background: #1a1a1a; padding: 20px; display: flex; flex-direction: column; border-left: 1px solid #333; }
   .log-zone { flex: 1; background: #0a0a0a; padding: 10px; border: 1px solid #333; font-family: monospace; font-size: 0.85em; overflow-y: auto; color: #4ade80; border-radius: 4px; margin-bottom: 20px; }
   .log-zone p { margin-bottom: 5px; }
@@ -119,7 +118,7 @@ let composantsPlaces = { mcu: false, imu: false, bec: false, xt60: false, pads: 
 let composantSelectionne = null;
 let canvas, ctx;
 let hoverPad = null;
-let lastClick = null; // Pour afficher un point rouge où on clique
+let lastClick = null; 
 
 window.onload = () => {
   canvas = document.getElementById('canvas-pcb');
@@ -157,21 +156,18 @@ function selectionnerComp(type) {
   dessinerPCB();
 }
 
-// Fonction pour obtenir les coordonnées réelles sur le canvas (même s'il est redimensionné)
-function getMousePos(e) {
+// Détection de la position EXACTE sans décalage
+function obtenirCoordonnees(e) {
   const rect = canvas.getBoundingClientRect();
-  const scaleX = canvas.width / rect.width;
-  const scaleY = canvas.height / rect.height;
-  
+  // On calcule la position par rapport au coin haut-gauche du canvas
   return {
-    x: (e.clientX - rect.left) * scaleX,
-    y: (e.clientY - rect.top) * scaleY
+    x: e.clientX - rect.left,
+    y: e.clientY - rect.top
   };
 }
 
-// Survol de la souris
 canvas.addEventListener('mousemove', (e) => {
-  const pos = getMousePos(e);
+  const pos = obtenirCoordonnees(e);
   const realX = pos.x - OFFSET_X;
   const realY = pos.y - OFFSET_Y;
 
@@ -192,18 +188,19 @@ canvas.addEventListener('mousemove', (e) => {
   }
 });
 
-// Clic sur le circuit
 canvas.addEventListener('click', (e) => {
-  if (!composantSelectionne) {
-    logMessage("Veuillez d'abord sélectionner un composant dans le menu de gauche.", "info");
-    return;
-  }
-  
-  const pos = getMousePos(e);
+  const pos = obtenirCoordonnees(e);
   const realX = pos.x - OFFSET_X;
   const realY = pos.y - OFFSET_Y;
   
-  // Sauvegarder la position pour l'afficher en rouge
+  // Log pour comprendre où on clique
+  logMessage(`Clic à X:${Math.round(realX)} Y:${Math.round(realY)}`, "info");
+
+  if (!composantSelectionne) {
+    logMessage("Veuillez d'abord sélectionner un composant dans le menu de gauche.", "erreur");
+    return;
+  }
+  
   lastClick = { x: realX, y: realY };
 
   let padTrouve = null;
@@ -219,7 +216,7 @@ canvas.addEventListener('click', (e) => {
   if (padTrouve) {
     if (padTrouve.type === composantSelectionne) {
       composantsPlaces[composantSelectionne] = true;
-      logMessage("Soudure réussie : " + padTrouve.nom + " (" + composantSelectionne.toUpperCase() + ")", "succes");
+      logMessage("Soudure réussie : " + padTrouve.nom, "succes");
       
       document.getElementById('comp-' + composantSelectionne).classList.remove('actif');
       document.getElementById('comp-' + composantSelectionne).classList.add('soude');
@@ -238,7 +235,6 @@ canvas.addEventListener('click', (e) => {
   
   dessinerPCB();
   
-  // Effacer le point rouge après 500ms
   setTimeout(() => {
     lastClick = null;
     dessinerPCB();
@@ -349,13 +345,12 @@ function dessinerPCB() {
     }
   }
 
-  // 5. Dessin du point rouge si on vient de cliquer
+  // 5. Dessin du point rouge
   if (lastClick) {
     ctx.fillStyle = '#ef4444';
     ctx.beginPath();
     ctx.arc(lastClick.x, lastClick.y, 6, 0, Math.PI*2);
     ctx.fill();
-    // Petit contour blanc pour bien le voir
     ctx.strokeStyle = '#fff';
     ctx.lineWidth = 2;
     ctx.stroke();
