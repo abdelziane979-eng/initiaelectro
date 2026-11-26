@@ -9,13 +9,14 @@
   body { font-family: 'Segoe UI', Arial, sans-serif; background: #121212; color: #e0e0e0; height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
   
   header { background: #1e1e1e; color: #4ade80; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #333; }
-  header h1 { font-size: 1.3em; font-family: monospace; letter-spacing: 1px; }
+  header h1 { font-size: 1.3em; font-family: monospace; }
   header p { font-size: 0.85em; color: #888; }
-  .btn-retour { background: transparent; color: #888; border: 1px solid #555; padding: 8px 16px; border-radius: 4px; cursor: pointer; text-decoration: none; font-family: monospace; transition: 0.2s; }
+  .btn-retour { background: transparent; color: #888; border: 1px solid #555; padding: 8px 16px; border-radius: 4px; cursor: pointer; text-decoration: none; font-family: monospace; }
   .btn-retour:hover { border-color: #4ade80; color: #4ade80; }
 
   .conteneur { display: flex; flex: 1; overflow: hidden; }
   
+  /* Palette de composants */
   .palette { width: 280px; background: #1a1a1a; padding: 15px; display: flex; flex-direction: column; gap: 8px; overflow-y: auto; border-right: 1px solid #333; }
   .palette h2 { font-size: 1em; color: #aaa; font-family: monospace; margin-bottom: 10px; border-bottom: 1px solid #333; padding-bottom: 5px; }
   .item-comp { background: #252525; padding: 12px; border-radius: 4px; cursor: pointer; display: flex; flex-direction: column; border: 1px solid #333; transition: 0.2s; }
@@ -24,14 +25,52 @@
   .item-comp strong { color: #fff; font-size: 0.9em; }
   .item-comp small { color: #888; font-family: monospace; font-size: 0.75em; margin-top: 4px; }
 
-  .zone-pcb { flex: 1; background: #0a0a0a; position: relative; overflow: hidden; display: flex; justify-content: center; align-items: center; background-image: radial-gradient(#222 1px, transparent 1px); background-size: 20px 20px; }
-  canvas { cursor: crosshair; display: block; }
+  /* Zone de dessin (DOM) */
+  .zone-jeu { flex: 1; background: #0a0a0a; position: relative; display: flex; justify-content: center; align-items: center; background-image: radial-gradient(#222 1px, transparent 1px); background-size: 20px 20px; }
+  
+  /* Le châssis global */
+  .chassis { position: relative; width: 500px; height: 500px; }
+  
+  /* Les croix du châssis */
+  .bras { position: absolute; width: 100%; height: 40px; background: #222; top: 50%; left: 0; transform: translateY(-50%) rotate(45deg); border-radius: 10px; border: 1px solid #333; }
+  .bras-2 { transform: translateY(-50%) rotate(-45deg); }
+  .centre-chassis { position: absolute; top: 50%; left: 50%; width: 120px; height: 120px; background: #1a1a1a; border: 2px solid #444; transform: translate(-50%, -50%); border-radius: 10px; z-index: 2; }
 
+  /* Les zones de dépôt (Slots) */
+  .slot { position: absolute; width: 70px; height: 70px; border: 2px dashed rgba(255,255,255,0.2); border-radius: 50%; display: flex; justify-content: center; align-items: center; font-family: monospace; font-size: 0.8em; color: #555; z-index: 3; transition: 0.2s; cursor: pointer; }
+  .slot:hover { background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.5); }
+  .slot.cible { border-color: #fbbf24; border-style: solid; box-shadow: 0 0 15px rgba(251,191,36,0.4); animation: pulse 1s infinite alternate; }
+  @keyframes pulse { from { box-shadow: 0 0 5px rgba(251,191,36,0.2); } to { box-shadow: 0 0 20px rgba(251,191,36,0.8); } }
+  
+  /* Position des slots */
+  .slot-m1 { top: 15px; left: 15px; }
+  .slot-m2 { top: 15px; right: 15px; }
+  .slot-m3 { bottom: 15px; left: 15px; }
+  .slot-m4 { bottom: 15px; right: 15px; }
+  .slot-stack { top: 50%; left: 50%; transform: translate(-50%, -50%); width: 100px; height: 100px; border-radius: 10px; }
+
+  /* Style quand rempli */
+  .slot.rempli { border: 2px solid #4ade80; background: #064e3b; color: #4ade80; cursor: default; }
+  
+  /* Détails visuels pour les composants placés */
+  .moteur-visuel { width: 40px; height: 40px; background: #555; border-radius: 50%; border: 3px solid #888; position: relative; }
+  .moteur-visuel::after { content: ''; position: absolute; top: 10px; left: 10px; width: 14px; height: 14px; background: #b45309; border-radius: 50%; }
+  
+  .helice-visuelle { position: absolute; width: 150px; height: 150px; pointer-events: none; display: flex; justify-content: center; align-items: center; }
+  .helice-cw-vis { width: 20px; height: 120px; background: rgba(239, 68, 68, 0.7); border-radius: 50%; transform: rotate(45deg); }
+  .helice-ccw-vis { width: 20px; height: 120px; background: rgba(59, 130, 246, 0.7); border-radius: 50%; transform: rotate(-45deg); }
+
+  .stack-visuel { width: 60px; height: 60px; background: #0d2b1a; border: 2px solid #4ade80; border-radius: 4px; display: flex; justify-content: center; align-items: center; }
+  .stack-visuel::after { content: ''; width: 20px; height: 20px; background: #111; }
+
+  /* Panneau droit */
   .panneau-droit { width: 300px; background: #1a1a1a; padding: 20px; display: flex; flex-direction: column; border-left: 1px solid #333; }
   .log-zone { flex: 1; background: #0a0a0a; padding: 10px; border: 1px solid #333; font-family: monospace; font-size: 0.85em; overflow-y: auto; color: #4ade80; border-radius: 4px; margin-bottom: 20px; }
   .log-zone p { margin-bottom: 5px; }
   .log-erreur { color: #ef4444; }
   .log-info { color: #3b82f6; }
+  
+  .progression { font-family: monospace; font-size: 1.1em; color: #fff; margin-bottom: 15px; text-align: center; background: #252525; padding: 10px; border-radius: 4px; border: 1px solid #333; }
   .btn-action { background: #4ade80; color: #000; border: none; padding: 15px; border-radius: 4px; font-size: 1em; font-weight: bold; cursor: pointer; font-family: monospace; transition: 0.2s; }
   .btn-action:hover { background: #22c55e; }
   .btn-action:disabled { background: #333; color: #666; cursor: not-allowed; }
@@ -42,7 +81,7 @@
 <header>
   <div>
     <h1>🔧 Assemblage Châssis & Moteurs</h1>
-    <p>Phase 2 : Montage mécanique et vissage des hélices</p>
+    <p>Phase 2 : Montage mécanique (Mode DOM sécurisé)</p>
   </div>
   <a href="index.html" class="btn-retour">← Quitter</a>
 </header>
@@ -72,50 +111,49 @@
     </div>
   </div>
 
-  <div class="zone-pcb" id="zone-pcb">
-    <canvas id="canvas-chassis" width="800" height="600"></canvas>
+  <div class="zone-jeu">
+    <div class="chassis">
+      <div class="bras"></div>
+      <div class="bras bras-2"></div>
+      <div class="centre-chassis"></div>
+
+      <!-- Zones de clic (Slots) -->
+      <div class="slot slot-m1" id="slot-m1" onclick="placerPiece('slot-m1', 'moteur')">M1</div>
+      <div class="slot slot-m2" id="slot-m2" onclick="placerPiece('slot-m2', 'moteur')">M2</div>
+      <div class="slot slot-m3" id="slot-m3" onclick="placerPiece('slot-m3', 'moteur')">M3</div>
+      <div class="slot slot-m4" id="slot-m4" onclick="placerPiece('slot-m4', 'moteur')">M4</div>
+      
+      <div class="slot slot-stack" id="slot-stack" onclick="placerPiece('slot-stack', 'stack')">Stack</div>
+    </div>
   </div>
 
   <div class="panneau-droit">
     <h2 style="color:#4ade80; font-family:monospace; margin-bottom:10px;">CONSOLE D'ASSEMBLAGE</h2>
+    
+    <div class="progression" id="progression">Progression : 0 / 9</div>
+
     <div class="log-zone" id="log">
       <p class="log-info">Châssis en carbone chargé.</p>
-      <p>Veuillez visser les moteurs, le stack et les hélices.</p>
+      <p>1. Sélectionnez une pièce à gauche.</p>
+      <p>2. Cliquez sur son emplacement sur le châssis.</p>
     </div>
     <button class="btn-action" id="btn-verifier" onclick="verifierDrone()" disabled>⚡ TESTER LE DRONE</button>
   </div>
 </div>
 
 <script>
-const BOARD_W = 600;
-const BOARD_H = 600;
-const OFFSET_X = 100;
-const OFFSET_Y = 0;
+// État global
+let pieceSelectionnee = null;
+let compteur = 0;
+const TOTAL_PIECES = 9; // 4 moteurs + 1 stack + 4 hélices
 
-const ZONES = {
-  moteur1: { x: 150, y: 150, nom: 'Moteur 1 (Avant Gauche)', type: 'moteur' },
-  moteur2: { x: 450, y: 150, nom: 'Moteur 2 (Avant Droit)', type: 'moteur' },
-  moteur3: { x: 150, y: 450, nom: 'Moteur 3 (Arrière Gauche)', type: 'moteur' },
-  moteur4: { x: 450, y: 450, nom: 'Moteur 4 (Arrière Droit)', type: 'moteur' },
-  stack: { x: 300, y: 300, nom: 'Emplacement Stack ESC/FC', type: 'stack' },
-  
-  helice1: { x: 150, y: 150, nom: 'Hélice M1 (CW)', type: 'helice-cw' },
-  helice2: { x: 450, y: 150, nom: 'Hélice M2 (CCW)', type: 'helice-ccw' },
-  helice3: { x: 150, y: 450, nom: 'Hélice M3 (CCW)', type: 'helice-ccw' },
-  helice4: { x: 450, y: 450, nom: 'Hélice M4 (CW)', type: 'helice-cw' }
-};
-
-let moteursPlaces = 0;
-let stackPlace = false;
-let helicesPlacees = 0;
-
-let composantSelectionne = null;
-let canvas, ctx;
-
-window.onload = () => {
-  canvas = document.getElementById('canvas-chassis');
-  ctx = canvas.getContext('2d');
-  dessinerChassis();
+// État des slots
+const slots = {
+  'slot-m1': { type: 'moteur', rempli: false, helice: null },
+  'slot-m2': { type: 'moteur', rempli: false, helice: null },
+  'slot-m3': { type: 'moteur', rempli: false, helice: null },
+  'slot-m4': { type: 'moteur', rempli: false, helice: null },
+  'slot-stack': { type: 'stack', rempli: false }
 };
 
 function logMessage(msg, type = 'info') {
@@ -128,165 +166,125 @@ function logMessage(msg, type = 'info') {
 }
 
 function selectionnerComp(type) {
-  if (type === 'moteur' && moteursPlaces >= 4) { logMessage("Les 4 moteurs sont déjà vissés !", "erreur"); return; }
-  if (type === 'stack' && stackPlace) { logMessage("Le stack est déjà fixé !", "erreur"); return; }
-  if (type.includes('helice') && helicesPlacees >= 4) { logMessage("Les 4 hélices sont déjà vissées !", "erreur"); return; }
-
-  composantSelectionne = type;
+  pieceSelectionnee = type;
+  
+  // Mise à jour visuelle de la palette
   document.querySelectorAll('.item-comp').forEach(el => el.classList.remove('actif'));
   document.getElementById('comp-' + type).classList.add('actif');
+  
   logMessage("Pièce sélectionnée : " + type.toUpperCase());
+  
+  // Faire clignoter les slots compatibles
+  document.querySelectorAll('.slot').forEach(el => el.classList.remove('cible'));
+  
+  if (type === 'moteur') {
+    ['slot-m1', 'slot-m2', 'slot-m3', 'slot-m4'].forEach(id => {
+      if (!slots[id].rempli) document.getElementById(id).classList.add('cible');
+    });
+  } else if (type === 'stack') {
+    if (!slots['slot-stack'].rempli) document.getElementById('slot-stack').classList.add('cible');
+  } else if (type.includes('helice')) {
+    // Les hélices se placent sur les moteurs déjà installés
+    ['slot-m1', 'slot-m2', 'slot-m3', 'slot-m4'].forEach(id => {
+      if (slots[id].rempli && !slots[id].helice) document.getElementById(id).classList.add('cible');
+    });
+  }
 }
 
-canvas.addEventListener('click', (e) => {
-  if (!composantSelectionne) return;
-  
-  const rect = canvas.getBoundingClientRect();
-  const clickX = e.clientX - rect.left;
-  const clickY = e.clientY - rect.top;
+function placerPiece(slotId, typeSlot) {
+  if (!pieceSelectionnee) {
+    logMessage("Veuillez d'abord sélectionner une pièce à gauche.", "erreur");
+    return;
+  }
 
-  let zoneTrouvee = null;
+  const slot = slots[slotId];
+  const elementSlot = document.getElementById(slotId);
+
+  // CAS 1 : On place un MOTEUR
+  if (pieceSelectionnee === 'moteur') {
+    if (typeSlot !== 'moteur') {
+      logMessage("Erreur : Un moteur ne se place pas au centre !", "erreur");
+      return;
+    }
+    if (slot.rempli) {
+      logMessage("Erreur : Un moteur est déjà vissé ici.", "erreur");
+      return;
+    }
+    slot.rempli = true;
+    elementSlot.innerHTML = '<div class="moteur-visuel"></div>';
+    elementSlot.classList.add('rempli');
+    elementSlot.classList.remove('cible');
+    logMessage("Moteur vissé sur le bras.", "succes");
+  } 
   
-  for (let key in ZONES) {
-    const zone = ZONES[key];
-    const dx = clickX - (zone.x + OFFSET_X);
-    const dy = clickY - (zone.y + OFFSET_Y);
+  // CAS 2 : On place le STACK
+  else if (pieceSelectionnee === 'stack') {
+    if (slotId !== 'slot-stack') {
+      logMessage("Erreur : Le stack se place au centre du châssis.", "erreur");
+      return;
+    }
+    if (slot.rempli) {
+      logMessage("Erreur : Le stack est déjà en place.", "erreur");
+      return;
+    }
+    slot.rempli = true;
+    elementSlot.innerHTML = '<div class="stack-visuel"></div>';
+    elementSlot.classList.add('rempli');
+    elementSlot.classList.remove('cible');
+    logMessage("Stack ESC + FC vissé au centre.", "succes");
+  }
+
+  // CAS 3 : On place une HÉLICE
+  else if (pieceSelectionnee.includes('helice')) {
+    if (typeSlot !== 'moteur') {
+      logMessage("Erreur : Les hélices se vissent sur les moteurs.", "erreur");
+      return;
+    }
+    if (!slot.rempli) {
+      logMessage("Erreur : Il faut d'abord visser un moteur ici.", "erreur");
+      return;
+    }
+    if (slot.helice) {
+      logMessage("Erreur : Une hélice est déjà vissée sur ce moteur.", "erreur");
+      return;
+    }
     
-    if (dx*dx + dy*dy < 50*50) {
-      zoneTrouvee = zone;
-      break;
+    // Vérification du sens de l'hélice (CW sur M1/M4, CCW sur M2/M3)
+    let sensCorrect = false;
+    if (slotId === 'slot-m1' || slotId === 'slot-m4') sensCorrect = (pieceSelectionnee === 'helice-cw');
+    if (slotId === 'slot-m2' || slotId === 'slot-m3') sensCorrect = (pieceSelectionnee === 'helice-ccw');
+
+    if (!sensCorrect) {
+      logMessage("❌ Erreur de sens ! L'hélice tournerait dans le mauvais sens.", "erreur");
+      return;
     }
+
+    slot.helice = pieceSelectionnee;
+    
+    // Ajout visuel de l'hélice
+    const heliceDiv = document.createElement('div');
+    heliceDiv.className = 'helice-visuelle';
+    heliceDiv.innerHTML = `<div class="${pieceSelectionnee === 'helice-cw' ? 'helice-cw-vis' : 'helice-ccw-vis'}"></div>`;
+    elementSlot.appendChild(heliceDiv);
+    
+    elementSlot.classList.remove('cible');
+    logMessage("Hélice vissée dans le bon sens.", "succes");
   }
 
-  if (zoneTrouvee) {
-    if (zoneTrouvee.type === composantSelectionne) {
-      
-      if (composantSelectionne === 'stack') {
-        stackPlace = true;
-        logMessage("Stack ESC + FC vissé au centre.", "succes");
-      } 
-      else if (composantSelectionne === 'moteur') {
-        if (!zoneTrouvee.rempli) {
-          zoneTrouvee.rempli = true;
-          moteursPlaces++;
-          logMessage("Moteur vissé : " + zoneTrouvee.nom, "succes");
-        } else {
-          logMessage("Un moteur est déjà vissé ici !", "erreur");
-          return;
-        }
-      }
-      else if (composantSelectionne.includes('helice')) {
-        if (!zoneTrouvee.rempli) {
-          zoneTrouvee.rempli = true;
-          helicesPlacees++;
-          logMessage("Hélice vissée : " + zoneTrouvee.nom, "succes");
-        } else {
-          logMessage("Une hélice est déjà vissée ici !", "erreur");
-          return;
-        }
-      }
+  // Mise à jour du compteur
+  compteur++;
+  document.getElementById('progression').textContent = "Progression : " + compteur + " / " + TOTAL_PIECES;
+  
+  // Désélectionner
+  pieceSelectionnee = null;
+  document.querySelectorAll('.item-comp').forEach(el => el.classList.remove('actif'));
+  document.querySelectorAll('.slot').forEach(el => el.classList.remove('cible'));
 
-      composantSelectionne = null;
-      document.querySelectorAll('.item-comp').forEach(el => el.classList.remove('actif'));
-      verifierSiFini();
-      dessinerChassis();
-
-    } else {
-      logMessage("Erreur : Cette pièce ne correspond pas à cet emplacement.", "erreur");
-    }
-  } else {
-    logMessage("Cliquez au centre d'un des 4 bras ou au centre du châssis.", "erreur");
-  }
-});
-
-function verifierSiFini() {
-  if (moteursPlaces === 4 && stackPlace && helicesPlacees === 4) {
+  // Vérifier si terminé
+  if (compteur === TOTAL_PIECES) {
     document.getElementById('btn-verifier').disabled = false;
     logMessage("Assemblage terminé. Lancez le test de la structure !", "info");
   }
-}
-
-function dessinerChassis() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  
-  ctx.save();
-  ctx.translate(OFFSET_X, OFFSET_Y);
-
-  // Châssis
-  ctx.lineCap = 'round';
-  ctx.lineWidth = 40;
-  ctx.strokeStyle = '#222'; 
-  ctx.beginPath();
-  ctx.moveTo(150, 150); ctx.lineTo(450, 450);
-  ctx.moveTo(450, 150); ctx.lineTo(150, 450);
-  ctx.stroke();
-
-  ctx.lineWidth = 38;
-  ctx.strokeStyle = '#333';
-  ctx.beginPath();
-  ctx.moveTo(150, 150); ctx.lineTo(450, 450);
-  ctx.moveTo(450, 150); ctx.lineTo(150, 450);
-  ctx.stroke();
-
-  // Plaque centrale
-  ctx.fillStyle = '#1a1a1a';
-  ctx.strokeStyle = '#444';
-  ctx.lineWidth = 2;
-  ctx.beginPath();
-  if (ctx.roundRect) ctx.roundRect(250, 250, 100, 100, 10);
-  else ctx.rect(250, 250, 100, 100);
-  ctx.fill(); ctx.stroke();
-
-  // Guides
-  ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
-  ctx.lineWidth = 2;
-  ctx.setLineDash([5, 5]);
-  for (let key in ZONES) {
-    const zone = ZONES[key];
-    ctx.beginPath();
-    ctx.arc(zone.x, zone.y, 30, 0, Math.PI*2);
-    ctx.stroke();
-  }
-  ctx.setLineDash([]);
-
-  // Composants
-  for (let key in ZONES) {
-    const zone = ZONES[key];
-    
-    if (zone.type === 'stack' && stackPlace) {
-      ctx.fillStyle = '#0d2b1a';
-      ctx.strokeStyle = '#4ade80';
-      ctx.beginPath();
-      if (ctx.roundRect) ctx.roundRect(zone.x - 30, zone.y - 30, 60, 60, 5);
-      else ctx.rect(zone.x - 30, zone.y - 30, 60, 60);
-      ctx.fill(); ctx.stroke();
-      ctx.fillStyle = '#111';
-      ctx.fillRect(zone.x - 10, zone.y - 10, 20, 20);
-    }
-
-    if (zone.type === 'moteur' && zone.rempli) {
-      ctx.fillStyle = '#555';
-      ctx.strokeStyle = '#888';
-      ctx.beginPath(); ctx.arc(zone.x, zone.y, 25, 0, Math.PI*2); ctx.fill(); ctx.stroke();
-      ctx.fillStyle = '#b45309';
-      ctx.beginPath(); ctx.arc(zone.x, zone.y, 15, 0, Math.PI*2); ctx.fill();
-      ctx.fillStyle = '#ccc';
-      ctx.beginPath(); ctx.arc(zone.x, zone.y, 5, 0, Math.PI*2); ctx.fill();
-    }
-
-    if (zone.type.includes('helice') && zone.rempli) {
-      ctx.save();
-      ctx.translate(zone.x, zone.y);
-      ctx.fillStyle = zone.type === 'helice-cw' ? 'rgba(239, 68, 68, 0.7)' : 'rgba(59, 130, 246, 0.7)'; 
-      ctx.beginPath(); ctx.ellipse(0, 0, 15, 45, 0, 0, Math.PI*2); ctx.fill();
-      ctx.beginPath(); ctx.ellipse(0, 0, 45, 15, 0, 0, Math.PI*2); ctx.fill();
-      ctx.fillStyle = '#000';
-      ctx.beginPath(); ctx.arc(0, 0, 8, 0, Math.PI*2); ctx.fill();
-      ctx.restore();
-    }
-  }
-
-  ctx.restore();
 }
 
 function verifierDrone() {
