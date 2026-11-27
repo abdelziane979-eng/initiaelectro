@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Câblage Radiocommande - InitiaElectro</title>
+<title>Atelier Câblage Radio - InitiaElectro</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: 'Segoe UI', Arial, sans-serif; background: #0f172a; color: #e2e8f0; height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
@@ -28,6 +28,7 @@
   .zone-jeu { flex: 1; background: #0b1120; position: relative; overflow: hidden; background-image: radial-gradient(#1e293b 1px, transparent 1px); background-size: 20px 20px; }
   canvas { display: block; cursor: crosshair; }
   canvas.mode-cablage { cursor: cell; }
+  canvas.mode-multimetre { cursor: crosshair; }
 
   /* Panneau droit */
   .panneau-droit { width: 300px; background: #1e293b; padding: 15px; display: flex; flex-direction: column; border-left: 2px solid #334155; }
@@ -39,6 +40,9 @@
   .btn-verifier { background: linear-gradient(135deg, #10b981, #059669); color: white; box-shadow: 0 4px 0 #047857; }
   .btn-verifier:hover { transform: translateY(-2px); box-shadow: 0 6px 0 #047857; }
   .btn-verifier:active { transform: translateY(2px); box-shadow: 0 2px 0 #047857; }
+  .btn-multimetre { background: linear-gradient(135deg, #0891b2, #06b6d4); color: white; box-shadow: 0 4px 0 #0e7490; }
+  .btn-multimetre:hover { transform: translateY(-2px); box-shadow: 0 6px 0 #0e7490; }
+  .btn-multimetre.actif { background: linear-gradient(135deg, #0e7490, #155e75); box-shadow: inset 0 2px 4px rgba(0,0,0,0.5); transform: translateY(2px); }
   .btn-effacer { background: linear-gradient(135deg, #ef4444, #dc2626); color: white; box-shadow: 0 4px 0 #991b1b; }
   .btn-effacer:hover { transform: translateY(-2px); box-shadow: 0 6px 0 #991b1b; }
   .btn-effacer:active { transform: translateY(2px); box-shadow: 0 2px 0 #991b1b; }
@@ -46,6 +50,7 @@
   .message { margin-top: 15px; padding: 15px; border-radius: 8px; font-weight: bold; display: none; text-align: left; line-height: 1.4; }
   .message.succes { display: block; background: #dcfce7; color: #166534; border: 2px solid #22c55e; }
   .message.erreur { display: block; background: #fee2e2; color: #991b1b; border: 2px solid #ef4444; }
+  .message.info { display: block; background: #e0f2fe; color: #0369a1; border: 2px solid #38bdf8; }
 </style>
 </head>
 <body>
@@ -86,6 +91,7 @@
         <li>🗑️ <strong>Clic droit</strong> pour supprimer</li>
       </ul>
     </div>
+    <button class="btn-action btn-multimetre" id="btn-multi" onclick="basculerMultimetre()">🔬 Test de Continuité</button>
     <button class="btn-action btn-verifier" onclick="verifierCablage()">✅ Vérifier le Câblage</button>
     <button class="btn-action btn-effacer" onclick="toutEffacer()">🗑️ Tout effacer</button>
     <div class="message" id="message"></div>
@@ -110,6 +116,11 @@ let composantSelectionne = null;
 let patteEnAttente = null;
 let composantEnDrag = null;
 let dragOffsetX = 0, dragOffsetY = 0;
+
+// Variables Multimètre
+let modeMultimetre = false;
+let pointeA = null;
+let pointeB = null;
 
 const CATALOGUE = {
   batterie: { 
@@ -164,6 +175,7 @@ const CATALOGUE = {
 };
 
 function choisirComposant(type) {
+  if (modeMultimetre) basculerMultimetre();
   composantSelectionne = type;
   document.querySelectorAll('.item-palette').forEach(el => el.classList.remove('actif'));
   event.currentTarget.classList.add('actif');
@@ -216,9 +228,100 @@ function trouverPatteSousSouris(x, y) {
   return null;
 }
 
+// ==========================================
+// GESTION DU MULTIMÈTRE
+// ==========================================
+function basculerMultimetre() {
+  modeMultimetre = !modeMultimetre;
+  pointeA = null; pointeB = null;
+  
+  const btn = document.getElementById('btn-multi');
+  const msg = document.getElementById('message');
+  
+  if (modeMultimetre) {
+    btn.classList.add('actif');
+    btn.innerHTML = '🔬 Multimètre : ON<br><small>Cliquez sur 2 pattes</small>';
+    composantSelectionne = null;
+    patteEnAttente = null;
+    canvas.classList.remove('mode-cablage');
+    canvas.classList.add('mode-multimetre');
+    document.querySelectorAll('.item-palette').forEach(el => el.classList.remove('actif'));
+    
+    msg.className = 'message info';
+    msg.innerHTML = "🔬 Mode Multimètre activé.<br>Cliquez sur une patte, puis sur une autre pour tester la continuité.";
+  } else {
+    btn.classList.remove('actif');
+    btn.innerHTML = '🔬 Test de Continuité';
+    canvas.classList.remove('mode-multimetre');
+    msg.style.display = 'none';
+  }
+  dessiner();
+}
+
+function testerContinuite(idA, idB) {
+  let adj = {};
+  fils.forEach(f => {
+    let noeudA = f.compA + ':' + f.patteA;
+    let noeudB = f.compB + ':' + f.patteB;
+    if (!adj[noeudA]) adj[noeudA] = [];
+    if (!adj[noeudB]) adj[noeudB] = [];
+    adj[noeudA].push(noeudB);
+    adj[noeudB].push(noeudA);
+  });
+
+  let visited = {};
+  let queue = [idA];
+  
+  while(queue.length > 0) {
+    let c = queue.shift();
+    if (c === idB) return true;
+    if (visited[c]) continue;
+    visited[c] = true;
+    if (adj[c]) {
+      adj[c].forEach(v => queue.push(v));
+    }
+  }
+  return false;
+}
+
 function clicCanvas(event) {
   const pos = coordonneesSouris(event);
   
+  // Mode Multimètre
+  if (modeMultimetre) {
+    const patte = trouverPatteSousSouris(pos.x, pos.y);
+    const msg = document.getElementById('message');
+    
+    if (patte) {
+      if (!pointeA) {
+        pointeA = patte;
+        msg.className = 'message info';
+        msg.innerHTML = "🔬 Pointe 1 connectée. Cliquez sur la deuxième patte.";
+      } else if (!pointeB) {
+        if (pointeA.compId === patte.compId && pointeA.patte.id === patte.patte.id) return;
+        pointeB = patte;
+        let idA = pointeA.compId + ':' + pointeA.patte.id;
+        let idB = pointeB.compId + ':' + pointeB.patte.id;
+        
+        if (testerContinuite(idA, idB)) {
+          msg.className = 'message succes';
+          msg.innerHTML = "🔔 BIP BIP !<br>Le courant passe entre ces deux pattes.";
+        } else {
+          msg.className = 'message erreur';
+          msg.innerHTML = "❌ Pas de continuité.<br>Le circuit est ouvert entre ces deux pattes.";
+        }
+        pointeA = null; pointeB = null;
+      }
+    } else {
+      pointeA = null; pointeB = null;
+      msg.className = 'message info';
+      msg.innerHTML = "🔬 Pointes réinitialisées. Cliquez sur 2 pattes.";
+    }
+    dessiner();
+    return;
+  }
+
+  // Mode Normal
   if (composantSelectionne) {
     creerComposant(composantSelectionne, pos.x, pos.y);
     composantSelectionne = null;
@@ -260,9 +363,9 @@ function clicCanvas(event) {
 
 function clicDroitCanvas(event) {
   event.preventDefault();
+  if (modeMultimetre) return;
   const pos = coordonneesSouris(event);
   
-  // Chercher fil
   for (let i = fils.length - 1; i >= 0; i--) {
     const f = fils[i];
     const compA = composants.find(c => c.id === f.compA);
@@ -279,7 +382,6 @@ function clicDroitCanvas(event) {
     }
   }
   
-  // Chercher composant
   const comp = trouverComposantSousSouris(pos.x, pos.y);
   if (comp) {
     composants = composants.filter(c => c.id !== comp.id);
@@ -298,7 +400,7 @@ function distancePointSegment(px, py, x1, y1, x2, y2) {
 }
 
 function sourisDown(event) {
-  if (composantSelectionne || patteEnAttente) return;
+  if (modeMultimetre || composantSelectionne || patteEnAttente) return;
   if (event.button === 2) return;
   const pos = coordonneesSouris(event);
   const comp = trouverComposantSousSouris(pos.x, pos.y);
@@ -377,7 +479,8 @@ function dessiner() {
     });
   });
 
-  if (patteEnAttente) {
+  // Dessin de la patte en attente (câblage)
+  if (patteEnAttente && !modeMultimetre) {
     const comp = composants.find(c => c.id === patteEnAttente.compId);
     if (comp) {
       const p = obtenirPatteAbsolue(comp, patteEnAttente.patte.id);
@@ -388,9 +491,25 @@ function dessiner() {
       ctx.stroke();
     }
   }
+
+  // Dessin des pointes du multimètre
+  if (modeMultimetre) {
+    if (pointeA) {
+      const comp = composants.find(c => c.id === pointeA.compId);
+      if (comp) {
+        const p = obtenirPatteAbsolue(comp, pointeA.patte.id);
+        ctx.strokeStyle = '#0ea5e9'; // Bleu
+        ctx.lineWidth = 4;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, 15, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+    }
+  }
 }
 
 function verifierCablage() {
+  if (modeMultimetre) basculerMultimetre();
   const msgBox = document.getElementById('message');
   msgBox.className = 'message';
   msgBox.style.display = 'none';
@@ -446,6 +565,7 @@ function verifierCablage() {
 }
 
 function toutEffacer() {
+  if (modeMultimetre) basculerMultimetre();
   if (confirm("Tout effacer ?")) {
     composants = [];
     fils = [];
