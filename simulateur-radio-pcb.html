@@ -162,3 +162,103 @@
     <button class="btn-action" id="btn-verifier" onclick="verifierCarte()" disabled>⚡ TESTER LA RADIO</button>
   </div>
 </div>
+ <script>
+// État global
+let composantSelectionne = null;
+let composantsSoudes = 0;
+const TOTAL_COMPOSANTS = 7; // mcu, rf, reg, bat, joy-g, joy-d, ecran
+
+// Fonction pour écrire dans la console de droite
+function logMessage(msg, type = 'info') {
+  const log = document.getElementById('log');
+  const p = document.createElement('p');
+  p.textContent = '> ' + msg;
+  p.className = type === 'erreur' ? 'log-erreur' : (type === 'succes' ? 'log-info' : '');
+  log.appendChild(p);
+  log.scrollTop = log.scrollHeight;
+}
+
+// Quand on clique sur un composant dans la liste de gauche
+function selectionnerComp(type) {
+  // Si le composant est déjà soudé, on ne fait rien
+  if (document.getElementById('comp-' + type).classList.contains('soude')) {
+    logMessage("Ce composant est déjà soudé !", "erreur");
+    return;
+  }
+  
+  composantSelectionne = type;
+  
+  // Mettre en surbrillance le composant dans la liste
+  document.querySelectorAll('.item-comp').forEach(el => el.classList.remove('actif'));
+  document.getElementById('comp-' + type).classList.add('actif');
+  
+  logMessage("Composant sélectionné : " + type.toUpperCase());
+  
+  // Faire clignoter la pastille correspondante sur le circuit
+  document.querySelectorAll('.pad').forEach(el => el.classList.remove('cible'));
+  document.getElementById('pad-' + type).classList.add('cible');
+}
+
+// Quand on clique sur une pastille du circuit
+function souder(typeRequis, nomPad) {
+  if (!composantSelectionne) {
+    logMessage("Veuillez d'abord sélectionner un composant à gauche.", "erreur");
+    return;
+  }
+
+  // Vérifier si le composant sélectionné correspond à la pastille
+  if (composantSelectionne !== typeRequis) {
+    logMessage("Erreur : Vous essayez de souder le mauvais composant sur " + nomPad + " !", "erreur");
+    return;
+  }
+
+  // Si c'est le bon composant, on le soude
+  const pad = document.getElementById('pad-' + composantSelectionne);
+  pad.classList.add('rempli');
+  pad.classList.remove('cible');
+  
+  // On change le texte pour montrer que c'est soudé
+  const label = pad.querySelector('span');
+  if (label) label.textContent = '✓';
+  
+  logMessage("Soudure réussie : " + nomPad + " (" + composantSelectionne.toUpperCase() + ")", "succes");
+  
+  // Grisser le composant dans la liste
+  document.getElementById('comp-' + composantSelectionne).classList.remove('actif');
+  document.getElementById('comp-' + composantSelectionne).classList.add('soude');
+  composantsSoudes++;
+
+  // Réinitialiser la sélection
+  composantSelectionne = null;
+  document.querySelectorAll('.item-comp').forEach(el => el.classList.remove('actif'));
+  document.querySelectorAll('.pad').forEach(el => el.classList.remove('cible'));
+
+  // Mettre à jour le compteur
+  document.getElementById('progression').textContent = "Composants soudés : " + composantsSoudes + " / " + TOTAL_COMPOSANTS;
+
+  // Si tout est soudé, activer le bouton de test
+  if (composantsSoudes === TOTAL_COMPOSANTS) {
+    document.getElementById('btn-verifier').disabled = false;
+    logMessage("Tous les composants sont en place. Lancez le test !", "info");
+  }
+}
+
+// Test final de la carte
+function verifierCarte() {
+  logMessage("⚡ Test de la radiocommande (TX)...", "info");
+  document.getElementById('btn-verifier').disabled = true;
+  
+  setTimeout(() => {
+    logMessage("✅ Microcontrôleur STM32 : OK", "succes");
+    logMessage("✅ Module RF ELRS (SX1280) : Transmission 2.4GHz activée", "succes");
+    logMessage("✅ Régulateur 3.3V : Stable", "succes");
+    logMessage("✅ Connecteurs Joysticks : Effet Hall détecté", "succes");
+    logMessage("✅ Écran OLED : Initialisé", "succes");
+    logMessage("✅ Batterie JST-XH : 8.4V (Full)", "succes");
+    logMessage("🎉 RADIOCOMMANDE PRÊTE À ÊTRE ASSEMBLÉE DANS SON BOÎTIER !", "succes");
+  }, 1500);
+}
+</script>
+
+</body>
+</html>
