@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simulateur PCB - Radiocommande</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: #121212; color: #e0e0e0; height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
+  
+  header { background: #1e1e1e; color: #f59e0b; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #333; }
+  header h1 { font-size: 1.3em; font-family: monospace; letter-spacing: 1px; }
+  header p { font-size: 0.85em; color: #888; }
+  .btn-retour { background: transparent; color: #888; border: 1px solid #555; padding: 8px 16px; border-radius: 4px; cursor: pointer; text-decoration: none; font-family: monospace; transition: 0.2s; }
+  .btn-retour:hover { border-color: #f59e0b; color: #f59e0b; }
+
+  .conteneur { display: flex; flex: 1; overflow: hidden; }
+  
+  /* Palette de composants */
+  .palette { width: 280px; background: #1a1a1a; padding: 15px; display: flex; flex-direction: column; gap: 8px; overflow-y: auto; border-right: 1px solid #333; }
+  .palette h2 { font-size: 1em; color: #aaa; font-family: monospace; margin-bottom: 10px; border-bottom: 1px solid #333; padding-bottom: 5px; }
+  .item-comp { background: #252525; padding: 12px; border-radius: 4px; cursor: pointer; display: flex; flex-direction: column; border: 1px solid #333; transition: 0.2s; }
+  .item-comp:hover { border-color: #f59e0b; background: #2a2a2a; }
+  .item-comp.actif { border-color: #f59e0b; background: #452a06; box-shadow: 0 0 10px rgba(245, 158, 11, 0.2); }
+  .item-comp.soude { opacity: 0.5; cursor: not-allowed; border-color: #f59e0b; background: #3f2a0a; }
+  .item-comp strong { color: #fff; font-size: 0.9em; }
+  .item-comp small { color: #888; font-family: monospace; font-size: 0.75em; margin-top: 4px; }
+
+  /* Zone de dessin PCB */
+  .zone-pcb { flex: 1; background: #0a0a0a; position: relative; display: flex; justify-content: center; align-items: center; background-image: radial-gradient(#222 1px, transparent 1px); background-size: 20px 20px; }
+  
+  /* Le Circuit Imprimé de la Radio (PCB) */
+  .pcb-board { position: relative; width: 700px; height: 450px; background: #0d2b1a; border: 4px solid #1a472a; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.8); }
+  
+  /* Pistes de cuivre décoratives (pour le style) */
+  .tracks { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; opacity: 0.3; }
+  .tracks div { position: absolute; background: #c9a84c; height: 2px; }
+  .track1 { top: 20%; left: 30%; width: 200px; transform: rotate(15deg); }
+  .track2 { top: 60%; left: 20%; width: 250px; transform: rotate(-10deg); }
+  .track3 { top: 40%; left: 60%; width: 150px; transform: rotate(45deg); }
+
+  /* Trous de fixation */
+  .trou { position: absolute; width: 12px; height: 12px; background: #000; border-radius: 50%; border: 2px solid #333; }
+  .trou-tl { top: 15px; left: 15px; }
+  .trou-tr { top: 15px; right: 15px; }
+  .trou-bl { bottom: 15px; left: 15px; }
+  .trou-br { bottom: 15px; right: 15px; }
+
+  /* Pastilles de soudure (Pads) */
+  .pad { position: absolute; background: #c9a84c; border: 2px solid rgba(0,0,0,0.5); border-radius: 4px; display: flex; justify-content: center; align-items: center; cursor: pointer; transition: all 0.2s; box-shadow: inset 0 0 5px rgba(255,255,255,0.3); }
+  .pad:hover { border-color: #fff; transform: scale(1.05); }
+  
+  .pad.cible { border: 3px solid #f59e0b; box-shadow: 0 0 20px #f59e0b; animation: clignote 0.8s infinite alternate; z-index: 10; }
+  @keyframes clignote { from { opacity: 0.6; } to { opacity: 1; } }
+  
+  .pad.rempli { background: #d97706; border-color: #b45309; cursor: default; box-shadow: inset 0 0 10px rgba(0,0,0,0.5); }
+
+  /* Formes spécifiques des pastilles */
+  .pad-mcu { width: 80px; height: 80px; top: 50%; left: 50%; transform: translate(-50%, -50%); border-radius: 8px; }
+  .pad-rf { width: 50px; height: 50px; top: 20%; right: 20%; border-radius: 4px; }
+  .pad-reg { width: 40px; height: 30px; top: 20%; left: 20%; border-radius: 4px; }
+  .pad-bat { width: 40px; height: 30px; bottom: 20%; left: 20%; border-radius: 4px; }
+  
+  .pad-joy-g { width: 30px; height: 60px; bottom: 20%; left: 45%; border-radius: 4px; }
+  .pad-joy-d { width: 30px; height: 60px; bottom: 20%; right: 45%; border-radius: 4px; }
+  .pad-ecran { width: 60px; height: 30px; top: 20%; left: 45%; border-radius: 4px; }
+
+  /* Textes des composants soudés */
+  .pad span { font-family: monospace; font-size: 11px; font-weight: bold; color: #000; pointer-events: none; }
+  .pad.rempli span { color: #fff; text-shadow: 0 1px 2px #000; }
+
+  /* Panneau de droite */
+  .panneau-droit { width: 300px; background: #1a1a1a; padding: 20px; display: flex; flex-direction: column; border-left: 1px solid #333; }
+  .log-zone { flex: 1; background: #0a0a0a; padding: 10px; border: 1px solid #333; font-family: monospace; font-size: 0.85em; overflow-y: auto; color: #f59e0b; border-radius: 4px; margin-bottom: 20px; }
+  .log-zone p { margin-bottom: 5px; }
+  .log-erreur { color: #ef4444; }
+  .log-info { color: #3b82f6; }
+  
+  .progression { font-family: monospace; font-size: 1.1em; color: #fff; margin-bottom: 15px; text-align: center; background: #252525; padding: 10px; border-radius: 4px; border: 1px solid #333; }
+  .btn-action { background: #f59e0b; color: #000; border: none; padding: 15px; border-radius: 4px; font-size: 1em; font-weight: bold; cursor: pointer; font-family: monospace; transition: 0.2s; }
+  .btn-action:hover { background: #d97706; }
+  .btn-action:disabled { background: #333; color: #666; cursor: not-allowed; }
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>📡 PCB Radiocommande (TX)</h1>
+    <p>Phase 3 : Soudure des composants de la radio</p>
+  </div>
+  <a href="index.html" class="btn-retour">← Quitter</a>
+</header>
+
+<div class="conteneur">
+  <div class="palette">
+    <h2>📦 COMPOSANTS CMS & CONNECTEURS</h2>
+    
+    <div class="item-comp" id="comp-mcu" onclick="selectionnerComp('mcu')">
+      <strong>Microcontrôleur STM32</strong>
+      <small>Ref: LQFP-48 (Cerveau)</small>
+    </div>
+    <div class="item-comp" id="comp-rf" onclick="selectionnerComp('rf')">
+      <strong>Puce RF (SX1280)</strong>
+      <small>Ref: QFN (Transmission ELRS)</small>
+    </div>
+    <div class="item-comp" id="comp-reg" onclick="selectionnerComp('reg')">
+      <strong>Régulateur 3.3V</strong>
+      <small>Ref: SOT-223 (Alimentation)</small>
+    </div>
+    <div class="item-comp" id="comp-bat" onclick="selectionnerComp('bat')">
+      <strong>Connecteur Batterie</strong>
+      <small>Ref: JST-XH (2 pins)</small>
+    </div>
+    <div class="item-comp" id="comp-joy-g" onclick="selectionnerComp('joy-g')">
+      <strong>Connecteur Joystick G</strong>
+      <small>Ref: JST (Gaz)</small>
+    </div>
+    <div class="item-comp" id="comp-joy-d" onclick="selectionnerComp('joy-d')">
+      <strong>Connecteur Joystick D</strong>
+      <small>Ref: JST (Direction)</small>
+    </div>
+    <div class="item-comp" id="comp-ecran" onclick="selectionnerComp('ecran')">
+      <strong>Connecteur Écran OLED</strong>
+      <small>Ref: I2C (4 pins)</small>
+    </div>
+  </div>
+
+  <div class="zone-pcb">
+    <div class="pcb-board">
+      <div class="tracks">
+        <div class="track1"></div>
+        <div class="track2"></div>
+        <div class="track3"></div>
+      </div>
+      <div class="trou trou-tl"></div>
+      <div class="trou trou-tr"></div>
+      <div class="trou trou-bl"></div>
+      <div class="trou trou-br"></div>
+
+      <!-- Pastilles (Pads) -->
+      <div class="pad pad-mcu" id="pad-mcu" onclick="souder('mcu', 'U1')"><span>U1</span></div>
+      <div class="pad pad-rf" id="pad-rf" onclick="souder('rf', 'RF1')"><span>RF1</span></div>
+      <div class="pad pad-reg" id="pad-reg" onclick="souder('reg', 'U2')"><span>U2</span></div>
+      <div class="pad pad-bat" id="pad-bat" onclick="souder('bat', 'BAT')"><span>BAT</span></div>
+      <div class="pad pad-joy-g" id="pad-joy-g" onclick="souder('joy-g', 'JOY-G')"><span>JG</span></div>
+      <div class="pad pad-joy-d" id="pad-joy-d" onclick="souder('joy-d', 'JOY-D')"><span>JD</span></div>
+      <div class="pad pad-ecran" id="pad-ecran" onclick="souder('ecran', 'OLED')"><span>OLED</span></div>
+    </div>
+  </div>
+
+  <div class="panneau-droit">
+    <h2 style="color:#f59e0b; font-family:monospace; margin-bottom:10px;">CONSOLE DE SOUDURE</h2>
+    
+    <div class="progression" id="progression">Composants soudés : 0 / 7</div>
+
+    <div class="log-zone" id="log">
+      <p class="log-info">PCB Radio chargé.</p>
+      <p>1. Sélectionnez un composant.</p>
+      <p>2. Cliquez sur sa pastille clignotante.</p>
+    </div>
+    <button class="btn-action" id="btn-verifier" onclick="verifierCarte()" disabled>⚡ TESTER LA RADIO</button>
+  </div>
+</div>
