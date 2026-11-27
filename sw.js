@@ -2,7 +2,7 @@
    SERVICE WORKER - InitiaElectro / EspaceElectronic
    Permet le fonctionnement hors ligne et l'installation PWA
    ========================================================= */
-var CACHE_NAME = 'initiaelectro-v919';
+var CACHE_NAME = 'initiaelectro-v929';
 var FILES_TO_CACHE = [
   './',
   './index.html',
